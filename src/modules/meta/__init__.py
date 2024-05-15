@@ -1,9 +1,8 @@
-from .cache import CacheTogglRequest
-from .meta import AuthenticationError, RequestMethod, TogglRequest
+from .cache import TogglCachedEndpoint
+from .meta import RequestMethod, TogglEndpoint
 
 __all__ = (
-    "TogglRequest",
-    "CacheTogglRequest",
+    "TogglEndpoint",
+    "TogglCachedEndpoint",
     "RequestMethod",
-    "AuthenticationError",
 )

@@ -1,14 +1,13 @@
-"""Metaclasses for requesting and modiftying data from the TOGGL API.
+"""Metaclass for requesting and modiftying data from the Toggl API.
 
 Classes:
     TogglRequest: Base class with basic functionality for all API requests.
-    CacheTogglRequest: Adds caching functionality to TogglRequest.
 """
 
 import enum
 from abc import ABCMeta, abstractmethod
 from types import MethodType
-from typing import Final
+from typing import Any, Final, Optional
 
 import httpx
 
@@ -21,23 +20,23 @@ class RequestMethod(enum.Enum):
     PATCH = enum.auto()
 
 
-class AuthenticationError(Exception):
-    """No valid authentication provided."""
-
-
-class TogglRequest(metaclass=ABCMeta):
+class TogglEndpoint(metaclass=ABCMeta):
     BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
     OK_RESPONSE: Final[int] = 200
+    HEADERS: Final[dict] = {"content-type": "application/json"}
 
-    __slots__ = ("__client", "workspace_id")
+    __slots__ = ("__client", "workspace_id", "headers")
 
-    def __init__(self, *, timeout: int = 20, **kwargs) -> None:
-        self.workspace_id = kwargs.get("workspace_id")
-        self.__client = httpx.Client(
-            timeout=timeout,
-            auth=self.authenticate(**kwargs),
-            headers=self.headers(**kwargs),
-        )
+    def __init__(
+        self,
+        workspace_id: int,
+        auth: httpx.BasicAuth,
+        *,
+        timeout: int = 20,
+        **kwargs,
+    ) -> None:
+        self.workspace_id = workspace_id
+        self.__client = httpx.Client(timeout=timeout, auth=auth)
 
     def method(self, method: RequestMethod) -> MethodType:
         match_dict = {
@@ -51,70 +50,67 @@ class TogglRequest(metaclass=ABCMeta):
 
     def request(
         self,
-        url: str,
+        parameters: str,
+        headers: Optional[dict] = None,
+        body: Optional[dict] = None,
         method: RequestMethod = RequestMethod.GET,
-        **kwargs,
     ) -> dict | None:
-        response = self.method(method)(url)
+        """Main request method which handles putting together the final API
+        request.
 
+        Args:
+            parameters (str): Request parameters with the endpoint excluded.
+                Will concate with the endpoint property.
+            headers (dict, optional): Custom request headers. Defaults to
+                class property if set to None.
+            body (dict, optional): Request body JSON data for specifying info.
+                Defaults to None. Only used with none-GET or DELETE requests.
+            method (RequestMethod): Request method to select. Defaults to GET.
+
+        Returns:
+            dict | None: Response data or None if request does not return any
+                data.
+        """
+
+        url = self.endpoint + parameters
+        headers = headers if headers else self.HEADERS
+
+        if body and method not in (RequestMethod.DELETE, RequestMethod.GET):
+            response = self.method(method)(url, headers=headers, json=body)
+        else:
+            response = self.method(method)(url, headers=headers)
         if response.status_code != self.OK_RESPONSE:
             # TODO: Toggl API return code lookup.
-            msg = f"Request failed with status code {response.status_code}"
+            msg = f"Request failed with status code {response.status_code}: {response.text}"
             raise httpx.HTTPError(msg)
 
-        if response.is_json:
+        try:
             return response.json()
+        except ValueError:
+            pass
 
         return None
 
-    def headers(self, **kwargs) -> dict[str, str]:
-        """Generate authentication headers for the Toggl Tracker API.
+    def body_creation(self, **kwargs) -> dict[str, Any]:
+        """Generate basic headers for Toggl API request.
 
         Args:
-            kwargs (dict): Toggl API credentials & extras.
+            kwargs (dict): Misc header arguments for the request.
 
         Returns:
-            dict: Authentication headers prefilled with provided kwargs.
+            dict: Basic headers for the Toggl API.
         """
 
-        headers = {
-            "content-type": "application/json",
+        return {
+            "workspace_id": self.workspace_id,
         }
-
-        if self.workspace_id:
-            headers["workspace_id"] = self.workspace_id
-
-        return headers
-
-    def authenticate(self, **kwargs) -> httpx.BasicAuth:
-        """Generate authentication headers for the Toggl tracker API.
-
-        Args:
-            kwargs (dict): Toggl API credentials & extras.
-
-        Returns:
-            BasicAuth: Authentication headers prefilled with provided kwargs.
-
-        Raises:
-            AuthenticationError: If not enough authentication material was
-                provided.
-        """
-        api_token = kwargs.get("api_token")
-        if api_token:
-            return httpx.BasicAuth(api_token, "api_token")
-
-        email = kwargs.get("email")
-        if not email:
-            msg = "No email was provided!"
-            raise AuthenticationError(msg)
-        password = kwargs.get("password")
-        if not password:
-            msg = "No password was provided!"
-            raise AuthenticationError(msg)
-
-        return httpx.BasicAuth(email, password)
 
     @property
     @abstractmethod
     def endpoint(self) -> str:
         return self.BASE_ENDPOINT
+
+    @property
+    @abstractmethod
+    def model(self):
+        pass
