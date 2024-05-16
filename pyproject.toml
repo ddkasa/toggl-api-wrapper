@@ -128,4 +128,5 @@ pythonpath = [
 markers = [
     "unit: Basic unit tests using local cache.",
     "integration: Tests that actively use the API.",
+    "slow: Tests that are slow to run or have delays included.",
 ]
