@@ -6,6 +6,17 @@ import pytest
 from src.modules.models import TogglTracker
 
 
+@pytest.fixture()
+def add_tracker(tracker_model):
+    tracker = tracker_model.add_tracker(
+        description="test_tracker",
+        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        duration=-1,
+    )
+    yield tracker
+    tracker_model.delete_tracker(tracker_id=tracker.id)
+
+
 @pytest.mark.unit()
 def test_tracker_kwargs(get_workspace_id):
     data = {
@@ -24,55 +35,37 @@ def test_tracker_kwargs(get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_tracker_creation(tracker_model):
-    data = tracker_model.add_tracker(
-        description="test_create",
-        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
-        duration=-1,
-    )
-    assert isinstance(data, TogglTracker)
-    tracker_model.delete_tracker(tracker_id=data.id)
+def test_tracker_creation(add_tracker):
+    assert isinstance(add_tracker, TogglTracker)
 
 
 @pytest.mark.integration()
-def atest_tracker_editing(tracker_model):
-    data = tracker_model.add_tracker(
-        description="test_edit",
-        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
-        duration=-1,
-    )
-    new_description = "testing_edit"
+def test_tracker_editing(tracker_model, add_tracker):
+    new_description = "new_description_test"
     data = tracker_model.edit_tracker(
-        tracker_id=data.id,
+        tracker_id=add_tracker.id,
         description=new_description,
     )
     assert isinstance(data, TogglTracker)
     assert data.name == new_description
-    tracker_model.delete_tracker(tracker_id=data.id)
 
 
 @pytest.mark.integration()
 def test_tracker_deletion(tracker_model, cache_tracker_model):
-    data = tracker_model.add_tracker(
-        description="test_delete",
+    tracker = tracker_model.add_tracker(
+        description="test_tracker",
         start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
         duration=-1,
     )
-    tracker_model.delete_tracker(tracker_id=data.id)
-    assert cache_tracker_model.get_tracker(tracker_id=data.id, refresh=True) is None
+    tracker_model.delete_tracker(tracker_id=tracker.id)
+    assert cache_tracker_model.get_tracker(tracker.id, refresh=True) is None
 
 
 @pytest.mark.integration()
-def test_tracker_stop(tracker_model, cache_tracker_model):
-    data = tracker_model.add_tracker(
-        description="test_stop",
-        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
-        duration=-1,
-    )
+def test_tracker_stop(tracker_model, cache_tracker_model, add_tracker):
     time.sleep(1)
-    tracker_model.stop_tracker(tracker_id=data.id)
+    tracker_model.stop_tracker(tracker_id=add_tracker.id)
     assert cache_tracker_model.get_tracker(
-        tracker_id=data.id,
+        tracker_id=add_tracker.id,
         refresh=True,
     ).duration > timedelta(milliseconds=10)
-    tracker_model.delete_tracker(tracker_id=data.id)

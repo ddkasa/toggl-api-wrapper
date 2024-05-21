@@ -3,6 +3,14 @@ import pytest
 from src.modules.models import TogglClient
 
 
+@pytest.fixture()
+def create_client(client_object, get_workspace_id):
+    name = "test_client_create"
+    client = client_object.create_client(name=name)
+    yield client
+    client_object.delete_client(client.id)
+
+
 @pytest.mark.unit()
 def test_client_model(get_workspace_id):
     data = {"id": 1, "name": "Test", "workspace_id": get_workspace_id}
@@ -14,18 +22,21 @@ def test_client_model(get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_client_get(client_object, cached_client_object, get_workspace_id):
-    name = "test_client_get"
-
+def test_client_delete(client_object, get_workspace_id):
+    name = "test_client_delete"
     client = client_object.create_client(name=name)
     assert isinstance(client, TogglClient)
     assert client.name == name
+    assert client.workspace.id == get_workspace_id
 
+    client_object.delete_client(client.id)
+
+
+@pytest.mark.integration()
+def test_client_get(client_object, cached_client_object, get_workspace_id, create_client):
     clients = cached_client_object.get_clients(refresh=True)
     assert len(clients) > 0
-    assert any(client.name == name for client in clients)
-
-    client_object.delete_client(clients[0].id)
+    assert any(client.name == create_client.name for client in clients)
 
 
 @pytest.mark.integration()
@@ -38,14 +49,10 @@ def test_client_create(client_object, get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_client_update(client_object, get_workspace_id):
-    name = "test_client_update"
-    client = client_object.create_client(name=name)
+def test_client_update(client_object, get_workspace_id, create_client):
+    client = client_object.update_client(
+        create_client.id,
+        name=create_client.name + "_2",
+    )
     assert isinstance(client, TogglClient)
-    assert client.name == name
-
-    client = client_object.update_client(client.id, name="test_client_update_2")
-    assert isinstance(client, TogglClient)
-    assert client.name == name + "_2"
-
-    client_object.delete_client(client.id)
+    assert client.name == create_client.name + "_2"
