@@ -40,7 +40,7 @@ class TogglClient(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglClient:
         return cls(
-            workspace=TogglWorkspace(id=kwargs["workspace_id"], name=""),
+            workspace=TogglWorkspace(id=kwargs["wid"], name=""),
             id=kwargs["id"],
             name=kwargs["name"],
         )
