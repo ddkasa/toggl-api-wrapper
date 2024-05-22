@@ -6,7 +6,7 @@ from typing import Optional
 
 import httpx
 
-from toggl_api.version import __version__
+from toggl_api.version import version
 
 from .meta import RequestMethod, TogglEndpoint
 
@@ -75,7 +75,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         data = {
             "timestamp": datetime.now(tz=UTC).isoformat(),
             "data": data,
-            "version": __version__,
+            "version": version,
         }
         with self.cache_path.open("w", encoding="utf-8") as f:
             json.dump(data, f)

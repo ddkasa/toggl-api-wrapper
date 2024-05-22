@@ -7,7 +7,7 @@ Classes:
 import enum
 from abc import ABCMeta, abstractmethod
 from types import MethodType
-from typing import Any, Final, Optional
+from typing import Any, Callable, Final, Optional
 
 import httpx
 
@@ -38,8 +38,8 @@ class TogglEndpoint(metaclass=ABCMeta):
         self.workspace_id = workspace_id
         self.__client = httpx.Client(timeout=timeout, auth=auth)
 
-    def method(self, method: RequestMethod) -> MethodType:
-        match_dict = {
+    def method(self, method: RequestMethod) -> Callable:
+        match_dict: dict[RequestMethod, Callable] = {
             RequestMethod.GET: self.__client.get,
             RequestMethod.POST: self.__client.post,
             RequestMethod.PUT: self.__client.put,
