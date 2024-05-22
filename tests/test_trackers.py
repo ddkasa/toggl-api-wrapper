@@ -6,17 +6,6 @@ import pytest
 from toggl_api.modules.models import TogglTracker
 
 
-@pytest.fixture()
-def add_tracker(tracker_model):
-    tracker = tracker_model.add_tracker(
-        description="test_tracker",
-        start=datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
-        duration=-1,
-    )
-    yield tracker
-    tracker_model.delete_tracker(tracker_id=tracker.id)
-
-
 @pytest.mark.unit()
 def test_tracker_kwargs(get_workspace_id):
     data = {

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ from toggl_api.modules.tag import TagCachedEndpoint, TagEndpoint
 from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
 from toggl_api.modules.user import UserCachedEndpoint, UserEndpoint
 from toggl_api.modules.workspace import CachedWorkspaceEndpoint
+from toggl_api.utility import format_iso
 
 
 @pytest.fixture(scope="session")
@@ -83,3 +85,14 @@ def cache_path() -> Path:
 @pytest.fixture(scope="session")
 def get_workspace_id() -> int:
     return int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
+
+
+@pytest.fixture()
+def add_tracker(tracker_model):
+    tracker = tracker_model.add_tracker(
+        description="test_tracker",
+        start=format_iso(datetime.now(tz=timezone.utc)),
+        duration=-1,
+    )
+    yield tracker
+    tracker_model.delete_tracker(tracker_id=tracker.id)

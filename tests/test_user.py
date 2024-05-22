@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 import pytest
 
 
@@ -9,29 +7,16 @@ def test_user_endpoint(user_object):
 
 
 @pytest.mark.integration()
-def test_current_tracker(user_object, tracker_model):
-    name = "current_tracker_test"
-    start = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
-    tracker = tracker_model.add_tracker(description=name, start=start, duration=-1)
+def test_current_tracker(user_object, tracker_model, add_tracker):
     current = user_object.current_tracker()
-    assert current.name == name
-    assert current.id == tracker.id
-    assert current.start == datetime.fromisoformat(start)
+    assert current.name == add_tracker.name
+    assert current.id == add_tracker.id
+    assert current.start == add_tracker.start
 
 
 @pytest.mark.integration()
-def test_current_tracker_cached(cached_user_object, tracker_model):
-    name = "current_tracker_cache_test"
-    start = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
-    tracker = tracker_model.add_tracker(
-        description=name,
-        start=start,
-        duration=-1,
-    )
-    current = cached_user_object.current_tracker()
-    assert current.name == name
-    assert current.id == tracker.id
-    assert current.start == datetime.fromisoformat(start)
+def test_current_tracker_cached(cached_user_object, tracker_model, add_tracker):
+    current = cached_user_object.current_tracker(refresh=True)
+    assert current.name == add_tracker.name
+    assert current.id == add_tracker.id
     assert cached_user_object.cache_path.exists()
-    cached_user_object.cache_path.unlink()
-    tracker_model.delete_tracker(tracker_id=tracker.id)

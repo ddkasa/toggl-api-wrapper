@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
+from toggl_api.utility import format_iso, parse_iso
+
 if TYPE_CHECKING:
     from typing import Optional
 
@@ -84,7 +86,7 @@ class TogglTracker(TogglClass):
     def __post_init__(self) -> None:
         if self.stop:
             self.duration = timedelta(seconds=self.duration)  # type: ignore[arg-type]
-            self.stop = datetime.fromisoformat(self.stop)  # type: ignore[arg-type]
+            self.stop = parse_iso(self.stop)  # type: ignore[arg-type]
         else:
             now = datetime.now(tz=timezone.utc)
             self.duration = now - self.start
@@ -99,7 +101,7 @@ class TogglTracker(TogglClass):
             id=kwargs["id"],
             name=kwargs["description"],
             workspace=TogglWorkspace(id=kwargs["workspace_id"], name=""),
-            start=datetime.fromisoformat(kwargs["start"]),
+            start=parse_iso(kwargs["start"]),
             duration=kwargs["duration"],
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id"),

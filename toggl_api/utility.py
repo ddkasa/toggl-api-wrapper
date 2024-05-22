@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Final
 
 ISO_FORMAT: Final[str] = r"%Y-%m-%dT%H:%M:%S"
@@ -13,4 +13,4 @@ def format_iso(date: datetime) -> str:
 def parse_iso(date: str) -> datetime:
     if date.endswith("Z"):
         date = date[:-1] + "-00:00"
-    return datetime.fromisoformat(date)  # noqa: DTZ007
+    return datetime.fromisoformat(date)
