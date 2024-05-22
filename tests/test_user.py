@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -11,7 +11,7 @@ def test_user_endpoint(user_object):
 @pytest.mark.integration()
 def test_current_tracker(user_object, tracker_model):
     name = "current_tracker_test"
-    start = datetime.now(tz=UTC).isoformat(timespec="seconds")
+    start = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
     tracker = tracker_model.add_tracker(description=name, start=start, duration=-1)
     current = user_object.current_tracker()
     assert current.name == name
@@ -22,7 +22,7 @@ def test_current_tracker(user_object, tracker_model):
 @pytest.mark.integration()
 def test_current_tracker_cached(cached_user_object, tracker_model):
     name = "current_tracker_cache_test"
-    start = datetime.now(tz=UTC).isoformat(timespec="seconds")
+    start = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
     tracker = tracker_model.add_tracker(
         description=name,
         start=start,

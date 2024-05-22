@@ -1,6 +1,6 @@
 import json
 from abc import abstractmethod
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -43,7 +43,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> httpx.Response:
+    ) -> dict | None:
         if not refresh and method == RequestMethod.GET:
             data = self.load_cache()
             if data:
@@ -61,7 +61,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         return response
 
     def load_cache(self) -> None | dict:
-        now = datetime.now(tz=UTC)
+        now = datetime.now(tz=timezone.utc)
         if not self.cache_path.exists():
             return None
         with self.cache_path.open("r", encoding="utf-8") as f:
@@ -73,7 +73,7 @@ class TogglCachedEndpoint(TogglEndpoint):
 
     def save_cache(self, data: dict) -> None:
         data = {
-            "timestamp": datetime.now(tz=UTC).isoformat(),
+            "timestamp": datetime.now(tz=timezone.utc).isoformat(),
             "data": data,
             "version": version,
         }

@@ -127,6 +127,7 @@ ignore = [
   "UP007", # Useless `typing` imports
   "N802",
   "PLW2901",
+  "UP017", # Python 3.10 backwards compatiblity
 
 ]
 # Allow fix for all enabled rules (when `--fix`) is provided.

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -86,7 +86,7 @@ class TogglTracker(TogglClass):
             self.duration = timedelta(seconds=self.duration)  # type: ignore[arg-type]
             self.stop = datetime.fromisoformat(self.stop)  # type: ignore[arg-type]
         else:
-            now = datetime.now(tz=UTC)
+            now = datetime.now(tz=timezone.utc)
             self.duration = now - self.start
 
     @property

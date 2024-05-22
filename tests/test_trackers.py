@@ -1,5 +1,5 @@
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -10,7 +10,7 @@ from toggl_api.modules.models import TogglTracker
 def add_tracker(tracker_model):
     tracker = tracker_model.add_tracker(
         description="test_tracker",
-        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        start=datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
         duration=-1,
     )
     yield tracker
@@ -54,7 +54,7 @@ def test_tracker_editing(tracker_model, add_tracker):
 def test_tracker_deletion(tracker_model, cache_tracker_model):
     tracker = tracker_model.add_tracker(
         description="test_tracker",
-        start=datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        start=datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
         duration=-1,
     )
     tracker_model.delete_tracker(tracker_id=tracker.id)
