@@ -81,6 +81,7 @@ class TogglEndpoint(metaclass=ABCMeta):
             response = self.method(method)(url, headers=headers)
         if response.status_code != self.OK_RESPONSE:
             # TODO: Toggl API return code lookup.
+            # TODO: If a "already exists" 400 code is returned it should return the get or None.
             msg = f"Request failed with status code {response.status_code}: {response.text}"
             raise httpx.HTTPError(msg)
 

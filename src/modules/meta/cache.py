@@ -13,6 +13,7 @@ from .meta import RequestMethod, TogglEndpoint
 
 class TogglCachedEndpoint(TogglEndpoint):
     # TODO: Use a simple sqlite DB for cache.
+    # TODO: Caching method should really store a table for each object instead of a request.
     __slots__ = ("_cache_path", "_expire_after")
 
     def __init__(  # noqa: PLR0913

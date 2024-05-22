@@ -2,7 +2,7 @@ from pathlib import Path
 
 from httpx import HTTPError
 
-from .meta import TogglCachedEndpoint, RequestMethod, TogglEndpoint
+from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
 
 
