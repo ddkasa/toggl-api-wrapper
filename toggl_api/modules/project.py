@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Final
 
 from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint
-from .models import TogglClient, TogglProject
+from .models import TogglProject
 
 
 class ProjectCachedEndpoint(TogglCachedEndpoint):
@@ -11,13 +11,15 @@ class ProjectCachedEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
         **kwargs,
-    ) -> list[TogglProject]:
+    ) -> list[TogglProject] | None:
         response = self.request("", refresh=refresh)
+        if response is None:
+            return None
 
-        return self.process_models(response)
+        return self.process_models(response)  # type: ignore[arg-type]
 
     def get_project(self, project_id: int) -> TogglProject:
-        return self.model.from_kwargs(**self.request(f"/{project_id}"))
+        return self.model.from_kwargs(**self.request(f"/{project_id}"))  # type: ignore[arg-type]
 
     @property
     def endpoint(self) -> str:

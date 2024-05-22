@@ -7,10 +7,12 @@ from .models import TogglTracker
 
 
 class UserCachedEndpoint(TogglCachedEndpoint):
-    def current_tracker(self) -> TogglTracker:
+    def current_tracker(self) -> TogglTracker | None:
         url = "time_entries/current"
 
         response = self.request(url)
+        if not isinstance(response, dict):
+            return None
 
         return TogglTracker.from_kwargs(**response)
 
@@ -36,10 +38,12 @@ class UserEndpoint(TogglEndpoint):
 
         return True
 
-    def current_tracker(self) -> TogglTracker:
+    def current_tracker(self) -> TogglTracker | None:
         url = "time_entries/current"
 
         response = self.request(url)
+        if not isinstance(response, dict):
+            return None
 
         return TogglTracker.from_kwargs(**response)
 

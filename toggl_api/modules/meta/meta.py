@@ -6,8 +6,8 @@ Classes:
 
 import enum
 from abc import ABCMeta, abstractmethod
-from types import MethodType
-from typing import Any, Callable, Final, Optional
+from collections.abc import Callable
+from typing import Any, Final, Optional
 
 import httpx
 
@@ -25,7 +25,7 @@ class TogglEndpoint(metaclass=ABCMeta):
     OK_RESPONSE: Final[int] = 200
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
-    __slots__ = ("__client", "workspace_id", "headers")
+    __slots__ = ("__client", "workspace_id")
 
     def __init__(
         self,

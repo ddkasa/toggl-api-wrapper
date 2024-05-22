@@ -49,28 +49,35 @@ class TrackerEndpoint(TogglEndpoint):
 
         return headers
 
-    def edit_tracker(self, tracker_id: int, **kwargs) -> TogglTracker:
+    def edit_tracker(self, tracker_id: int, **kwargs) -> TogglTracker | None:
         data = self.request(
             f"/{tracker_id}",
             method=RequestMethod.PUT,
             body=self.body_creation(**kwargs),
         )
+        if data is None:
+            return None
+
         return self.model.from_kwargs(**data)
 
     def delete_tracker(self, tracker_id: int) -> None:
         self.request(f"/{tracker_id}", method=RequestMethod.DELETE)
 
-    def stop_tracker(self, tracker_id: int) -> TogglTracker:
+    def stop_tracker(self, tracker_id: int) -> TogglTracker | None:
         data = self.request(f"/{tracker_id}/stop", method=RequestMethod.PATCH)
+        if data is None:
+            return None
 
         return self.model.from_kwargs(**data)
 
-    def add_tracker(self, **kwargs) -> TogglTracker:
+    def add_tracker(self, **kwargs) -> TogglTracker | None:
         data = self.request(
             "",
             method=RequestMethod.POST,
             body=self.body_creation(**kwargs),
         )
+        if data is None:
+            return None
         return self.model.from_kwargs(**data)
 
     @property
@@ -88,7 +95,7 @@ class TrackerCachedEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
         **kwargs,
-    ) -> list[TogglTracker]:
+    ) -> list[TogglTracker] | None:
         since = kwargs.get("since")  # UNIX Timestamp
         before = kwargs.get("before")  #  YYYY-MM-DD
         start_date = kwargs.get("start_date")  # YYYY-MM-DD or RFC3339
@@ -100,6 +107,10 @@ class TrackerCachedEndpoint(TogglCachedEndpoint):
         elif start_date and end_date:
             params = f"?start_date={start_date}&end_date={end_date}"
         response = self.request(params, refresh=refresh)
+
+        if not isinstance(response, list):
+            return None
+
         return self.process_models(response)
 
     def get_tracker(
@@ -109,7 +120,7 @@ class TrackerCachedEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
     ) -> TogglTracker | None:
         cache = self.load_cache() if not refresh else None
-        if cache is not None:
+        if isinstance(cache, list):
             entries = self.process_models(cache)
             for item in entries:
                 if item.id == tracker_id:
@@ -118,9 +129,12 @@ class TrackerCachedEndpoint(TogglCachedEndpoint):
         try:
             response = self.request(f"/{tracker_id}", refresh=refresh)
         except HTTPError:
+            response = None
+
+        if not isinstance(response, dict):
             return None
 
-        return self.model.from_kwargs(**response)  # type: ignore[return-value]
+        return self.model.from_kwargs(**response)
 
     @property
     def endpoint(self) -> str:

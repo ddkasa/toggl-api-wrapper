@@ -5,8 +5,10 @@ from .models import TogglWorkspace
 
 
 class CachedWorkspaceEndpoint(TogglCachedEndpoint):
-    def get_workspace(self, *, refresh: bool = False) -> TogglWorkspace:
+    def get_workspace(self, *, refresh: bool = False) -> TogglWorkspace | None:
         response = self.request("", refresh=refresh)
+        if not isinstance(response, dict):
+            return None
         return self.model.from_kwargs(**response)
 
     @property

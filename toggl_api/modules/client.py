@@ -58,7 +58,7 @@ class ClientEndpoint(TogglEndpoint):
 
 
 class ClientCachedEndpoint(TogglCachedEndpoint):
-    def get_clients(self, **kwargs) -> list[TogglClient]:
+    def get_clients(self, **kwargs) -> list[TogglClient] | None:
         url = ""
 
         status = kwargs.get("status")
@@ -74,6 +74,9 @@ class ClientCachedEndpoint(TogglCachedEndpoint):
             url += f"{name}"
 
         response = self.request(url)
+
+        if not isinstance(response, list):
+            return None
 
         return self.process_models(response)
 

@@ -13,8 +13,10 @@ class TagCachedEndpoint(TogglCachedEndpoint):
         **kwargs,
     ) -> list[TogglTag]:
         response = self.request("", refresh=refresh)
+        if response is None:
+            return []
 
-        return self.process_models(response)
+        return self.process_models(response)  # type: ignore[arg-type]
 
     @property
     def endpoint(self) -> str:

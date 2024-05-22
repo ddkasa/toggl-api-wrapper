@@ -43,7 +43,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> dict | None:
+    ) -> dict | list | None:
         if not refresh and method == RequestMethod.GET:
             data = self.load_cache()
             if data:
