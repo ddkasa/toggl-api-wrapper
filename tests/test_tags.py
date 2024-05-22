@@ -1,6 +1,6 @@
 import pytest
 
-from src.modules.models import TogglTag
+from toggl_api.modules.models import TogglTag
 
 
 @pytest.mark.unit()

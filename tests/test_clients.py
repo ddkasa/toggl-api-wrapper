@@ -1,6 +1,6 @@
 import pytest
 
-from src.modules.models import TogglClient
+from toggl_api.modules.models import TogglClient
 
 
 @pytest.fixture()

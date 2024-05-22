@@ -5,8 +5,8 @@ from pathlib import Path
 import httpx
 import pytest
 
-from src.modules.meta import RequestMethod, TogglCachedEndpoint
-from src.modules.models import TogglTracker
+from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
+from toggl_api.modules.models import TogglTracker
 
 
 class RequestTest(TogglCachedEndpoint):

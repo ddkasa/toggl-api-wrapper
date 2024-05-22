@@ -4,13 +4,13 @@ from pathlib import Path
 import pytest
 from httpx import BasicAuth
 
-from src.config import generate_authentication
-from src.modules.client import ClientCachedEndpoint, ClientEndpoint
-from src.modules.project import ProjectCachedEndpoint, ProjectEndpoint
-from src.modules.tag import CachedTagEndpoint, TagEndpoint
-from src.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
-from src.modules.user import UserCachedEndpoint, UserEndpoint
-from src.modules.workspace import CachedWorkspaceEndpoint
+from toggl_api.config import generate_authentication
+from toggl_api.modules.client import ClientCachedEndpoint, ClientEndpoint
+from toggl_api.modules.project import ProjectCachedEndpoint, ProjectEndpoint
+from toggl_api.modules.tag import CachedTagEndpoint, TagEndpoint
+from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
+from toggl_api.modules.user import UserCachedEndpoint, UserEndpoint
+from toggl_api.modules.workspace import CachedWorkspaceEndpoint
 
 
 @pytest.fixture(scope="session")

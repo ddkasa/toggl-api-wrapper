@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from httpx import BasicAuth
 
-from src.config import AuthenticationError, use_togglrc
+from toggl_api.config import AuthenticationError, use_togglrc
 
 
 @pytest.mark.unit()

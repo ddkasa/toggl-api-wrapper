@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from src.modules.models import TogglTracker
+from toggl_api.modules.models import TogglTracker
 
 
 @pytest.fixture()

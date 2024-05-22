@@ -1,7 +1,7 @@
 import pytest
 
-from src.modules.models import TogglProject
-from src.modules.project import ProjectEndpoint
+from toggl_api.modules.models import TogglProject
+from toggl_api.modules.project import ProjectEndpoint
 
 
 @pytest.fixture()

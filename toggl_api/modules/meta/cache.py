@@ -6,7 +6,7 @@ from typing import Optional
 
 import httpx
 
-from src.version import __version__
+from toggl_api.version import __version__
 
 from .meta import RequestMethod, TogglEndpoint
 
