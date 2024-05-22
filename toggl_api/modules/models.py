@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
-from toggl_api.utility import format_iso, parse_iso
+from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -42,7 +42,7 @@ class TogglClient(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglClient:
         return cls(
-            workspace=TogglWorkspace(id=kwargs["wid"], name=""),
+            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
             id=kwargs["id"],
             name=kwargs["name"],
         )
@@ -58,16 +58,17 @@ class TogglProject(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglProject:
         client = kwargs.get("client_id")
+        workspace = TogglWorkspace(id=get_workspace(kwargs), name="")
         if client:
             client = TogglClient(
                 id=client,
                 name="",
-                workspace=kwargs["workspace_id"],
+                workspace=workspace,
             )
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
-            workspace=TogglWorkspace(id=kwargs["workspace_id"], name=""),
+            workspace=workspace,
             color=kwargs["color"],
             client=client,
             active=kwargs["active"],
@@ -100,7 +101,7 @@ class TogglTracker(TogglClass):
         return cls(
             id=kwargs["id"],
             name=kwargs["description"],
-            workspace=TogglWorkspace(id=kwargs["workspace_id"], name=""),
+            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
             start=parse_iso(kwargs["start"]),
             duration=kwargs["duration"],
             stop=kwargs.get("stop"),
@@ -117,6 +118,6 @@ class TogglTag(TogglClass):
     def from_kwargs(cls, **kwargs) -> TogglTag:
         return cls(
             id=kwargs["id"],
-            workspace=TogglWorkspace(id=kwargs["workspace_id"], name=""),
+            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
             name=kwargs["name"],
         )

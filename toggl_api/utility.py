@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Final
 
-ISO_FORMAT: Final[str] = r"%Y-%m-%dT%H:%M:%S"
+
+def get_workspace(data: dict) -> int:
+    workspace = data.get("workspace_id")
+    if workspace:
+        return workspace
+    return data["wid"]
+
 
 # NOTE: Date utilities for python 3.10 compatibility.
-
-
 def format_iso(date: datetime) -> str:
     return date.isoformat(timespec="seconds")
 

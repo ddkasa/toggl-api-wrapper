@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from toggl_api.utility import format_iso, parse_iso
+from toggl_api.utility import format_iso, get_workspace, parse_iso
 
 
 @pytest.mark.unit()
@@ -27,3 +27,22 @@ def test_parse_iso():
         )
         == iso
     )
+
+
+@pytest.mark.unit()
+@pytest.mark.parametrize(
+    ("data", "result"),
+    [
+        ({"wid": 1}, 1),
+        ({"workspace_id": 25}, 25),
+        ({"workspace_id": 25, "wid": 1}, 25),
+        ({}, KeyError),
+    ],
+)
+def test_get_workspace(data, result):
+    if type(result) == type and issubclass(result, Exception):
+        with pytest.raises(result) as excinfo:
+            get_workspace(data)
+        assert isinstance(excinfo.value, result)
+    else:
+        assert get_workspace(data) == result
