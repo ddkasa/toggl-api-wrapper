@@ -13,7 +13,7 @@ def create_client(client_object, get_workspace_id):
 
 @pytest.mark.unit()
 def test_client_model(get_workspace_id):
-    data = {"id": 1, "name": "Test", "workspace_id": get_workspace_id}
+    data = {"id": 1, "name": "Test", "wid": get_workspace_id}
     client = TogglClient.from_kwargs(**data)
     assert isinstance(client, TogglClient)
     assert client.id == data["id"]

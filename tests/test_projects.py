@@ -29,6 +29,7 @@ def test_project_model(get_workspace_id):
     assert project.id == data["id"]
     assert project.name == data["name"]
     assert project.color == data["color"]
+    assert project.workspace.id == get_workspace_id
 
 
 @pytest.mark.integration()
