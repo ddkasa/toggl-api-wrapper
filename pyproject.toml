@@ -5,22 +5,43 @@ description = "Simple Toggl API wrapper for non-premium features."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 license = "MIT"
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Typing :: Typed",
+]
+packages = [
+    { include = "src", to = "toggl_api" },
+    
+]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 httpx = "^0.27.0"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 pytest-env = "^1.1.3"
 pytest-order = "^1.2.1"
-
-
+coverage = "^7.5.1"
+mypy = "^1.10.0"
+tox-poetry-installer = "^0.10.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.extras]
+test = ["pytest"]
 
 [tool.ruff]
 exclude = [
@@ -125,11 +146,44 @@ line-ending = "auto"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+# pythonpath = [
+#   "."
+# ]
 markers = [
     "unit: Basic unit tests using local cache.",
     "integration: Tests that actively use the API.",
     "slow: Tests that are slow to run or have delays included.",
 ]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = True
+envlist = ruff, mypy, py310, py311, py312, py313
+
+[testenv]
+passenv = 
+    TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
+    TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
+setenv = 
+    TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
+    TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
+    PYTHONPATH = {toxinidir}
+deps = 
+    pytest
+required_locked_deps = True
+poetry_dep_groups =
+    dev
+commands = 
+    pytest {posargs}
+
+[testenv:mypy]
+allowlist_externals = mypy
+basepython = python3.12
+commands = mypy toggl_api
+
+[testenv:ruff]
+allowlist_externals = ruff
+basepython = python3.12
+commands = ruff check toggl_api
+"""

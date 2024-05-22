@@ -3,3 +3,5 @@
 .envrc
 cache
 files
+.tox
+.coverage
