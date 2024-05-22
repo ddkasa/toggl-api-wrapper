@@ -7,7 +7,7 @@ from httpx import BasicAuth
 from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientCachedEndpoint, ClientEndpoint
 from toggl_api.modules.project import ProjectCachedEndpoint, ProjectEndpoint
-from toggl_api.modules.tag import CachedTagEndpoint, TagEndpoint
+from toggl_api.modules.tag import TagCachedEndpoint, TagEndpoint
 from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
 from toggl_api.modules.user import UserCachedEndpoint, UserEndpoint
 from toggl_api.modules.workspace import CachedWorkspaceEndpoint
@@ -29,8 +29,8 @@ def tag_object(get_workspace_id, config_setup) -> TagEndpoint:
 
 
 @pytest.fixture(scope="session")
-def cached_tag_object(cache_path, get_workspace_id, config_setup) -> CachedTagEndpoint:
-    return CachedTagEndpoint(cache_path, get_workspace_id, config_setup)
+def cached_tag_object(cache_path, get_workspace_id, config_setup) -> TagCachedEndpoint:
+    return TagCachedEndpoint(cache_path, get_workspace_id, config_setup)
 
 
 @pytest.fixture(scope="session")

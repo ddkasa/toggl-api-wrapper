@@ -5,7 +5,7 @@ from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTag
 
 
-class CachedTagEndpoint(TogglCachedEndpoint):
+class TagCachedEndpoint(TogglCachedEndpoint):
     def get_tags(
         self,
         *,
