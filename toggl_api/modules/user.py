@@ -7,10 +7,10 @@ from .models import TogglTracker
 
 
 class UserCachedEndpoint(TogglCachedEndpoint):
-    def current_tracker(self) -> TogglTracker | None:
+    def current_tracker(self, *, refresh: bool = False) -> TogglTracker | None:
         url = "time_entries/current"
 
-        response = self.request(url)
+        response = self.request(url, refresh=refresh)
         if not isinstance(response, dict):
             return None
 
