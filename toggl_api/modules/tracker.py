@@ -143,7 +143,3 @@ class TrackerCachedEndpoint(TogglCachedEndpoint):
     @property
     def model(self) -> type[TogglTracker]:
         return TogglTracker
-
-    @property
-    def cache_path(self) -> Path:
-        return super().cache_path / "history.json"

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -7,6 +7,7 @@ from httpx import BasicAuth
 
 from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientCachedEndpoint, ClientEndpoint
+from toggl_api.modules.meta.cache import JSONCache, SqliteCache
 from toggl_api.modules.project import ProjectCachedEndpoint, ProjectEndpoint
 from toggl_api.modules.tag import TagCachedEndpoint, TagEndpoint
 from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
@@ -20,9 +21,17 @@ def client_object(get_workspace_id, config_setup) -> ClientEndpoint:
     return ClientEndpoint(get_workspace_id, config_setup)
 
 
-@pytest.fixture(scope="session")
-def cached_client_object(cache_path, get_workspace_id, config_setup) -> ClientCachedEndpoint:
-    return ClientCachedEndpoint(cache_path, get_workspace_id, config_setup)
+@pytest.fixture()
+def cached_client_object(
+    sqlite_cache,
+    get_workspace_id,
+    config_setup,
+) -> ClientCachedEndpoint:
+    return ClientCachedEndpoint(
+        get_workspace_id,
+        config_setup,
+        sqlite_cache,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -66,8 +75,8 @@ def tracker_model(get_workspace_id, config_setup) -> TrackerEndpoint:
 
 
 @pytest.fixture(scope="session")
-def cache_tracker_model(get_workspace_id, config_setup) -> TrackerCachedEndpoint:
-    return TrackerCachedEndpoint(Path("files"), get_workspace_id, config_setup)
+def cache_tracker_model(get_workspace_id, config_setup, cache_path) -> TrackerCachedEndpoint:
+    return TrackerCachedEndpoint(cache_path, get_workspace_id, config_setup)
 
 
 @pytest.fixture(scope="session")
@@ -76,10 +85,13 @@ def config_setup() -> BasicAuth:
 
 
 @pytest.fixture(scope="session")
-def cache_path() -> Path:
-    path = Path("cache")
-    path.mkdir(exist_ok=True, parents=True)
-    return path
+def cache_path():
+    path = Path("tests/cache")
+    yield path
+    if path.exists():
+        for file in path.rglob("*"):
+            file.unlink()
+        path.rmdir()
 
 
 @pytest.fixture(scope="session")
@@ -96,3 +108,16 @@ def add_tracker(tracker_model):
     )
     yield tracker
     tracker_model.delete_tracker(tracker_id=tracker.id)
+
+
+@pytest.fixture(scope="session")
+def get_sqlite_cache(cache_path):
+    return SqliteCache(cache_path, timedelta(days=1))
+
+
+@pytest.fixture(scope="session")
+def get_json_cache(cache_path):
+    cache_path = cache_path / "extra"
+    cache_path.mkdir(parents=True, exist_ok=True)
+    yield JSONCache(cache_path, timedelta(days=1))
+    cache_path.rmdir()
