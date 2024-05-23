@@ -33,8 +33,8 @@ pytest-env = "^1.1.3"
 pytest-order = "^1.2.1"
 coverage = "^7.5.1"
 mypy = "^1.10.0"
-tox-poetry-installer = "^0.10.3"
 
+tox-gh-actions = "^3.2.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -162,21 +162,18 @@ isolated_build = True
 envlist = ruff, mypy, py310, py311, py312, py313
 
 [testenv]
-passenv = 
-    TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
-    TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
+skip_install = true
+passenv = *
 setenv = 
     TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
     TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
     PYTHONPATH = {toxinidir}
-deps = 
-    pytest
-required_locked_deps = True
-poetry_dep_groups =
-    dev
-commands = 
-    pytest {posargs}
 
+allowlist_externals = poetry
+commands_pre = 
+    poetry install
+commands = 
+    poetry run pytest {posargs}
 
 [gh-actions]
 python = 
@@ -185,14 +182,13 @@ python =
     3.12: ruff, mypy, py312
     3.13: py313
 
-
 [testenv:mypy]
-allowlist_externals = mypy
+allowlist_externals = mypy, poetry
 basepython = python3.12
 commands = mypy toggl_api
 
 [testenv:ruff]
-allowlist_externals = ruff
+allowlist_externals = ruff, poetry
 basepython = python3.12
 commands = ruff check toggl_api
 """

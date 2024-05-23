@@ -23,6 +23,17 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.23)"]
 
 [[package]]
+name = "cachetools"
+version = "5.3.3"
+description = "Extensible memoizing collections and decorators"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "cachetools-5.3.3-py3-none-any.whl", hash = "sha256:0abad1021d3f8325b2fc1d2e9c8b9c9d57b04c3932657a72465447332c24d945"},
+    {file = "cachetools-5.3.3.tar.gz", hash = "sha256:ba29e2dfa0b8b556606f097407ed1aa62080ee108ab0dc5ec9d6a723a007d105"},
+]
+
+[[package]]
 name = "certifi"
 version = "2024.2.2"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -31,6 +42,17 @@ python-versions = ">=3.6"
 files = [
     {file = "certifi-2024.2.2-py3-none-any.whl", hash = "sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1"},
     {file = "certifi-2024.2.2.tar.gz", hash = "sha256:0569859f95fc761b18b45ef421b1290a0f65f147e92a1e5eb3e635f9a5e4e66f"},
+]
+
+[[package]]
+name = "chardet"
+version = "5.2.0"
+description = "Universal encoding detector for Python 3"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "chardet-5.2.0-py3-none-any.whl", hash = "sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970"},
+    {file = "chardet-5.2.0.tar.gz", hash = "sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7"},
 ]
 
 [[package]]
@@ -328,26 +350,23 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
-name = "poetry-core"
-version = "1.9.0"
-description = "Poetry PEP 517 Build Backend"
+name = "pyproject-api"
+version = "1.6.1"
+description = "API to interact with the python pyproject.toml based projects"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = ">=3.8"
 files = [
-    {file = "poetry_core-1.9.0-py3-none-any.whl", hash = "sha256:4e0c9c6ad8cf89956f03b308736d84ea6ddb44089d16f2adc94050108ec1f5a1"},
-    {file = "poetry_core-1.9.0.tar.gz", hash = "sha256:fa7a4001eae8aa572ee84f35feb510b321bd652e5cf9293249d62853e1f935a2"},
+    {file = "pyproject_api-1.6.1-py3-none-any.whl", hash = "sha256:4c0116d60476b0786c88692cf4e325a9814965e2469c5998b830bba16b183675"},
+    {file = "pyproject_api-1.6.1.tar.gz", hash = "sha256:1817dc018adc0d1ff9ca1ed8c60e1623d5aaca40814b953af14a9cf9a5cae538"},
 ]
 
-[[package]]
-name = "py"
-version = "1.11.0"
-description = "library with cross-python path, ini-parsing, io, code, log facilities"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-files = [
-    {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
-    {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
-]
+[package.dependencies]
+packaging = ">=23.1"
+tomli = {version = ">=2.0.1", markers = "python_version < \"3.11\""}
+
+[package.extras]
+docs = ["furo (>=2023.8.19)", "sphinx (<7.2)", "sphinx-autodoc-typehints (>=1.24)"]
+testing = ["covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)", "setuptools (>=68.1.2)", "wheel (>=0.41.2)"]
 
 [[package]]
 name = "pytest"
@@ -404,17 +423,6 @@ files = [
 pytest = {version = ">=6.2.4", markers = "python_version >= \"3.10\""}
 
 [[package]]
-name = "six"
-version = "1.16.0"
-description = "Python 2 and 3 compatibility utilities"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
-    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
-]
-
-[[package]]
 name = "sniffio"
 version = "1.3.1"
 description = "Sniff out which async library your code is running under"
@@ -438,46 +446,47 @@ files = [
 
 [[package]]
 name = "tox"
-version = "3.28.0"
+version = "4.15.0"
 description = "tox is a generic virtualenv management and test command line tool"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+python-versions = ">=3.8"
 files = [
-    {file = "tox-3.28.0-py2.py3-none-any.whl", hash = "sha256:57b5ab7e8bb3074edc3c0c0b4b192a4f3799d3723b2c5b76f1fa9f2d40316eea"},
-    {file = "tox-3.28.0.tar.gz", hash = "sha256:d0d28f3fe6d6d7195c27f8b054c3e99d5451952b54abdae673b71609a581f640"},
+    {file = "tox-4.15.0-py3-none-any.whl", hash = "sha256:300055f335d855b2ab1b12c5802de7f62a36d4fd53f30bd2835f6a201dda46ea"},
+    {file = "tox-4.15.0.tar.gz", hash = "sha256:7a0beeef166fbe566f54f795b4906c31b428eddafc0102ac00d20998dd1933f6"},
 ]
 
 [package.dependencies]
-colorama = {version = ">=0.4.1", markers = "platform_system == \"Windows\""}
-filelock = ">=3.0.0"
-packaging = ">=14"
-pluggy = ">=0.12.0"
-py = ">=1.4.17"
-six = ">=1.14.0"
-tomli = {version = ">=2.0.1", markers = "python_version >= \"3.7\" and python_version < \"3.11\""}
-virtualenv = ">=16.0.0,<20.0.0 || >20.0.0,<20.0.1 || >20.0.1,<20.0.2 || >20.0.2,<20.0.3 || >20.0.3,<20.0.4 || >20.0.4,<20.0.5 || >20.0.5,<20.0.6 || >20.0.6,<20.0.7 || >20.0.7"
+cachetools = ">=5.3.2"
+chardet = ">=5.2"
+colorama = ">=0.4.6"
+filelock = ">=3.13.1"
+packaging = ">=23.2"
+platformdirs = ">=4.1"
+pluggy = ">=1.3"
+pyproject-api = ">=1.6.1"
+tomli = {version = ">=2.0.1", markers = "python_version < \"3.11\""}
+virtualenv = ">=20.25"
 
 [package.extras]
-docs = ["pygments-github-lexers (>=0.0.5)", "sphinx (>=2.0.0)", "sphinxcontrib-autoprogram (>=0.1.5)", "towncrier (>=18.5.0)"]
-testing = ["flaky (>=3.4.0)", "freezegun (>=0.3.11)", "pathlib2 (>=2.3.3)", "psutil (>=5.6.1)", "pytest (>=4.0.0)", "pytest-cov (>=2.5.1)", "pytest-mock (>=1.10.0)", "pytest-randomly (>=1.0.0)"]
+docs = ["furo (>=2023.9.10)", "sphinx (>=7.2.6)", "sphinx-argparse-cli (>=1.11.1)", "sphinx-autodoc-typehints (>=1.25.2)", "sphinx-copybutton (>=0.5.2)", "sphinx-inline-tabs (>=2023.4.21)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.11)"]
+testing = ["build[virtualenv] (>=1.0.3)", "covdefaults (>=2.3)", "detect-test-pollution (>=1.2)", "devpi-process (>=1)", "diff-cover (>=8.0.2)", "distlib (>=0.3.8)", "flaky (>=3.7)", "hatch-vcs (>=0.4)", "hatchling (>=1.21)", "psutil (>=5.9.7)", "pytest (>=7.4.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-xdist (>=3.5)", "re-assert (>=1.1)", "time-machine (>=2.13)", "wheel (>=0.42)"]
 
 [[package]]
-name = "tox-poetry-installer"
-version = "0.10.3"
-description = "A plugin for Tox that lets you install test environment dependencies from the Poetry lockfile"
+name = "tox-gh-actions"
+version = "3.2.0"
+description = "Seamless integration of tox into GitHub Actions"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.7"
 files = [
-    {file = "tox_poetry_installer-0.10.3-py3-none-any.whl", hash = "sha256:8580caf05f1ac83a7a938e449cfcb220cadaf6b087e9581ae837d782804ad4bc"},
-    {file = "tox_poetry_installer-0.10.3.tar.gz", hash = "sha256:58af36082293b87e3488184f46ccf6f288c52c90e802066f53d3209c0f1c6226"},
+    {file = "tox-gh-actions-3.2.0.tar.gz", hash = "sha256:ac6fa3b8da51bc90dd77985fd55f09e746c6558c55910c0a93d643045a2b0ccc"},
+    {file = "tox_gh_actions-3.2.0-py2.py3-none-any.whl", hash = "sha256:821b66a4751a788fa3e9617bd796d696507b08c6e1d929ee4faefba06b73b694"},
 ]
 
 [package.dependencies]
-poetry-core = ">=1.1.0,<2.0.0"
-tox = ">=3.8.0,<4.0.0"
+tox = ">=4,<5"
 
 [package.extras]
-poetry = ["cleo (>=1.0,<3.0)", "poetry (>=1.2.0,<1.5.0)"]
+testing = ["black", "devpi-process", "flake8 (>=6,<7)", "mypy", "pytest (>=7,<8)", "pytest-cov (>=3,<4)", "pytest-mock (>=3,<4)", "pytest-randomly (>=3)"]
 
 [[package]]
 name = "typing-extensions"
@@ -516,4 +525,4 @@ test = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "36d4fa5f52b6b2ce41c066204bf5f71dfffb9391401d5ced91fb02f92b1f8b3b"
+content-hash = "2714d9be0964bb55adc7224fd313fbe4ee50387a4cd41d95a32c4effb57997d1"
