@@ -27,6 +27,8 @@ class TogglClass(metaclass=ABCMeta):
 
 @dataclass
 class TogglWorkspace(TogglClass):
+    ___tablename__ = "workspace"
+
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglWorkspace:
         return cls(
@@ -37,6 +39,8 @@ class TogglWorkspace(TogglClass):
 
 @dataclass
 class TogglClient(TogglClass):
+    __tablename__ = "client"
+
     workspace: TogglWorkspace
 
     @classmethod
@@ -50,6 +54,8 @@ class TogglClient(TogglClass):
 
 @dataclass
 class TogglProject(TogglClass):
+    __tablename__ = "project"
+
     workspace: TogglWorkspace
     color: str
     client: Optional[TogglClient] = field(default=None)
@@ -77,6 +83,8 @@ class TogglProject(TogglClass):
 
 @dataclass
 class TogglTracker(TogglClass):
+    __tablename__ = "tracker"
+
     workspace: TogglWorkspace
     start: datetime
     duration: timedelta | float
@@ -101,7 +109,7 @@ class TogglTracker(TogglClass):
         return cls(
             id=kwargs["id"],
             name=kwargs["description"],
-            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
+            workspace=kwargs["workspace_id"],
             start=parse_iso(kwargs["start"]),
             duration=kwargs["duration"],
             stop=kwargs.get("stop"),
@@ -112,6 +120,7 @@ class TogglTracker(TogglClass):
 
 @dataclass
 class TogglTag(TogglClass):
+    __tablename__ = "tag"
     workspace: TogglWorkspace
 
     @classmethod
