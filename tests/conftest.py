@@ -21,7 +21,7 @@ def client_object(get_workspace_id, config_setup) -> ClientEndpoint:
     return ClientEndpoint(get_workspace_id, config_setup)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def cached_client_object(
     sqlite_cache,
     get_workspace_id,
@@ -86,12 +86,12 @@ def config_setup() -> BasicAuth:
 
 @pytest.fixture(scope="session")
 def cache_path():
-    path = Path("tests/cache")
+    path = Path("cache")
     yield path
-    if path.exists():
-        for file in path.rglob("*"):
-            file.unlink()
-        path.rmdir()
+    # if path.exists():
+    #     for file in path.rglob("*"):
+    #         file.unlink()
+    #     path.rmdir()
 
 
 @pytest.fixture(scope="session")

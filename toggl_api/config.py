@@ -7,7 +7,7 @@ from httpx import BasicAuth
 
 
 class AuthenticationError(ValueError):
-    """Authentication failled or was not provided."""
+    """Authentication failed or was not provided."""
 
 
 def generate_authentication() -> BasicAuth:

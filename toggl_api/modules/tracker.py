@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from httpx import HTTPError
 
 from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 from abc import ABCMeta, abstractmethod
+from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import sqlalchemy as db
+from sqlalchemy.orm import Session
 
 from toggl_api.modules.models import register_tables
 from toggl_api.utility import parse_iso
@@ -14,7 +16,7 @@ from toggl_api.version import version
 from .meta import RequestMethod, TogglEndpoint
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
     from pathlib import Path
 
     import httpx
@@ -23,6 +25,14 @@ if TYPE_CHECKING:
 
 
 class TogglCache(metaclass=ABCMeta):
+    """Abstract class for caching toggl API data to disk.
+
+    Attributes:
+        _cache_path: Path to the cache file
+        _expire_after: Time after which the cache should be refreshed
+        _parent: Parent TogglCachedEndpoint
+    """
+
     __slots__ = ("_cache_path", "_expire_after", "_parent")
 
     def __init__(
@@ -37,20 +47,28 @@ class TogglCache(metaclass=ABCMeta):
         self._parent = parent
 
     @abstractmethod
-    def load_cache(self) -> list:
+    def load_cache(self, method: RequestMethod) -> list[TogglClass]:
         pass
 
     @abstractmethod
-    def save_cache(self, data: Iterable[dict[str, Any]]) -> None:
-        return None
+    def save_cache(self, data: list[TogglClass], method: RequestMethod) -> None:
+        pass
 
     @abstractmethod
-    def find_model(
-        self,
-        data: Iterable[dict[str, Any]],
-        query: str | int,
-    ) -> TogglClass | None:
-        return None
+    def find_entry(self, **kwargs) -> list[TogglClass]:
+        pass
+
+    @abstractmethod
+    def add_entry(self, entry: TogglClass) -> None:
+        pass
+
+    @abstractmethod
+    def update_entry(self, entry: TogglClass) -> TogglClass | None:
+        pass
+
+    @abstractmethod
+    def delete_entry(self, entry: TogglClass) -> TogglClass | None:
+        pass
 
     @property
     @abstractmethod
@@ -73,22 +91,35 @@ class TogglCache(metaclass=ABCMeta):
     def parent(self, value: Optional[TogglCachedEndpoint]) -> None:
         self._parent = value
 
+    def find_method(self, method: RequestMethod) -> Callable | None:
+        match_func: Final[dict[RequestMethod, Callable]] = {
+            RequestMethod.GET: self.find_entry,
+            RequestMethod.POST: self.update_entry,
+            RequestMethod.PATCH: self.update_entry,
+            RequestMethod.PUT: self.add_entry,
+            RequestMethod.DELETE: self.delete_entry,
+        }
+        return match_func.get(method)
+
+    def parent_exists(self) -> None:
+        if isinstance(self.parent, TogglCachedEndpoint):
+            return
+        msg = "Parent is not setup!"
+        raise TypeError(msg)
+
 
 class JSONCache(TogglCache):
-    def find_model(
-        self,
-        data: Iterable[dict[str, Any]],
-        query: str | int,
-    ) -> TogglClass | None:
-        if self.parent is None:
-            return None
-        for item in data:
-            if query in (item["id"], item["name"]):
-                return self.parent.model.from_kwargs(**item)
+    """Class for caching data to disk in JSON format.
 
-        return None
+    Args:
+        path: Path to the cache file
+        expire_after: Time after which the cache should be refreshed
+        parent: Parent TogglCachedEndpoint
 
-    def save_cache(self, data: Iterable) -> None:
+    """
+
+    def save_cache(self, data: Iterable, method: RequestMethod) -> None:
+        self.parent_exists()
         data = {
             "timestamp": datetime.now(tz=timezone.utc).isoformat(),
             "data": data,
@@ -97,16 +128,36 @@ class JSONCache(TogglCache):
         with self.cache_path.open("w", encoding="utf-8") as f:
             json.dump(data, f)
 
-    def load_cache(self) -> list:
+    def load_cache(self) -> list[TogglClass]:
+        self.parent_exists()
         now = datetime.now(tz=timezone.utc)
         if not self.cache_path.exists():
             return []
         with self.cache_path.open("r", encoding="utf-8") as f:
             data = json.load(f)
         if now - self.expire_after <= parse_iso(data["timestamp"]):
-            return data["data"]
+            return self.parent.process_models(data["data"])  # type: ignore[union-attr]
 
         return []
+
+    def find_entry(self, **kwargs) -> list[TogglClass]:
+        data = self.load_cache()
+
+        entries: list[TogglClass] = []
+        for item in data:
+            if all(getattr(item, k) == v for k, v in kwargs.items()):
+                entries.append(item)  # noqa: PERF401
+
+        return entries
+
+    def add_entry(self, entry: TogglClass) -> None:
+        pass
+
+    def update_entry(self, entry: TogglClass) -> TogglClass | None:
+        pass
+
+    def delete_entry(self, entry: TogglClass) -> TogglClass | None:
+        pass
 
     @property
     def cache_path(self) -> Path:
@@ -127,23 +178,41 @@ class SqliteCache(TogglCache):
         with self.database.connect():
             self.metadata = register_tables(self.database)
 
-    def save_cache(self, data: Iterable) -> None:
-        return
+    def save_cache(self, data: TogglClass, method: RequestMethod) -> None:
+        func = self.find_method(method)
+        if func is None:
+            return None
 
-    def load_cache(self) -> list:
+        return func(data)
+
+    def load_cache(self, method: RequestMethod) -> list[TogglClass]:
         return []
 
-    def add_entry(self, **kwargs) -> None:
-        return None
+    def add_entry(self, entry: TogglClass) -> None:
+        if self.parent is None:
+            return
+        with Session(self.database) as session:
+            session.add(entry)
+            session.commit()
 
-    def update_entry(self, row_id: int, **kwargs) -> None:
-        return None
+    def update_entry(self, entry: TogglClass) -> None:
+        with Session(self.database) as session:
+            session.add(entry)
+            session.commit()
 
-    def delete_entry(self, row_id: int) -> None:
-        return None
+    def delete_entry(self, entry: TogglClass) -> None:
+        with Session(self.database) as session:
+            session.delete(entry)
+            session.commit()
 
-    def find_model() -> TogglClass | None:
-        return
+    def find_entry(  # type: ignore[override]
+        self,
+        query: TogglClass,
+    ) -> TogglClass | None:
+        if self.parent is None:
+            return None
+        with Session(self.database) as session:
+            return session.query(self.parent.model).get(query)
 
     @property
     def cache_path(self) -> Path:
@@ -181,7 +250,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         refresh: bool = False,
     ) -> dict | list | None:
         if not refresh and method == RequestMethod.GET:
-            data = self.load_cache()
+            data = self.load_cache(method)
             if data:
                 return data
         else:
@@ -195,21 +264,22 @@ class TogglCachedEndpoint(TogglEndpoint):
         if response is None:
             return None
 
-        self.save_cache(response)
+        if not isinstance(response, Sequence):
+            response = [response]
+
+        self.save_cache(response, method)
 
         return response
 
-    def load_cache(self) -> None | list:
-        if not self.cache.cache_path.exists():
-            return []
-        return self.cache.load_cache()
+    def load_cache(self, method: RequestMethod) -> list:
+        return self.cache.load_cache(method)
 
-    def save_cache(self, data: Iterable) -> None:
+    def save_cache(self, data: Sequence[TogglClass], method: RequestMethod) -> None:
         if not self.cache.expire_after.total_seconds():
             return None
-        return self.cache.save_cache(data)
+        return self.cache.save_cache(data, method)
 
-    def process_models(self, data: list[dict]) -> list:
+    def process_models(self, data: Sequence[dict[str, Any]]) -> list[TogglClass]:
         return [self.model.from_kwargs(**tracker) for tracker in data]
 
     @property

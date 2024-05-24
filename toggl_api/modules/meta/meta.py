@@ -54,7 +54,7 @@ class TogglEndpoint(metaclass=ABCMeta):
         headers: Optional[dict] = None,
         body: Optional[dict] = None,
         method: RequestMethod = RequestMethod.GET,
-    ) -> dict | None:
+    ) -> dict | list | None:
         """Main request method which handles putting together the final API
         request.
 
