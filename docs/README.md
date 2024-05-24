@@ -31,7 +31,7 @@ from toggl_api import TogglClient
 ### Basic Environment
 
 - Development is ran through Poetry.
-
+ 
 1. `$ git clone https://github.com/ddkasa/toggl-api-wrapper`
 2. `$ cd toggl-api-wrapper`
 3. `$ poetry shell` 
@@ -42,6 +42,7 @@ from toggl_api import TogglClient
 - Check typing with `$ mypy toggl_api`
 
 ### Testing
+
 - Make sure to set the environment variables plus the correct workspace id through the **TOGGL_WORKSPACE_ID**.
 - All tests are run through `$ pytest`.
 - Basic unit tests through `$ pytest -m unit`.
@@ -53,4 +54,4 @@ from toggl_api import TogglClient
 
 
 ## License
-MIT. Check [LICENSE](LICENSE.md) for more information.
+MIT. Check [LICENSE](about/LICENSE.md) for more information.
