@@ -1,3 +1,4 @@
+import json
 import time
 from datetime import timedelta
 from pathlib import Path
@@ -7,7 +8,7 @@ import sqlalchemy as db
 from sqlalchemy.orm import Session
 
 from tests.conftest import EndPointTest
-from toggl_api.modules.meta import RequestMethod
+from toggl_api.modules.meta import CustomDecoder, CustomEncoder, RequestMethod
 from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.modules.models.schema import register_tables
 
@@ -73,15 +74,10 @@ def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
 
 
 @pytest.mark.unit()
-def test_cache_functionality(meta_object, get_test_data):
-    if meta_object.cache.cache_path.exists():
-        meta_object.cache.cache_path.unlink()
-
-    meta_object.cache.save_cache(get_test_data, RequestMethod.GET)
-    test_data = meta_object.process_models(get_test_data)
-    assert meta_object.cache.load_cache() == test_data
-
-    meta_object.cache.cache_path.unlink()
+def test_cache_functionality(meta_object, model_data):
+    model_data.pop("model")
+    meta_object.cache.save_cache(model_data.values(), RequestMethod.GET)
+    assert meta_object.cache.load_cache() == list(model_data.values())
 
 
 @pytest.mark.unit()
@@ -98,3 +94,13 @@ def test_expiration(meta_object, get_test_data):
     assert meta_object.cache.cache_path.exists()
     time.sleep(10)
     assert not meta_object.load_cache()
+
+
+@pytest.mark.unit()
+def test_encoder(model_data, cache_path):
+    model_data.pop("model")
+    cache_file = cache_path / "encoder.json"
+    with cache_file.open("w", encoding="utf-8") as f:
+        json.dump(model_data, f, cls=CustomEncoder)
+    with cache_file.open("r", encoding="utf-8") as f:
+        assert json.load(f, cls=CustomDecoder) == model_data

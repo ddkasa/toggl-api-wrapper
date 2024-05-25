@@ -18,7 +18,7 @@ def test_client_model(get_workspace_id):
     assert isinstance(client, TogglClient)
     assert client.id == data["id"]
     assert client.name == data["name"]
-    assert client.workspace.id == get_workspace_id
+    assert client.workspace == get_workspace_id
 
 
 @pytest.mark.integration()
@@ -27,7 +27,7 @@ def test_client_delete(client_object, get_workspace_id):
     client = client_object.create_client(name=name)
     assert isinstance(client, TogglClient)
     assert client.name == name
-    assert client.workspace.id == get_workspace_id
+    assert client.workspace == get_workspace_id
 
     client_object.delete_client(client.id)
 

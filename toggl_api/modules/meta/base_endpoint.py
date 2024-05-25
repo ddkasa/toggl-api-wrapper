@@ -4,23 +4,18 @@ Classes:
     TogglRequest: Base class with basic functionality for all API requests.
 """
 
-import enum
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
 from typing import Any, Final, Optional
 
 import httpx
 
-
-class RequestMethod(enum.Enum):
-    GET = enum.auto()
-    POST = enum.auto()
-    PUT = enum.auto()
-    DELETE = enum.auto()
-    PATCH = enum.auto()
+from .enums import RequestMethod
 
 
 class TogglEndpoint(metaclass=ABCMeta):
+    """Base class with basic functionality for all API requests."""
+
     BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
     OK_RESPONSE: Final[int] = 200
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -80,17 +75,21 @@ class TogglEndpoint(metaclass=ABCMeta):
         else:
             response = self.method(method)(url, headers=headers)
         if response.status_code != self.OK_RESPONSE:
+            print(url)
             # TODO: Toggl API return code lookup.
             # TODO: If a "already exists" 400 code is returned it should return the get or None.
             msg = f"Request failed with status code {response.status_code}: {response.text}"
             raise httpx.HTTPError(msg)
 
         try:
-            return response.json()
+            data = response.json()
         except ValueError:
-            pass
+            return None
 
-        return None
+        if not isinstance(data, list):
+            return [data]
+
+        return data
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         """Generate basic headers for Toggl API request.

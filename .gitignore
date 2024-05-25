@@ -1,7 +1,7 @@
 # Environments
 .venv
 .envrc
-cache
+.cache
 files
 .tox
 .coverage

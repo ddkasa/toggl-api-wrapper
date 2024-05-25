@@ -7,14 +7,22 @@ from httpx import BasicAuth
 
 from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientCachedEndpoint, ClientEndpoint
-from toggl_api.modules.meta.cache import JSONCache, SqliteCache, TogglCachedEndpoint
-from toggl_api.modules.models import TogglTracker
+from toggl_api.modules.meta import JSONCache, SqliteCache, TogglCachedEndpoint
+from toggl_api.modules.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.modules.project import ProjectCachedEndpoint, ProjectEndpoint
 from toggl_api.modules.tag import TagCachedEndpoint, TagEndpoint
 from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
 from toggl_api.modules.user import UserCachedEndpoint, UserEndpoint
 from toggl_api.modules.workspace import CachedWorkspaceEndpoint
 from toggl_api.utility import format_iso
+
+
+class ModelTest(TogglClass):
+    def from_kwargs(self, **kwargs) -> TogglClass:
+        return self(
+            id=kwargs["id"],
+            name=kwargs["name"],
+        )
 
 
 @pytest.fixture(scope="session")
@@ -43,6 +51,39 @@ class EndPointTest(TogglCachedEndpoint):
     @property
     def model(self) -> type[TogglTracker]:
         return TogglTracker
+
+
+@pytest.fixture()
+def model_data(get_workspace_id):
+    workspace = TogglWorkspace(get_workspace_id, "test_workspace")
+
+    client = TogglClient(1, "test_client", workspace)
+    project = TogglProject(
+        1,
+        "test_project",
+        workspace,
+        color="#000000",
+        client=client,
+        active=True,
+    )
+    tag = TogglTag(1, "test_tag", workspace)
+    return {
+        "workspace": workspace,
+        "model": ModelTest(1, "test_model"),
+        "client": client,
+        "project": project,
+        "tracker": TogglTracker(
+            1,
+            "test_tracker",
+            workspace,
+            start="2020-01-01T00:00:00Z",
+            duration=3600,
+            stop="2020-01-01T01:00:00Z",
+            project=project,
+            tags=[tag],
+        ),
+        "tag": tag,
+    }
 
 
 @pytest.fixture(scope="module")
