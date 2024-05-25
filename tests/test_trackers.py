@@ -10,7 +10,7 @@ from toggl_api.modules.models import TogglTracker
 def test_tracker_kwargs(get_workspace_id):
     data = {
         "id": 1100,
-        "workspace_id": get_workspace_id,
+        "workspace": get_workspace_id,
         "description": "test",
         "start": "2020-01-01T00:00:00Z",
         "stop": "2020-01-01T01:00:00Z",

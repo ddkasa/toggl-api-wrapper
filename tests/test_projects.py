@@ -1,6 +1,7 @@
 import pytest
 
 from toggl_api.modules.models import TogglProject
+from toggl_api.modules.models.models import TogglWorkspace
 from toggl_api.modules.project import ProjectEndpoint
 
 
@@ -20,7 +21,7 @@ def test_project_model(get_workspace_id):
     data = {
         "id": 1100,
         "name": "test",
-        "workspace_id": get_workspace_id,
+        "workspace": TogglWorkspace(id=get_workspace_id, name="test_workspace"),
         "color": "#000000",
         "active": True,
     }
@@ -29,7 +30,7 @@ def test_project_model(get_workspace_id):
     assert project.id == data["id"]
     assert project.name == data["name"]
     assert project.color == data["color"]
-    assert project.workspace.id == get_workspace_id
+    assert project.workspace.id == data["workspace"].id
 
 
 @pytest.mark.integration()

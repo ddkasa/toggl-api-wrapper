@@ -3,16 +3,18 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
+    from collections.abc import Hashable
     from typing import Optional
 
 
 @dataclass
 class TogglClass(metaclass=ABCMeta):
+    __tablename__ = "base"
     id: int
     name: str
 
@@ -23,6 +25,12 @@ class TogglClass(metaclass=ABCMeta):
             id=kwargs["id"],
             name=kwargs["name"],
         )
+
+    def __getitem__(self, item: Hashable) -> Any:
+        return getattr(self, item)
+
+    def __setitem__(self, item: Hashable, value: Any) -> None:
+        setattr(self, item, value)
 
 
 @dataclass
@@ -64,7 +72,10 @@ class TogglProject(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglProject:
         client = kwargs.get("client_id")
-        workspace = TogglWorkspace(id=get_workspace(kwargs), name="")
+        workspace = get_workspace(kwargs)
+        if isinstance(workspace, dict):
+            workspace = TogglWorkspace(**kwargs)
+
         if client:
             client = TogglClient(
                 id=client,
@@ -106,10 +117,12 @@ class TogglTracker(TogglClass):
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglTracker:
+        workspace = get_workspace(kwargs)
+
         return cls(
             id=kwargs["id"],
-            name=kwargs["description"],
-            workspace=kwargs["workspace_id"],
+            name=kwargs.get("description", kwargs.get("name", "")),
+            workspace=workspace,
             start=parse_iso(kwargs["start"]),
             duration=kwargs["duration"],
             stop=kwargs.get("stop"),

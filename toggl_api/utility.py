@@ -5,7 +5,14 @@ def get_workspace(data: dict) -> int:
     workspace = data.get("workspace_id")
     if workspace:
         return workspace
-    return data["wid"]
+    workspace = data.get("wid")
+    if workspace:
+        return workspace
+    workspace = data.get("workspace")
+    if workspace:
+        return workspace
+    msg = "Workspace not found!"
+    raise KeyError(msg)
 
 
 # NOTE: Date utilities for python 3.10 compatibility.
