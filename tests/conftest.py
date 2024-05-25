@@ -7,7 +7,8 @@ from httpx import BasicAuth
 
 from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientCachedEndpoint, ClientEndpoint
-from toggl_api.modules.meta.cache import JSONCache, SqliteCache
+from toggl_api.modules.meta.cache import JSONCache, SqliteCache, TogglCachedEndpoint
+from toggl_api.modules.models import TogglTracker
 from toggl_api.modules.project import ProjectCachedEndpoint, ProjectEndpoint
 from toggl_api.modules.tag import TagCachedEndpoint, TagEndpoint
 from toggl_api.modules.tracker import TrackerCachedEndpoint, TrackerEndpoint
@@ -32,6 +33,50 @@ def cached_client_object(
         config_setup,
         sqlite_cache,
     )
+
+
+class EndPointTest(TogglCachedEndpoint):
+    @property
+    def endpoint(self) -> str:
+        return super().endpoint
+
+    @property
+    def model(self) -> type[TogglTracker]:
+        return TogglTracker
+
+
+@pytest.fixture(scope="module")
+def get_test_data(get_workspace_id):
+    return [
+        {
+            "id": 1,
+            "workspace_id": get_workspace_id,
+            "description": "test",
+            "start": "2020-01-01T00:00:00Z",
+            "stop": "2020-01-01T01:00:00Z",
+            "duration": 3600,
+            "tags": ["tag1", "tag2"],
+        },
+        {
+            "id": 2,
+            "workspace_id": get_workspace_id,
+            "description": "test2",
+            "start": "2020-01-01T00:00:00Z",
+            "stop": "2020-01-01T00:30:00Z",
+            "duration": 1800,
+            "tags": ["tag1", "tag2"],
+        },
+    ]
+
+
+@pytest.fixture(scope="session")
+def meta_object(config_setup, get_workspace_id, get_json_cache):
+    return EndPointTest(get_workspace_id, config_setup, get_json_cache)
+
+
+@pytest.fixture(scope="session")
+def meta_object_sqlite(config_setup, get_workspace_id, get_sqlite_cache):
+    return EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
 
 
 @pytest.fixture(scope="session")
@@ -84,14 +129,21 @@ def config_setup() -> BasicAuth:
     return generate_authentication()
 
 
+def cleanup(cache_path):
+    for file in cache_path.rglob("*"):
+        if file.is_dir():
+            cleanup(cache_path)
+            continue
+        file.unlink()
+    cache_path.rmdir()
+
+
 @pytest.fixture(scope="session")
 def cache_path():
-    path = Path("cache")
+    path = Path(__file__).resolve().parents[0] / Path("cache")
     yield path
-    # if path.exists():
-    #     for file in path.rglob("*"):
-    #         file.unlink()
-    #     path.rmdir()
+    if path.exists():
+        cleanup(path)
 
 
 @pytest.fixture(scope="session")
@@ -117,7 +169,5 @@ def get_sqlite_cache(cache_path):
 
 @pytest.fixture(scope="session")
 def get_json_cache(cache_path):
-    cache_path = cache_path / "extra"
     cache_path.mkdir(parents=True, exist_ok=True)
-    yield JSONCache(cache_path, timedelta(days=1))
-    cache_path.rmdir()
+    return JSONCache(cache_path, timedelta(days=1))
