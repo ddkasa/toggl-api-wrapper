@@ -76,7 +76,7 @@ def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
 @pytest.mark.unit()
 def test_cache_functionality(meta_object, model_data):
     model_data.pop("model")
-    meta_object.cache.save_cache(model_data.values(), RequestMethod.GET)
+    meta_object.cache.save_cache([], model_data.values(), RequestMethod.GET)
     assert meta_object.cache.load_cache() == list(model_data.values())
 
 
@@ -88,16 +88,16 @@ def test_expire_after_setter(meta_object):
 
 
 @pytest.mark.slow()
-def test_expiration(meta_object, get_test_data):
-    meta_object.expire_after = timedelta(seconds=10)
-    meta_object.save_cache(get_test_data)
+def test_expiration_json(meta_object, get_test_data):
+    meta_object.cache.expire_after = timedelta(seconds=10)
+    meta_object.save_cache([], get_test_data, RequestMethod.GET)
     assert meta_object.cache.cache_path.exists()
     time.sleep(10)
     assert not meta_object.load_cache()
 
 
 @pytest.mark.unit()
-def test_encoder(model_data, cache_path):
+def test_encoder_json(model_data, cache_path):
     model_data.pop("model")
     cache_file = cache_path / "encoder.json"
     with cache_file.open("w", encoding="utf-8") as f:

@@ -1,6 +1,15 @@
+from datetime import datetime, timezone
+
 import pytest
 
 from toggl_api.modules.models import TogglTag
+
+
+@pytest.fixture()
+def add_tag(tag_object):
+    tag = tag_object.create_tag(name="test_tag")
+    yield tag
+    tag_object.delete_tag(tag=tag.id)
 
 
 @pytest.mark.unit()
@@ -23,7 +32,7 @@ def test_tag_creation(tag_object, get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_tag_update(tag_object, cached_tag_object, get_workspace_id):
+def test_tag_update(tag_object, get_workspace_id):
     name = "test_tag_update"
     tag = tag_object.create_tag(name)
     assert isinstance(tag, TogglTag)
@@ -36,10 +45,10 @@ def test_tag_update(tag_object, cached_tag_object, get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_get_tag(tag_object, cached_tag_object, get_workspace_id):
+def test_get_tag(tag_object, get_workspace_id):
     name = "test_tag_get"
     tag = tag_object.create_tag(name)
-    tags = cached_tag_object.get_tags(refresh=True)
+    tags = tag_object.get_tags(refresh=True)
     assert len(tags) > 0
     assert any(tag.id == t.id for t in tags)
 

@@ -40,21 +40,21 @@ def test_tracker_editing(tracker_model, add_tracker):
 
 
 @pytest.mark.integration()
-def test_tracker_deletion(tracker_model, cache_tracker_model):
+def test_tracker_deletion(tracker_model):
     tracker = tracker_model.add_tracker(
         description="test_tracker",
         start=datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
         duration=-1,
     )
     tracker_model.delete_tracker(tracker_id=tracker.id)
-    assert cache_tracker_model.get_tracker(tracker.id, refresh=True) is None
+    assert tracker_model.get_tracker(tracker.id, refresh=True) is None
 
 
 @pytest.mark.integration()
-def test_tracker_stop(tracker_model, cache_tracker_model, add_tracker):
+def test_tracker_stop(tracker_model, add_tracker):
     time.sleep(1)
     tracker_model.stop_tracker(tracker_id=add_tracker.id)
-    assert cache_tracker_model.get_tracker(
+    assert tracker_model.get_tracker(
         tracker_id=add_tracker.id,
         refresh=True,
     ).duration > timedelta(milliseconds=10)

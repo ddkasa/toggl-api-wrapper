@@ -1,7 +1,6 @@
 import pytest
 
 from toggl_api.modules.models import TogglProject
-from toggl_api.modules.models.models import TogglWorkspace
 from toggl_api.modules.project import ProjectEndpoint
 
 
@@ -21,7 +20,7 @@ def test_project_model(get_workspace_id):
     data = {
         "id": 1100,
         "name": "test",
-        "workspace": TogglWorkspace(id=get_workspace_id, name="test_workspace"),
+        "workspace": get_workspace_id,
         "color": "#000000",
         "active": True,
     }
@@ -30,14 +29,14 @@ def test_project_model(get_workspace_id):
     assert project.id == data["id"]
     assert project.name == data["name"]
     assert project.color == data["color"]
-    assert project.workspace == data["workspace"].id
+    assert project.workspace == data["workspace"]
 
 
 @pytest.mark.integration()
-def test_create_project(create_project, project_object, cached_project_object):
+def test_create_project(create_project, project_object):
     assert isinstance(create_project, TogglProject)
 
-    check_project = cached_project_object.get_project(create_project.id)
+    check_project = project_object.get_project(create_project.id)
     assert isinstance(check_project, TogglProject)
     assert check_project.name == create_project.name
     assert check_project.color == ProjectEndpoint.get_color("blue")

@@ -33,8 +33,8 @@ def test_client_delete(client_object, get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_client_get(client_object, cached_client_object, get_workspace_id, create_client):
-    clients = cached_client_object.get_clients(refresh=True)
+def test_client_get(client_object, get_workspace_id, create_client):
+    clients = client_object.get_clients(refresh=True)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)
 
