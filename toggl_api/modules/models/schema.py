@@ -43,7 +43,7 @@ def register_tables(engine: db.Engine) -> db.MetaData:
         db.Column("name", db.String(255)),
         db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
         db.Column("color", db.String(6)),
-        db.Column("client", db.ForeignKey("client.id")),
+        db.Column("client", db.Integer, db.ForeignKey("client.id")),
         db.Column("active", db.Boolean),
     )
     _map_imperatively(TogglProject, project)
@@ -55,7 +55,7 @@ def register_tables(engine: db.Engine) -> db.MetaData:
         db.Column("updated", db.DateTime(timezone=True), onupdate=func.now()),
         db.Column("id", db.Integer, primary_key=True),
         db.Column("name", db.String(255)),
-        db.Column("workspace", db.ForeignKey("workspace.id")),
+        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
     )
     _map_imperatively(TogglTag, tag)
 
@@ -66,11 +66,11 @@ def register_tables(engine: db.Engine) -> db.MetaData:
         db.Column("updated", db.DateTime(timezone=True), onupdate=func.now()),
         db.Column("id", db.Integer, primary_key=True, unique=True),
         db.Column("name", db.String(255)),
-        db.Column("workspace", db.ForeignKey("workspace.id")),
+        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
         db.Column("start", db.DateTime),
         db.Column("duration", db.Interval),
         db.Column("stop", db.DateTime),
-        db.Column("project", db.ForeignKey("project.id")),
+        db.Column("project", db.Integer, db.ForeignKey("project.id")),
     )
 
     tracker_tag = db.Table(

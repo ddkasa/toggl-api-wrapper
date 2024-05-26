@@ -46,42 +46,49 @@ class TogglWorkspace(TogglClass):
 
 
 @dataclass
-class TogglClient(TogglClass):
-    __tablename__ = "client"
+class WorkspaceChild(TogglClass):
+    __tablename__ = "workspace_child"
 
-    workspace: TogglWorkspace
+    workspace: int
+
+    def __post_init__(self) -> None:
+        if isinstance(self.workspace, TogglWorkspace):
+            self.workspace = self.workspace.id
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglClient:
+    def from_kwargs(cls, **kwargs) -> TogglClass:
         return cls(
-            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
             id=kwargs["id"],
             name=kwargs["name"],
+            workspace=get_workspace(kwargs),
         )
 
 
 @dataclass
-class TogglProject(TogglClass):
+class TogglClient(WorkspaceChild):
+    __tablename__ = "client"
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+
+
+@dataclass
+class TogglProject(WorkspaceChild):
     __tablename__ = "project"
 
-    workspace: TogglWorkspace
     color: str
-    client: Optional[TogglClient] = field(default=None)
+    client: Optional[int] = field(default=None)
     active: bool = field(default=True)
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if isinstance(self.client, TogglClient):
+            self.client = self.client.id
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglProject:
-        client = kwargs.get("client_id")
+        client = kwargs.get("client_id", kwargs.get("client"))
         workspace = get_workspace(kwargs)
-        if isinstance(workspace, dict):
-            workspace = TogglWorkspace(**kwargs)
-
-        if client:
-            client = TogglClient(
-                id=client,
-                name="",
-                workspace=workspace,
-            )
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -93,17 +100,22 @@ class TogglProject(TogglClass):
 
 
 @dataclass
-class TogglTracker(TogglClass):
+class TogglTracker(WorkspaceChild):
     __tablename__ = "tracker"
 
-    workspace: TogglWorkspace
     start: datetime
     duration: timedelta | float
     stop: Optional[datetime | str] = field(default=None)
-    project: Optional[TogglProject] = field(default=None)
+    project: Optional[int] = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
     def __post_init__(self) -> None:
+        super().__post_init__()
+        if isinstance(self.project, TogglProject):
+            self.project = self.project.id
+        if isinstance(self.tags, list):
+            self.tags = [TogglTag.from_kwargs(**t) for t in self.tags if isinstance(t, dict)]
+
         if self.stop:
             self.duration = timedelta(seconds=self.duration)  # type: ignore[arg-type]
             self.stop = parse_iso(self.stop)  # type: ignore[arg-type]
@@ -132,14 +144,8 @@ class TogglTracker(TogglClass):
 
 
 @dataclass
-class TogglTag(TogglClass):
+class TogglTag(WorkspaceChild):
     __tablename__ = "tag"
-    workspace: TogglWorkspace
 
-    @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglTag:
-        return cls(
-            id=kwargs["id"],
-            workspace=TogglWorkspace(id=get_workspace(kwargs), name=""),
-            name=kwargs["name"],
-        )
+    def __post_init__(self) -> None:
+        super().__post_init__()
