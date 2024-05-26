@@ -1,10 +1,10 @@
 from httpx import HTTPError
 
-from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint
+from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTracker
 
 
-class TrackerEndpoint(TogglEndpoint):
+class TrackerEndpoint(TogglCachedEndpoint):
     def body_creation(self, **kwargs) -> dict:  # noqa: C901
         headers = {}
         workspace_id = kwargs.get("workspace_id", self.workspace_id)
@@ -76,67 +76,11 @@ class TrackerEndpoint(TogglEndpoint):
         )
         if data is None:
             return None
-        return self.model.from_kwargs(**data)
+        return self.model.from_kwargs(**data[0])
 
     @property
     def endpoint(self) -> str:
         return super().endpoint + f"workspaces/{self.workspace_id}/time_entries"
-
-    @property
-    def model(self) -> type[TogglTracker]:
-        return TogglTracker
-
-
-class TrackerCachedEndpoint(TogglCachedEndpoint):
-    def get_trackers(
-        self,
-        *,
-        refresh: bool = False,
-        **kwargs,
-    ) -> list[TogglTracker] | None:
-        since = kwargs.get("since")  # UNIX Timestamp
-        before = kwargs.get("before")  #  YYYY-MM-DD
-        start_date = kwargs.get("start_date")  # YYYY-MM-DD or RFC3339
-        end_date = kwargs.get("end_date")  # YYYY-MM-DD or RFC3339
-
-        params = ""
-        if since and before:
-            params = f"?since={since}&before={before}"
-        elif start_date and end_date:
-            params = f"?start_date={start_date}&end_date={end_date}"
-        response = self.request(params, refresh=refresh)
-
-        if not isinstance(response, list):
-            return None
-
-        return self.process_models(response)
-
-    def get_tracker(
-        self,
-        tracker_id: int,
-        *,
-        refresh: bool = False,
-    ) -> TogglTracker | None:
-        cache = self.load_cache() if not refresh else None
-        if isinstance(cache, list):
-            entries = self.process_models(cache)
-            for item in entries:
-                if item.id == tracker_id:
-                    return self.model.from_kwargs(**item)  # type: ignore[return-value]
-
-        try:
-            response = self.request(f"/{tracker_id}", refresh=refresh)
-        except HTTPError:
-            response = None
-
-        if not isinstance(response, dict):
-            return None
-
-        return self.model.from_kwargs(**response)
-
-    @property
-    def endpoint(self) -> str:
-        return super().endpoint + "me/time_entries"
 
     @property
     def model(self) -> type[TogglTracker]:

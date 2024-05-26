@@ -1,20 +1,15 @@
-from .client import ClientCachedEndpoint, ClientEndpoint
-from .project import ProjectCachedEndpoint, ProjectEndpoint
-from .tag import TagCachedEndpoint, TagEndpoint
-from .tracker import TrackerCachedEndpoint, TrackerEndpoint
-from .user import UserCachedEndpoint, UserEndpoint
-from .workspace import CachedWorkspaceEndpoint
+from .client import ClientEndpoint
+from .project import ProjectEndpoint
+from .tag import TagEndpoint
+from .tracker import TrackerEndpoint
+from .user import UserEndpoint
+from .workspace import WorkspaceEndpoint
 
 __all__ = (
-    "ClientCachedEndpoint",
     "ClientEndpoint",
-    "ProjectCachedEndpoint",
     "ProjectEndpoint",
-    "TagCachedEndpoint",
     "TagEndpoint",
-    "TrackerCachedEndpoint",
     "TrackerEndpoint",
-    "UserCachedEndpoint",
+    "WorkspaceEndpoint",
     "UserEndpoint",
-    "CachedWorkspaceEndpoint",
 )

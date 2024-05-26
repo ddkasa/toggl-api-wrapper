@@ -1,11 +1,10 @@
-from pathlib import Path
 from typing import Any
 
-from .meta import RequestMethod, TogglCachedEndpoint, TogglEndpoint
+from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
 
 
-class ClientEndpoint(TogglEndpoint):
+class ClientEndpoint(TogglCachedEndpoint):
     def body_creation(self, **kwargs) -> dict[str, Any]:
         headers = super().body_creation(**kwargs)
 
@@ -24,17 +23,22 @@ class ClientEndpoint(TogglEndpoint):
 
         return headers
 
-    def create_client(self, **kwargs) -> TogglClient:
+    def create_client(self, **kwargs) -> TogglClient | None:
         body = self.body_creation(**kwargs)
 
         response = self.request("", body=body, method=RequestMethod.POST)
+        if response is None:
+            return None
 
-        return self.model.from_kwargs(**response)
+        return self.model.from_kwargs(**response[0])
 
-    def get_client(self, client_id: int) -> TogglClient:
+    def get_client(self, client_id: int) -> TogglClient | None:
         response = self.request(f"/{client_id}")
 
-        return self.model.from_kwargs(**response)
+        if response is None:
+            return None
+
+        return self.model.from_kwargs(**response[0])
 
     def update_client(self, client_id: int, **kwargs) -> TogglClient:
         body = self.body_creation(**kwargs)
@@ -43,21 +47,15 @@ class ClientEndpoint(TogglEndpoint):
             body=body,
             method=RequestMethod.PUT,
         )
-        return self.model.from_kwargs(**response)
+
+        if response is None:
+            return None
+
+        return self.model.from_kwargs(**response[0])
 
     def delete_client(self, client_id: int) -> None:
         self.request(f"/{client_id}", method=RequestMethod.DELETE)
 
-    @property
-    def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}/clients"
-
-    @property
-    def model(self):
-        return TogglClient
-
-
-class ClientCachedEndpoint(TogglCachedEndpoint):
     def get_clients(self, **kwargs) -> list[TogglClient] | None:
         url = ""
 
@@ -75,7 +73,7 @@ class ClientCachedEndpoint(TogglCachedEndpoint):
 
         response = self.request(url)
 
-        if not isinstance(response, list):
+        if response is None:
             return None
 
         return self.process_models(response)
@@ -83,10 +81,6 @@ class ClientCachedEndpoint(TogglCachedEndpoint):
     @property
     def endpoint(self) -> str:
         return super().endpoint + f"workspaces/{self.workspace_id}/clients"
-
-    @property
-    def cache_path(self) -> Path:
-        return super().cache_path / "clients.json"
 
     @property
     def model(self) -> type[TogglClient]:

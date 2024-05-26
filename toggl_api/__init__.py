@@ -1,13 +1,9 @@
 from .modules import (
-    CachedWorkspaceEndpoint,
-    ClientCachedEndpoint,
     ClientEndpoint,
-    ProjectCachedEndpoint,
-    TagCachedEndpoint,
     TagEndpoint,
-    TrackerCachedEndpoint,
-    UserCachedEndpoint,
+    TrackerEndpoint,
     UserEndpoint,
+    WorkspaceEndpoint,
 )
 from .modules.models import (
     TogglClient,
@@ -28,13 +24,10 @@ __all__ = [
     "TogglTag",
     "TogglTracker",
     "TogglWorkspace",
-    "ClientCachedEndpoint",
     "ClientEndpoint",
-    "ProjectCachedEndpoint",
-    "TagCachedEndpoint",
     "TagEndpoint",
-    "TrackerCachedEndpoint",
-    "UserCachedEndpoint",
     "UserEndpoint",
-    "CachedWorkspaceEndpoint",
+    "WorkspaceEndpoint",
+    "TrackerEndpoint",
+    "UserEndpoint",
 ]
