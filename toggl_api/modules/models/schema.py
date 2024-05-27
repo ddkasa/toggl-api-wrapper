@@ -69,8 +69,8 @@ def register_tables(engine: db.Engine) -> db.MetaData:
         db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
         db.Column("start", db.DateTime),
         db.Column("duration", db.Interval),
-        db.Column("stop", db.DateTime),
-        db.Column("project", db.Integer, db.ForeignKey("project.id")),
+        db.Column("stop", db.DateTime, nullable=True),
+        db.Column("project", db.Integer, db.ForeignKey("project.id"), nullable=True),
     )
 
     tracker_tag = db.Table(

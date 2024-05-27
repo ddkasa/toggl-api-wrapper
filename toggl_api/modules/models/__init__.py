@@ -18,7 +18,6 @@ def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
         else:
             data[field.name] = field_data
 
-    print(data)
     return data
 
 
