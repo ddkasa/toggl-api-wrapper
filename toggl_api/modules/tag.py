@@ -11,25 +11,30 @@ class TagEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
         **kwargs,
     ) -> list[TogglTag]:
-        response = self.request("", refresh=refresh)
-        if response is None:
-            return None
-
-        return self.process_models(response)  # type: ignore[arg-type]
+        return self.request("", refresh=refresh)
 
     def create_tag(self, name: str, **kwargs) -> TogglTag:
         body = self.body_creation(**kwargs)
         body["name"] = name
-        response = self.request("", body=body, method=RequestMethod.POST)
-        return self.model.from_kwargs(**response)  # type: ignore[arg-type]
+        return self.request(
+            "",
+            body=body,
+            method=RequestMethod.POST,
+            refresh=True,
+        )
 
-    def update_tag(self, tag_id: str, **kwargs) -> TogglTag:
+    def update_tag(self, tag: TogglTag, **kwargs) -> TogglTag:
         body = self.body_creation(**kwargs)
-        response = self.request(f"/{tag_id}", body=body, method=RequestMethod.PUT)
-        return self.model.from_kwargs(**response)  # type: ignore[arg-type]
+        return self.request(
+            f"/{tag.id}",
+            body=body,
+            method=RequestMethod.PUT,
+            refresh=True,
+        )
 
-    def delete_tag(self, tag_id: int, **kwargs) -> None:
-        self.request(f"/{tag_id}", method=RequestMethod.DELETE)
+    def delete_tag(self, tag: TogglTag, **kwargs) -> None:
+        self.request(f"/{tag.id}", method=RequestMethod.DELETE, refresh=True)
+        self.cache.delete_entry(tag)
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         headers = super().body_creation(**kwargs)

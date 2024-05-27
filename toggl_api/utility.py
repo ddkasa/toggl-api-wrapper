@@ -3,13 +3,13 @@ from datetime import datetime
 
 def get_workspace(data: dict) -> int:
     workspace = data.get("workspace_id")
-    if workspace:
+    if isinstance(workspace, int):
         return workspace
     workspace = data.get("wid")
-    if workspace:
+    if isinstance(workspace, int):
         return workspace
     workspace = data.get("workspace")
-    if workspace:
+    if isinstance(workspace, int):
         return workspace
     msg = "Workspace not found!"
     raise KeyError(msg)

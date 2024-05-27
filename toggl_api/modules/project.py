@@ -1,4 +1,4 @@
-from typing import Any, Final
+from typing import Any, Final, Optional
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
@@ -28,17 +28,15 @@ class ProjectEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
         **kwargs,
     ) -> list[TogglProject] | None:
-        response = self.request("", refresh=refresh)
-        if response is None:
-            return None
+        return self.request("", refresh=refresh)
 
-        return self.process_models(response)  # type: ignore[arg-type]
-
-    def get_project(self, project_id: int) -> TogglProject:
-        response = self.request(f"/{project_id}")
-        if response is None:
-            return None
-        self.model.from_kwargs(**response[0])  # type: ignore[arg-type]
+    def get_project(
+        self,
+        project_id: int,
+        *,
+        refresh: bool = False,
+    ) -> TogglProject | None:
+        return self.request(f"/{project_id}", refresh=refresh)
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         headers = super().body_creation(**kwargs)
@@ -72,30 +70,30 @@ class ProjectEndpoint(TogglCachedEndpoint):
             headers["start_date"] = start_date
         return headers
 
-    def delete_project(self, project_id: int) -> None:
-        self.request(f"/{project_id}", method=RequestMethod.DELETE)
+    def delete_project(self, project: TogglProject) -> None:
+        self.request(f"/{project.id}", method=RequestMethod.DELETE)
+        self.cache.delete_entry(project)
 
-    def edit_project(self, project_id: int, **kwargs) -> TogglProject | None:
-        data = self.request(
-            f"/{project_id}",
+    def edit_project(self, project: TogglProject, **kwargs) -> Optional[TogglProject]:
+        return self.request(
+            f"/{project.id}",
             method=RequestMethod.PUT,
             body=self.body_creation(**kwargs),
+            refresh=True,
         )
-        if data is None:
-            return None
 
-        return self.model.from_kwargs(**data[0])
-
-    def add_project(self, **kwargs) -> TogglProject | None:
-        data = self.request(
+    def add_project(
+        self,
+        *,
+        refresh: bool = False,
+        **kwargs,
+    ) -> TogglProject | None:
+        return self.request(
             "",
             method=RequestMethod.POST,
             body=self.body_creation(**kwargs),
+            refresh=True,
         )
-        if data is None:
-            return None
-
-        return self.model.from_kwargs(**data[0])
 
     @classmethod
     def get_color(cls, color: str) -> str:

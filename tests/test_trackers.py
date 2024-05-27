@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 import pytest
 
@@ -29,9 +29,9 @@ def test_tracker_creation(add_tracker):
 
 
 @pytest.mark.integration()
-def test_tracker_editing(tracker_model, add_tracker):
-    new_description = "new_description_test"
-    data = tracker_model.edit_tracker(
+def test_tracker_editing(tracker_object, add_tracker):
+    new_description = "new_description_test_2"
+    data = tracker_object.edit_tracker(
         tracker_id=add_tracker.id,
         description=new_description,
     )
@@ -40,21 +40,16 @@ def test_tracker_editing(tracker_model, add_tracker):
 
 
 @pytest.mark.integration()
-def test_tracker_deletion(tracker_model):
-    tracker = tracker_model.add_tracker(
-        description="test_tracker",
-        start=datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
-        duration=-1,
-    )
-    tracker_model.delete_tracker(tracker_id=tracker.id)
-    assert tracker_model.get_tracker(tracker.id, refresh=True) is None
+def test_tracker_stop(tracker_object, add_tracker, user_object):
+    diff = 5
+    time.sleep(diff)
+    trackstop = tracker_object.stop_tracker(tracker_id=add_tracker.id)
+    assert trackstop.duration >= timedelta(seconds=diff)
 
 
 @pytest.mark.integration()
-def test_tracker_stop(tracker_model, add_tracker):
-    time.sleep(1)
-    tracker_model.stop_tracker(tracker_id=add_tracker.id)
-    assert tracker_model.get_tracker(
-        tracker_id=add_tracker.id,
-        refresh=True,
-    ).duration > timedelta(milliseconds=10)
+@pytest.mark.order(after="test_tracker_stop")
+def test_tracker_deletion(tracker_object, user_object, add_tracker):
+    tracker_object.delete_tracker(add_tracker)
+    assert add_tracker != user_object.get_tracker(add_tracker.id)
+    assert add_tracker != user_object.get_tracker(add_tracker.id, refresh=True)

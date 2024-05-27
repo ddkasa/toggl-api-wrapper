@@ -1,5 +1,3 @@
-from httpx import HTTPError
-
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTracker
 
@@ -52,31 +50,38 @@ class TrackerEndpoint(TogglCachedEndpoint):
             f"/{tracker_id}",
             method=RequestMethod.PUT,
             body=self.body_creation(**kwargs),
+            refresh=True,
         )
-        if data is None:
+        if not isinstance(data, self.model):
             return None
 
-        return self.model.from_kwargs(**data)
+        return data
 
-    def delete_tracker(self, tracker_id: int) -> None:
-        self.request(f"/{tracker_id}", method=RequestMethod.DELETE)
+    def delete_tracker(self, tracker: TogglTracker) -> None:
+        self.request(f"/{tracker.id}", method=RequestMethod.DELETE, refresh=True)
+        self.cache.delete_entry(tracker)
 
     def stop_tracker(self, tracker_id: int) -> TogglTracker | None:
-        data = self.request(f"/{tracker_id}/stop", method=RequestMethod.PATCH)
-        if data is None:
+        data = self.request(
+            f"/{tracker_id}/stop",
+            method=RequestMethod.PATCH,
+            refresh=True,
+        )
+        if not isinstance(data, self.model):
             return None
 
-        return self.model.from_kwargs(**data)
+        return data
 
     def add_tracker(self, **kwargs) -> TogglTracker | None:
         data = self.request(
             "",
             method=RequestMethod.POST,
             body=self.body_creation(**kwargs),
+            refresh=True,
         )
-        if data is None:
+        if not isinstance(data, self.model):
             return None
-        return self.model.from_kwargs(**data[0])
+        return data
 
     @property
     def endpoint(self) -> str:

@@ -6,7 +6,7 @@ from .models import TogglTracker
 
 
 class UserEndpoint(TogglCachedEndpoint):
-    def current_tracker(self, *, refresh: bool = False) -> TogglTracker | None:
+    def current_tracker(self, *, refresh: bool = True) -> TogglTracker | None:
         url = "time_entries/current"
 
         try:
@@ -16,10 +16,7 @@ class UserEndpoint(TogglCachedEndpoint):
             if err.response.status_code == tracker_not_running:
                 return None
 
-        if response is None:
-            return None
-
-        return TogglTracker.from_kwargs(**response[0])
+        return response
 
     def get_trackers(
         self,
@@ -39,10 +36,9 @@ class UserEndpoint(TogglCachedEndpoint):
             params = f"?start_date={start_date}&end_date={end_date}"
         response = self.request(params, refresh=refresh)
 
-        if not isinstance(response, list):
+        if response is None:
             return []
-
-        return self.process_models(response)
+        return response
 
     def get_tracker(
         self,
@@ -52,20 +48,20 @@ class UserEndpoint(TogglCachedEndpoint):
     ) -> TogglTracker | None:
         cache = self.load_cache() if not refresh else None
         if isinstance(cache, list):
-            entries = self.process_models(cache)
-            for item in entries:
+            for item in cache:
                 if item.id == tracker_id:
-                    return self.model.from_kwargs(**item)  # type: ignore[return-value]
+                    return item  # type: ignore[return-value]
 
         try:
             response = self.request(f"time_entries/{tracker_id}", refresh=refresh)
-        except HTTPError:
+        except HTTPError as exc:
+            print(exc)
             response = None
 
-        if not isinstance(response, dict):
+        if not isinstance(response, self.model):
             return None
 
-        return self.model.from_kwargs(**response)
+        return response
 
     def check_authentication(self) -> bool:
         try:

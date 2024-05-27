@@ -1,13 +1,12 @@
+from typing import Optional
+
 from .meta import TogglCachedEndpoint
 from .models import TogglWorkspace
 
 
 class WorkspaceEndpoint(TogglCachedEndpoint):
-    def get_workspace(self, *, refresh: bool = False) -> TogglWorkspace | None:
-        response = self.request("", refresh=refresh)
-        if not isinstance(response, list):
-            return None
-        return self.model.from_kwargs(**response[0])
+    def get_workspace(self, *, refresh: bool = False) -> Optional[TogglWorkspace]:
+        return self.request("", refresh=refresh)
 
     @property
     def model(self) -> type[TogglWorkspace]:

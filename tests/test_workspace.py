@@ -16,8 +16,8 @@ def test_workspace_model():
 
 
 @pytest.mark.integration()
-def test_get_workspace(workspace_object):
+def test_get_workspace(workspace_object, get_workspace_id):
     data = workspace_object.get_workspace(refresh=True)
     assert isinstance(data, TogglWorkspace)
-    assert data.id == workspace_object.workspace_id
+    assert data.id == get_workspace_id
     assert workspace_object.cache.cache_path.exists()
