@@ -12,13 +12,14 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Optional
 
 from .base_endpoint import TogglEndpoint
 from .enums import RequestMethod
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import httpx
 
     from toggl_api.modules.models import TogglClass
@@ -55,9 +56,9 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> dict | list | None:
+    ) -> Optional[dict | list]:
         data = self.load_cache()
-        if data and refresh:
+        if data and not refresh:
             return data
 
         response = super().request(
@@ -67,10 +68,14 @@ class TogglCachedEndpoint(TogglEndpoint):
             body=body,
         )
 
-        if not isinstance(response, Sequence):
-            response = [response]
+        if response is None or method == RequestMethod.DELETE:
+            return None
+        if isinstance(response, list):
+            response = self.process_models(response)
+        elif isinstance(response, dict):
+            response = self.model.from_kwargs(**response)
 
-        self.save_cache(data, response, method)
+        self.save_cache(response, method)
 
         return response
 
@@ -79,16 +84,18 @@ class TogglCachedEndpoint(TogglEndpoint):
 
     def save_cache(
         self,
-        data: Sequence[TogglClass],
         response: list[TogglClass],
         method: RequestMethod,
     ) -> None:
         if not self.cache.expire_after.total_seconds():
             return None
-        return self.cache.save_cache(data, response, method)
+        return self.cache.save_cache(response, method)
 
-    def process_models(self, data: Sequence[dict[str, Any]]) -> list[TogglClass]:
-        return [self.model.from_kwargs(**tracker) for tracker in data]
+    def process_models(
+        self,
+        data: Sequence[dict[str, Any]],
+    ) -> list[TogglClass]:
+        return [self.model.from_kwargs(**mdl) for mdl in data]
 
     @property
     @abstractmethod

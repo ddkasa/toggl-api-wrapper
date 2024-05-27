@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from tests.conftest import EndPointTest
 from toggl_api.modules.meta import CustomDecoder, CustomEncoder, RequestMethod
-from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace
+from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, as_dict_custom
 from toggl_api.modules.models.schema import register_tables
 
 
@@ -76,8 +76,12 @@ def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
 @pytest.mark.unit()
 def test_cache_functionality(meta_object, model_data):
     model_data.pop("model")
-    meta_object.cache.save_cache([], model_data.values(), RequestMethod.GET)
-    assert meta_object.cache.load_cache() == list(model_data.values())
+    model_data = [as_dict_custom(item) for item in model_data.values()]
+
+    meta_object.cache.session.data = model_data
+    meta_object.cache.save_cache(model_data, RequestMethod.GET)
+    assert meta_object.cache.load_cache() == model_data
+    meta_object.cache.cache_path.unlink()
 
 
 @pytest.mark.unit()
@@ -88,11 +92,17 @@ def test_expire_after_setter(meta_object):
 
 
 @pytest.mark.slow()
-def test_expiration_json(meta_object, get_test_data):
-    meta_object.cache.expire_after = timedelta(seconds=10)
-    meta_object.save_cache([], get_test_data, RequestMethod.GET)
+def test_expiration_json(meta_object, model_data):
+    model_data.pop("model")
+
+    meta_object.cache.expire_after = timedelta(seconds=5)
+    meta_object.save_cache(list(model_data.values()), RequestMethod.GET)
     assert meta_object.cache.cache_path.exists()
     time.sleep(10)
+    meta_object.cache.session.load(
+        meta_object.cache.cache_path,
+        meta_object.cache.expire_after,
+    )
     assert not meta_object.load_cache()
 
 

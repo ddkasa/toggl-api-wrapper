@@ -4,6 +4,7 @@ Classes:
     TogglRequest: Base class with basic functionality for all API requests.
 """
 
+import logging
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
 from typing import Any, Final, Optional
@@ -11,6 +12,8 @@ from typing import Any, Final, Optional
 import httpx
 
 from .enums import RequestMethod
+
+log = logging.getLogger("toggl_api")
 
 
 class TogglEndpoint(metaclass=ABCMeta):
@@ -75,21 +78,16 @@ class TogglEndpoint(metaclass=ABCMeta):
         else:
             response = self.method(method)(url, headers=headers)
         if response.status_code != self.OK_RESPONSE:
-            print(url)
             # TODO: Toggl API return code lookup.
             # TODO: If a "already exists" 400 code is returned it should return the get or None.
-            msg = f"Request failed with status code {response.status_code}: {response.text}"
-            raise httpx.HTTPError(msg)
+            msg = "Request failed with status code %s: %s"
+            log.error(msg, response.status_code, response.text)
+            raise httpx.HTTPError(msg % (response.status_code, response.text))
 
         try:
-            data = response.json()
+            return response.json()
         except ValueError:
             return None
-
-        if not isinstance(data, list):
-            return [data]
-
-        return data
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         """Generate basic headers for Toggl API request.

@@ -67,15 +67,30 @@ class TogglCache(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def add_entry(self, entry: TogglClass) -> None:
+    def add_entries(
+        self,
+        data: list[TogglClass],
+        update: list[TogglClass],
+        **kwargs,
+    ) -> None:
         pass
 
     @abstractmethod
-    def update_entry(self, entry: TogglClass) -> TogglClass | None:
+    def update_entries(
+        self,
+        data: list[TogglClass],
+        update: list[TogglClass],
+        **kwargs,
+    ) -> TogglClass | None:
         pass
 
     @abstractmethod
-    def delete_entry(self, entry: TogglClass) -> TogglClass | None:
+    def delete_entries(
+        self,
+        data: list[TogglClass],
+        update: list[TogglClass],
+        **kwargs,
+    ) -> TogglClass | None:
         pass
 
     @property
@@ -101,11 +116,11 @@ class TogglCache(metaclass=ABCMeta):
 
     def find_method(self, method: RequestMethod) -> Callable | None:
         match_func: Final[dict[RequestMethod, Callable]] = {
-            RequestMethod.GET: self.add_entry,
-            RequestMethod.POST: self.update_entry,
-            RequestMethod.PATCH: self.update_entry,
-            RequestMethod.PUT: self.add_entry,
-            RequestMethod.DELETE: self.delete_entry,
+            RequestMethod.GET: self.add_entries,
+            RequestMethod.POST: self.update_entries,
+            RequestMethod.PATCH: self.update_entries,
+            RequestMethod.PUT: self.add_entries,
+            # RequestMethod.DELETE: self.delete_entries,
         }
         return match_func.get(method)
 

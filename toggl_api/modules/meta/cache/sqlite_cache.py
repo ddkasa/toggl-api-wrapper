@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import atexit
 from typing import TYPE_CHECKING, Optional
 
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from toggl_api.modules.models import register_tables
+from toggl_api.modules.models import TogglClass, register_tables
 
 from .base_cache import TogglCache
 
@@ -14,11 +15,14 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
-    from toggl_api.modules.models import TogglClass
 
 
 class SqliteCache(TogglCache):
-    __slots__ = ("database", "metadata")
+    __slots__ = (
+        "database",
+        "metadata",
+        "session",
+    )
 
     def __init__(
         self,
@@ -28,47 +32,48 @@ class SqliteCache(TogglCache):
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = db.create_engine(f"sqlite:///{self.cache_path}")
-        with self.database.connect():
-            self.metadata = register_tables(self.database)
+        self.metadata = register_tables(self.database)
 
-    def save_cache(self, data: TogglClass, method: RequestMethod) -> None:
+        self.session = Session(self.database)
+        atexit.register(self.session.close)
+
+    def save_cache(self, entry: TogglClass, method: RequestMethod) -> None:
+        self.parent_exists()
         func = self.find_method(method)
         if func is None:
-            msg = f"Caching method {method} is not implemented"
-            raise NotImplementedError(msg)
+            return
 
-        func(data)
+        func(entry)
 
     def load_cache(self) -> list[TogglClass]:
         self.parent_exists()
+        return self.session.query(self.parent.model)
 
-        return []
+    def add_entries(self, entry: TogglClass) -> None:
+        if isinstance(entry, TogglClass):
+            self.session.add(entry)
+        else:
+            self.session.add_all(entry)
 
-    def add_entry(self, entry: TogglClass) -> None:
-        if self.parent is None:
-            return
-        with Session(self.database) as session:
-            session.add(entry)
-            session.commit()
+        self.session.commit()
 
-    def update_entry(self, entry: TogglClass) -> None:
-        with Session(self.database) as session:
-            session.add(entry)
-            session.commit()
+    def update_entries(self, entry: TogglClass) -> None:
+        self.session.merge(entry)
+        self.session.commit()
+
+    def delete_entries(self, entry: list[TogglClass]) -> None:
+        for item in entry:
+            self.delete_entry(item)
 
     def delete_entry(self, entry: TogglClass) -> None:
-        with Session(self.database) as session:
-            session.delete(entry)
-            session.commit()
+        self.session.delete(entry)
+        self.session.commit()
 
     def find_entry(  # type: ignore[override]
         self,
         query: TogglClass,
     ) -> TogglClass | None:
-        if self.parent is None:
-            return None
-        with Session(self.database) as session:
-            return session.query(self.parent.model).get(query)
+        return self.session.query(self.parent.model).get(query)
 
     @property
     def cache_path(self) -> Path:
