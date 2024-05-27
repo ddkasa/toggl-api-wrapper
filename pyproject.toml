@@ -36,6 +36,8 @@ coverage = "^7.5.1"
 tox-gh-actions = "^3.2.0"
 pytest-httpx = "^0.30.0"
 pytest-sqlalchemy-mock = "^0.1.6"
+faker = "^25.2.0"
+pytest-reportlog = "^0.4.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.0"
@@ -163,14 +165,14 @@ ignore_missing_imports = true
 ignore_no_redef = true
 
 [tool.pytest.ini_options]
-# pythonpath = [
-#   "."
-# ]
 markers = [
     "unit: Basic unit tests using local cache.",
     "integration: Tests that actively use the API.",
     "slow: Tests that are slow to run or have delays included.",
 ]
+testpaths = ["tests"]
+addopts = "--report-log=logs/pytest.jsonl"
+
 
 [tool.tox]
 legacy_tox_ini = """

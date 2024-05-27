@@ -5,3 +5,4 @@
 files
 .tox
 .coverage
+logs

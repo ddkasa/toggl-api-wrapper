@@ -283,6 +283,20 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "faker"
+version = "25.2.0"
+description = "Faker is a Python package that generates fake data for you."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "Faker-25.2.0-py3-none-any.whl", hash = "sha256:cfe97c4857c4c36ee32ea4aaabef884895992e209bae4cbd26807cf3e05c6918"},
+    {file = "Faker-25.2.0.tar.gz", hash = "sha256:45b84f47ff1ef86e3d1a8d11583ca871ecf6730fad0660edadc02576583a2423"},
+]
+
+[package.dependencies]
+python-dateutil = ">=2.4"
+
+[[package]]
 name = "filelock"
 version = "3.14.0"
 description = "A platform independent file lock."
@@ -983,6 +997,23 @@ files = [
 pytest = {version = ">=6.2.4", markers = "python_version >= \"3.10\""}
 
 [[package]]
+name = "pytest-reportlog"
+version = "0.4.0"
+description = "Replacement for the --resultlog option, focused in simplicity and extensibility"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-reportlog-0.4.0.tar.gz", hash = "sha256:c9f2079504ee51f776d3118dcf5e4730f163d3dcf26ebc8f600c1fa307bf638c"},
+    {file = "pytest_reportlog-0.4.0-py3-none-any.whl", hash = "sha256:5db4d00586546d8c6b95c66466629f1e913440c36d97795a673d2e19c5cedd5c"},
+]
+
+[package.dependencies]
+pytest = "*"
+
+[package.extras]
+dev = ["pre-commit", "tox"]
+
+[[package]]
 name = "pytest-sqlalchemy-mock"
 version = "0.1.6"
 description = "pytest sqlalchemy plugin for mock"
@@ -1458,4 +1489,4 @@ test = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9c50f2a37fdb1f13f390a527f8943e2890e1cf41df814e6e2bbd3ff4445097e4"
+content-hash = "fa4f21f457bbcea0a5a37d17e86327c4176fee27629e589bb7940eb8b16c9893"
