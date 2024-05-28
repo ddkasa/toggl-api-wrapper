@@ -21,7 +21,7 @@ def format_iso(date: datetime) -> str:
 
 
 def parse_iso(date: str) -> datetime:
-    if not isinstance(date, str):
+    if isinstance(date, datetime):
         return date
     if date.endswith("Z"):
         date = date[:-1] + "-00:00"

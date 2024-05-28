@@ -65,8 +65,7 @@ class JSONSession:
                 data = json.load(f, cls=CustomDecoder)
             self.timestamp = parse_iso(data["timestamp"])
             self.version = data["version"]
-            min_ts = datetime.now(timezone.utc) - expire_after
-            self.data = [m for m in data["data"] if m.timestamp >= min_ts]
+            self.data = data["data"]
         else:
             self.timestamp = datetime.now(timezone.utc)
             self.version = version
@@ -79,8 +78,18 @@ class JSONCache(TogglCache):
         path: Path to the cache file
         expire_after: Time after which the cache should be refreshed
         parent: Parent TogglCachedEndpoint
-        session: Store the current json data in memory while handling the cache.
 
+    Methods:
+        commit: Wrapper for JSONSession.save() that saves the current json data
+            to disk.
+        save_cache: Saves the given data to the cache. Takes a list of Toggl
+            objects or a single Toggl object as an argument and process the
+            change before saving.
+        load_cache: Loads the data from the cache and returns the data to the
+            caller discarding expired entries.
+
+    Attributes:
+        session: Store the current json data in memory while handling the cache.
     """
 
     __slots__ = ("session",)
@@ -111,7 +120,8 @@ class JSONCache(TogglCache):
         self.commit()
 
     def load_cache(self) -> list[TogglClass]:
-        return self.session.data
+        min_ts = datetime.now(timezone.utc) - self.expire_after
+        return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
 
     def find_entry(
         self,

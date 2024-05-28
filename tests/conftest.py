@@ -1,3 +1,5 @@
+# mypy: disable-error-code=override
+
 import contextlib
 import os
 from datetime import datetime, timedelta, timezone
@@ -20,8 +22,9 @@ from toggl_api.utility import format_iso
 
 
 class ModelTest(TogglClass):
-    def from_kwargs(self, **kwargs) -> TogglClass:
-        return self(
+    @classmethod
+    def from_kwargs(cls, **kwargs) -> TogglClass:
+        return cls(
             id=kwargs["id"],
             name=kwargs["name"],
         )
@@ -85,7 +88,7 @@ def model_data(get_workspace_id):
         "model": ModelTest(id=1, name="test_model"),
         "client": client,
         "project": project,
-        "tracker": TogglTracker(
+        "tracker": TogglTracker.from_kwargs(
             id=1,
             name="test_tracker",
             workspace=workspace.id,

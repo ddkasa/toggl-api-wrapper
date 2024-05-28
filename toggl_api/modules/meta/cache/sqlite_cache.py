@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import atexit
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
 import sqlalchemy as db
@@ -18,6 +19,19 @@ if TYPE_CHECKING:
 
 
 class SqliteCache(TogglCache):
+    """Class for caching data to a Sqlite database.
+
+    Attributes:
+        database: Sqlalchemy database engine.
+        metadata: Sqlalchemy metadata.
+        session: Sqlalchemy session.
+
+    Methods:
+        load_cache: Loads the data from disk and stores it in the data attribute.
+            Invalidates any entries older than expire argument.
+
+    """
+
     __slots__ = (
         "database",
         "metadata",
@@ -48,16 +62,16 @@ class SqliteCache(TogglCache):
         func = self.find_method(method)
         if func is None:
             return
-
         func(entry)
-
         self.commit()
 
-    def load_cache(self) -> list[TogglClass]:
+    def load_cache(self) -> db.Query[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
-        return list(self.session.query(self.parent.model))
+        query = self.session.query(self.parent.model)
+        min_ts = datetime.now(timezone.utc) - self._expire_after
+        return query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
 
     def add_entries(self, entry: list[TogglClass] | TogglClass) -> None:
         if isinstance(entry, TogglClass):
@@ -85,12 +99,17 @@ class SqliteCache(TogglCache):
 
     def find_entry(
         self,
-        query: TogglClass,
-    ) -> TogglClass | None:
+        query: TogglClass | dict,
+    ) -> db.Query[TogglClass]:
+        if isinstance(query, TogglClass):
+            query = {"name": query.name, "id": query.id}
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
-        return self.session.query(self.parent.model).get(query)
+        min_ts = datetime.now(timezone.utc) - self.expire_after
+        search = self.session.query(self.parent.model)
+        search = search.filter(self.parent.model.timestamp >= min_ts)  # type: ignore[operator]
+        return search.filter_by(**query)  # type: ignore[name-defined]
 
     @property
     def cache_path(self) -> Path:

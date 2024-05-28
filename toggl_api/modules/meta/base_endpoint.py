@@ -10,7 +10,6 @@ from collections.abc import Callable
 from typing import Any, Final, Optional
 
 import httpx
-from httpx import HTTPStatusError
 
 from toggl_api.modules.models.models import TogglClass
 
