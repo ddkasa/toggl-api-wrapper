@@ -30,6 +30,20 @@ if TYPE_CHECKING:
 
 @dataclass
 class JSONSession:
+    """Data structure for storing JSON in memory.
+
+    Methods:
+        save: Saves the data to a JSON file. Setting current timestamp and
+            version.
+        load: Loads the data from disk and stores it in the data attribute.
+            Invalidates any entries older than expire argument.
+
+    Attributes:
+        timestamp: Timestamp of the data for when it was loaded.
+        version: Version of the data structure.
+        data: List of Toggl objects stored in memory.
+    """
+
     timestamp: datetime = field(init=False)
     version: str = field(init=False, default=version)
     data: list[TogglClass] = field(default_factory=list)
@@ -42,17 +56,16 @@ class JSONSession:
             "version": self.version,
             "data": self.data,
         }
-
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
-    def load(self, path: Path, expire: timedelta) -> None:
+    def load(self, path: Path, expire_after: timedelta) -> None:
         if path.exists():
             with path.open("r", encoding="utf-8") as f:
                 data = json.load(f, cls=CustomDecoder)
             self.timestamp = parse_iso(data["timestamp"])
             self.version = data["version"]
-            min_ts = datetime.now(timezone.utc) - expire
+            min_ts = datetime.now(timezone.utc) - expire_after
             self.data = [m for m in data["data"] if m.timestamp >= min_ts]
         else:
             self.timestamp = datetime.now(timezone.utc)
@@ -201,9 +214,9 @@ class CustomDecoder(json.decoder.JSONDecoder):
             with contextlib.suppress(json.decoder.JSONDecodeError):
                 obj = super().decode(obj)
 
-        if isinstance(obj, dict) and "timestamp" in obj and isinstance(obj["timestamp"], str):
-            obj["timestamp"] = parse_iso(obj["timestamp"])
         if isinstance(obj, dict):
+            if "timestamp" in obj and isinstance(obj["timestamp"], str):
+                obj["timestamp"] = parse_iso(obj["timestamp"])
             for k, v in obj.items():
                 obj[k] = self.decode(v)
             if "class" in obj:
