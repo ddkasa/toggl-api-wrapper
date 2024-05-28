@@ -68,17 +68,17 @@ def model_data(get_workspace_id):
         workspace=workspace.id,
     )
     project = TogglProject(
-        1,
-        "test_project",
+        id=1,
+        name="test_project",
         workspace=workspace.id,
         color="000000",
         client=client.id,
         active=True,
     )
     tag = TogglTag(
-        1,
-        "test_tag",
-        workspace.id,
+        id=1,
+        name="test_tag",
+        workspace=workspace.id,
     )
     return {
         "workspace": workspace,

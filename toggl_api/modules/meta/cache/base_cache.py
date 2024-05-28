@@ -14,20 +14,23 @@ if TYPE_CHECKING:
     from toggl_api.modules.models import TogglClass
 
 
+# TODO: Possibly could add a 'session' object for all cache types.
+# TODO: Implement a uniform way of handling querying/searching caches.
 class TogglCache(metaclass=ABCMeta):
     """Abstract class for caching toggl API data to disk.
 
     Integrates fully with TogglCachedEndpoint to create a seemless depending on
     the users choice of cache.
 
-
     Abstract Methods:
-        load_cache:
-        save_cache
-        find_entry
-        add_entry
-        update_entry
-        delete_entry
+        commit: Commits the cache to disk, database or other form.
+            Basically method for finalising the cache.
+        load_cache: Loads the cache from disk, database or other form.
+        save_cache: Saves and preforms action depending on request type.
+        find_entry: Looks for a TogglClass in the cache.
+        add_entry: Adds a TogglClass to the cache.
+        update_entry: Updates a TogglClass in the cache.
+        delete_entry: Deletes a TogglClass from the cache.
 
     Methods:
         find_method: Matches a RequestMethod to cache functionality.
@@ -55,42 +58,44 @@ class TogglCache(metaclass=ABCMeta):
         self._parent = parent
 
     @abstractmethod
+    def commit(self) -> None:
+        pass
+
+    @abstractmethod
     def load_cache(self) -> list[TogglClass]:
         pass
 
     @abstractmethod
-    def save_cache(self, data: list[TogglClass], method: RequestMethod) -> None:
+    def save_cache(
+        self,
+        entry: list[TogglClass] | TogglClass,
+        method: RequestMethod,
+    ) -> None:
         pass
 
     @abstractmethod
-    def find_entry(self, **kwargs) -> list[TogglClass]:
+    def find_entry(self, entry: TogglClass) -> TogglClass | None:
         pass
 
     @abstractmethod
     def add_entries(
         self,
-        data: list[TogglClass],
         update: list[TogglClass],
-        **kwargs,
     ) -> None:
         pass
 
     @abstractmethod
     def update_entries(
         self,
-        data: list[TogglClass],
-        update: list[TogglClass],
-        **kwargs,
-    ) -> TogglClass | None:
+        update: list[TogglClass] | TogglClass,
+    ) -> None:
         pass
 
     @abstractmethod
     def delete_entries(
         self,
-        data: list[TogglClass],
-        update: list[TogglClass],
-        **kwargs,
-    ) -> TogglClass | None:
+        update: list[TogglClass] | TogglClass,
+    ) -> None:
         pass
 
     @property
@@ -120,12 +125,5 @@ class TogglCache(metaclass=ABCMeta):
             RequestMethod.POST: self.update_entries,
             RequestMethod.PATCH: self.update_entries,
             RequestMethod.PUT: self.add_entries,
-            # RequestMethod.DELETE: self.delete_entries,
         }
         return match_func.get(method)
-
-    def parent_exists(self) -> None:
-        if self.parent is not None:
-            return
-        msg = "Parent is not setup!"
-        raise TypeError(msg)

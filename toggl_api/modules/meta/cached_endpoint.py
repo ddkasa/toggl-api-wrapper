@@ -12,14 +12,12 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from .base_endpoint import TogglEndpoint
 from .enums import RequestMethod
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     import httpx
 
     from toggl_api.modules.models import TogglClass
@@ -56,7 +54,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> Optional[dict | list]:
+    ) -> Optional[TogglClass | list[TogglClass]]:
         data = self.load_cache()
         if data and not refresh:
             return data
@@ -70,12 +68,8 @@ class TogglCachedEndpoint(TogglEndpoint):
 
         if response is None or method == RequestMethod.DELETE:
             return None
-        if isinstance(response, list):
-            response = self.process_models(response)
-        elif isinstance(response, dict):
-            response = self.model.from_kwargs(**response)
 
-        self.save_cache(response, method)
+        self.save_cache(response, method)  # type: ignore[arg-type]
 
         return response
 
@@ -84,18 +78,12 @@ class TogglCachedEndpoint(TogglEndpoint):
 
     def save_cache(
         self,
-        response: list[TogglClass],
+        response: list[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
         if not self.cache.expire_after.total_seconds():
             return None
         return self.cache.save_cache(response, method)
-
-    def process_models(
-        self,
-        data: Sequence[dict[str, Any]],
-    ) -> list[TogglClass]:
-        return [self.model.from_kwargs(**mdl) for mdl in data]
 
     @property
     @abstractmethod

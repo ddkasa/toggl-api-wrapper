@@ -32,7 +32,7 @@ def test_tracker_creation(add_tracker):
 def test_tracker_editing(tracker_object, add_tracker):
     new_description = "new_description_test_2"
     data = tracker_object.edit_tracker(
-        tracker_id=add_tracker.id,
+        tracker=add_tracker,
         description=new_description,
     )
     assert isinstance(data, TogglTracker)
@@ -43,7 +43,7 @@ def test_tracker_editing(tracker_object, add_tracker):
 def test_tracker_stop(tracker_object, add_tracker, user_object):
     diff = 5
     time.sleep(diff)
-    trackstop = tracker_object.stop_tracker(tracker_id=add_tracker.id)
+    trackstop = tracker_object.stop_tracker(tracker=add_tracker)
     assert trackstop.duration >= timedelta(seconds=diff)
 
 

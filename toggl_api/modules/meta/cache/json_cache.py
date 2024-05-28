@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Optional
 
@@ -21,7 +21,7 @@ from toggl_api.version import version
 from .base_cache import TogglCache
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Iterable
     from pathlib import Path
 
     from toggl_api.modules.meta import RequestMethod
@@ -37,8 +37,14 @@ class JSONSession:
     def save(self, path: Path) -> None:
         self.timestamp = datetime.now(timezone.utc)
         self.version = version
+        data = {
+            "timestamp": self.timestamp.isoformat(),
+            "version": self.version,
+            "data": self.data,
+        }
+
         with path.open("w", encoding="utf-8") as f:
-            json.dump(asdict(self), f, cls=CustomEncoder)
+            json.dump(data, f, cls=CustomEncoder)
 
     def load(self, path: Path, expire: timedelta) -> None:
         if path.exists():
@@ -66,7 +72,7 @@ class JSONCache(TogglCache):
 
     __slots__ = ("session",)
 
-    # TODO: Consider creating a 'session' object to manage the cache peristently.
+    # TODO: Consider creating a 'session' object to manage the cache persistently.
 
     def __init__(
         self,
@@ -75,17 +81,16 @@ class JSONCache(TogglCache):
         parent: Optional[TogglCachedEndpoint] = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.session = None
+        self.session = JSONSession()
 
     def commit(self) -> None:
         self.session.save(self.cache_path)
 
     def save_cache(
         self,
-        update: Iterable[TogglClass],
+        update: Iterable[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
-        self.parent_exists()
         func = self.find_method(method)
         if func is not None:
             func(update)
@@ -93,18 +98,17 @@ class JSONCache(TogglCache):
         self.commit()
 
     def load_cache(self) -> list[TogglClass]:
-        self.parent_exists()
         return self.session.data
 
     def find_entry(
         self,
-        entry: Optional[Mapping | TogglClass] = None,
+        entry: TogglClass,
         **kwargs,
     ) -> Optional[TogglClass]:
         if not self.session.data:
             return None
         for item in self.session.data:
-            if entry is not None and item["id"] == entry["id"]:
+            if entry is not None and item["id"] == entry["id"] and type(entry) == type(item):
                 return item
         return None
 
@@ -112,20 +116,18 @@ class JSONCache(TogglCache):
         self,
         item: TogglClass,
     ) -> None:
-        find_entry = self.find_entry(entry=item)
-        if not find_entry:
+        find_entry = self.find_entry(item)
+        if find_entry is None:
             return self.session.data.append(item)
         index = self.session.data.index(find_entry)
         self.session.data[index] = item
-        return self.commit()
+        return None
 
     def add_entries(
         self,
-        update: list[TogglClass],
+        update: list[TogglClass] | TogglClass,
         **kwargs,
     ) -> None:
-        if not update:
-            return self.session.data
         if isinstance(update, TogglClass):
             return self.add_entry(update)
         for item in update:
@@ -134,7 +136,7 @@ class JSONCache(TogglCache):
 
     def update_entries(
         self,
-        update: list[TogglClass],
+        update: list[TogglClass] | TogglClass,
         **kwargs,
     ) -> None:
         self.add_entries(update)
@@ -142,22 +144,25 @@ class JSONCache(TogglCache):
     def delete_entry(self, entry: TogglClass) -> None:
         find_entry = self.find_entry(entry)
         if not find_entry:
-            return None
+            return
         index = self.session.data.index(find_entry)
         self.session.data.pop(index)
-        return self.commit()
 
     def delete_entries(
         self,
-        update: list[TogglClass],
+        update: list[TogglClass] | TogglClass,
         **kwargs,
     ) -> None:
+        if isinstance(update, TogglClass):
+            return self.delete_entry(update)
         for entry in update:
             self.delete_entry(entry)
-        self.commit()
+        return None
 
     @property
     def cache_path(self) -> Path:
+        if self.parent is None:
+            return self._cache_path / "cache.json"
         return self._cache_path / f"cache_{self.parent.model.__tablename__}.json"
 
     @property
@@ -167,8 +172,7 @@ class JSONCache(TogglCache):
     @parent.setter
     def parent(self, parent: Optional[TogglCachedEndpoint]) -> None:
         self._parent = parent
-        if parent is not None and self.session is None:
-            self.session = JSONSession()
+        if parent is not None:
             self.session.load(self.cache_path, self.expire_after)
 
 
@@ -184,8 +188,7 @@ class CustomEncoder(json.encoder.JSONEncoder):
 
 
 class CustomDecoder(json.decoder.JSONDecoder):
-    MATCH_DICT: Final[str, TogglClass] = {
-        TogglClass.__tablename__: TogglClass,
+    MATCH_DICT: Final[dict[str, type[TogglClass]]] = {
         TogglClient.__tablename__: TogglClient,
         TogglProject.__tablename__: TogglProject,
         TogglTag.__tablename__: TogglTag,
@@ -193,20 +196,20 @@ class CustomDecoder(json.decoder.JSONDecoder):
         TogglWorkspace.__tablename__: TogglWorkspace,
     }
 
-    def decode(self, obj: Any) -> Any:
+    def decode(self, obj: Any) -> Any:  # type: ignore[override]
         if obj and isinstance(obj, str):
             with contextlib.suppress(json.decoder.JSONDecodeError):
                 obj = super().decode(obj)
 
         if isinstance(obj, dict) and "timestamp" in obj and isinstance(obj["timestamp"], str):
             obj["timestamp"] = parse_iso(obj["timestamp"])
-        if isinstance(obj, dict) and "class" in obj:
-            cls: str = obj.pop("class")
-            return self.MATCH_DICT[cls].from_kwargs(**obj)
-
         if isinstance(obj, dict):
             for k, v in obj.items():
                 obj[k] = self.decode(v)
+            if "class" in obj:
+                cls: str = obj.pop("class")
+                obj = self.MATCH_DICT[cls].from_kwargs(**obj)
+
         elif isinstance(obj, list):
             for i, v in enumerate(obj):
                 obj[i] = self.decode(v)

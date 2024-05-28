@@ -10,6 +10,9 @@ from collections.abc import Callable
 from typing import Any, Final, Optional
 
 import httpx
+from httpx import HTTPStatusError
+
+from toggl_api.modules.models.models import TogglClass
 
 from .enums import RequestMethod
 
@@ -52,7 +55,7 @@ class TogglEndpoint(metaclass=ABCMeta):
         headers: Optional[dict] = None,
         body: Optional[dict] = None,
         method: RequestMethod = RequestMethod.GET,
-    ) -> dict | list | None:
+    ) -> Optional[list[TogglClass] | TogglClass]:
         """Main request method which handles putting together the final API
         request.
 
@@ -77,17 +80,25 @@ class TogglEndpoint(metaclass=ABCMeta):
             response = self.method(method)(url, headers=headers, json=body)
         else:
             response = self.method(method)(url, headers=headers)
+
         if response.status_code != self.OK_RESPONSE:
             # TODO: Toggl API return code lookup.
             # TODO: If a "already exists" 400 code is returned it should return the get or None.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
-            raise httpx.HTTPError(msg % (response.status_code, response.text))
+            response.raise_for_status()
 
         try:
-            return response.json()
+            data = response.json()
         except ValueError:
             return None
+
+        if isinstance(data, list):
+            data = self.process_models(data)
+        elif isinstance(data, dict):
+            data = self.model.from_kwargs(**data)
+
+        return data
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         """Generate basic headers for Toggl API request.
@@ -103,6 +114,12 @@ class TogglEndpoint(metaclass=ABCMeta):
             "workspace_id": self.workspace_id,
         }
 
+    def process_models(
+        self,
+        data: list[dict[str, Any]],
+    ) -> list[TogglClass]:
+        return [self.model.from_kwargs(**mdl) for mdl in data]
+
     @property
     @abstractmethod
     def endpoint(self) -> str:
@@ -110,5 +127,5 @@ class TogglEndpoint(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def model(self):
-        pass
+    def model(self) -> type[TogglClass]:
+        return TogglClass
