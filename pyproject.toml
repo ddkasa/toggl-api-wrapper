@@ -162,7 +162,6 @@ line-ending = "auto"
 
 [tool.mypy]
 ignore_missing_imports = true
-ignore_no_redef = true
 
 [tool.pytest.ini_options]
 markers = [
