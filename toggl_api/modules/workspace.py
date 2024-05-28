@@ -6,7 +6,7 @@ from .models import TogglWorkspace
 
 class WorkspaceEndpoint(TogglCachedEndpoint):
     def get_workspace(self, *, refresh: bool = False) -> Optional[TogglWorkspace]:
-        return self.request("", refresh=refresh)
+        return self.request("", refresh=refresh)  # type: ignore[return-value]
 
     @property
     def model(self) -> type[TogglWorkspace]:

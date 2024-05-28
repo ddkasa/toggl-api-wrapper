@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTracker
 
@@ -45,9 +47,13 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         return headers
 
-    def edit_tracker(self, tracker_id: int, **kwargs) -> TogglTracker | None:
+    def edit_tracker(
+        self,
+        tracker: TogglTracker,
+        **kwargs,
+    ) -> Optional[TogglTracker]:
         data = self.request(
-            f"/{tracker_id}",
+            f"/{tracker.id}",
             method=RequestMethod.PUT,
             body=self.body_creation(**kwargs),
             refresh=True,
@@ -58,30 +64,28 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return data
 
     def delete_tracker(self, tracker: TogglTracker) -> None:
-        self.request(f"/{tracker.id}", method=RequestMethod.DELETE, refresh=True)
-        self.cache.delete_entry(tracker)
-
-    def stop_tracker(self, tracker_id: int) -> TogglTracker | None:
-        data = self.request(
-            f"/{tracker_id}/stop",
-            method=RequestMethod.PATCH,
+        self.request(
+            f"/{tracker.id}",
+            method=RequestMethod.DELETE,
             refresh=True,
         )
-        if not isinstance(data, self.model):
-            return None
+        self.cache.delete_entries(tracker)
+        self.cache.commit()
 
-        return data
+    def stop_tracker(self, tracker: TogglTracker) -> Optional[TogglTracker]:
+        return self.request(
+            f"/{tracker.id}/stop",
+            method=RequestMethod.PATCH,
+            refresh=True,
+        )  # type: ignore[return-value]
 
-    def add_tracker(self, **kwargs) -> TogglTracker | None:
-        data = self.request(
+    def add_tracker(self, **kwargs) -> Optional[TogglTracker]:
+        return self.request(
             "",
             method=RequestMethod.POST,
             body=self.body_creation(**kwargs),
             refresh=True,
-        )
-        if not isinstance(data, self.model):
-            return None
-        return data
+        )  # type: ignore[return-value]
 
     @property
     def endpoint(self) -> str:

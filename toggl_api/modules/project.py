@@ -27,16 +27,19 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
         **kwargs,
-    ) -> list[TogglProject] | None:
-        return self.request("", refresh=refresh)
+    ) -> Optional[list[TogglProject]]:
+        return self.request("", refresh=refresh)  # type: ignore[return-value]
 
     def get_project(
         self,
         project_id: int,
         *,
         refresh: bool = False,
-    ) -> TogglProject | None:
-        return self.request(f"/{project_id}", refresh=refresh)
+    ) -> Optional[TogglProject]:
+        return self.request(
+            f"/{project_id}",
+            refresh=refresh,
+        )  # type: ignore[return-value]
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         headers = super().body_creation(**kwargs)
@@ -72,7 +75,8 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
     def delete_project(self, project: TogglProject) -> None:
         self.request(f"/{project.id}", method=RequestMethod.DELETE)
-        self.cache.delete_entry(project)
+        self.cache.delete_entries(project)
+        self.cache.commit()
 
     def edit_project(self, project: TogglProject, **kwargs) -> Optional[TogglProject]:
         return self.request(
@@ -80,7 +84,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             method=RequestMethod.PUT,
             body=self.body_creation(**kwargs),
             refresh=True,
-        )
+        )  # type: ignore[return-value]
 
     def add_project(
         self,
@@ -93,7 +97,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             method=RequestMethod.POST,
             body=self.body_creation(**kwargs),
             refresh=True,
-        )
+        )  # type: ignore[return-value]
 
     @classmethod
     def get_color(cls, color: str) -> str:

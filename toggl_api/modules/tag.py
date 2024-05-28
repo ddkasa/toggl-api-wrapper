@@ -9,9 +9,8 @@ class TagEndpoint(TogglCachedEndpoint):
         self,
         *,
         refresh: bool = False,
-        **kwargs,
     ) -> list[TogglTag]:
-        return self.request("", refresh=refresh)
+        return self.request("", refresh=refresh)  # type: ignore[return-value]
 
     def create_tag(self, name: str, **kwargs) -> TogglTag:
         body = self.body_creation(**kwargs)
@@ -21,7 +20,7 @@ class TagEndpoint(TogglCachedEndpoint):
             body=body,
             method=RequestMethod.POST,
             refresh=True,
-        )
+        )  # type: ignore[return-value]
 
     def update_tag(self, tag: TogglTag, **kwargs) -> TogglTag:
         body = self.body_creation(**kwargs)
@@ -30,11 +29,12 @@ class TagEndpoint(TogglCachedEndpoint):
             body=body,
             method=RequestMethod.PUT,
             refresh=True,
-        )
+        )  # type: ignore[return-value]
 
     def delete_tag(self, tag: TogglTag, **kwargs) -> None:
         self.request(f"/{tag.id}", method=RequestMethod.DELETE, refresh=True)
-        self.cache.delete_entry(tag)
+        self.cache.delete_entries(tag)
+        self.cache.commit()
 
     def body_creation(self, **kwargs) -> dict[str, Any]:
         headers = super().body_creation(**kwargs)

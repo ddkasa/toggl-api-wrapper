@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
@@ -30,29 +30,27 @@ class ClientEndpoint(TogglCachedEndpoint):
             body=body,
             method=RequestMethod.POST,
             refresh=True,
-        )
+        )  # type: ignore[return-value]
 
     def get_client(
         self,
         client_id: int,
         *,
         refresh: bool = False,
-    ) -> TogglClient | None:
-        return self.request(f"/{client_id}", refresh=refresh)
+    ) -> Optional[TogglClient]:
+        return self.request(
+            f"/{client_id}",
+            refresh=refresh,
+        )  # type: ignore[return-value]
 
-    def update_client(self, client_id: int, **kwargs) -> TogglClient:
+    def update_client(self, client_id: int, **kwargs) -> Optional[TogglClient]:
         body = self.body_creation(**kwargs)
-        response = self.request(
+        return self.request(
             f"/{client_id}",
             body=body,
             method=RequestMethod.PUT,
             refresh=True,
-        )
-
-        if response is None:
-            return None
-
-        return response
+        )  # type: ignore[return-value]
 
     def delete_client(self, client: TogglClient) -> None:
         self.request(
@@ -60,14 +58,15 @@ class ClientEndpoint(TogglCachedEndpoint):
             method=RequestMethod.DELETE,
             refresh=True,
         )
-        self.cache.delete_entry(client)
+        self.cache.delete_entries(client)
+        self.cache.commit()
 
     def get_clients(
         self,
         *,
         refresh: bool = False,
         **kwargs,
-    ) -> list[TogglClient] | None:
+    ) -> list[TogglClient]:
         status = kwargs.get("status")
         name = kwargs.get("name")
 
@@ -82,7 +81,7 @@ class ClientEndpoint(TogglCachedEndpoint):
             url += f"{name}"
 
         response = self.request(url)
-        return response if isinstance(response, list) else []
+        return response if isinstance(response, list) else []  # type: ignore[return-value]
 
     @property
     def endpoint(self) -> str:

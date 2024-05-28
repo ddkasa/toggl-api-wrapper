@@ -1,29 +1,31 @@
-import httpx
-from httpx import HTTPError
+from typing import Final, Optional
+
+from httpx import HTTPError, HTTPStatusError
 
 from .meta import TogglCachedEndpoint
 from .models import TogglTracker
 
 
 class UserEndpoint(TogglCachedEndpoint):
-    def current_tracker(self, *, refresh: bool = True) -> TogglTracker | None:
+    TRACKER_NOT_RUNNING: Final[int] = 405
+
+    def current_tracker(self, *, refresh: bool = True) -> Optional[TogglTracker]:
         url = "time_entries/current"
 
         try:
             response = self.request(url, refresh=refresh)
-        except httpx.HTTPError as err:
-            tracker_not_running = 405
-            if err.response.status_code == tracker_not_running:
+        except HTTPStatusError as err:
+            if err.response.status_code == self.TRACKER_NOT_RUNNING:
                 return None
 
-        return response
+        return response if isinstance(response, TogglTracker) else None
 
     def get_trackers(
         self,
         *,
         refresh: bool = False,
         **kwargs,
-    ) -> list[TogglTracker] | None:
+    ) -> list[TogglTracker]:
         since = kwargs.get("since")  # UNIX Timestamp
         before = kwargs.get("before")  #  YYYY-MM-DD
         start_date = kwargs.get("start_date")  # YYYY-MM-DD or RFC3339
@@ -36,16 +38,14 @@ class UserEndpoint(TogglCachedEndpoint):
             params = f"?start_date={start_date}&end_date={end_date}"
         response = self.request(params, refresh=refresh)
 
-        if response is None:
-            return []
-        return response
+        return response if isinstance(response, list) else []  # type: ignore[return-value]
 
     def get_tracker(
         self,
         tracker_id: int,
         *,
         refresh: bool = False,
-    ) -> TogglTracker | None:
+    ) -> Optional[TogglTracker]:
         cache = self.load_cache() if not refresh else None
         if isinstance(cache, list):
             for item in cache:
@@ -53,15 +53,14 @@ class UserEndpoint(TogglCachedEndpoint):
                     return item  # type: ignore[return-value]
 
         try:
-            response = self.request(f"time_entries/{tracker_id}", refresh=refresh)
-        except HTTPError as exc:
-            print(exc)
+            response = self.request(
+                f"time_entries/{tracker_id}",
+                refresh=refresh,
+            )
+        except HTTPError:
             response = None
 
-        if not isinstance(response, self.model):
-            return None
-
-        return response
+        return response  # type: ignore[return-value]
 
     def check_authentication(self) -> bool:
         try:

@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Any
 from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
-    from collections.abc import Hashable
     from typing import Optional
 
 
@@ -19,6 +18,7 @@ class TogglClass(metaclass=ABCMeta):
     id: int
     name: str
     timestamp: Optional[datetime] = field(
+        compare=False,
         default_factory=partial(
             datetime.now,
             tz=timezone.utc,
@@ -40,10 +40,10 @@ class TogglClass(metaclass=ABCMeta):
             timestamp=kwargs.get("timestamp"),
         )
 
-    def __getitem__(self, item: Hashable) -> Any:
+    def __getitem__(self, item: str) -> Any:
         return getattr(self, item)
 
-    def __setitem__(self, item: Hashable, value: Any) -> None:
+    def __setitem__(self, item: str, value: Any) -> None:
         setattr(self, item, value)
 
 
@@ -56,7 +56,7 @@ class TogglWorkspace(TogglClass):
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglWorkspace:
-        return super().from_kwargs(**kwargs)
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
 
 @dataclass
@@ -168,3 +168,7 @@ class TogglTag(WorkspaceChild):
 
     def __post_init__(self) -> None:
         super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs) -> TogglTag:
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]

@@ -6,7 +6,7 @@ from .schema import register_tables
 
 
 def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
-    data = {"class": obj.__tablename__}
+    data: dict[str, Any] = {"class": obj.__tablename__}
 
     for field in fields(obj):
         field_data = getattr(obj, field.name)
