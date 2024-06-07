@@ -111,11 +111,13 @@ def tracker_object(get_workspace_id, config_setup, get_json_cache, user_object):
 
 @pytest.fixture()
 def add_tracker(tracker_object, faker):
-    return tracker_object.add_tracker(
+    tracker = tracker_object.add_tracker(
         description=faker.name(),
         start=format_iso(datetime.now(tz=timezone.utc)),
-        stop=format_iso(datetime.now(tz=timezone.utc) + timedelta(hours=1)),
+        duration=-1,
     )
+    yield tracker
+    tracker_object.delete_tracker(tracker)
 
 
 def _client_cleanup(endpoint):

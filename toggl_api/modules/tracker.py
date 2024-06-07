@@ -1,4 +1,9 @@
+from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+from httpx import HTTPStatusError
+
+from toggl_api.utility import format_iso
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTracker
@@ -12,9 +17,9 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         created_with = kwargs.get("created_with", "toggl-api-wrapper")
         description = kwargs.get("description")
-        duration = kwargs.get("duration")
+        duration = kwargs.get("duration", -1)
         project_id = kwargs.get("project_id")
-        start = kwargs.get("start")
+        start = kwargs.get("start", datetime.now(tz=timezone.utc))
         start_date = kwargs.get("start_date")
         stop = kwargs.get("stop")
         tag_action = kwargs.get("tag_action")
@@ -26,18 +31,20 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         if created_with:
             headers["created_with"] = created_with
+        if not description:
+            description = kwargs.get("name")
         if description:
             headers["description"] = description
         if duration:
-            headers["duration"] = duration
+            headers["duration"] = duration.total_seconds() if isinstance(duration, timedelta) else duration
         if project_id:
             headers["project_id"] = project_id
         if start:
-            headers["start"] = start
+            headers["start"] = format_iso(start)
         elif start_date:
-            headers["start_date"] = start_date
+            headers["start_date"] = format_iso(start_date)
         if stop:
-            headers["stop"] = stop
+            headers["stop"] = format_iso(stop)
         if tag_action:
             headers["tag_action"] = tag_action
         if tag_ids:
@@ -64,11 +71,15 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return data
 
     def delete_tracker(self, tracker: TogglTracker) -> None:
-        self.request(
-            f"/{tracker.id}",
-            method=RequestMethod.DELETE,
-            refresh=True,
-        )
+        try:
+            self.request(
+                f"/{tracker.id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code != self.NOT_FOUND:
+                raise
         self.cache.delete_entries(tracker)
         self.cache.commit()
 

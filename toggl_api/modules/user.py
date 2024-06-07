@@ -10,6 +10,7 @@ class UserEndpoint(TogglCachedEndpoint):
     TRACKER_NOT_RUNNING: Final[int] = 405
 
     def current_tracker(self, *, refresh: bool = True) -> Optional[TogglTracker]:
+        # NOTE: This needs a possible overide on cache in order to refresh more frequently.
         url = "time_entries/current"
 
         try:

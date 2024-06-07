@@ -74,7 +74,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         return headers
 
     def delete_project(self, project: TogglProject) -> None:
-        self.request(f"/{project.id}", method=RequestMethod.DELETE)
+        self.request(
+            f"/{project.id}",
+            method=RequestMethod.DELETE,
+            refresh=True,
+        )
         self.cache.delete_entries(project)
         self.cache.commit()
 

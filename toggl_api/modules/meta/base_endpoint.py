@@ -21,8 +21,10 @@ log = logging.getLogger("toggl_api")
 class TogglEndpoint(metaclass=ABCMeta):
     """Base class with basic functionality for all API requests."""
 
-    BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
     OK_RESPONSE: Final[int] = 200
+    NOT_FOUND: Final[int] = 404
+
+    BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
     __slots__ = ("__client", "workspace_id")

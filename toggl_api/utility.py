@@ -16,7 +16,9 @@ def get_workspace(data: dict) -> int:
 
 
 # NOTE: Date utilities for python 3.10 compatibility.
-def format_iso(date: datetime) -> str:
+def format_iso(date: datetime | str) -> str:
+    if isinstance(date, str):
+        return date
     return date.isoformat(timespec="seconds")
 
 
