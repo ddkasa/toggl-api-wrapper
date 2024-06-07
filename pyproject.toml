@@ -49,7 +49,7 @@ mkdocs-click = "^0.8.1"
 mkdocs-redirects = "^1.2.1"
 mkdocs-autorefs = "^1.0.1"
 mkdocs-literate-nav = "^0.6.1"
-mkdocstrings = "^0.25.1"
+mkdocstrings = {extras = ["python"], version = "^0.25.1"}
 mkdocs-simple-hooks = "^0.1.5"
 mkdocs-material = "^9.5.24"
 
