@@ -18,6 +18,8 @@ from .base_endpoint import TogglEndpoint
 from .enums import RequestMethod
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     import httpx
 
     from toggl_api.modules.models import TogglClass
@@ -54,7 +56,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglClass | list[TogglClass]]:
+    ) -> Optional[TogglClass | Iterable[TogglClass]]:
         data = self.load_cache()
         if data and not refresh:
             return data
@@ -73,7 +75,7 @@ class TogglCachedEndpoint(TogglEndpoint):
 
         return response
 
-    def load_cache(self) -> list:
+    def load_cache(self) -> Iterable[TogglClass]:
         return self.cache.load_cache()
 
     def save_cache(

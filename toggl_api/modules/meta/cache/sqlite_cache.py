@@ -5,13 +5,14 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
 import sqlalchemy as db
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from toggl_api.modules.models import TogglClass, register_tables
 
 from .base_cache import TogglCache
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from datetime import timedelta
     from pathlib import Path
 
@@ -27,8 +28,8 @@ class SqliteCache(TogglCache):
         session: Sqlalchemy session.
 
     Methods:
-        load_cache: Loads the data from disk and stores it in the data attribute.
-            Invalidates any entries older than expire argument.
+        load_cache: Loads the data from disk and stores it in the data
+            attribute. Invalidates any entries older than expire argument.
 
     """
 
@@ -63,53 +64,64 @@ class SqliteCache(TogglCache):
         if func is None:
             return
         func(entry)
-        self.commit()
 
-    def load_cache(self) -> db.Query[TogglClass]:
+    def load_cache(self, *, expire: bool = True) -> Query[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
         query = self.session.query(self.parent.model)
-        min_ts = datetime.now(timezone.utc) - self._expire_after
-        return query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+        if expire:
+            min_ts = datetime.now(timezone.utc) - self._expire_after
+            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+        return query
 
-    def add_entries(self, entry: list[TogglClass] | TogglClass) -> None:
+    def add_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
         if isinstance(entry, TogglClass):
-            self.session.add(entry)
-        else:
-            self.session.add_all(entry)
+            entry = (entry,)
+        for item in entry:
+            if self.find_entry(item, expire=False):
+                self.update_entries(item)
+                continue
+            self.session.add(item)
+        self.commit()
 
-    def update_entries(self, entry: list[TogglClass] | TogglClass) -> None:
+    def update_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
         if isinstance(entry, TogglClass):
-            self.session.merge(entry)
-        else:
-            for item in entry:
-                self.session.merge(item)
-
-    def delete_entries(self, entry: list[TogglClass] | TogglClass) -> None:
-        if isinstance(entry, TogglClass):
-            return self.session.delete(entry)
+            entry = (entry,)
 
         for item in entry:
-            self.delete_entry(item)
-        return None
+            self.session.merge(item)
+        self.commit()
 
-    def delete_entry(self, entry: TogglClass) -> None:
-        self.session.delete(entry)
+    def delete_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
+        if isinstance(entry, TogglClass):
+            entry = (entry,)
+
+        for item in entry:
+            if self.find_entry(item, expire=False):
+                self.session.query(
+                    self.parent.model,  # type: ignore[union-attr]
+                ).filter_by(id=item.id).delete()
+        self.commit()
 
     def find_entry(
         self,
         query: TogglClass | dict,
-    ) -> db.Query[TogglClass]:
-        if isinstance(query, TogglClass):
-            query = {"name": query.name, "id": query.id}
+        *,
+        expire: bool = True,
+    ) -> Optional[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
-        min_ts = datetime.now(timezone.utc) - self.expire_after
+
+        if isinstance(query, TogglClass):
+            query = {"name": query.name, "id": query.id}
+
         search = self.session.query(self.parent.model)
-        search = search.filter(self.parent.model.timestamp >= min_ts)  # type: ignore[operator]
-        return search.filter_by(**query)  # type: ignore[name-defined]
+        if expire:
+            min_ts = datetime.now(timezone.utc) - self._expire_after
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+        return search.filter_by(**query).first()  # type: ignore[name-defined]
 
     @property
     def cache_path(self) -> Path:

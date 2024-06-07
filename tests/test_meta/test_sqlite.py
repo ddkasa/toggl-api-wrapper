@@ -1,4 +1,3 @@
-from dataclasses import asdict
 import time
 from datetime import timedelta
 
@@ -65,30 +64,26 @@ def test_db_creation(meta_object_sqlite):
 def test_add_entries_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
-    meta_object_sqlite.cache.commit()
 
     assert tracker in meta_object_sqlite.cache.load_cache()
-    meta_object_sqlite.cache.delete_entry(tracker)
-    assert tracker not in meta_object_sqlite.cache.load_cache()
 
 
 @pytest.mark.unit()
+@pytest.mark.order(after="test_add_entries_sqlite")
 def test_update_entries_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
-    meta_object_sqlite.cache.commit()
     tracker.name = "updated_test_tracker"
     meta_object_sqlite.cache.update_entries(tracker)
-    meta_object_sqlite.cache.commit()
 
     assert tracker in meta_object_sqlite.cache.load_cache()
 
 
 @pytest.mark.unit()
+@pytest.mark.order(after="test_update_entries_sqlite")
 def test_delete_entries_sqlite(meta_object_sqlite, model_data):
     cache = meta_object_sqlite.cache.load_cache()
     meta_object_sqlite.cache.delete_entries(cache)
-    meta_object_sqlite.cache.commit()
     assert not meta_object_sqlite.cache.load_cache().all()
 
 
@@ -96,23 +91,25 @@ def test_delete_entries_sqlite(meta_object_sqlite, model_data):
 def test_query_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
-    meta_object_sqlite.cache.commit()
     tracker_data = {"id": tracker.id, "name": tracker.name}
-    assert tracker == meta_object_sqlite.cache.find_entry(tracker_data).first()
+    assert tracker == meta_object_sqlite.cache.find_entry(tracker_data)
 
 
 @pytest.mark.unit()
-def test_expiration_json(meta_object_sqlite, model_data):
+def test_expiration_sqlite(meta_object_sqlite, model_data):
     delay = timedelta(seconds=5)
     tracker = model_data["tracker"]
-    tracker.id += 1
     meta_object_sqlite.cache.expire_after = delay
     assert meta_object_sqlite.cache.expire_after == delay
     meta_object_sqlite.cache.add_entries(tracker)
-    meta_object_sqlite.cache.commit()
     time.sleep(delay.total_seconds() + 2)
     tracker_data = {"id": tracker.id, "name": tracker.name}
-    assert not meta_object_sqlite.cache.find_entry(tracker_data).all()
+    assert (
+        meta_object_sqlite.cache.find_entry(
+            tracker_data,
+        )
+        is None
+    )
 
 
 @pytest.fixture(scope="session")

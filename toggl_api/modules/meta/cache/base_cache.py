@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from toggl_api.modules.meta.enums import RequestMethod
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
     from datetime import timedelta
     from pathlib import Path
 
@@ -62,7 +62,7 @@ class TogglCache(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def load_cache(self) -> list[TogglClass]:
+    def load_cache(self, *, expire: bool = True) -> Iterable[TogglClass]:
         pass
 
     @abstractmethod
@@ -74,7 +74,12 @@ class TogglCache(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def find_entry(self, entry: TogglClass) -> TogglClass | None:
+    def find_entry(
+        self,
+        entry: TogglClass | dict,
+        *,
+        expire: bool = True,
+    ) -> Optional[TogglClass]:
         pass
 
     @abstractmethod

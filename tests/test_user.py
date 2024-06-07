@@ -1,6 +1,8 @@
 import pytest
 
 
+@pytest.mark.order("first")
+@pytest.mark.tryfirst()
 @pytest.mark.integration()
 def test_user_endpoint(user_object):
     assert isinstance(user_object.check_authentication(), bool)

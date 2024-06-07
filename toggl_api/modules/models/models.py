@@ -6,8 +6,6 @@ from datetime import datetime, timedelta, timezone
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy.orm import reconstructor
-
 from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
@@ -28,7 +26,6 @@ class TogglClass(metaclass=ABCMeta):
         ),
     )
 
-    @reconstructor
     def __post_init__(self) -> None:
         if isinstance(self.timestamp, str):
             self.timestamp = parse_iso(self.timestamp)
@@ -133,7 +130,6 @@ class TogglTracker(WorkspaceChild):
     project: Optional[int] = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
-    @reconstructor
     def __post_init__(self) -> None:
         super().__post_init__()
         if isinstance(self.project, TogglProject):
@@ -145,7 +141,6 @@ class TogglTracker(WorkspaceChild):
         if isinstance(self.duration, float | int):
             self.duration = timedelta(seconds=self.duration)
 
-        print(f"test {self.name}", self.start.tzinfo)
         if self.stop:
             self.stop = parse_iso(self.stop)  # type: ignore[arg-type]
         else:

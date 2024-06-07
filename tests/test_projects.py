@@ -50,11 +50,12 @@ def test_get_project(create_project, project_object):
 @pytest.mark.integration()
 def test_edit_project(project_object, create_project, faker):
     name = faker.name()
+    color = ProjectEndpoint.get_color("red")
     project = project_object.edit_project(
         create_project,
         name=name,
-        color=ProjectEndpoint.get_color("red"),
+        color=color,
     )
     assert isinstance(project, TogglProject)
     assert project.name == name
-    assert project.color == ProjectEndpoint.get_color("red")
+    assert project.color == color

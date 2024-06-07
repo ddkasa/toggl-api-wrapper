@@ -119,13 +119,13 @@ class JSONCache(TogglCache):
 
         self.commit()
 
-    def load_cache(self) -> list[TogglClass]:
+    def load_cache(self, *, expire: bool = True) -> list[TogglClass]:
         min_ts = datetime.now(timezone.utc) - self.expire_after
-        return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
+        return [m for m in self.session.data if expire and m.timestamp >= min_ts]  # type: ignore[operator]
 
     def find_entry(
         self,
-        entry: TogglClass,
+        entry: TogglClass | dict,
         **kwargs,
     ) -> Optional[TogglClass]:
         if not self.session.data:
