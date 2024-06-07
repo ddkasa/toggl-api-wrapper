@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
+from sqlalchemy.orm import reconstructor
+
 from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
@@ -19,17 +21,21 @@ class TogglClass(metaclass=ABCMeta):
     name: str
     timestamp: Optional[datetime] = field(
         compare=False,
+        repr=False,
         default_factory=partial(
             datetime.now,
             tz=timezone.utc,
         ),
     )
 
+    @reconstructor
     def __post_init__(self) -> None:
         if isinstance(self.timestamp, str):
             self.timestamp = parse_iso(self.timestamp)
         elif self.timestamp is None:
             self.timestamp = datetime.now(tz=timezone.utc)
+
+        self.timestamp = self.timestamp.replace(tzinfo=timezone.utc)
 
     @classmethod
     @abstractmethod
@@ -122,26 +128,32 @@ class TogglTracker(WorkspaceChild):
             tz=timezone.utc,
         ),
     )
-    duration: timedelta | float = field(default_factory=timedelta)
+    duration: Optional[timedelta] = field(default=None)
     stop: Optional[datetime | str] = field(default=None)
     project: Optional[int] = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
+    @reconstructor
     def __post_init__(self) -> None:
         super().__post_init__()
         if isinstance(self.project, TogglProject):
             self.project = self.project.id
         if isinstance(self.tags, list):
             self.tags = [TogglTag.from_kwargs(**t) for t in self.tags if isinstance(t, dict)]
-        if isinstance(self.start, str):
+        if isinstance(self.start, str | datetime):
             self.start = parse_iso(self.start)
+        if isinstance(self.duration, float | int):
+            self.duration = timedelta(seconds=self.duration)
 
+        print(f"test {self.name}", self.start.tzinfo)
         if self.stop:
-            self.duration = timedelta(seconds=self.duration)  # type: ignore[arg-type]
             self.stop = parse_iso(self.stop)  # type: ignore[arg-type]
         else:
             now = datetime.now(tz=timezone.utc)
             self.duration = now - self.start
+
+        if isinstance(self.stop, str | datetime):
+            self.stop = parse_iso(self.stop)
 
     @property
     def running(self) -> bool:
@@ -153,8 +165,8 @@ class TogglTracker(WorkspaceChild):
             id=kwargs["id"],
             name=kwargs.get("description", kwargs.get("name", "")),
             workspace=get_workspace(kwargs),
-            start=parse_iso(kwargs.get("start", datetime.now(tz=timezone.utc))),
-            duration=kwargs.get("duration", 0),
+            start=kwargs.get("start", datetime.now(tz=timezone.utc)),
+            duration=kwargs.get("duration"),
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id", kwargs.get("project")),
             tags=kwargs["tags"] if kwargs.get("tags") else [],

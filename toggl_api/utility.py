@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def get_workspace(data: dict) -> int:
@@ -20,9 +20,9 @@ def format_iso(date: datetime) -> str:
     return date.isoformat(timespec="seconds")
 
 
-def parse_iso(date: str) -> datetime:
+def parse_iso(date: str | datetime) -> datetime:
     if isinstance(date, datetime):
-        return date
+        return date.replace(tzinfo=timezone.utc)
     if date.endswith("Z"):
         date = date[:-1] + "-00:00"
-    return datetime.fromisoformat(date)
+    return datetime.fromisoformat(date).replace(tzinfo=timezone.utc)

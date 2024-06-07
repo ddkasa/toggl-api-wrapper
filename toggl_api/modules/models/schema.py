@@ -64,11 +64,11 @@ def register_tables(engine: db.Engine) -> db.MetaData:
         metadata,
         db.Column("created", db.DateTime(timezone=True), server_default=func.now()),
         db.Column("timestamp", db.DateTime(timezone=True)),
-        db.Column("id", db.Integer, primary_key=True, unique=True),
+        db.Column("id", db.Integer, primary_key=True),
         db.Column("name", db.String(255)),
         db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
         db.Column("start", db.DateTime(timezone=True)),
-        db.Column("duration", db.Interval),
+        db.Column("duration", db.Interval, nullable=True),
         db.Column("stop", db.DateTime(timezone=True), nullable=True),
         db.Column("project", db.Integer, db.ForeignKey("project.id"), nullable=True),
     )
