@@ -68,8 +68,15 @@ theme:
 nav:
   - Home: README.md
   - Getting Started: getting-started.md
-  - API Reference: user-guide/
-  - Development: dev-guide/
+  - API Reference:
+      - Endpoint: user-guide/endpoint.md 
+      - Cache: user-guide/cache.md
+      - Models: user-guide/model.md
+      - Workspace: user-guide/workspace.md
+      - Client: user-guide/client.md
+      - Projects: user-guide/project.md
+      - Trackers: user-guide/tracker.md
+      - Tags: user-guide/tag.md
   - Release Notes: about/release-notes.md
   - About:
     - Contributing: about/CONTRIBUTING.md

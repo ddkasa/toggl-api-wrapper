@@ -1,7 +1,15 @@
 from dataclasses import fields
 from typing import Any
 
-from .models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from .models import (
+    TogglClass,
+    TogglClient,
+    TogglProject,
+    TogglTag,
+    TogglTracker,
+    TogglWorkspace,
+    WorkspaceChild,
+)
 from .schema import register_tables
 
 
@@ -27,6 +35,7 @@ __all__ = (
     "TogglProject",
     "TogglClass",
     "TogglTracker",
+    "WorkspaceChild",
     "TogglWorkspace",
     "register_tables",
     "as_dict_custom",

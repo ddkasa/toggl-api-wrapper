@@ -29,6 +29,13 @@ if TYPE_CHECKING:
 
 # REFACTOR: Possibly turn this into a mixin to avoid duplication and more flexibility.
 class TogglCachedEndpoint(TogglEndpoint):
+    """Abstract cached endpoint for requesting toggl API data to disk.
+
+    Attributes:
+        _cache: Cache object for caching toggl API data to disk. Builtin cache
+            types are JSONCache and SqliteCache.
+    """
+
     __slots__ = ("_cache",)
 
     def __init__(
@@ -57,6 +64,21 @@ class TogglCachedEndpoint(TogglEndpoint):
         *,
         refresh: bool = False,
     ) -> Optional[TogglClass | Iterable[TogglClass]]:
+        """Overridden request method with builtin cache.
+
+        Args:
+            parameters: Request parameters with the endpoint excluded.
+            headers: Request headers. Custom headers can be added here.
+            body: Request body for GET, POST, PUT, PATCH requests.
+                Defaults to None.
+            method: Request method. Defaults to GET.
+            refresh: Whether to refresh the cache or not. Defaults to False.
+
+        Returning:
+            TogglClass | Iterable[TogglClass] | None: Toggl API response data
+                processed into TogglClass objects.
+        """
+
         data = self.load_cache()
         if data and not refresh:
             return data

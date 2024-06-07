@@ -14,6 +14,14 @@ if TYPE_CHECKING:
 
 @dataclass
 class TogglClass(metaclass=ABCMeta):
+    """Base class for all Toggl dataclasses.
+
+    Attributes:
+        id: Toggl API / Database ID (Primary Key) of the Toggl object.
+        name: Name or description of the Toggl object.
+        timestamp: Timestamp of when the Toggl object was last modified.
+    """
+
     __tablename__ = "base"
     id: int
     name: str
@@ -52,6 +60,8 @@ class TogglClass(metaclass=ABCMeta):
 
 @dataclass
 class TogglWorkspace(TogglClass):
+    """Data structure for Toggl workspaces."""
+
     ___tablename__ = "workspace"
 
     def __post_init__(self) -> None:
@@ -64,6 +74,8 @@ class TogglWorkspace(TogglClass):
 
 @dataclass
 class WorkspaceChild(TogglClass):
+    """Base class for all Toggl workspace objects."""
+
     __tablename__ = "workspace_child"
 
     workspace: int = field(default=0)
@@ -72,7 +84,7 @@ class WorkspaceChild(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglClass:
+    def from_kwargs(cls, **kwargs) -> WorkspaceChild:
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -83,6 +95,8 @@ class WorkspaceChild(TogglClass):
 
 @dataclass
 class TogglClient(WorkspaceChild):
+    """Data structure for Toggl clients."""
+
     __tablename__ = "client"
 
     def __post_init__(self) -> None:
@@ -91,6 +105,17 @@ class TogglClient(WorkspaceChild):
 
 @dataclass
 class TogglProject(WorkspaceChild):
+    """Data structure for Toggl projects.
+
+    Attributes:
+        color: Color of the project. Defaults to blue. Refer to
+            [ProjectEndpoint][toggl_api.modules.project.ProjectEndpoint] for
+            all colors.
+        client: ID of the client the project belongs to. Defaults to None.
+        active: Whether the project is archived or not. Defaults to True.
+
+    """
+
     __tablename__ = "project"
 
     color: str = field(default="0b83d9")
@@ -117,6 +142,22 @@ class TogglProject(WorkspaceChild):
 
 @dataclass
 class TogglTracker(WorkspaceChild):
+    """Data structure for trackers.
+
+    Attributes:
+        name: Description of the tracker. Refers to tracker **description**
+            inside the Toggl API. Inherited.
+        start: Start time of the tracker. Defaults to time created if nothing
+            is passed.
+        duration: Duration of the tracker
+        stop: Stop time of the tracker
+        project: ID of the project
+        tags: List of tags
+
+    Methods:
+        active(bool): Whether the tracker is running.
+    """
+
     __tablename__ = "tracker"
 
     start: datetime = field(
@@ -150,7 +191,6 @@ class TogglTracker(WorkspaceChild):
         if isinstance(self.stop, str | datetime):
             self.stop = parse_iso(self.stop)
 
-    @property
     def running(self) -> bool:
         return self.stop is None
 
@@ -171,6 +211,8 @@ class TogglTracker(WorkspaceChild):
 
 @dataclass
 class TogglTag(WorkspaceChild):
+    """Data structure for Toggl tags."""
+
     __tablename__ = "tag"
 
     def __post_init__(self) -> None:

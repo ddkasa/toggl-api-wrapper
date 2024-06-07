@@ -22,7 +22,7 @@ class TogglCache(metaclass=ABCMeta):
     Integrates fully with TogglCachedEndpoint to create a seemless depending on
     the users choice of cache.
 
-    Abstract Methods:
+    AbstractMethods:
         commit: Commits the cache to disk, database or other form.
             Basically method for finalising the cache.
         load_cache: Loads the cache from disk, database or other form.
