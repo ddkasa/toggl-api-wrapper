@@ -118,7 +118,7 @@ def user_object_sqlite(user_object, get_sqlite_cache):
     return user_object
 
 
-@pytest.mark.integration()
+@pytest.mark.unit()
 def test_tracker_cache(
     user_object_sqlite,
     get_test_data,

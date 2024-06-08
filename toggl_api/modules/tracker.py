@@ -1,68 +1,78 @@
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta
+from typing import Literal, Optional
 
 from httpx import HTTPStatusError
 
+from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
+from toggl_api.modules.models import TogglTracker
 from toggl_api.utility import format_iso
 
-from .meta import RequestMethod, TogglCachedEndpoint
-from .models import TogglTracker
 
+@dataclass
+class TrackerBody:
+    workspace_id: Optional[int] = field(default=None)
+    description: Optional[str] = field(default=None)
+    duration: Optional[int | timedelta] = field(default=None)
+    """Duration set in a timedelta or in seconds if using an integer."""
+    project_id: Optional[int] = field(default=None)
+    start: Optional[datetime] = field(default=None)
+    start_date: Optional[date] = field(default=None)
+    """Start date in YYYY-MM-DD format. If start is present start_date is ignored."""
+    stop: Optional[datetime] = field(default=None)
+    tag_action: Optional[Literal["add", "remove"]] = field(default=None)
+    """Options are *add* or *remove*. Will default to *add* if not set and tags are present."""
+    tag_ids: list[int] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    shared_with_user_ids: list[int] = field(default_factory=list)
+    created_with: str = field(default="toggl-api-wrapper")
 
-class TrackerEndpoint(TogglCachedEndpoint):
-    def body_creation(self, **kwargs) -> dict:  # noqa: C901
-        headers = {}
-        workspace_id = kwargs.get("workspace_id", self.workspace_id)
-        headers["workspace_id"] = workspace_id
+    def format_body(self, workspace_id: int) -> dict:
+        headers = {
+            "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
+            "created_with": self.created_with,
+            "description": self.description,
+        }
 
-        created_with = kwargs.get("created_with", "toggl-api-wrapper")
-        description = kwargs.get("description")
-        duration = kwargs.get("duration", -1)
-        project_id = kwargs.get("project_id")
-        start = kwargs.get("start", datetime.now(tz=timezone.utc))
-        start_date = kwargs.get("start_date")
-        stop = kwargs.get("stop")
-        tag_action = kwargs.get("tag_action")
-        tag_ids = kwargs.get("tag_ids")
-        tags = kwargs.get("tags")
-        shared_with_user_ids = kwargs.get("shared_with_user_ids", [])
+        if self.duration:
+            dur = self.duration.total_seconds() if isinstance(self.duration, timedelta) else self.duration
+            headers["duration"] = dur
 
-        headers["shared_with_user_ids"] = shared_with_user_ids
+        if self.project_id:
+            headers["project_id"] = self.project_id
 
-        if created_with:
-            headers["created_with"] = created_with
-        if not description:
-            description = kwargs.get("name")
-        if description:
-            headers["description"] = description
-        if duration:
-            headers["duration"] = duration.total_seconds() if isinstance(duration, timedelta) else duration
-        if project_id:
-            headers["project_id"] = project_id
-        if start:
-            headers["start"] = format_iso(start)
-        elif start_date:
-            headers["start_date"] = format_iso(start_date)
-        if stop:
-            headers["stop"] = format_iso(stop)
-        if tag_action:
-            headers["tag_action"] = tag_action
-        if tag_ids:
-            headers["tag_ids"] = tag_ids
-        if tags:
-            headers["tags"] = tags
+        if self.start:
+            headers["start"] = format_iso(self.start)
+        elif self.start_date:
+            headers["start_date"] = format_iso(self.start_date)
+
+        if self.stop:
+            headers["stop"] = format_iso(self.stop)
+
+        if self.tag_ids:
+            headers["tag_ids"] = self.tag_ids
+
+        if self.tags:
+            headers["tags"] = self.tags
+
+        if self.tag_action:
+            headers["tag_action"] = self.tag_action
+        elif self.tag_ids or self.tags and not self.tag_action:
+            headers["tag_action"] = "add"
 
         return headers
 
+
+class TrackerEndpoint(TogglCachedEndpoint):
     def edit_tracker(
         self,
         tracker: TogglTracker,
-        **kwargs,
+        body: TrackerBody,
     ) -> Optional[TogglTracker]:
         data = self.request(
             f"/{tracker.id}",
             method=RequestMethod.PUT,
-            body=self.body_creation(**kwargs),
+            body=body.format_body(self.workspace_id),
             refresh=True,
         )
         if not isinstance(data, self.model):
@@ -90,11 +100,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
             refresh=True,
         )  # type: ignore[return-value]
 
-    def add_tracker(self, **kwargs) -> Optional[TogglTracker]:
+    def add_tracker(self, body: TrackerBody) -> Optional[TogglTracker]:
         return self.request(
             "",
             method=RequestMethod.POST,
-            body=self.body_creation(**kwargs),
+            body=body.format_body(self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 

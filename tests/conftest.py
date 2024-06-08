@@ -15,10 +15,9 @@ from toggl_api.modules.meta import JSONCache, SqliteCache, TogglCachedEndpoint
 from toggl_api.modules.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.modules.project import ProjectEndpoint
 from toggl_api.modules.tag import TagEndpoint
-from toggl_api.modules.tracker import TrackerEndpoint
+from toggl_api.modules.tracker import TrackerBody, TrackerEndpoint
 from toggl_api.modules.user import UserEndpoint
 from toggl_api.modules.workspace import WorkspaceEndpoint
-from toggl_api.utility import format_iso
 
 
 @pytest.fixture(scope="session")
@@ -111,11 +110,12 @@ def tracker_object(get_workspace_id, config_setup, get_json_cache, user_object):
 
 @pytest.fixture()
 def add_tracker(tracker_object, faker):
-    tracker = tracker_object.add_tracker(
+    body = TrackerBody(
+        tracker_object.workspace_id,
         description=faker.name(),
-        start=format_iso(datetime.now(tz=timezone.utc)),
-        duration=-1,
+        start=datetime.now(tz=timezone.utc),
     )
+    tracker = tracker_object.add_tracker(body=body)
     yield tracker
     tracker_object.delete_tracker(tracker)
 

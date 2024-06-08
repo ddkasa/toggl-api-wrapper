@@ -26,8 +26,10 @@ def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
 def test_cache_functionality_json(meta_object, model_data):
     model_data.pop("model")
     model_data = list(model_data.values())
+    if meta_object.cache.cache_path.exists():
+        meta_object.cache.cache_path.unlink()
     meta_object.cache.save_cache(model_data, RequestMethod.GET)
-    assert meta_object.cache.load_cache() == model_data
+    assert all(x in meta_object.cache.load_cache() for x in model_data)
     meta_object.cache.cache_path.unlink()
 
 

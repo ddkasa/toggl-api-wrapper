@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import pytest
 
+from toggl_api import TrackerBody
 from toggl_api.modules.models import TogglTracker
 
 
@@ -21,7 +22,7 @@ def test_tracker_kwargs(get_workspace_id, faker):
     assert tracker.name == data["description"]
     assert isinstance(tracker, TogglTracker)
     assert tracker.id == data["id"]
-    assert not tracker.running
+    assert not tracker.running()
 
 
 @pytest.mark.integration()
@@ -31,13 +32,13 @@ def test_tracker_creation(add_tracker):
 
 @pytest.mark.integration()
 def test_tracker_editing(tracker_object, add_tracker, faker):
-    new_description = faker.name()
+    new_description = TrackerBody(description=faker.name())
     data = tracker_object.edit_tracker(
         tracker=add_tracker,
-        description=new_description,
+        body=new_description,
     )
     assert isinstance(data, TogglTracker)
-    assert data.name == new_description
+    assert data.name == new_description.description
 
 
 @pytest.mark.integration()
