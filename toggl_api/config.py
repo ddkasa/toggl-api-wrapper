@@ -11,18 +11,17 @@ class AuthenticationError(ValueError):
 
 
 def generate_authentication() -> BasicAuth:
-    email = os.getenv("TOGGL_API_TOKEN")
-    if email is None:
-        email = os.getenv("TOGGL_EMAIL")
-        if email is None:
-            msg = "Email or API Key not set."
-            raise AuthenticationError(msg)
+    api_token = os.getenv("TOGGL_API_TOKEN")
+    if api_token is None:
+        msg = "Email or API Key not set."
+        raise AuthenticationError(msg)
 
     password = os.getenv("TOGGL_PASSWORD", "api_token")
 
-    return BasicAuth(email, password)
+    return BasicAuth(api_token, password)
 
 
+# NOTE: For .togglrc compatibility.
 def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     if config_path is None:
         config_path = Path.home()
