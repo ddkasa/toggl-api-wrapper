@@ -1,9 +1,11 @@
 # Python Toggl API Wrapper
 
-*Under Development: Anything might change without notice at the moment.*
+> [!WARNING]  
+> *Alpha Stage: Anything might change without notice at any moment.*
 
-Simple Python Toggl API wrapper for none premium features primarily created for usage with some of my projects.
+Simple Python Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
 
+***
 
 ## Installation
 
@@ -26,7 +28,7 @@ Simple Python Toggl API wrapper for none premium features primarily created for 
 
 
 ## Development
-- See [CONTRIBUTING](about/CONTRIBUTING.md).
+See [CONTRIBUTING](about/CONTRIBUTING.md).
 
 ## License
 MIT. Check [LICENSE](about/LICENSE.md) for more information.

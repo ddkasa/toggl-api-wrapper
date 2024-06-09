@@ -1,4 +1,5 @@
-- Setup authentication through environment variables. Preferably a testing account for integration testing.
+- Setup authentication through environment variables. 
+- Preferably a testing account for integration testing.
 
 ## Basic Environment
 - Development is ran through Poetry.
@@ -6,7 +7,6 @@
 1. `$ git clone https://github.com/ddkasa/toggl-api-wrapper`
 2. `$ cd toggl-api-wrapper`
 3. `$ poetry shell` 
-    1. *Setup .envrc for automatic environment and local testing variables.*
 4. `$ poetry install`
 
 - Lint with `$ ruff toggl_api`

@@ -1,5 +1,3 @@
-# Getting Started
-
 ## Installation
 
 ### Poetry
@@ -13,8 +11,3 @@ pip install toggl-api-wrapper
 ```
 
 
-## Usage
-
-```python
-from toggl_api import TogglClient
-```

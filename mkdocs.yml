@@ -5,7 +5,6 @@ site_description: Simple Toggl API wrapper for non-premium features.
 site_author: David Kasakaits
 docs_dir: 'docs/'
 
-
 repo_name: ddkasa/toggl-api-wrapper
 repo_url: https://www.github.com/ddkasa/toggl-api-wrapper
 
@@ -59,7 +58,9 @@ theme:
 
 nav:
   - Home: README.md
-  - Getting Started: getting-started.md
+  - Getting Started:
+    - Installation: user-guide/installation.md
+    - Examples: user-guide/examples.md
   - API Reference:
       - Overview: api-guide/index.md
       - Endpoint: api-guide/endpoint.md 
