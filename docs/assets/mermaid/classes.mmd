@@ -1,0 +1,205 @@
+classDiagram
+  class AuthenticationError {
+  }
+  class ClientEndpoint {
+    endpoint
+    model
+    body_creation() dict[str, Any]
+    create_client() TogglClient | None
+    delete_client(client: TogglClient) None
+    get_client(client_id: int) Optional[TogglClient]
+    get_clients() list[TogglClient]
+    update_client(client_id: int) Optional[TogglClient]
+  }
+  class CustomDecoder {
+    MATCH_DICT : Final[dict[str, type[TogglClass]]]
+    decode(obj: Any) Any
+  }
+  class CustomEncoder {
+    default(o: Any) Any
+  }
+  class JSONCache {
+    cache_path
+    parent
+    session
+    add_entries(update: list[TogglClass] | TogglClass) None
+    add_entry(item: TogglClass) None
+    commit() None
+    delete_entries(update: list[TogglClass] | TogglClass) None
+    delete_entry(entry: TogglClass) None
+    find_entry(entry: TogglClass | dict) Optional[TogglClass]
+    load_cache() list[TogglClass]
+    save_cache(update: Iterable[TogglClass] | TogglClass, method: RequestMethod) None
+    update_entries(update: list[TogglClass] | TogglClass) None
+  }
+  class JSONSession {
+    data : list[TogglClass]
+    timestamp : datetime
+    version : str
+    load(path: Path, expire_after: timedelta) None
+    save(path: Path) None
+  }
+  class ProjectEndpoint {
+    BASIC_COLORS : Final[dict[str, str]]
+    endpoint
+    model
+    add_project() TogglProject | None
+    body_creation() dict[str, Any]
+    delete_project(project: TogglProject) None
+    edit_project(project: TogglProject) Optional[TogglProject]
+    get_color(color: str) str
+    get_color_id(color: str) int
+    get_project(project_id: int) Optional[TogglProject]
+    get_projects() Optional[list[TogglProject]]
+  }
+  class RequestMethod {
+    name
+  }
+  class SqliteCache {
+    cache_path
+    database
+    metadata
+    session
+    add_entries(entry: Iterable[TogglClass] | TogglClass) None
+    commit() None
+    delete_entries(entry: Iterable[TogglClass] | TogglClass) None
+    find_entry(query: TogglClass | dict) Optional[TogglClass]
+    load_cache() Query[TogglClass]
+    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod) None
+    update_entries(entry: Iterable[TogglClass] | TogglClass) None
+  }
+  class TagEndpoint {
+    endpoint
+    model
+    body_creation() dict[str, Any]
+    create_tag(name: str) TogglTag
+    delete_tag(tag: TogglTag) None
+    get_tags() list[TogglTag]
+    update_tag(tag: TogglTag) TogglTag
+  }
+  class TogglCache {
+    cache_path
+    expire_after
+    parent
+    add_entries(update: list[TogglClass])* None
+    commit()* None
+    delete_entries(update: list[TogglClass] | TogglClass)* None
+    find_entry(entry: TogglClass | dict)* Optional[TogglClass]
+    find_method(method: RequestMethod) Callable | None
+    load_cache()* Iterable[TogglClass]
+    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod)* None
+    update_entries(update: list[TogglClass] | TogglClass)* None
+  }
+  class TogglCachedEndpoint {
+    cache
+    endpoint
+    load_cache() Iterable[TogglClass]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Optional[TogglClass | Iterable[TogglClass]]
+    save_cache(response: list[TogglClass] | TogglClass, method: RequestMethod) None
+  }
+  class TogglClass {
+    id : int
+    name : str
+    timestamp : Optional[datetime]
+    from_kwargs()* TogglClass
+  }
+  class TogglClient {
+  }
+  class TogglEndpoint {
+    BASE_ENDPOINT : Final[str]
+    HEADERS : Final[dict]
+    NOT_FOUND : Final[int]
+    OK_RESPONSE : Final[int]
+    endpoint
+    model
+    workspace_id : int
+    body_creation() dict[str, Any]
+    method(method: RequestMethod) Callable
+    process_models(data: list[dict[str, Any]]) list[TogglClass]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Optional[list[TogglClass] | TogglClass]
+  }
+  class TogglProject {
+    active : bool
+    client : Optional[int]
+    color : str
+    from_kwargs() TogglProject
+  }
+  class TogglTag {
+    from_kwargs() TogglTag
+  }
+  class TogglTracker {
+    duration : Optional[timedelta]
+    project : Optional[int]
+    start : datetime
+    stop : Optional[datetime | str]
+    tags : list[TogglTag]
+    from_kwargs() TogglTracker
+    running() bool
+  }
+  class TogglWorkspace {
+    from_kwargs() TogglWorkspace
+  }
+  class TrackerBody {
+    created_with : str
+    description : Optional[str]
+    duration : Optional[int | timedelta]
+    project_id : Optional[int]
+    shared_with_user_ids : list[int]
+    start : Optional[datetime]
+    start_date : Optional[date]
+    stop : Optional[datetime]
+    tag_action : Optional[Literal['add', 'remove']]
+    tag_ids : list[int]
+    tags : list[str]
+    workspace_id : Optional[int]
+    format_body(workspace_id: int) dict
+  }
+  class TrackerEndpoint {
+    endpoint
+    model
+    add_tracker(body: TrackerBody) Optional[TogglTracker]
+    delete_tracker(tracker: TogglTracker) None
+    edit_tracker(tracker: TogglTracker, body: TrackerBody) Optional[TogglTracker]
+    stop_tracker(tracker: TogglTracker) Optional[TogglTracker]
+  }
+  class UTCDateTime {
+    cache_ok : bool
+    impl
+    process_bind_param(value: datetime, _) Optional[datetime]
+    process_result_value(value: Optional[datetime], _) Optional[datetime]
+  }
+  class UserEndpoint {
+    TRACKER_NOT_RUNNING : Final[int]
+    endpoint
+    model
+    check_authentication() bool
+    current_tracker() Optional[TogglTracker]
+    get_tracker(tracker_id: int) Optional[TogglTracker]
+    get_trackers() list[TogglTracker]
+  }
+  class WorkspaceChild {
+    workspace : int
+    from_kwargs() WorkspaceChild
+  }
+  class WorkspaceEndpoint {
+    endpoint
+    model
+    get_workspace() Optional[TogglWorkspace]
+  }
+  ClientEndpoint --|> TogglCachedEndpoint
+  JSONCache --|> TogglCache
+  SqliteCache --|> TogglCache
+  TogglCachedEndpoint --|> TogglEndpoint
+  TogglClient --|> WorkspaceChild
+  TogglProject --|> WorkspaceChild
+  TogglTag --|> WorkspaceChild
+  TogglTracker --|> WorkspaceChild
+  TogglWorkspace --|> TogglClass
+  WorkspaceChild --|> TogglClass
+  ProjectEndpoint --|> TogglCachedEndpoint
+  TagEndpoint --|> TogglCachedEndpoint
+  TrackerEndpoint --|> TogglCachedEndpoint
+  UserEndpoint --|> TogglCachedEndpoint
+  WorkspaceEndpoint --|> TogglCachedEndpoint
+  JSONSession --* JSONCache : session
+  TogglCache --o TogglCachedEndpoint : _cache

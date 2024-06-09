@@ -1,0 +1,96 @@
+classDiagram
+  class toggl_api {
+  }
+  class config {
+  }
+  class modules {
+  }
+  class client {
+  }
+  class meta {
+  }
+  class base_endpoint {
+  }
+  class cache {
+  }
+  class base_cache {
+  }
+  class json_cache {
+  }
+  class sqlite_cache {
+  }
+  class cached_endpoint {
+  }
+  class enums {
+  }
+  class models {
+  }
+  class models {
+  }
+  class schema {
+  }
+  class project {
+  }
+  class tag {
+  }
+  class tracker {
+  }
+  class user {
+  }
+  class workspace {
+  }
+  class utility {
+  }
+  class version {
+  }
+  toggl_api --> modules
+  toggl_api --> models
+  toggl_api --> version
+  modules --> client
+  modules --> project
+  modules --> tag
+  modules --> tracker
+  modules --> user
+  modules --> workspace
+  client --> meta
+  client --> models
+  meta --> base_endpoint
+  meta --> cache
+  meta --> cached_endpoint
+  meta --> enums
+  base_endpoint --> enums
+  base_endpoint --> models
+  cache --> base_cache
+  cache --> json_cache
+  cache --> sqlite_cache
+  base_cache --> enums
+  json_cache --> base_cache
+  json_cache --> models
+  json_cache --> utility
+  json_cache --> version
+  sqlite_cache --> base_cache
+  sqlite_cache --> models
+  cached_endpoint --> base_endpoint
+  cached_endpoint --> enums
+  models --> models
+  models --> schema
+  models --> utility
+  schema --> models
+  project --> meta
+  project --> models
+  tag --> meta
+  tag --> models
+  tracker --> meta
+  tracker --> models
+  tracker --> utility
+  user --> meta
+  user --> models
+  workspace --> meta
+  workspace --> models
+  base_cache ..> meta
+  base_cache ..> models
+  json_cache ..> meta
+  json_cache ..> cached_endpoint
+  sqlite_cache ..> meta
+  cached_endpoint ..> cache
+  cached_endpoint ..> models

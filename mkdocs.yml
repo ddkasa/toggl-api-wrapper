@@ -20,21 +20,13 @@ theme:
     - content.action.view
     - content.code.annotate
     - content.code.copy
-    # - content.code.select
-    # - content.footnote.tooltips
+    - content.code.select
     - content.tabs.link
     - content.tooltips
-    # - header.autohide
-    # - navigation.expand
     - navigation.footer
     - navigation.indexes
-    # - navigation.instant
-    # - navigation.instant.prefetch
-    # - navigation.instant.progress
-    # - navigation.prune
     - navigation.sections
     - navigation.tabs
-    # - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
@@ -69,14 +61,15 @@ nav:
   - Home: README.md
   - Getting Started: getting-started.md
   - API Reference:
-      - Endpoint: user-guide/endpoint.md 
-      - Cache: user-guide/cache.md
-      - Models: user-guide/model.md
-      - Workspace: user-guide/workspace.md
-      - Client: user-guide/client.md
-      - Projects: user-guide/project.md
-      - Trackers: user-guide/tracker.md
-      - Tags: user-guide/tag.md
+      - Overview: api-guide/index.md
+      - Endpoint: api-guide/endpoint.md 
+      - Cache: api-guide/cache.md
+      - Models: api-guide/model.md
+      - Workspace: api-guide/workspace.md
+      - Client: api-guide/client.md
+      - Projects: api-guide/project.md
+      - Trackers: api-guide/tracker.md
+      - Tags: api-guide/tag.md
   - Release Notes: about/release-notes.md
   - About:
     - Contributing: about/CONTRIBUTING.md
@@ -90,19 +83,24 @@ exclude_docs: |
 
 markdown_extensions:
   - toc:
-      permalink: 
+      permalink: true
   - attr_list
   - def_list
   - tables
   - pymdownx.highlight:
       use_pygments: false
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+     custom_fences:
+      - name: mermaid
+        class: mermaid
+        format: !!python/name:mermaid2.fence_mermaid_custom
   - callouts
   - mdx_gh_links:
       user: mkdocs
       repo: mkdocs
   - mkdocs-click
+  - md_in_html
 
 copyright: Copyright &copy; 2024 David Kasakaitis
 
@@ -112,6 +110,9 @@ copyright: Copyright &copy; 2024 David Kasakaitis
 plugins:
   - search
   - autorefs
+  - glightbox
+  - macros
+  - mermaid2
   - literate-nav:
       nav_file: docs/README.md
       implicit_index: true
