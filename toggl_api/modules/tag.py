@@ -1,5 +1,3 @@
-from typing import Any
-
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
 
@@ -12,21 +10,22 @@ class TagEndpoint(TogglCachedEndpoint):
     ) -> list[TogglTag]:
         return self.request("", refresh=refresh)  # type: ignore[return-value]
 
-    def create_tag(self, name: str, **kwargs) -> TogglTag:
-        body = self.body_creation(**kwargs)
-        body["name"] = name
+    def create_tag(self, name: str) -> TogglTag:
         return self.request(
             "",
-            body=body,
+            body={"name": name},
             method=RequestMethod.POST,
             refresh=True,
         )  # type: ignore[return-value]
 
-    def update_tag(self, tag: TogglTag, **kwargs) -> TogglTag:
-        body = self.body_creation(**kwargs)
+    def update_tag(
+        self,
+        tag: TogglTag,
+    ) -> TogglTag:
+        """Sets the name of the tag based on the tag object."""
         return self.request(
             f"/{tag.id}",
-            body=body,
+            body={"name": tag.name},
             method=RequestMethod.PUT,
             refresh=True,
         )  # type: ignore[return-value]
@@ -35,17 +34,6 @@ class TagEndpoint(TogglCachedEndpoint):
         self.request(f"/{tag.id}", method=RequestMethod.DELETE, refresh=True)
         self.cache.delete_entries(tag)
         self.cache.commit()
-
-    def body_creation(self, **kwargs) -> dict[str, Any]:
-        headers = super().body_creation(**kwargs)
-        tag_id = kwargs.get("tag_id")
-        name = kwargs.get("name")
-        if name:
-            headers["name"] = name
-        if tag_id:
-            headers["tag_id"] = tag_id
-
-        return headers
 
     @property
     def endpoint(self) -> str:

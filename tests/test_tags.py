@@ -26,11 +26,11 @@ def test_tag_creation(tag_object, get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_tag_update(tag_object, get_workspace_id, add_tag):
-    name = "test_tag_update"
-    tag = tag_object.update_tag(add_tag, name="test_tag_update_2")
+def test_tag_update(tag_object, get_workspace_id, add_tag, monkeypatch):
+    monkeypatch.setattr(add_tag, "name", "test_tag_update_2")
+    tag = tag_object.update_tag(add_tag)
     assert isinstance(tag, TogglTag)
-    assert tag.name == name + "_2"
+    assert tag.name == add_tag.name
 
 
 @pytest.mark.integration()
