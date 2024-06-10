@@ -1,5 +1,10 @@
 # Python Toggl API Wrapper
 
+
+[![codecov](https://codecov.io/gh/ddkasa/toggl-api-wrapper/graph/badge.svg?token=7N5QL9NWZB)](https://codecov.io/gh/ddkasa/toggl-api-wrapper)
+***
+
+
 > [!WARNING]  
 > *Alpha Stage: Anything might change without notice at any moment.*
 

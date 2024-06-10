@@ -230,4 +230,4 @@ commands = ruff check toggl_api
 """
 
 [tool.coverage.run]
-omit = ["*/tests/*", "*/.venv/*", "*/.mypy_cache/*", "*/.ruff_cache/*", "*/.pytest_cache/*"]
+omit = ["*/tests/*", "*/.venv/*", "*/.mypy_cache/*", "*/.ruff_cache/*", "*/.pytest_cache/*", "docs/*"]
