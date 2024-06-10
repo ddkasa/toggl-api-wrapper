@@ -30,7 +30,11 @@ class UTCDateTime(TypeDecorator):
     impl = DateTime(timezone=True)
     cache_ok = True
 
-    def process_bind_param(self, value: datetime, _) -> Optional[datetime]:
+    def process_bind_param(  # type: ignore[override]
+        self,
+        value: datetime,
+        _,
+    ) -> Optional[datetime]:
         if value is not None:
             if not isinstance(value, datetime):
                 raise TypeError("expected datetime.datetime, not " + repr(value))
@@ -40,7 +44,7 @@ class UTCDateTime(TypeDecorator):
             return value.astimezone(timezone.utc)
         return None
 
-    def process_result_value(
+    def process_result_value(  # type: ignore[override]
         self,
         value: Optional[datetime],
         _,

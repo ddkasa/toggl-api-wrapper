@@ -178,18 +178,18 @@ class TogglTracker(WorkspaceChild):
         if isinstance(self.tags, list):
             self.tags = [TogglTag.from_kwargs(**t) for t in self.tags if isinstance(t, dict)]
         if isinstance(self.start, str | datetime):
-            self.start = parse_iso(self.start)
+            self.start = parse_iso(self.start)  # type: ignore[assignment]
         if isinstance(self.duration, float | int):
             self.duration = timedelta(seconds=self.duration)
 
         if self.stop:
-            self.stop = parse_iso(self.stop)  # type: ignore[arg-type]
+            self.stop = parse_iso(self.stop)  # type: ignore[assignment]
         else:
             now = datetime.now(tz=timezone.utc)
             self.duration = now - self.start
 
         if isinstance(self.stop, str | datetime):
-            self.stop = parse_iso(self.stop)
+            self.stop = parse_iso(self.stop)  # type: ignore[assignment]
 
     def running(self) -> bool:
         return self.stop is None

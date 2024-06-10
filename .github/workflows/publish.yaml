@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install --with dev
-        pip install ruff mypy
+        pip install tox ruff mypy
 
     - name: Type check
       run: mypy toggl_api
