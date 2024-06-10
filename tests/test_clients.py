@@ -1,11 +1,17 @@
 import pytest
 
+from toggl_api import ClientBody
 from toggl_api.modules.models import TogglClient
 
 
 @pytest.fixture(scope="session")
-def create_client(client_object, get_workspace_id):
-    return client_object.create_client(name="test_client_create")
+def create_client_body(get_workspace_id, faker):
+    return ClientBody(name=faker.name(), workspace_id=get_workspace_id)
+
+
+@pytest.fixture(scope="session")
+def create_client(client_object, create_client_body):
+    return client_object.create_client(create_client_body)
 
 
 @pytest.mark.unit()
@@ -18,6 +24,13 @@ def test_client_model(get_workspace_id):
     assert client.workspace == get_workspace_id
 
 
+@pytest.mark.unit()
+def test_client_name(client_object, create_client_body, monkeypatch):
+    monkeypatch.setattr(create_client_body, "name", None)
+    with pytest.raises(ValueError):  # noqa: PT011
+        client_object.create_client(create_client_body)
+
+
 @pytest.mark.integration()
 @pytest.mark.order(after="test_client_model")
 def test_client_get(client_object, get_workspace_id, create_client):
@@ -28,20 +41,18 @@ def test_client_get(client_object, get_workspace_id, create_client):
 
 @pytest.mark.integration()
 @pytest.mark.order(after="test_client_get")
-def test_client_create(client_object, get_workspace_id, create_client):
+def test_client_create(client_object, create_client_body, create_client):
     assert isinstance(create_client, TogglClient)
-    assert create_client.name == "test_client_create"
+    assert create_client.name == create_client_body.name
 
 
 @pytest.mark.integration()
 @pytest.mark.order(after="test_client_create")
-def test_client_update(client_object, get_workspace_id, create_client):
-    client = client_object.update_client(
-        create_client.id,
-        name=create_client.name + "_2",
-    )
+def test_client_update(client_object, create_client_body, create_client, monkeypatch):
+    monkeypatch.setattr(create_client_body, "name", create_client_body.name + "_2")
+    client = client_object.update_client(create_client, body=create_client_body)
     assert isinstance(client, TogglClient)
-    assert client.name == create_client.name + "_2"
+    assert client.name == create_client_body.name
 
 
 @pytest.mark.integration()

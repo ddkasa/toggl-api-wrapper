@@ -1,33 +1,54 @@
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
 
 
+@dataclass
+class ClientBody:
+    """JSON body dataclass for PUT, POST & PATCH requests."""
+
+    workspace_id: Optional[int] = field(default=None)
+
+    name: Optional[str] = field(default=None)
+    """Name of the project. Defaults to None. Will be required if its a POST request."""
+    status: Optional[str] = field(default=None)
+    notes: Optional[str] = field(default=None)
+
+    def format_body(self, workspace_id: int) -> dict[str, Any]:
+        """Formats the body for JSON requests.
+
+        Gets called by the endpoint methods before requesting.
+
+        Args:
+            workspace_id (int): Alternate Workspace ID for the request
+                if the body does not contain a workspace_id.
+
+        Returns:
+            dict[str, Any]: JSON compatible formatted body.
+        """
+        body: dict[str, Any] = {
+            "wid": self.workspace_id if self.workspace_id else workspace_id,
+        }
+
+        if self.name:
+            body["name"] = self.name
+        if self.status:
+            body["status"] = self.status
+        if self.notes:
+            body["notes"] = self.notes
+        return body
+
+
 class ClientEndpoint(TogglCachedEndpoint):
-    def body_creation(self, **kwargs) -> dict[str, Any]:
-        headers = super().body_creation(**kwargs)
-
-        headers["wid"] = self.workspace_id
-
-        status = kwargs.get("status")
-        name = kwargs.get("name")
-        notes = kwargs.get("notes")
-
-        if name:
-            headers["name"] = name
-        if status:
-            headers["status"] = status
-        if notes:
-            headers["notes"] = notes
-
-        return headers
-
-    def create_client(self, **kwargs) -> TogglClient | None:
-        body = self.body_creation(**kwargs)
+    def create_client(self, body: ClientBody) -> Optional[TogglClient]:
+        if body.name is None:
+            msg = "Name must be set in order to create a client!"
+            raise ValueError(msg)
         return self.request(
             "",
-            body=body,
+            body=body.format_body(self.workspace_id),
             method=RequestMethod.POST,
             refresh=True,
         )  # type: ignore[return-value]
@@ -43,11 +64,14 @@ class ClientEndpoint(TogglCachedEndpoint):
             refresh=refresh,
         )  # type: ignore[return-value]
 
-    def update_client(self, client_id: int, **kwargs) -> Optional[TogglClient]:
-        body = self.body_creation(**kwargs)
+    def update_client(
+        self,
+        client: TogglClient,
+        body: ClientBody,
+    ) -> Optional[TogglClient]:
         return self.request(
-            f"/{client_id}",
-            body=body,
+            f"/{client.id}",
+            body=body.format_body(self.workspace_id),
             method=RequestMethod.PUT,
             refresh=True,
         )  # type: ignore[return-value]
@@ -63,13 +87,11 @@ class ClientEndpoint(TogglCachedEndpoint):
 
     def get_clients(
         self,
+        status: Optional[str] = None,
+        name: Optional[str] = None,
         *,
         refresh: bool = False,
-        **kwargs,
     ) -> list[TogglClient]:
-        status = kwargs.get("status")
-        name = kwargs.get("name")
-
         url = ""
         if status:
             url += f"?{status}"

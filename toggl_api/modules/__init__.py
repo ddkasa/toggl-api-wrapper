@@ -1,4 +1,4 @@
-from .client import ClientEndpoint
+from .client import ClientBody, ClientEndpoint
 from .project import ProjectBody, ProjectEndpoint
 from .tag import TagEndpoint
 from .tracker import TrackerBody, TrackerEndpoint
@@ -14,4 +14,5 @@ __all__ = (
     "TrackerBody",
     "WorkspaceEndpoint",
     "UserEndpoint",
+    "ClientBody",
 )
