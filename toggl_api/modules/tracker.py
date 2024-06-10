@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Final, Literal, Optional
 
 from httpx import HTTPStatusError
@@ -11,6 +11,8 @@ from toggl_api.utility import format_iso
 
 @dataclass
 class TrackerBody:
+    """JSON body dataclass for PUT, POST & PATCH requests."""
+
     workspace_id: Optional[int] = field(default=None)
     description: Optional[str] = field(default=None)
     duration: Optional[int | timedelta] = field(default=None)
@@ -28,6 +30,17 @@ class TrackerBody:
     created_with: str = field(default="toggl-api-wrapper")
 
     def format_body(self, workspace_id: int) -> dict:  # noqa: C901
+        """Formats the body for JSON requests.
+
+        Gets called by the endpoint methods before requesting.
+
+        Args:
+            workspace_id (int): Alternate Workspace ID for the request
+                if the body does not contain a workspace_id.
+
+        Returns:
+            dict[str, Any]: JSON compatible formatted body.
+        """
         headers = {
             "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
             "created_with": self.created_with,
@@ -110,6 +123,14 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return None
 
     def add_tracker(self, body: TrackerBody) -> Optional[TogglTracker]:
+        if not isinstance(body.description, str):
+            msg = "Description must be set in order to create a tracker!"
+            raise ValueError(msg)  # noqa: TRY004
+
+        if body.start is None and body.start_date is None:
+            body.start = datetime.now(tz=timezone.utc)
+            body.duration = -1
+
         return self.request(
             "",
             method=RequestMethod.POST,
