@@ -779,6 +779,23 @@ markupsafe = ">=2.0.1"
 mkdocs = ">=1.1"
 
 [[package]]
+name = "mkdocs-callouts"
+version = "1.13.2"
+description = "A simple plugin that converts Obsidian style callouts and converts them into mkdocs supported 'admonitions' (a.k.a. callouts)."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "mkdocs-callouts-1.13.2.tar.gz", hash = "sha256:ebb114fe005b1f968498eb677059f7a77236fed3a4feb18607b0fda09f0968ba"},
+    {file = "mkdocs_callouts-1.13.2-py3-none-any.whl", hash = "sha256:bc3d19f20159aaeffc2e8012a8c6b70cd3ba0cbacf38defe3abffa7510170100"},
+]
+
+[package.dependencies]
+mkdocs = ">=1"
+
+[package.extras]
+tests = ["pytest"]
+
+[[package]]
 name = "mkdocs-click"
 version = "0.8.1"
 description = "An MkDocs extension to generate documentation for Click command line applications"
@@ -1777,4 +1794,4 @@ test = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6d68d0a2dce67e09115cddd9bfc10e151361b4705a17b8f62ff2ef45772b3ae6"
+content-hash = "a49bf81e6c799b8323bbf29e26dba6bab2e0d31ef62c6941b9e7b70821273ab3"

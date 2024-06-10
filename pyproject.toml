@@ -44,6 +44,7 @@ pytest-httpx = "^0.30.0"
 pytest-sqlalchemy-mock = "^0.1.6"
 faker = "^25.2.0"
 pytest-reportlog = "^0.4.0"
+mkdocs-callouts = "^1.13.2"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.0"
