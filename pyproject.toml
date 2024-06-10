@@ -23,6 +23,12 @@ packages = [
     { include = "toggl_api" },
 ]
 
+
+[tool.poetry.urls]
+"Homepage" = "https://ddkasa.github.io/toggl-api-wrapper/"
+"Source" = "https://github.com/ddkasa/github-random-star"
+"Bug Tracker" = "https://github.com/ddkasa/github-random-star/issues"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 httpx = "^0.27.0"
