@@ -195,7 +195,7 @@ addopts = "--report-log=logs/pytest.jsonl"
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = ruff, mypy, py310, py311, py312, py313
+envlist = ruff, mypy, py310, py311, py312
 
 [testenv]
 skip_install = true
@@ -207,7 +207,7 @@ setenv =
 
 allowlist_externals = poetry
 commands_pre = 
-    poetry install
+    poetry install --without=docs
 commands = 
     poetry run pytest {posargs}
 

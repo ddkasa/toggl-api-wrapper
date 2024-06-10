@@ -1,7 +1,8 @@
 # Python Toggl API Wrapper
 
 
-[![codecov](https://codecov.io/gh/ddkasa/toggl-api-wrapper/graph/badge.svg?token=7N5QL9NWZB)](https://codecov.io/gh/ddkasa/toggl-api-wrapper)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ddkasa/toggl-api-wrapper/publish.yaml?style=for-the-badge)
+![Codecov](https://img.shields.io/codecov/c/github/ddkasa/toggl-api-wrapper?style=for-the-badge)
 ***
 
 
