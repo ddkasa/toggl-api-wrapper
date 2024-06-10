@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -18,6 +19,13 @@ from toggl_api.modules.tag import TagEndpoint
 from toggl_api.modules.tracker import TrackerBody, TrackerEndpoint
 from toggl_api.modules.user import UserEndpoint
 from toggl_api.modules.workspace import WorkspaceEndpoint
+
+
+@pytest.fixture(autouse=True)
+def _rate_limit():
+    yield
+    if os.environ.get("GH_ACTION"):
+        time.sleep(1)
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +47,8 @@ def cache_path():
     path = Path(__file__).resolve().parents[0] / Path("cache")
     yield path
     if path.exists():
-        cleanup(path)
+        with contextlib.suppress(PermissionError):
+            cleanup(path)
 
 
 @pytest.fixture(scope="session")
