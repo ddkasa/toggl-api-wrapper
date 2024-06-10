@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
-from typing import Literal, Optional
+from typing import Final, Literal, Optional
 
 from httpx import HTTPStatusError
 
@@ -27,7 +27,7 @@ class TrackerBody:
     shared_with_user_ids: list[int] = field(default_factory=list)
     created_with: str = field(default="toggl-api-wrapper")
 
-    def format_body(self, workspace_id: int) -> dict:
+    def format_body(self, workspace_id: int) -> dict:  # noqa: C901
         headers = {
             "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
             "created_with": self.created_with,
@@ -37,6 +37,8 @@ class TrackerBody:
         if self.duration:
             dur = self.duration.total_seconds() if isinstance(self.duration, timedelta) else self.duration
             headers["duration"] = dur
+        elif not self.stop and self.start:
+            headers["duration"] = -1
 
         if self.project_id:
             headers["project_id"] = self.project_id
@@ -64,6 +66,8 @@ class TrackerBody:
 
 
 class TrackerEndpoint(TogglCachedEndpoint):
+    TRACKER_ALREADY_STOPPED: Final[int] = 409
+
     def edit_tracker(
         self,
         tracker: TogglTracker,
@@ -94,11 +98,16 @@ class TrackerEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def stop_tracker(self, tracker: TogglTracker) -> Optional[TogglTracker]:
-        return self.request(
-            f"/{tracker.id}/stop",
-            method=RequestMethod.PATCH,
-            refresh=True,
-        )  # type: ignore[return-value]
+        try:
+            return self.request(  # type: ignore[return-value]
+                f"/{tracker.id}/stop",
+                method=RequestMethod.PATCH,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code != self.TRACKER_ALREADY_STOPPED:
+                raise
+        return None
 
     def add_tracker(self, body: TrackerBody) -> Optional[TogglTracker]:
         return self.request(
