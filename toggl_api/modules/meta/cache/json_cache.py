@@ -63,7 +63,7 @@ class JSONSession:
         if path.exists():
             with path.open("r", encoding="utf-8") as f:
                 data = json.load(f, cls=CustomDecoder)
-            self.timestamp = parse_iso(data["timestamp"])
+            self.timestamp = parse_iso(data["timestamp"])  # type: ignore[assignment]
             self.version = data["version"]
             self.data = data["data"]
         else:

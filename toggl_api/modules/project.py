@@ -1,7 +1,72 @@
+from dataclasses import dataclass, field
+from datetime import date, datetime
 from typing import Any, Final, Optional
+
+from toggl_api.utility import format_iso
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
+
+
+@dataclass
+class ProjectBody:
+    """JSON body dataclass for PUT, POST & PATCH requests."""
+
+    workspace_id: Optional[int] = field(default=None)
+    name: Optional[str] = field(default=None)
+    """Name of the project. Defaults to None. Will be required if its a POST request."""
+
+    active: bool = field(default=True)
+    """Whether the project is archived or active."""
+    is_private: Optional[bool] = field(default=True)
+    """Whether the project is private or not. Defaults to True."""
+
+    client_id: Optional[int] = field(default=None)
+    client_name: Optional[str] = field(default=None)
+    """Client name if client_id is not set. Defaults to None. If client_id is
+    set the client_name will be ignored."""
+
+    color: Optional[str] = field(default=None)
+
+    start_date: Optional[datetime | date] = field(default=None)
+    end_date: Optional[datetime | date] = field(default=None)
+    """Date to set the end of the project. If not set or start date is after
+    the end date the end date will be ignored."""
+
+    def format_body(self, workspace_id: int) -> dict[str, Any]:
+        """Formats the body for JSON requests.
+
+        Gets called by the endpoint methods before requesting.
+
+        Args:
+            workspace_id (int): Alternate Workspace ID for the request
+                if the body does not contain a workspace_id.
+
+        Returns:
+            dict[str, Any]: JSON compatible formatted body.
+        """
+        headers: dict[str, Any] = {
+            "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
+            "active": self.active,
+            "is_private": self.is_private,
+        }
+
+        if self.client_id:
+            headers["client_id"] = self.client_id
+        elif self.client_name:
+            headers["client_name"] = self.client_name
+        if self.color:
+            color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
+            headers["color"] = color
+        if self.start_date:
+            headers["start_date"] = format_iso(self.start_date)
+            if self.end_date and self.end_date > self.start_date:
+                headers["end_date"] = format_iso(self.end_date)
+
+        if self.name:
+            headers["name"] = self.name
+
+        return headers
 
 
 class ProjectEndpoint(TogglCachedEndpoint):
@@ -41,38 +106,6 @@ class ProjectEndpoint(TogglCachedEndpoint):
             refresh=refresh,
         )  # type: ignore[return-value]
 
-    def body_creation(self, **kwargs) -> dict[str, Any]:
-        headers = super().body_creation(**kwargs)
-
-        active = kwargs.get("active")
-        client_id = kwargs.get("client_id")
-        client_name = kwargs.get("client_name")
-        color = kwargs.get("color")
-        end_date = kwargs.get("end_date")
-        is_private = kwargs.get("is_private")
-        name = kwargs.get("name")
-        start_date = kwargs.get("start_date")
-
-        if active is not None:
-            headers["active"] = active
-        if client_id:
-            headers["client_id"] = client_id
-        if client_name:
-            headers["client_name"] = client_name
-        if color:
-            if color in self.BASIC_COLORS:
-                color = ProjectEndpoint.get_color(color)
-            headers["color"] = color
-        if end_date:
-            headers["end_date"] = end_date
-        if is_private is not None:
-            headers["is_private"] = is_private
-        if name:
-            headers["name"] = name
-        if start_date:
-            headers["start_date"] = start_date
-        return headers
-
     def delete_project(self, project: TogglProject) -> None:
         self.request(
             f"/{project.id}",
@@ -82,24 +115,29 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(project)
         self.cache.commit()
 
-    def edit_project(self, project: TogglProject, **kwargs) -> Optional[TogglProject]:
+    def edit_project(
+        self,
+        project: TogglProject,
+        body: ProjectBody,
+    ) -> Optional[TogglProject]:
         return self.request(
             f"/{project.id}",
             method=RequestMethod.PUT,
-            body=self.body_creation(**kwargs),
+            body=body.format_body(self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 
     def add_project(
         self,
-        *,
-        refresh: bool = False,
-        **kwargs,
-    ) -> TogglProject | None:
+        body: ProjectBody,
+    ) -> Optional[TogglProject]:
+        if body.name is None:
+            msg = "Name must be set in order to create a project!"
+            raise ValueError(msg)
         return self.request(
             "",
             method=RequestMethod.POST,
-            body=self.body_creation(**kwargs),
+            body=body.format_body(self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 

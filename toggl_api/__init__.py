@@ -1,5 +1,6 @@
 from .modules import (
     ClientEndpoint,
+    ProjectBody,
     TagEndpoint,
     TrackerBody,
     TrackerEndpoint,
@@ -32,4 +33,5 @@ __all__ = [
     "TrackerEndpoint",
     "UserEndpoint",
     "TrackerBody",
+    "ProjectBody",
 ]
