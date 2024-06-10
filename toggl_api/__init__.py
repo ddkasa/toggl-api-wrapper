@@ -1,7 +1,11 @@
+from .config import generate_authentication
 from .modules import (
     ClientBody,
     ClientEndpoint,
+    JSONCache,
     ProjectBody,
+    ProjectEndpoint,
+    SqliteCache,
     TagEndpoint,
     TrackerBody,
     TrackerEndpoint,
@@ -31,9 +35,13 @@ __all__ = [
     "TagEndpoint",
     "UserEndpoint",
     "WorkspaceEndpoint",
+    "ProjectEndpoint",
     "TrackerEndpoint",
     "UserEndpoint",
     "TrackerBody",
     "ProjectBody",
     "ClientBody",
+    "generate_authentication",
+    "SqliteCache",
+    "JSONCache",
 ]

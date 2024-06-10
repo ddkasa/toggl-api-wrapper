@@ -1,10 +1,10 @@
 ## Class Diagram
 ```mermaid
-{% include "assets/mermaid/classes.mmd" %}
+{% include "static/mermaid/classes.mmd" %}
 ```
 
 ## Packages Diagram
 ```mermaid
-{% include "assets/mermaid/packages.mmd" %}
+{% include "static/mermaid/packages.mmd" %}
 ```
 

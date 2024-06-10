@@ -1,4 +1,5 @@
 from .client import ClientBody, ClientEndpoint
+from .meta import JSONCache, SqliteCache
 from .project import ProjectBody, ProjectEndpoint
 from .tag import TagEndpoint
 from .tracker import TrackerBody, TrackerEndpoint
@@ -15,4 +16,6 @@ __all__ = (
     "WorkspaceEndpoint",
     "UserEndpoint",
     "ClientBody",
+    "SqliteCache",
+    "JSONCache",
 )
