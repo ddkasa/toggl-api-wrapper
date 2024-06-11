@@ -47,7 +47,7 @@ def cache_path():
     path = Path(__file__).resolve().parents[0] / Path("cache")
     yield path
     if path.exists():
-        with contextlib.suppress(PermissionError):
+        with contextlib.suppress(PermissionError):  # Windows Compatibility Issues
             cleanup(path)
 
 

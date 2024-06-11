@@ -1,15 +1,21 @@
 classDiagram
   class AuthenticationError {
   }
+  class ClientBody {
+    name : Optional[str]
+    notes : Optional[str]
+    status : Optional[str]
+    workspace_id : Optional[int]
+    format_body(workspace_id: int) dict[str, Any]
+  }
   class ClientEndpoint {
     endpoint
     model
-    body_creation() dict[str, Any]
-    create_client() TogglClient | None
+    create_client(body: ClientBody) Optional[TogglClient]
     delete_client(client: TogglClient) None
     get_client(client_id: int) Optional[TogglClient]
-    get_clients() list[TogglClient]
-    update_client(client_id: int) Optional[TogglClient]
+    get_clients(status: Optional[str], name: Optional[str]) list[TogglClient]
+    update_client(client: TogglClient, body: ClientBody) Optional[TogglClient]
   }
   class CustomDecoder {
     MATCH_DICT : Final[dict[str, type[TogglClass]]]
@@ -39,14 +45,25 @@ classDiagram
     load(path: Path, expire_after: timedelta) None
     save(path: Path) None
   }
+  class ProjectBody {
+    active : bool
+    client_id : Optional[int]
+    client_name : Optional[str]
+    color : Optional[str]
+    end_date : Optional[datetime | date]
+    is_private : Optional[bool]
+    name : Optional[str]
+    start_date : Optional[datetime | date]
+    workspace_id : Optional[int]
+    format_body(workspace_id: int) dict[str, Any]
+  }
   class ProjectEndpoint {
     BASIC_COLORS : Final[dict[str, str]]
     endpoint
     model
-    add_project() TogglProject | None
-    body_creation() dict[str, Any]
+    add_project(body: ProjectBody) Optional[TogglProject]
     delete_project(project: TogglProject) None
-    edit_project(project: TogglProject) Optional[TogglProject]
+    edit_project(project: TogglProject, body: ProjectBody) Optional[TogglProject]
     get_color(color: str) str
     get_color_id(color: str) int
     get_project(project_id: int) Optional[TogglProject]
@@ -71,7 +88,6 @@ classDiagram
   class TagEndpoint {
     endpoint
     model
-    body_creation() dict[str, Any]
     create_tag(name: str) TogglTag
     delete_tag(tag: TogglTag) None
     get_tags() list[TogglTag]
@@ -113,7 +129,6 @@ classDiagram
     endpoint
     model
     workspace_id : int
-    body_creation() dict[str, Any]
     method(method: RequestMethod) Callable
     process_models(data: list[dict[str, Any]]) list[TogglClass]
     request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Optional[list[TogglClass] | TogglClass]
@@ -155,6 +170,7 @@ classDiagram
     format_body(workspace_id: int) dict
   }
   class TrackerEndpoint {
+    TRACKER_ALREADY_STOPPED : Final[int]
     endpoint
     model
     add_tracker(body: TrackerBody) Optional[TogglTracker]
@@ -175,7 +191,7 @@ classDiagram
     check_authentication() bool
     current_tracker() Optional[TogglTracker]
     get_tracker(tracker_id: int) Optional[TogglTracker]
-    get_trackers() list[TogglTracker]
+    get_trackers(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
   }
   class WorkspaceChild {
     workspace : int

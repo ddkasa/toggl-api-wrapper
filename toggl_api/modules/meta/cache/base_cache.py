@@ -22,7 +22,7 @@ class TogglCache(metaclass=ABCMeta):
     Integrates fully with TogglCachedEndpoint to create a seemless depending on
     the users choice of cache.
 
-    AbstractMethods:
+    Methods:
         commit: Commits the cache to disk, database or other form.
             Basically method for finalising the cache.
         load_cache: Loads the cache from disk, database or other form.
@@ -31,8 +31,6 @@ class TogglCache(metaclass=ABCMeta):
         add_entry: Adds a TogglClass to the cache.
         update_entry: Updates a TogglClass in the cache.
         delete_entry: Deletes a TogglClass from the cache.
-
-    Methods:
         find_method: Matches a RequestMethod to cache functionality.
         parent_exist: Validates if the parent has been set. The parent will be
             generally set by the endpoint when assigned.

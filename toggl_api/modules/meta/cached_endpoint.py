@@ -74,7 +74,7 @@ class TogglCachedEndpoint(TogglEndpoint):
             method: Request method. Defaults to GET.
             refresh: Whether to refresh the cache or not. Defaults to False.
 
-        Returning:
+        Returns:
             TogglClass | Iterable[TogglClass] | None: Toggl API response data
                 processed into TogglClass objects.
         """

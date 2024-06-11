@@ -1,5 +1,5 @@
 site_name: Toggl API Wrapper
-site_url: ""
+site_url: https://ddkasa.github.io/toggl-api-wrapper/
 use_directory_urls: false
 site_description: Simple Toggl API wrapper for non-premium features.
 site_author: David Kasakaits
@@ -57,12 +57,13 @@ theme:
     code: Roboto Mono
 
 nav:
-  - Home: README.md
   - Getting Started:
+    - Overview: README.md
     - Installation: user-guide/installation.md
     - Examples: user-guide/examples.md
   - API Reference:
       - Overview: api-guide/index.md
+      - Config: api-guide/config.md
       - Endpoint: api-guide/endpoint.md 
       - Cache: api-guide/cache.md
       - Models: api-guide/model.md
@@ -104,6 +105,7 @@ markdown_extensions:
       repo: mkdocs
   - mkdocs-click
   - md_in_html
+  - admonition
 
 copyright: Copyright &copy; 2024 David Kasakaitis
 
@@ -131,5 +133,6 @@ plugins:
   - mkdocs_github_changelog:
       token: !ENV GITHUB_TOKEN
       enabled: True
+  - callouts
 watch:
   - toggl_api

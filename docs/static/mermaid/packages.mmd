@@ -43,10 +43,12 @@ classDiagram
   }
   class version {
   }
+  toggl_api --> config
   toggl_api --> modules
   toggl_api --> models
   toggl_api --> version
   modules --> client
+  modules --> meta
   modules --> project
   modules --> tag
   modules --> tracker
@@ -78,6 +80,7 @@ classDiagram
   schema --> models
   project --> meta
   project --> models
+  project --> utility
   tag --> meta
   tag --> models
   tracker --> meta

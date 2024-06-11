@@ -98,6 +98,14 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return data
 
     def delete_tracker(self, tracker: TogglTracker) -> None:
+        """Delete tracker from Toggl.
+
+        Args:
+            tracker: Tracker object with ID to delete.
+
+        Returns:
+            None: If the tracker was deleted or not found at all.
+        """
         try:
             self.request(
                 f"/{tracker.id}",
@@ -111,6 +119,15 @@ class TrackerEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def stop_tracker(self, tracker: TogglTracker) -> Optional[TogglTracker]:
+        """Stops a running tracker.
+
+        Args:
+            tracker (TogglTracker): Tracker object with IP to stop.
+
+        Returns:
+            TogglTracker: If the tracker was stopped or if the tracker wasn't
+                running it return None.
+        """
         try:
             return self.request(  # type: ignore[return-value]
                 f"/{tracker.id}/stop",
@@ -123,6 +140,18 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return None
 
     def add_tracker(self, body: TrackerBody) -> Optional[TogglTracker]:
+        """Add a new tracker.
+
+        Args:
+            body: Body of the request. Description must be set.
+
+        Raises:
+            ValueError: Description must be set in order to create a new
+                tracker.
+
+        Returns:
+            TogglTracker: If a tracker was created.
+        """
         if not isinstance(body.description, str):
             msg = "Description must be set in order to create a tracker!"
             raise ValueError(msg)  # noqa: TRY004

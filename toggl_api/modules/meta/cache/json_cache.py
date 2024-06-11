@@ -89,7 +89,7 @@ class JSONCache(TogglCache):
             caller discarding expired entries.
 
     Attributes:
-        session: Store the current json data in memory while handling the cache.
+        session(JSONSession): Store the current json data in memory while handling the cache.
     """
 
     __slots__ = ("session",)

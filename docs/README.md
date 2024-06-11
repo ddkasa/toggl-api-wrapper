@@ -1,6 +1,8 @@
 # Python Toggl API Wrapper
 
 
+![PyPI - Version](https://img.shields.io/pypi/v/toggl-api-wrapper?style=for-the-badge&link=https%3A%2F%2Fpypi.org%2Fproject%2Ftoggl-api-wrapper%2F)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/toggl-api-wrapper?style=for-the-badge)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ddkasa/toggl-api-wrapper/publish.yaml?style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/ddkasa/toggl-api-wrapper?style=for-the-badge)
 ***
@@ -17,21 +19,25 @@ Simple Python Toggl API wrapper for non-premium features primarily focused on cr
 
 ### Poetry
 
-- `$ poetry add toggl-api-wrapper`
+```
+poetry add toggl-api-wrapper
+```
 
 ### PIP
 
-- `$ pip install toggl-api-wrapper`
+```
+pip install toggl-api-wrapper
+```
 
 ## Usage
 
 - Currently supports interacting with Trackers, Projects, Clients & Tags and some extras.
 - Designed to be rudimentary to allow simple development of custom commands.
 
-- Most of the configuration relies on setting the environment variables.
-1. **TOGGL_API_TOKEN**: Your Toggl API token or account email.
-    - If using an email **TOGGL_PASSWORD** must be set as well.
 
+## Documentation
+- [API Documentation](https://ddkasa.github.io/toggl-api-wrapper/api-guide/)
+- [User Guide](https://ddkasa.github.io/toggl-api-wrapper/user-guide/)
 
 ## Development
 See [CONTRIBUTING](about/CONTRIBUTING.md).

@@ -3,7 +3,7 @@
 {% include "static/mermaid/classes.mmd" %}
 ```
 
-## Packages Diagram
+## Package Diagram
 ```mermaid
 {% include "static/mermaid/packages.mmd" %}
 ```

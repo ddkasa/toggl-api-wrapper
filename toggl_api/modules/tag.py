@@ -31,6 +31,7 @@ class TagEndpoint(TogglCachedEndpoint):
         )  # type: ignore[return-value]
 
     def delete_tag(self, tag: TogglTag, **kwargs) -> None:
+        """Deletes a tag based on its id."""
         self.request(f"/{tag.id}", method=RequestMethod.DELETE, refresh=True)
         self.cache.delete_entries(tag)
         self.cache.commit()

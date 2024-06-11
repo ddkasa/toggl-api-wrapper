@@ -11,6 +11,14 @@ class AuthenticationError(ValueError):
 
 
 def generate_authentication() -> BasicAuth:
+    """Gathers credentials from environment variables.
+
+    Raises:
+        AuthenticationError: If credentials are not set or invalid.
+
+    Returns:
+        BasicAuth: BasicAuth object that is used with httpx client.
+    """
     api_token = os.getenv("TOGGL_API_TOKEN")
     if api_token is None:
         msg = "Email or API Key not set."
@@ -23,6 +31,20 @@ def generate_authentication() -> BasicAuth:
 
 # NOTE: For .togglrc compatibility.
 def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
+    """Gathers credentials from environment variables.
+
+    Mainly here for backwards compatibility.
+
+    Args:
+        config_path: Path to .togglrc file. Defaults to None. If None, will use
+            $HOME/.togglrc for the default location.
+
+    Raises:
+        AuthenticationError: If credentials are not set or invalid.
+
+    Returns:
+        BasicAuth: BasicAuth object that is used with httpx client.
+    """
     if config_path is None:
         config_path = Path.home()
     config_path = config_path / ".togglrc"
@@ -30,7 +52,6 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         msg = f"Config file not found: {config_path}"
         raise AuthenticationError(msg)
 
-    password = os.getenv("TOGGL_PASSWORD", "api_token")
     config = configparser.ConfigParser()
     config.read(config_path)
 

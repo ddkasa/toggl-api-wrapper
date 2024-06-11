@@ -1,4 +1,4 @@
-- With **TOGGL_API_TOKEN** environment variables setup correctly.
+- With environment variables setup correctly.
 
 ### Tracker Example
 ```python
