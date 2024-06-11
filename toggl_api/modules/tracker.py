@@ -86,6 +86,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         tracker: TogglTracker,
         body: TrackerBody,
     ) -> Optional[TogglTracker]:
+        """Edit an existing tracker."""
         data = self.request(
             f"/{tracker.id}",
             method=RequestMethod.PUT,
@@ -122,11 +123,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
         """Stops a running tracker.
 
         Args:
-            tracker (TogglTracker): Tracker object with IP to stop.
+            tracker: Tracker object with IP to stop.
 
         Returns:
             TogglTracker: If the tracker was stopped or if the tracker wasn't
-                running it return None.
+                running it will return None.
         """
         try:
             return self.request(  # type: ignore[return-value]
@@ -143,14 +144,16 @@ class TrackerEndpoint(TogglCachedEndpoint):
         """Add a new tracker.
 
         Args:
-            body: Body of the request. Description must be set.
+            body: Body of the request. Description must be set. If start date
+                is not set it will be set to current time with duration set
+                to -1 for a running tracker.
 
         Raises:
             ValueError: Description must be set in order to create a new
                 tracker.
 
         Returns:
-            TogglTracker: If a tracker was created.
+            TogglTracker: The tracker that was created.
         """
         if not isinstance(body.description, str):
             msg = "Description must be set in order to create a tracker!"
@@ -158,7 +161,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         if body.start is None and body.start_date is None:
             body.start = datetime.now(tz=timezone.utc)
-            body.duration = -1
+            if body.stop is None:
+                body.duration = -1
 
         return self.request(
             "",
