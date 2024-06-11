@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import atexit
 import logging
+import random
+import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Final, Optional
 
@@ -28,6 +30,7 @@ class TogglEndpoint(ABC):
 
     OK_RESPONSE: Final[int] = 200
     NOT_FOUND: Final[int] = 404
+    SERVER_ERROR: Final[int] = 5
 
     BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -96,9 +99,14 @@ class TogglEndpoint(ABC):
 
         if response.status_code != self.OK_RESPONSE:
             # TODO: Toggl API return code lookup.
-            # TODO: If a "already exists" 400 code is returned it should return the get or None.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
+            if response.status_code % 100 == self.SERVER_ERROR:
+                delay = random.randint(1, 5)  # noqa: S311
+                log.info("Status code is a server error. Retrying request in %s seconds", delay)
+                time.sleep(delay)
+                return self.request(parameters, headers, body, method)
+
             response.raise_for_status()
 
         try:
