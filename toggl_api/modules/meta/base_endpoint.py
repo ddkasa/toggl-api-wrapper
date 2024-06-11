@@ -4,6 +4,7 @@ Classes:
     TogglRequest: Base class with basic functionality for all API requests.
 """
 
+import atexit
 import logging
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
@@ -38,7 +39,14 @@ class TogglEndpoint(metaclass=ABCMeta):
         **kwargs,
     ) -> None:
         self.workspace_id = workspace_id
-        self.__client = httpx.Client(timeout=timeout, auth=auth)
+        # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
+        # as current httpx concatenation is causing appended slashes.
+        self.__client = httpx.Client(
+            base_url=self.BASE_ENDPOINT,
+            timeout=timeout,
+            auth=auth,
+        )
+        atexit.register(self.__client.close)
 
     def method(self, method: RequestMethod) -> Callable:
         match_dict: dict[RequestMethod, Callable] = {
@@ -110,7 +118,7 @@ class TogglEndpoint(metaclass=ABCMeta):
     @property
     @abstractmethod
     def endpoint(self) -> str:
-        return self.BASE_ENDPOINT
+        pass
 
     @property
     @abstractmethod

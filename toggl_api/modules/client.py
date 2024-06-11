@@ -46,6 +46,7 @@ class ClientEndpoint(TogglCachedEndpoint):
         if body.name is None:
             msg = "Name must be set in order to create a client!"
             raise ValueError(msg)
+
         return self.request(
             "",
             body=body.format_body(self.workspace_id),
@@ -107,7 +108,7 @@ class ClientEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}/clients"
+        return f"workspaces/{self.workspace_id}/clients"
 
     @property
     def model(self) -> type[TogglClient]:

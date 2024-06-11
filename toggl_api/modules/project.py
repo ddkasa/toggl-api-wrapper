@@ -152,7 +152,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}/projects"
+        return f"workspaces/{self.workspace_id}/projects"
 
     @property
     def model(self) -> type[TogglProject]:

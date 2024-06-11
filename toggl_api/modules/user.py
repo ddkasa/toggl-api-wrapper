@@ -92,7 +92,7 @@ class UserEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + "me/"
+        return "me/"
 
     @property
     def model(self) -> type[TogglTracker]:

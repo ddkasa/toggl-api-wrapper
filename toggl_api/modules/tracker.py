@@ -173,7 +173,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}/time_entries"
+        return f"workspaces/{self.workspace_id}/time_entries"
 
     @property
     def model(self) -> type[TogglTracker]:

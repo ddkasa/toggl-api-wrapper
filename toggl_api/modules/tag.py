@@ -38,7 +38,7 @@ class TagEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}/tags"
+        return f"workspaces/{self.workspace_id}/tags"
 
     @property
     def model(self) -> type[TogglTag]:

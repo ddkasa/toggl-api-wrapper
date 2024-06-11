@@ -15,4 +15,4 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return super().endpoint + f"workspaces/{self.workspace_id}"
+        return f"workspaces/{self.workspace_id}"

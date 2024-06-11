@@ -172,7 +172,7 @@ class ModelTest(TogglClass):
 class EndPointTest(TogglCachedEndpoint):
     @property
     def endpoint(self) -> str:
-        return super().endpoint
+        return ""
 
     @property
     def model(self) -> type[TogglTracker]:

@@ -112,7 +112,7 @@ class TogglCachedEndpoint(TogglEndpoint):
     @property
     @abstractmethod
     def endpoint(self) -> str:
-        return super().endpoint
+        pass
 
     @property
     def cache(self) -> TogglCache:
