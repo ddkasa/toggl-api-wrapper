@@ -5,10 +5,28 @@ on:
     tags:
       - "v*.*.*"
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+
+
+
   test:
+    needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
-
       max-parallel: 1
       fail-fast: true
       matrix:
@@ -19,7 +37,6 @@ jobs:
       TOGGL_WORKSPACE_ID: ${{ secrets.TOGGL_WORKSPACE_ID }}
       TOGGL_API_TOKEN: ${{ secrets.TOGGL_API_TOKEN }}
       GH_ACTION: "ACTION"
-
 
     steps:
     - uses: actions/checkout@v4
@@ -32,14 +49,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install poetry
-        pip install tox-gh-actions tox ruff mypy
-
-    - name: Type check
-      run: mypy toggl_api
-
-    - name: Lint code
-      run: ruff check toggl_api
+        pip install poetry tox-gh-actions tox ruff mypy
 
     - name: Run tests
       run: tox
@@ -54,7 +64,21 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+    
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+
+      - name: Generate Stubs
+        run: stubgen toggl_api/
+
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v2.0
         with:
