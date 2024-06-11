@@ -4,12 +4,12 @@ from .cached_endpoint import TogglCachedEndpoint
 from .enums import RequestMethod
 
 __all__ = (
-    "CustomEncoder",
     "CustomDecoder",
-    "TogglEndpoint",
-    "TogglCachedEndpoint",
-    "RequestMethod",
-    "TogglCache",
+    "CustomEncoder",
     "JSONCache",
+    "RequestMethod",
     "SqliteCache",
+    "TogglCache",
+    "TogglCachedEndpoint",
+    "TogglEndpoint",
 )

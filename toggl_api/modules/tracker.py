@@ -42,7 +42,7 @@ class TrackerBody:
             dict[str, Any]: JSON compatible formatted body.
         """
         headers = {
-            "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
+            "workspace_id": self.workspace_id or workspace_id,
             "created_with": self.created_with,
             "description": self.description,
         }
@@ -72,7 +72,7 @@ class TrackerBody:
 
         if self.tag_action:
             headers["tag_action"] = self.tag_action
-        elif self.tag_ids or self.tags and not self.tag_action:
+        elif self.tag_ids or (self.tags and not self.tag_action):
             headers["tag_action"] = "add"
 
         return headers

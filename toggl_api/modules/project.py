@@ -46,7 +46,7 @@ class ProjectBody:
             dict[str, Any]: JSON compatible formatted body.
         """
         headers: dict[str, Any] = {
-            "workspace_id": self.workspace_id if self.workspace_id else workspace_id,
+            "workspace_id": self.workspace_id or workspace_id,
             "active": self.active,
             "is_private": self.is_private,
         }

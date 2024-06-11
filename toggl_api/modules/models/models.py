@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from functools import partial
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class TogglClass(metaclass=ABCMeta):
+class TogglClass(ABC):
     """Base class for all Toggl dataclasses.
 
     Attributes:

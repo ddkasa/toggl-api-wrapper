@@ -4,11 +4,12 @@ Classes:
     TogglRequest: Base class with basic functionality for all API requests.
 """
 
+from __future__ import annotations
+
 import atexit
 import logging
-from abc import ABCMeta, abstractmethod
-from collections.abc import Callable
-from typing import Any, Final, Optional
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
 
@@ -16,10 +17,13 @@ from toggl_api.modules.models.models import TogglClass
 
 from .enums import RequestMethod
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 log = logging.getLogger("toggl_api")
 
 
-class TogglEndpoint(metaclass=ABCMeta):
+class TogglEndpoint(ABC):
     """Base class with basic functionality for all API requests."""
 
     OK_RESPONSE: Final[int] = 200
@@ -83,9 +87,9 @@ class TogglEndpoint(metaclass=ABCMeta):
         """
 
         url = self.endpoint + parameters
-        headers = headers if headers else self.HEADERS
+        headers = headers or self.HEADERS
 
-        if body and method not in (RequestMethod.DELETE, RequestMethod.GET):
+        if body and method not in {RequestMethod.DELETE, RequestMethod.GET}:
             response = self.method(method)(url, headers=headers, json=body)
         else:
             response = self.method(method)(url, headers=headers)

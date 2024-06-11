@@ -29,7 +29,7 @@ class ClientBody:
             dict[str, Any]: JSON compatible formatted body.
         """
         body: dict[str, Any] = {
-            "wid": self.workspace_id if self.workspace_id else workspace_id,
+            "wid": self.workspace_id or workspace_id,
         }
 
         if self.name:

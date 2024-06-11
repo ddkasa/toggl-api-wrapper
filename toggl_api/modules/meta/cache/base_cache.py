@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Final, Optional
 
 from toggl_api.modules.meta.enums import RequestMethod
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 # TODO: Possibly could add a 'session' object for all cache types.
 # TODO: Implement a uniform way of handling querying/searching caches.
-class TogglCache(metaclass=ABCMeta):
+class TogglCache(ABC):
     """Abstract class for caching toggl API data to disk.
 
     Integrates fully with TogglCachedEndpoint to create a seemless depending on

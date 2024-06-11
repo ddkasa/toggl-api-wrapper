@@ -30,13 +30,13 @@ def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
 
 
 __all__ = (
-    "TogglTag",
+    "TogglClass",
     "TogglClient",
     "TogglProject",
-    "TogglClass",
+    "TogglTag",
     "TogglTracker",
-    "WorkspaceChild",
     "TogglWorkspace",
-    "register_tables",
+    "WorkspaceChild",
     "as_dict_custom",
+    "register_tables",
 )

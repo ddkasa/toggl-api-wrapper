@@ -47,7 +47,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     """
     if config_path is None:
         config_path = Path.home()
-    config_path = config_path / ".togglrc"
+    config_path /= ".togglrc"
     if not config_path.exists():
         msg = f"Config file not found: {config_path}"
         raise AuthenticationError(msg)
