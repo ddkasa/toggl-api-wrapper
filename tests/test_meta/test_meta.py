@@ -45,8 +45,3 @@ def test_process_models(meta_object, get_test_data, meta_object_sqlite):
     assert all(isinstance(model, meta_object.model) for model in models)
     assert meta_object_sqlite.process_models(get_test_data) == models
     assert all(isinstance(model, meta_object_sqlite.model) for model in models)
-
-
-@pytest.mark.unit()
-def test_body_creation(meta_object, get_workspace_id):
-    assert meta_object.body_creation() == {"workspace_id": get_workspace_id}

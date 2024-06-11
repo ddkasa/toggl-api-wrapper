@@ -101,20 +101,6 @@ class TogglEndpoint(metaclass=ABCMeta):
 
         return data
 
-    def body_creation(self, **kwargs) -> dict[str, Any]:
-        """Generate basic headers for Toggl API request.
-
-        Args:
-            kwargs (dict): Misc header arguments for the request.
-
-        Returns:
-            dict: Basic headers for the Toggl API.
-        """
-
-        return {
-            "workspace_id": self.workspace_id,
-        }
-
     def process_models(
         self,
         data: list[dict[str, Any]],
