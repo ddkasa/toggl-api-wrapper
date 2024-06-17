@@ -1,10 +1,12 @@
 import time
-from datetime import timedelta
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
 
 import pytest
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
+from toggl_api.modules.meta import RequestMethod
 from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
 
 
@@ -88,11 +90,33 @@ def test_delete_entries_sqlite(meta_object_sqlite, model_data):
 
 
 @pytest.mark.unit()
-def test_query_sqlite(meta_object_sqlite, model_data):
+def test_find_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
     tracker_data = {"id": tracker.id, "name": tracker.name}
     assert tracker == meta_object_sqlite.cache.find_entry(tracker_data)
+
+
+@pytest.mark.unit()
+def test_query_sqlite(tracker_object_sqlite, model_data, faker):
+    tracker_object_sqlite.cache.session.data = []
+    names = [faker.name() for _ in range(10)]
+    tracker = model_data.pop("tracker")
+    tracker.timestamp = datetime.now(timezone.utc)
+    tracker_object_sqlite.save_cache(tracker, RequestMethod.GET)
+
+    for i in range(1, 11):
+        t = TogglTracker(**asdict(tracker))
+        t.id += i
+        t.name = names[i - 1]
+        t.timestamp = datetime.now(timezone.utc)
+        tracker_object_sqlite.save_cache(t, RequestMethod.GET)
+
+    tracker_object_sqlite.cache.commit()
+
+    assert tracker_object_sqlite.load_cache().count() == 11  # noqa: PLR2004
+
+    assert tracker_object_sqlite.query(name=tracker.name)[0] == tracker
 
 
 @pytest.mark.unit()

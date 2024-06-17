@@ -12,7 +12,7 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from .base_endpoint import TogglEndpoint
 from .enums import RequestMethod
@@ -108,6 +108,21 @@ class TogglCachedEndpoint(TogglEndpoint):
         if not self.cache.expire_after.total_seconds():
             return None
         return self.cache.save_cache(response, method)
+
+    def query(
+        self,
+        *,
+        inverse: bool = False,
+        distinct: bool = False,
+        expire: bool = True,
+        **query: dict[str, Any],
+    ) -> Iterable[TogglClass]:
+        return self.cache.query(
+            inverse=inverse,
+            distinct=distinct,
+            expire=expire,
+            **query,
+        )
 
     @property
     @abstractmethod

@@ -117,6 +117,19 @@ def tracker_object(get_workspace_id, config_setup, get_json_cache, user_object):
     _tracker_cleanup(endpoint, user_object)
 
 
+@pytest.fixture(scope="session")
+def tracker_object_sqlite(
+    get_workspace_id,
+    config_setup,
+    get_sqlite_cache,
+    user_object,
+):
+    endpoint = TrackerEndpoint(get_workspace_id, config_setup, get_sqlite_cache)
+    _tracker_cleanup(endpoint, user_object)
+    yield endpoint
+    _tracker_cleanup(endpoint, user_object)
+
+
 @pytest.fixture()
 def add_tracker(tracker_object, faker):
     body = TrackerBody(

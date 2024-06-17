@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import atexit
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import sqlalchemy as db
 from sqlalchemy.orm import Query, Session
@@ -50,6 +50,7 @@ class SqliteCache(TogglCache):
         self.metadata = register_tables(self.database)
 
         self.session = Session(self.database)
+        # FIX: Persistent connection not a good idea.
         atexit.register(self.session.close)
 
     def commit(self) -> None:
@@ -115,13 +116,31 @@ class SqliteCache(TogglCache):
             raise ValueError(msg)
 
         if isinstance(query, TogglClass):
-            query = {"name": query.name, "id": query.id}
+            query = {"id": query.id}
 
         search = self.session.query(self.parent.model)
         if expire:
             min_ts = datetime.now(timezone.utc) - self._expire_after
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
         return search.filter_by(**query).first()  # type: ignore[name-defined]
+
+    def query(
+        self,
+        *,
+        inverse: bool = False,
+        distinct: bool = False,
+        expire: bool = True,
+        **query: dict[str, Any],
+    ) -> Query[TogglClass]:
+        if self.parent is None:
+            msg = "Cannot load cache without parent!"
+            raise ValueError(msg)
+
+        search = self.session.query(self.parent.model)
+        if expire:
+            min_ts = datetime.now(timezone.utc) - self._expire_after
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+        return search.filter_by(**query)
 
     @property
     def cache_path(self) -> Path:

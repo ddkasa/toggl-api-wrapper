@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 from toggl_api.modules.meta.enums import RequestMethod
 
@@ -24,16 +24,17 @@ class TogglCache(ABC):
 
     Methods:
         commit: Commits the cache to disk, database or other form.
-            Basically method for finalising the cache.
-        load_cache: Loads the cache from disk, database or other form.
-        save_cache: Saves and preforms action depending on request type.
-        find_entry: Looks for a TogglClass in the cache.
-        add_entry: Adds a TogglClass to the cache.
-        update_entry: Updates a TogglClass in the cache.
-        delete_entry: Deletes a TogglClass from the cache.
+            Basically method for finalising the cache. Abstract.
+        load_cache: Loads the cache from disk, database or other form. Abstract.
+        save_cache: Saves and preforms action depending on request type. Abstract.
+        find_entry: Looks for a TogglClass in the cache. Abstract.
+        add_entry: Adds a TogglClass to the cache. Abstract.
+        update_entry: Updates a TogglClass in the cache. Abstract.
+        delete_entry: Deletes a TogglClass from the cache. Abstract.
         find_method: Matches a RequestMethod to cache functionality.
         parent_exist: Validates if the parent has been set. The parent will be
-            generally set by the endpoint when assigned.
+            generally set by the endpoint when assigned. Abstract.
+        query: Queries the cache for various varibles. Abstract.
 
     Attributes:
         _cache_path: Path to the cache file. Will generate the folder if it
@@ -99,6 +100,18 @@ class TogglCache(ABC):
         self,
         update: list[TogglClass] | TogglClass,
     ) -> None:
+        pass
+
+    @abstractmethod
+    def query(
+        self,
+        *,
+        inverse: bool = False,
+        distinct: bool = False,
+        expire: bool = True,
+        **query: dict[str, Any],
+    ) -> Iterable[TogglClass]:
+        # TODO: Implement a data structure to hold query arguments & results.
         pass
 
     @property

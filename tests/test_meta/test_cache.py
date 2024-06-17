@@ -1,12 +1,14 @@
 import json
 import time
-from datetime import timedelta
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
 
 from tests.conftest import EndPointTest
 from toggl_api.modules.meta import CustomDecoder, CustomEncoder, RequestMethod
+from toggl_api.modules.models.models import TogglTracker
 
 
 @pytest.mark.unit()
@@ -80,3 +82,25 @@ def test_max_length(model_data, get_json_cache):
     get_json_cache.commit()
 
     assert len(get_json_cache.load_cache()) == 10  # noqa: PLR2004
+
+
+@pytest.mark.unit()
+def test_query(model_data, tracker_object, faker):
+    tracker_object.cache.session.max_length = 20
+    tracker_object.cache.session.data = []
+    tracker_object.cache.commit()
+    names = [faker.name() for _ in range(12)]
+    tracker = model_data.pop("tracker")
+    tracker.id = 1
+
+    t = TogglTracker(**asdict(tracker))
+    for i in range(1, 13):
+        t.timestamp = datetime.now(timezone.utc)
+        tracker_object.cache.session.data.append(t)
+        t.id += i
+        t.name = names[i - 1]
+    tracker_object.cache.commit()
+
+    assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
+
+    assert tracker_object.query(name=names[-1])[0].name == t.name

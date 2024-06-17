@@ -131,13 +131,12 @@ class JSONCache(TogglCache):
         func = self.find_method(method)
         if func is not None:
             func(update)
-
         self.commit()
 
     def load_cache(self, *, expire: bool = True) -> list[TogglClass]:
         self.session.load(self.cache_path, self.expire_after)
         min_ts = datetime.now(timezone.utc) - self.expire_after
-        return [m for m in self.session.data if expire and m.timestamp >= min_ts]  # type: ignore[operator]
+        return [m for m in self.session.data if not expire or m.timestamp >= min_ts]  # type: ignore[operator]
 
     def find_entry(
         self,
@@ -159,6 +158,7 @@ class JSONCache(TogglCache):
         if find_entry is None:
             return self.session.data.append(item)
         index = self.session.data.index(find_entry)
+        item.timestamp = datetime.now(timezone.utc)
         self.session.data[index] = item
         return None
 
@@ -197,6 +197,38 @@ class JSONCache(TogglCache):
         for entry in update:
             self.delete_entry(entry)
         return None
+
+    def query(
+        self,
+        *,
+        inverse: bool = False,
+        distinct: bool = False,
+        expire: bool = True,
+        **query: dict[str, Any],
+    ) -> list[TogglClass]:
+        # TODO: Implementation details are still lacking here.
+        if self.parent is None:
+            msg = "Cannot load cache without parent!"
+            raise ValueError(msg)
+
+        self.session.load(self.cache_path, self.expire_after)
+        search = self.session.data
+        min_ts = datetime.now(timezone.utc) - self.expire_after
+        results: list[TogglClass] = []
+        existing_values: set[Any] = set()
+
+        for model in search:
+            if expire and model.timestamp and min_ts >= model.timestamp:
+                continue
+            if all(model[key] == value for key, value in query.items()) and (
+                not distinct or all(model[k] not in existing_values for k in query)
+            ):
+                if distinct:
+                    existing_values.add(query.values())
+                results.append(model)
+        if inverse:
+            results.reverse()
+        return results
 
     @property
     def cache_path(self) -> Path:
