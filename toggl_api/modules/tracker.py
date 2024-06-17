@@ -72,7 +72,7 @@ class TrackerBody:
 
         if self.tag_action:
             headers["tag_action"] = self.tag_action
-        elif self.tag_ids or (self.tags and not self.tag_action):
+        elif (self.tag_ids or self.tags) and not self.tag_action:
             headers["tag_action"] = "add"
 
         return headers
