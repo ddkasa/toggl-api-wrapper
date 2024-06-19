@@ -203,6 +203,7 @@ envlist = ruff, mypy, py310, py311, py312
 skip_install = true
 passenv = *
 setenv = 
+    GH_ACTION = "True"
     TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
     TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
     PYTHONPATH = {toxinidir}

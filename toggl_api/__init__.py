@@ -23,6 +23,7 @@ from .version import version
 
 __author__ = "David Kasakaitis"
 __version__ = version
+__typed__ = True
 
 
 __all__ = [

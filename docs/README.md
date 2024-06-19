@@ -23,7 +23,7 @@ Simple Python Toggl API wrapper for non-premium features primarily focused on cr
 poetry add toggl-api-wrapper
 ```
 
-### PIP
+### Pip
 
 ```
 pip install toggl-api-wrapper
