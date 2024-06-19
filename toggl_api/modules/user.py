@@ -18,6 +18,7 @@ class UserEndpoint(TogglCachedEndpoint):
         except HTTPStatusError as err:
             if err.response.status_code == self.TRACKER_NOT_RUNNING:
                 return None
+            raise
 
         return response if isinstance(response, TogglTracker) else None
 
@@ -54,7 +55,8 @@ class UserEndpoint(TogglCachedEndpoint):
             params = f"?start_date={start_date}&end_date={end_date}"
         response = self.request(params, refresh=refresh)
 
-        # Need to filter cached trackers.
+        # TODO: Need to filter cached trackers.
+        # TODO: Implement sorting of trackers.
 
         return response if isinstance(response, list) else []  # type: ignore[return-value]
 
