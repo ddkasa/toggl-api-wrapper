@@ -50,7 +50,6 @@ class SqliteCache(TogglCache):
         self.metadata = register_tables(self.database)
 
         self.session = Session(self.database)
-        # FIX: Persistent connection not a good idea.
         atexit.register(self.session.close)
 
     def commit(self) -> None:
@@ -145,3 +144,6 @@ class SqliteCache(TogglCache):
     @property
     def cache_path(self) -> Path:
         return super().cache_path / "cache.sqlite"
+
+    def __del__(self) -> None:
+        self.session.close()
