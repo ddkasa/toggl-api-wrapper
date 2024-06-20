@@ -32,6 +32,8 @@ if TYPE_CHECKING:
 class JSONSession:
     """Data structure for storing JSON in memory.
 
+    Similar to a SQL session as its meant to have the same/similar interface.
+
     Methods:
         save: Saves the data to a JSON file. Setting current timestamp and
             version.
@@ -39,22 +41,25 @@ class JSONSession:
             Invalidates any entries older than expire argument.
 
     Attributes:
+        max_length: Max length of the data to be stored.
         timestamp: Timestamp of the data for when it was loaded.
         version: Version of the data structure.
         data: List of Toggl objects stored in memory.
     """
 
+    # TODO: Implement max length of data.
+    max_length: int = field(default=10_000)
     timestamp: datetime = field(init=False)
     version: str = field(init=False, default=version)
     data: list[TogglClass] = field(default_factory=list)
 
-    def save(self, path: Path) -> None:
+    def commit(self, path: Path) -> None:
         self.timestamp = datetime.now(timezone.utc)
         self.version = version
         data = {
             "timestamp": self.timestamp.isoformat(),
             "version": self.version,
-            "data": self.data,
+            "data": self.process_data(self.data),
         }
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
@@ -65,10 +70,15 @@ class JSONSession:
                 data = json.load(f, cls=CustomDecoder)
             self.timestamp = parse_iso(data["timestamp"])  # type: ignore[assignment]
             self.version = data["version"]
-            self.data = data["data"]
+            self.data = self.process_data(data["data"])
+
         else:
             self.timestamp = datetime.now(timezone.utc)
             self.version = version
+
+    def process_data(self, data: list[TogglClass]) -> list[TogglClass]:
+        data.sort(key=lambda x: x.timestamp or datetime.now(timezone.utc))
+        return data[: self.max_length]
 
 
 class JSONCache(TogglCache):
@@ -77,7 +87,9 @@ class JSONCache(TogglCache):
     Args:
         path: Path to the cache file
         expire_after: Time after which the cache should be refreshed
-        parent: Parent TogglCachedEndpoint
+        parent: Parent endpoint that will use the cache. Usually assigned
+            automatically when supplied to a cached endpoint.
+        max_length: Max length of the data to be stored.
 
     Methods:
         commit: Wrapper for JSONSession.save() that saves the current json data
@@ -89,7 +101,8 @@ class JSONCache(TogglCache):
             caller discarding expired entries.
 
     Attributes:
-        session(JSONSession): Store the current json data in memory while handling the cache.
+        session(JSONSession): Store the current json data in memory while
+            handling the cache.
     """
 
     __slots__ = ("session",)
@@ -101,12 +114,14 @@ class JSONCache(TogglCache):
         path: Path,
         expire_after: timedelta,
         parent: Optional[TogglCachedEndpoint] = None,
+        *,
+        max_length: int = 10_000,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.session = JSONSession()
+        self.session = JSONSession(max_length=max_length)
 
     def commit(self) -> None:
-        self.session.save(self.cache_path)
+        self.session.commit(self.cache_path)
 
     def save_cache(
         self,
@@ -120,6 +135,7 @@ class JSONCache(TogglCache):
         self.commit()
 
     def load_cache(self, *, expire: bool = True) -> list[TogglClass]:
+        self.session.load(self.cache_path, self.expire_after)
         min_ts = datetime.now(timezone.utc) - self.expire_after
         return [m for m in self.session.data if expire and m.timestamp >= min_ts]  # type: ignore[operator]
 

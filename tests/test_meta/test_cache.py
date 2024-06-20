@@ -63,3 +63,20 @@ def test_encoder_json(model_data, cache_path):
         json.dump(model_data, f, cls=CustomEncoder)
     with cache_file.open("r", encoding="utf-8") as f:
         assert json.load(f, cls=CustomDecoder) == model_data
+
+
+@pytest.mark.unit()
+def test_max_length(model_data, get_json_cache):
+    get_json_cache.session.data = []
+    assert get_json_cache.session.max_length == 10000  # noqa: PLR2004
+    get_json_cache.session.max_length = 10
+    assert get_json_cache.session.max_length == 10  # noqa: PLR2004
+
+    for _ in range(get_json_cache.session.max_length + 5):
+        model_data["tracker"].id + 1
+        model_data["tracker"].timestamp = datetime.now(timezone.utc)
+        get_json_cache.session.data.append(model_data["tracker"])
+
+    get_json_cache.commit()
+
+    assert len(get_json_cache.load_cache()) == 10  # noqa: PLR2004

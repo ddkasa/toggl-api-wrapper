@@ -11,7 +11,7 @@ from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, reg
 @pytest.fixture()
 def db_conn(cache_path):
     cache_path.mkdir(parents=True, exist_ok=True)
-    cache_path = cache_path / "cache.sqlite"
+    cache_path /= "cache.sqlite"
     engine = db.create_engine(f"sqlite:///{cache_path}")
     conn = engine.connect()
     yield engine
