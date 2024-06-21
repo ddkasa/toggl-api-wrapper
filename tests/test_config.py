@@ -18,8 +18,20 @@ def test_auth_integration(user_object):
 
 @pytest.mark.unit()
 def test_use_togglrc():
+    # REFACTOR: Could change this to create config files on fly.
     rc_folder = Path("files/")
     rc_folder.mkdir(parents=True, exist_ok=True)
     assert rc_folder.exists()
+    with pytest.raises(AuthenticationError):
+        use_togglrc(rc_folder)
+
+    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_1")
+    assert rc_folder.exists()
+    assert isinstance(use_togglrc(rc_folder), BasicAuth)
+
+    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_2")
+    assert isinstance(use_togglrc(rc_folder), BasicAuth)
+
+    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_3")
     with pytest.raises(AuthenticationError):
         use_togglrc(rc_folder)

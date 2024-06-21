@@ -36,7 +36,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     Mainly here for backwards compatibility.
 
     Args:
-        config_path: Path to .togglrc file. Defaults to None. If None, will use
+        config_path: Path to .togglrc folder not file. If None, will use
             $HOME/.togglrc for the default location.
 
     Raises:
@@ -58,20 +58,24 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     if not config.has_section("auth"):
         msg = "No auth section in config file"
         raise AuthenticationError(msg)
+    try:
+        api_token = config.get("auth", "api_token")
+        if api_token:
+            return BasicAuth(api_token, "api_token")
+    except configparser.NoOptionError:
+        pass
 
-    api_token = config.get("auth", "api_token")
-    if api_token:
-        return BasicAuth(api_token, "api_token")
-
-    email = config.get("auth", "email")
-    if email is None:
+    try:
+        email = config.get("auth", "email")
+    except configparser.NoOptionError as err:
         msg = "No email in config file"
-        raise AuthenticationError(msg)
+        raise AuthenticationError(msg) from err
 
-    password = config.get("auth", "password")
-    if password is None:
-        msg = "No password in config file"
-        raise AuthenticationError(msg)
+    try:
+        password = config.get("auth", "password")
+    except configparser.NoOptionError as err:
+        msg = "No password set in config file"
+        raise AuthenticationError(msg) from err
 
     return BasicAuth(email, password)
 
