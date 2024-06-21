@@ -11,6 +11,7 @@ Classes:
 
 from __future__ import annotations
 
+import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -25,6 +26,8 @@ if TYPE_CHECKING:
     from toggl_api.modules.models import TogglClass
 
     from .cache import TogglCache
+
+log = logging.getLogger("toggl-api")
 
 
 # REFACTOR: Possibly turn this into a mixin to avoid duplication and more flexibility.
@@ -81,6 +84,12 @@ class TogglCachedEndpoint(TogglEndpoint):
 
         data = self.load_cache()
         if data and not refresh:
+            log.info(
+                "Loading request %s%s data from cache.",
+                self.endpoint,
+                parameters,
+                extra={"body": body, "headers": headers, "method": method},
+            )
             return data
 
         response = super().request(

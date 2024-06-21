@@ -22,7 +22,7 @@ from .enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-log = logging.getLogger("toggl_api")
+log = logging.getLogger("toggl-api")
 
 
 class TogglEndpoint(ABC):
@@ -103,7 +103,7 @@ class TogglEndpoint(ABC):
             log.error(msg, response.status_code, response.text)
             if response.status_code % 100 == self.SERVER_ERROR:
                 delay = random.randint(1, 5)  # noqa: S311
-                log.info("Status code is a server error. Retrying request in %s seconds", delay)
+                log.error("Status code is a server error. Retrying request in %s seconds", delay)
                 time.sleep(delay)
                 return self.request(parameters, headers, body, method)
 

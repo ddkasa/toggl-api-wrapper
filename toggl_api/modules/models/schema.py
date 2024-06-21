@@ -12,7 +12,7 @@ from sqlalchemy.types import DateTime, TypeDecorator
 from .models import TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 
 
-# TODO: From sqlalchemy-utc package. Should look for better solution.
+# NOTE: From sqlalchemy-utc package.
 class UTCDateTime(TypeDecorator):
     """Almost equivalent to :class:`~sqlalchemy.types.DateTime` with
     ``timezone=True`` option, but it differs from that by:
