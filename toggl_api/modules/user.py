@@ -42,6 +42,7 @@ class UserEndpoint(TogglCachedEndpoint):
                 or with time in RFC3339 format. To be used with end_date.
             end_date: Get entries with start time, until end_date YYYY-MM-DD or
                 with time in RFC3339 format. To be used with start_date.
+            refresh: Whether to refresh the cache or not.
 
         Returns:
             list[TogglTracker]: List of TogglTracker objects that are within
@@ -66,20 +67,29 @@ class UserEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> Optional[TogglTracker]:
-        """Get a single tracker by ID."""
-        cache = self.load_cache() if not refresh else None
-        if isinstance(cache, list):
-            for item in cache:
-                if item.id == tracker_id:
-                    return item  # type: ignore[return-value]
+        """Get a single tracker by ID.
 
+        Args:
+            tracker_id: ID of the tracker to get.
+            refresh: Whether to refresh the cache or not.
+
+        Returns:
+            TogglTracker | None: TogglTracker object or None if not found.
+        """
+        if not refresh:
+            tracker = self.cache.find_entry({"id": tracker_id})
+            if isinstance(tracker, TogglTracker):
+                return tracker
+            refresh = True
         try:
             response = self.request(
                 f"time_entries/{tracker_id}",
                 refresh=refresh,
             )
-        except HTTPError:
-            response = None
+        except HTTPStatusError as err:
+            if err.response.status_code == self.NOT_FOUND:
+                return None
+            raise
 
         return response  # type: ignore[return-value]
 

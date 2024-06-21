@@ -34,6 +34,9 @@ def test_client_name(client_object, create_client_body, monkeypatch):
 @pytest.mark.integration()
 @pytest.mark.order(after="test_client_model")
 def test_client_get(client_object, get_workspace_id, create_client):
+    clients = client_object.get_clients(refresh=False)
+    assert len(clients) > 0
+    assert any(client.name == create_client.name for client in clients)
     clients = client_object.get_clients(refresh=True)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)

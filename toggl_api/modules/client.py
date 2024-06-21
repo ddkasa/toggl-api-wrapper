@@ -60,17 +60,17 @@ class ClientEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> Optional[TogglClient]:
+        if not refresh:
+            client = self.cache.find_entry({"id": client_id})
+            if isinstance(client, TogglClient):
+                return client
+            refresh = True
+
         response = self.request(
             f"/{client_id}",
             refresh=refresh,
         )
-        if not response:
-            return None
-
-        if isinstance(response, list):  # NOTE: If retrieved from cache.
-            response = response[0]
-
-        return response  # type: ignore[return-value]
+        return response or None  # type: ignore[return-value]
 
     def update_client(
         self,

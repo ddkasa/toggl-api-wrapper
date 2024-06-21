@@ -17,3 +17,18 @@ def test_current_tracker(user_object, add_tracker, tracker_object):
     assert current.name == add_tracker.name
     assert current.id == add_tracker.id
     assert current.start == add_tracker.start
+
+
+@pytest.mark.integration()
+def test_tracker_get(user_object, add_tracker):
+    t = user_object.get_tracker(add_tracker.id)
+    assert isinstance(t, TogglTracker)
+    assert t.name == add_tracker.name
+    assert t.id == add_tracker.id
+    assert t.start == add_tracker.start
+
+    t = user_object.get_tracker(add_tracker.id, refresh=True)
+    assert isinstance(t, TogglTracker)
+    assert t.name == add_tracker.name
+    assert t.id == add_tracker.id
+    assert t.start == add_tracker.start

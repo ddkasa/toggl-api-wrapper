@@ -143,10 +143,10 @@ class JSONCache(TogglCache):
         entry: TogglClass | dict,
         **kwargs,
     ) -> Optional[TogglClass]:
-        if not self.session.data:
+        if not self.session.data or self.parent is None:
             return None
         for item in self.session.data:
-            if entry is not None and item["id"] == entry["id"] and type(entry) == type(item):
+            if item is not None and item["id"] == entry["id"] and isinstance(item, self.parent.model):
                 return item
         return None
 

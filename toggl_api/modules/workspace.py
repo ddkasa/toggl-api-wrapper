@@ -7,6 +7,13 @@ from .models import TogglWorkspace
 class WorkspaceEndpoint(TogglCachedEndpoint):
     def get_workspace(self, *, refresh: bool = False) -> Optional[TogglWorkspace]:
         """Get the current workspace based on the workspace_id class attribute."""
+
+        if not refresh:
+            tracker = self.cache.find_entry({"id": self.workspace_id})
+            if isinstance(tracker, TogglWorkspace):
+                return tracker
+            refresh = True
+
         return self.request("", refresh=refresh)  # type: ignore[return-value]
 
     @property
