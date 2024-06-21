@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import Final, Literal, Optional
+from typing import Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError
 
@@ -23,13 +23,14 @@ class TrackerBody:
     """Start date in YYYY-MM-DD format. If start is present start_date is ignored."""
     stop: Optional[datetime] = field(default=None)
     tag_action: Optional[Literal["add", "remove"]] = field(default=None)
-    """Options are *add* or *remove*. Will default to *add* if not set and tags are present."""
+    """Options are *add* or *remove*. Will default to *add* when editing a
+    tracker. Otherwise ignored."""
     tag_ids: list[int] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
     shared_with_user_ids: list[int] = field(default_factory=list)
     created_with: str = field(default="toggl-api-wrapper")
 
-    def format_body(self, workspace_id: int) -> dict:  # noqa: C901
+    def format_body(self, workspace_id: int) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
@@ -72,9 +73,6 @@ class TrackerBody:
 
         if self.tag_action:
             headers["tag_action"] = self.tag_action
-        elif (self.tag_ids or self.tags) and not self.tag_action:
-            headers["tag_action"] = "add"
-
         return headers
 
 
@@ -87,6 +85,9 @@ class TrackerEndpoint(TogglCachedEndpoint):
         body: TrackerBody,
     ) -> Optional[TogglTracker]:
         """Edit an existing tracker."""
+        if (body.tag_ids or body.tags) and not body.tag_action:
+            body.tag_action = "add"
+
         data = self.request(
             f"/{tracker.id}",
             method=RequestMethod.PUT,
@@ -163,6 +164,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
             body.start = datetime.now(tz=timezone.utc)
             if body.stop is None:
                 body.duration = -1
+
+        body.tag_action = None
 
         return self.request(
             "",

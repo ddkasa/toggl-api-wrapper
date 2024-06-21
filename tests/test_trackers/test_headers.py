@@ -34,9 +34,10 @@ def test_tags(get_workspace_id):
     b_format = body.format_body(get_workspace_id)
     assert b_format.get("tags") == tags
     assert b_format.get("tag_ids") is None
-    assert b_format.get("tag_action") == "add"
+    assert b_format.get("tag_action") is None
 
     body.tag_ids = [1, 2]
+    body.tag_action = "add"
     b_format = body.format_body(get_workspace_id)
     assert b_format.get("tags") == tags
     assert b_format.get("tag_ids") == [1, 2]
@@ -44,6 +45,7 @@ def test_tags(get_workspace_id):
 
     body.tag_ids = []
     body.tags = []
+    body.tag_action = None
     b_format = body.format_body(get_workspace_id)
     assert b_format.get("tags") is None
     assert b_format.get("tag_ids") is None
