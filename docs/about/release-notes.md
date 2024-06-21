@@ -1,2 +1,2 @@
-::github-release-changelog ddkasa/toggl-api-wrapper
+<!-- ::github-release-changelog ddkasa/toggl-api-wrapper -->
 

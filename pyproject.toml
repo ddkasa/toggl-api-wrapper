@@ -10,7 +10,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.12",
     "Topic :: Internet",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: MIT License",
@@ -64,7 +63,7 @@ mkdocs-glightbox = "^0.4.0"
 mkdocs-mermaid2-plugin = "^1.1.1"
 mkdocs-macros-plugin = "^1.0.5"
 pygments = "^2.18.0"
-mkdocs-github-changelog = "^0.1.0"
+# mkdocs-github-changelog = "^0.1.0"
 
 [tool.poetry.group.types.dependencies]
 types-sqlalchemy = "^1.4.53.38"

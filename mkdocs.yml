@@ -72,7 +72,7 @@ nav:
       - Projects: api-guide/project.md
       - Trackers: api-guide/tracker.md
       - Tags: api-guide/tag.md
-  - Release Notes: about/release-notes.md
+  # - Release Notes: about/release-notes.md
   - About:
     - Contributing: about/CONTRIBUTING.md
     - License: about/LICENSE.md
@@ -130,9 +130,9 @@ plugins:
             show_root_heading: true
             show_source: false
             show_signature_annotations: true
-  - mkdocs_github_changelog:
-      token: !ENV GITHUB_TOKEN
-      enabled: True
+  # - mkdocs_github_changelog:
+  #     token: !ENV GITHUB_TOKEN
+  #     enabled: True
   - callouts
 watch:
   - toggl_api
