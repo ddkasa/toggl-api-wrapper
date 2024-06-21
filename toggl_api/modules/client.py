@@ -56,10 +56,12 @@ class ClientEndpoint(TogglCachedEndpoint):
 
     def get_client(
         self,
-        client_id: int,
+        client_id: int | TogglClient,
         *,
         refresh: bool = False,
     ) -> Optional[TogglClient]:
+        if isinstance(client_id, TogglClient):
+            client_id = client_id.id
         if not refresh:
             client = self.cache.find_entry({"id": client_id})
             if isinstance(client, TogglClient):
@@ -74,22 +76,28 @@ class ClientEndpoint(TogglCachedEndpoint):
 
     def update_client(
         self,
-        client: TogglClient,
+        client: TogglClient | int,
         body: ClientBody,
     ) -> Optional[TogglClient]:
+        if isinstance(client, TogglClient):
+            client = client.id
         return self.request(
-            f"/{client.id}",
+            f"/{client}",
             body=body.format_body(self.workspace_id),
             method=RequestMethod.PUT,
             refresh=True,
         )  # type: ignore[return-value]
 
-    def delete_client(self, client: TogglClient) -> None:
+    def delete_client(self, client: TogglClient | int) -> None:
         self.request(
-            f"/{client.id}",
+            f"/{client if isinstance(client, int) else client.id}",
             method=RequestMethod.DELETE,
             refresh=True,
         )
+        if isinstance(client, int):
+            client = self.cache.find_entry({"id": client})  # type: ignore[assignment]
+            if not isinstance(client, TogglClient):
+                return
         self.cache.delete_entries(client)
         self.cache.commit()
 

@@ -63,7 +63,7 @@ class UserEndpoint(TogglCachedEndpoint):
 
     def get_tracker(
         self,
-        tracker_id: int,
+        tracker_id: int | TogglTracker,
         *,
         refresh: bool = False,
     ) -> Optional[TogglTracker]:
@@ -76,6 +76,9 @@ class UserEndpoint(TogglCachedEndpoint):
         Returns:
             TogglTracker | None: TogglTracker object or None if not found.
         """
+        if isinstance(tracker_id, TogglTracker):
+            tracker_id = tracker_id.id
+
         if not refresh:
             tracker = self.cache.find_entry({"id": tracker_id})
             if isinstance(tracker, TogglTracker):

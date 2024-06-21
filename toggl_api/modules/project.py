@@ -96,10 +96,13 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
     def get_project(
         self,
-        project_id: int,
+        project_id: int | TogglProject,
         *,
         refresh: bool = False,
     ) -> Optional[TogglProject]:
+        if isinstance(project_id, TogglProject):
+            project_id = project_id.id
+
         if not refresh:
             project = self.cache.find_entry({"id": project_id})
             if isinstance(project, TogglProject):
@@ -113,22 +116,29 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
         return response or None  # type: ignore[return-value]
 
-    def delete_project(self, project: TogglProject) -> None:
+    def delete_project(self, project: TogglProject | int) -> None:
         self.request(
-            f"/{project.id}",
+            f"/{project if isinstance(project, int) else project.id}",
             method=RequestMethod.DELETE,
             refresh=True,
         )
+
+        if isinstance(project, int):
+            project = self.cache.find_entry({"id": project})  # type: ignore[assignment]
+            if not isinstance(project, TogglProject):
+                return
         self.cache.delete_entries(project)
         self.cache.commit()
 
     def edit_project(
         self,
-        project: TogglProject,
+        project: TogglProject | int,
         body: ProjectBody,
     ) -> Optional[TogglProject]:
+        if isinstance(project, TogglProject):
+            project = project.id
         return self.request(
-            f"/{project.id}",
+            f"/{project}",
             method=RequestMethod.PUT,
             body=body.format_body(self.workspace_id),
             refresh=True,

@@ -81,15 +81,18 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     def edit_tracker(
         self,
-        tracker: TogglTracker,
+        tracker: TogglTracker | int,
         body: TrackerBody,
     ) -> Optional[TogglTracker]:
         """Edit an existing tracker."""
         if (body.tag_ids or body.tags) and not body.tag_action:
             body.tag_action = "add"
 
+        if isinstance(tracker, TogglTracker):
+            tracker = tracker.id
+
         data = self.request(
-            f"/{tracker.id}",
+            f"/{tracker}",
             method=RequestMethod.PUT,
             body=body.format_body(self.workspace_id),
             refresh=True,
@@ -99,7 +102,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         return data
 
-    def delete_tracker(self, tracker: TogglTracker) -> None:
+    def delete_tracker(self, tracker: TogglTracker | int) -> None:
         """Delete tracker from Toggl.
 
         Args:
@@ -108,19 +111,26 @@ class TrackerEndpoint(TogglCachedEndpoint):
         Returns:
             None: If the tracker was deleted or not found at all.
         """
+
         try:
             self.request(
-                f"/{tracker.id}",
+                f"/{tracker if isinstance(tracker, int) else tracker.id}",
                 method=RequestMethod.DELETE,
                 refresh=True,
             )
         except HTTPStatusError as err:
             if err.response.status_code != self.NOT_FOUND:
                 raise
+
+        if isinstance(tracker, int):
+            tracker = self.cache.find_entry({"id": tracker})  # type: ignore[assignment]
+            if not isinstance(tracker, TogglTracker):
+                return
+
         self.cache.delete_entries(tracker)
         self.cache.commit()
 
-    def stop_tracker(self, tracker: TogglTracker) -> Optional[TogglTracker]:
+    def stop_tracker(self, tracker: TogglTracker | int) -> Optional[TogglTracker]:
         """Stops a running tracker.
 
         Args:
@@ -130,9 +140,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
             TogglTracker: If the tracker was stopped or if the tracker wasn't
                 running it will return None.
         """
+        if isinstance(tracker, TogglTracker):
+            tracker = tracker.id
         try:
             return self.request(  # type: ignore[return-value]
-                f"/{tracker.id}/stop",
+                f"/{tracker}/stop",
                 method=RequestMethod.PATCH,
                 refresh=True,
             )
