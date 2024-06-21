@@ -1,3 +1,4 @@
+import random
 import time
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
@@ -32,7 +33,8 @@ def test_schema(setup_schema):
 
 
 @pytest.mark.unit()
-def test_model_creation(setup_schema, get_workspace_id, db_conn):
+def test_model_creation(setup_schema, db_conn):
+    get_workspace_id = random.randint(1, 1000)  # noqa: S311
     data = {
         "id": 1100,
         "workspace_id": get_workspace_id,

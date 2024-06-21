@@ -34,7 +34,6 @@ def test_model_parameter(meta_object):
 
 @pytest.mark.unit()
 def test_endpoint(meta_object):
-    # TODO: Change urls to httpx URL objects.
     assert isinstance(meta_object.endpoint, str)
 
 
