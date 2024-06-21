@@ -91,7 +91,6 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self,
         *,
         refresh: bool = False,
-        **kwargs,
     ) -> Optional[list[TogglProject]]:
         return self.request("", refresh=refresh)  # type: ignore[return-value]
 
@@ -101,10 +100,17 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> Optional[TogglProject]:
-        return self.request(
+        response = self.request(
             f"/{project_id}",
             refresh=refresh,
-        )  # type: ignore[return-value]
+        )
+        if not response:
+            return None
+
+        if isinstance(response, list):  # NOTE: If already in cache.
+            response = response[0]
+
+        return response  # type: ignore[return-value]
 
     def delete_project(self, project: TogglProject) -> None:
         self.request(

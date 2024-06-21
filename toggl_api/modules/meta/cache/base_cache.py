@@ -14,8 +14,6 @@ if TYPE_CHECKING:
     from toggl_api.modules.models import TogglClass
 
 
-# TODO: Possibly could add a 'session' object for all cache types.
-# TODO: Implement a uniform way of handling querying/searching caches.
 class TogglCache(ABC):
     """Abstract class for caching toggl API data to disk.
 
