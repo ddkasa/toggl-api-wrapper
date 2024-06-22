@@ -102,7 +102,7 @@ class TogglEndpoint(ABC):
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
             if response.status_code % 100 == self.SERVER_ERROR:
-                delay = random.randint(1, 5)  # noqa: S311
+                delay = random.randint(1, 5)
                 log.error("Status code is a server error. Retrying request in %s seconds", delay)
                 time.sleep(delay)
                 return self.request(parameters, headers, body, method)

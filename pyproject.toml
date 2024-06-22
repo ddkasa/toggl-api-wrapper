@@ -163,6 +163,7 @@ ignore = [
   "PLW2901",
   "UP017", # Python 3.10 backwards compatiblity
   "PLR6301", # Class Method Suggestion
+  "S311", # Unsafe pseudo-random generator
 ]
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

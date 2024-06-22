@@ -8,3 +8,4 @@ files
 *,cover
 coverage.xml
 logs
+cache/cache.sqlite
