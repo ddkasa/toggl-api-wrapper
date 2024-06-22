@@ -12,10 +12,10 @@ classDiagram
     endpoint
     model
     create_client(body: ClientBody) Optional[TogglClient]
-    delete_client(client: TogglClient) None
-    get_client(client_id: int) Optional[TogglClient]
+    delete_client(client: TogglClient | int) None
+    get_client(client_id: int | TogglClient) Optional[TogglClient]
     get_clients(status: Optional[str], name: Optional[str]) list[TogglClient]
-    update_client(client: TogglClient, body: ClientBody) Optional[TogglClient]
+    update_client(client: TogglClient | int, body: ClientBody) Optional[TogglClient]
   }
   class CustomDecoder {
     MATCH_DICT : Final[dict[str, type[TogglClass]]]
@@ -35,15 +35,18 @@ classDiagram
     delete_entry(entry: TogglClass) None
     find_entry(entry: TogglClass | dict) Optional[TogglClass]
     load_cache() list[TogglClass]
+    query() list[TogglClass]
     save_cache(update: Iterable[TogglClass] | TogglClass, method: RequestMethod) None
     update_entries(update: list[TogglClass] | TogglClass) None
   }
   class JSONSession {
     data : list[TogglClass]
+    max_length : int
     timestamp : datetime
     version : str
+    commit(path: Path) None
     load(path: Path, expire_after: timedelta) None
-    save(path: Path) None
+    process_data(data: list[TogglClass]) list[TogglClass]
   }
   class ProjectBody {
     active : bool
@@ -62,11 +65,11 @@ classDiagram
     endpoint
     model
     add_project(body: ProjectBody) Optional[TogglProject]
-    delete_project(project: TogglProject) None
-    edit_project(project: TogglProject, body: ProjectBody) Optional[TogglProject]
+    delete_project(project: TogglProject | int) None
+    edit_project(project: TogglProject | int, body: ProjectBody) Optional[TogglProject]
     get_color(color: str) str
     get_color_id(color: str) int
-    get_project(project_id: int) Optional[TogglProject]
+    get_project(project_id: int | TogglProject) Optional[TogglProject]
     get_projects() Optional[list[TogglProject]]
   }
   class RequestMethod {
@@ -82,6 +85,7 @@ classDiagram
     delete_entries(entry: Iterable[TogglClass] | TogglClass) None
     find_entry(query: TogglClass | dict) Optional[TogglClass]
     load_cache() Query[TogglClass]
+    query() Query[TogglClass]
     save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod) None
     update_entries(entry: Iterable[TogglClass] | TogglClass) None
   }
@@ -103,6 +107,7 @@ classDiagram
     find_entry(entry: TogglClass | dict)* Optional[TogglClass]
     find_method(method: RequestMethod) Callable | None
     load_cache()* Iterable[TogglClass]
+    query()* Iterable[TogglClass]
     save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod)* None
     update_entries(update: list[TogglClass] | TogglClass)* None
   }
@@ -110,6 +115,7 @@ classDiagram
     cache
     endpoint
     load_cache() Iterable[TogglClass]
+    query() Iterable[TogglClass]
     request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Optional[TogglClass | Iterable[TogglClass]]
     save_cache(response: list[TogglClass] | TogglClass, method: RequestMethod) None
   }
@@ -126,6 +132,7 @@ classDiagram
     HEADERS : Final[dict]
     NOT_FOUND : Final[int]
     OK_RESPONSE : Final[int]
+    SERVER_ERROR : Final[int]
     endpoint
     model
     workspace_id : int
@@ -149,6 +156,7 @@ classDiagram
     stop : Optional[datetime | str]
     tags : list[TogglTag]
     from_kwargs() TogglTracker
+    get_tags() list[TogglTag]
     running() bool
   }
   class TogglWorkspace {
@@ -167,16 +175,16 @@ classDiagram
     tag_ids : list[int]
     tags : list[str]
     workspace_id : Optional[int]
-    format_body(workspace_id: int) dict
+    format_body(workspace_id: int) dict[str, Any]
   }
   class TrackerEndpoint {
     TRACKER_ALREADY_STOPPED : Final[int]
     endpoint
     model
     add_tracker(body: TrackerBody) Optional[TogglTracker]
-    delete_tracker(tracker: TogglTracker) None
-    edit_tracker(tracker: TogglTracker, body: TrackerBody) Optional[TogglTracker]
-    stop_tracker(tracker: TogglTracker) Optional[TogglTracker]
+    delete_tracker(tracker: TogglTracker | int) None
+    edit_tracker(tracker: TogglTracker | int, body: TrackerBody) Optional[TogglTracker]
+    stop_tracker(tracker: TogglTracker | int) Optional[TogglTracker]
   }
   class UTCDateTime {
     cache_ok : bool
@@ -190,7 +198,7 @@ classDiagram
     model
     check_authentication() bool
     current_tracker() Optional[TogglTracker]
-    get_tracker(tracker_id: int) Optional[TogglTracker]
+    get_tracker(tracker_id: int | TogglTracker) Optional[TogglTracker]
     get_trackers(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
   }
   class WorkspaceChild {

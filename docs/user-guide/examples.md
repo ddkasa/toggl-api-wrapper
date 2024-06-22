@@ -33,3 +33,7 @@
         active=True,
     )
 ```
+
+## Applications Using Toggl API Wrapper
+
+- [Ulauncher Toggl Extension](https://github.com/ddkasa/ulauncher-toggl-extension)
