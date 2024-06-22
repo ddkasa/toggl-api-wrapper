@@ -5,7 +5,7 @@ import pytest
 from toggl_api import TrackerBody
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def create_body(get_workspace_id, faker):
     start = datetime.now(tz=timezone.utc)
     delta = timedelta(hours=1)

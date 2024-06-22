@@ -4,12 +4,12 @@ from toggl_api import ClientBody
 from toggl_api.modules.models import TogglClient
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def create_client_body(get_workspace_id, faker):
     return ClientBody(name=faker.name(), workspace_id=get_workspace_id)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def create_client(client_object, create_client_body):
     return client_object.create_client(create_client_body)
 

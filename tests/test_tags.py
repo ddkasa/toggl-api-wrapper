@@ -3,14 +3,14 @@ import pytest
 from toggl_api.modules.models import TogglTag
 
 
-@pytest.fixture(scope="session")
-def add_tag(tag_object):
-    return tag_object.create_tag(name="test_tag")
+@pytest.fixture()
+def add_tag(tag_object, faker):
+    return tag_object.create_tag(name=faker.name())
 
 
 @pytest.mark.unit()
-def test_tag_model(get_workspace_id):
-    data = {"id": 1, "name": "Test", "workspace_id": get_workspace_id}
+def test_tag_model(get_workspace_id, faker):
+    data = {"id": 1, "name": faker.name(), "workspace_id": get_workspace_id}
     tag = TogglTag.from_kwargs(**data)
     assert isinstance(tag, TogglTag)
     assert tag.id == data["id"]
@@ -18,16 +18,16 @@ def test_tag_model(get_workspace_id):
 
 
 @pytest.mark.integration()
-def test_tag_creation(tag_object, get_workspace_id):
-    name = "test_tag_creation"
+def test_tag_creation(tag_object, get_workspace_id, faker):
+    name = faker.name()
     tag = tag_object.create_tag(name)
     assert isinstance(tag, TogglTag)
     assert tag.name == name
 
 
 @pytest.mark.integration()
-def test_tag_update(tag_object, get_workspace_id, add_tag, monkeypatch):
-    monkeypatch.setattr(add_tag, "name", "test_tag_update_2")
+def test_tag_update(tag_object, get_workspace_id, add_tag, monkeypatch, faker):
+    monkeypatch.setattr(add_tag, "name", faker.name())
     tag = tag_object.update_tag(add_tag)
     assert isinstance(tag, TogglTag)
     assert tag.name == add_tag.name

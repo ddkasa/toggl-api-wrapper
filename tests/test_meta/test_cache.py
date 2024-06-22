@@ -55,9 +55,9 @@ def test_expiration_json(meta_object, model_data):
 
 
 @pytest.mark.unit()
-def test_encoder_json(model_data, cache_path):
+def test_encoder_json(model_data, tmp_path):
     model_data.pop("model")
-    cache_file = cache_path / "encoder.json"
+    cache_file = tmp_path / "encoder.json"
     with cache_file.open("w", encoding="utf-8") as f:
         json.dump(model_data, f, cls=CustomEncoder)
     with cache_file.open("r", encoding="utf-8") as f:

@@ -12,9 +12,8 @@ from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, reg
 
 
 @pytest.fixture()
-def db_conn(cache_path):
-    cache_path.mkdir(parents=True, exist_ok=True)
-    cache_path /= "cache.sqlite"
+def db_conn(tmp_path):
+    cache_path = tmp_path / "cache.sqlite"
     engine = db.create_engine(f"sqlite:///{cache_path}")
     conn = engine.connect()
     yield engine
@@ -72,7 +71,6 @@ def test_db_creation(meta_object_sqlite):
 def test_add_entries_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
-
     assert tracker in meta_object_sqlite.cache.load_cache()
 
 
@@ -98,30 +96,28 @@ def test_delete_entries_sqlite(meta_object_sqlite, model_data):
 @pytest.mark.unit()
 def test_find_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
+    tracker.id += random.randint(50, 100_000)
     meta_object_sqlite.cache.add_entries(tracker)
-    tracker_data = {"id": tracker.id, "name": tracker.name}
-    assert tracker == meta_object_sqlite.cache.find_entry(tracker_data)
+
+    assert tracker == meta_object_sqlite.cache.find_entry(tracker, expire=False)
 
 
 @pytest.mark.unit()
 def test_query_sqlite(tracker_object_sqlite, model_data, faker):
-    tracker_object_sqlite.cache.session.data = []
     names = [faker.name() for _ in range(10)]
     tracker = model_data.pop("tracker")
     tracker.timestamp = datetime.now(timezone.utc)
     tracker_object_sqlite.save_cache(tracker, RequestMethod.GET)
 
+    d = asdict(tracker)
     for i in range(1, 11):
-        t = TogglTracker(**asdict(tracker))
-        t.id += i
-        t.name = names[i - 1]
-        t.timestamp = datetime.now(timezone.utc)
-        tracker_object_sqlite.save_cache(t, RequestMethod.GET)
+        d["id"] += i + 1
+        d["name"] = names[i - 1]
+        d["timestamp"] = datetime.now(timezone.utc)
+        tracker_object_sqlite.save_cache(tracker.from_kwargs(**d), RequestMethod.GET)
 
     tracker_object_sqlite.cache.commit()
-
     assert tracker_object_sqlite.load_cache().count() == 11  # noqa: PLR2004
-
     assert tracker_object_sqlite.query(name=tracker.name)[0] == tracker
 
 
@@ -134,15 +130,10 @@ def test_expiration_sqlite(meta_object_sqlite, model_data):
     meta_object_sqlite.cache.add_entries(tracker)
     time.sleep(delay.total_seconds() + 2)
     tracker_data = {"id": tracker.id, "name": tracker.name}
-    assert (
-        meta_object_sqlite.cache.find_entry(
-            tracker_data,
-        )
-        is None
-    )
+    assert meta_object_sqlite.cache.find_entry(tracker_data) is None
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def user_object_sqlite(user_object, get_sqlite_cache):
     user_object.cache = get_sqlite_cache
     return user_object
@@ -155,6 +146,7 @@ def test_tracker_cache(
     httpx_mock,
 ):
     tracker = get_test_data[1]
+    tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
     tracker_id = tracker["id"]
     httpx_mock.add_response(
         json=tracker,

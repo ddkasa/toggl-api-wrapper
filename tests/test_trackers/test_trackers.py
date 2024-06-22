@@ -30,8 +30,8 @@ def test_tracker_kwargs(get_workspace_id, faker):
     assert all(tag in tracker.tags for tag in data["tags"])
 
     data["tags"] = [
-        {"name": "awd1", "id": 1, "workspace_id": get_workspace_id},
-        {"name": "awd2", "id": 2, "workspace_id": get_workspace_id},
+        {"name": faker.name(), "id": 1, "workspace_id": get_workspace_id},
+        {"name": faker.name(), "id": 2, "workspace_id": get_workspace_id},
     ]
     assert all(TogglTag.from_kwargs(**tag) for tag in tracker.tags for tag in data["tags"])
 
@@ -44,7 +44,7 @@ def test_tracker_creation(add_tracker):
 @pytest.mark.integration()
 def test_tracker_editing(tracker_object, add_tracker, faker):
     new_description = TrackerBody(description=faker.name())
-    new_description.tags = ["new_tag", "new_tag2"]
+    new_description.tags = [faker.name(), faker.name()]
     data = tracker_object.edit_tracker(
         tracker=add_tracker,
         body=new_description,

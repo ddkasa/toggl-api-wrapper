@@ -7,7 +7,7 @@ from toggl_api.modules.project import ProjectBody, ProjectEndpoint
 from toggl_api.utility import format_iso
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def project_body(faker, get_workspace_id):
     return ProjectBody(
         workspace_id=get_workspace_id,
@@ -17,7 +17,7 @@ def project_body(faker, get_workspace_id):
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def create_project(
     project_object,
     project_body,
