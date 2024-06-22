@@ -57,9 +57,6 @@ class TogglClass(ABC):
     def __setitem__(self, item: str, value: Any) -> None:
         setattr(self, item, value)
 
-    def __str__(self) -> str:
-        return f"{self.name}(#{self.id})"
-
 
 @dataclass
 class TogglWorkspace(TogglClass):
@@ -178,8 +175,6 @@ class TogglTracker(WorkspaceChild):
         super().__post_init__()
         if isinstance(self.project, TogglProject):
             self.project = self.project.id
-        if isinstance(self.tags, list):
-            self.tags = [TogglTag.from_kwargs(**t) for t in self.tags if isinstance(t, dict)]
         if isinstance(self.start, str | datetime):
             self.start = parse_iso(self.start)  # type: ignore[assignment]
         if isinstance(self.duration, float | int):
@@ -207,9 +202,26 @@ class TogglTracker(WorkspaceChild):
             duration=kwargs.get("duration"),
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id", kwargs.get("project")),
-            tags=kwargs["tags"] if kwargs.get("tags") else [],
+            tags=TogglTracker.get_tags(**kwargs),
             timestamp=kwargs.get("timestamp"),
         )
+
+    @staticmethod
+    def get_tags(**kwargs: dict) -> list[TogglTag]:
+        tag_id = kwargs.get("tag_ids")
+        tag = kwargs.get("tags")
+        tags = []
+        if tag and isinstance(tag[0], dict):
+            for t in tag:
+                tags.append(TogglTag.from_kwargs(**t))  # noqa: PERF401
+        elif tag_id and tag:
+            workspace = get_workspace(kwargs)
+            for i, t in zip(tag_id, tag, strict=True):
+                tags.append(TogglTag(id=i, name=t, workspace=workspace))
+        else:
+            tags = tag or tags  # type: ignore[assignment]
+
+        return tags
 
 
 @dataclass

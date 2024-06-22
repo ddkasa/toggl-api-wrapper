@@ -15,7 +15,7 @@ from toggl_api.modules.models import (
     TogglWorkspace,
     as_dict_custom,
 )
-from toggl_api.utility import parse_iso
+from toggl_api.utility import format_iso, parse_iso
 from toggl_api.version import version
 
 from .base_cache import TogglCache
@@ -57,7 +57,7 @@ class JSONSession:
         self.timestamp = datetime.now(timezone.utc)
         self.version = version
         data = {
-            "timestamp": self.timestamp.isoformat(),
+            "timestamp": format_iso(self.timestamp.isoformat()),
             "version": self.version,
             "data": self.process_data(self.data),
         }

@@ -34,18 +34,22 @@ def test_schema(setup_schema):
 
 @pytest.mark.unit()
 def test_model_creation(setup_schema, db_conn):
-    get_workspace_id = random.randint(1, 1000)  # noqa: S311
+    get_workspace_id = random.randint(1, 100_000)
     data = {
-        "id": 1100,
+        "id": random.randint(50, 100_000),
         "workspace_id": get_workspace_id,
         "description": "test",
         "start": "2020-01-01T00:00:00Z",
         "stop": "2020-01-01T01:00:00Z",
         "duration": 3600,
         "tags": [
-            TogglTag(id=1, name="test", workspace=get_workspace_id),
+            TogglTag(
+                id=random.randint(1000, 100_000),
+                name="test",
+                workspace=get_workspace_id,
+            ),
         ],
-        "project_id": 1,
+        "project_id": random.randint(1000, 100_000),
     }
     tracker = TogglTracker.from_kwargs(**data)
 

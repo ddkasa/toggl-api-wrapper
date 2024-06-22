@@ -5,6 +5,7 @@ import pytest
 
 from toggl_api import TrackerBody
 from toggl_api.modules.models import TogglTracker
+from toggl_api.modules.models.models import TogglTag
 
 
 @pytest.mark.unit()
@@ -16,13 +17,23 @@ def test_tracker_kwargs(get_workspace_id, faker):
         "start": "2020-01-01T00:00:00Z",
         "stop": "2020-01-01T01:00:00Z",
         "duration": 3600,
-        "tags": ["tag1", "tag2"],
+        "tags": [
+            TogglTag(id=1, name=faker.name()),
+            TogglTag(id=2, name=faker.name()),
+        ],
     }
     tracker = TogglTracker.from_kwargs(**data)
     assert tracker.name == data["description"]
     assert isinstance(tracker, TogglTracker)
     assert tracker.id == data["id"]
     assert not tracker.running()
+    assert all(tag in tracker.tags for tag in data["tags"])
+
+    data["tags"] = [
+        {"name": "awd1", "id": 1, "workspace_id": get_workspace_id},
+        {"name": "awd2", "id": 2, "workspace_id": get_workspace_id},
+    ]
+    assert all(TogglTag.from_kwargs(**tag) for tag in tracker.tags for tag in data["tags"])
 
 
 @pytest.mark.integration()
@@ -33,12 +44,14 @@ def test_tracker_creation(add_tracker):
 @pytest.mark.integration()
 def test_tracker_editing(tracker_object, add_tracker, faker):
     new_description = TrackerBody(description=faker.name())
+    new_description.tags = ["new_tag", "new_tag2"]
     data = tracker_object.edit_tracker(
         tracker=add_tracker,
         body=new_description,
     )
     assert isinstance(data, TogglTracker)
     assert data.name == new_description.description
+    assert all(tag.name in new_description.tags for tag in data.tags)
 
 
 @pytest.mark.integration()

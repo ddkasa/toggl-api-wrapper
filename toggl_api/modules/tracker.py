@@ -177,7 +177,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
             if body.stop is None:
                 body.duration = -1
 
-        body.tag_action = None
+        body.tag_action = "add"
 
         return self.request(
             "",

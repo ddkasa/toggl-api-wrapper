@@ -1,6 +1,5 @@
 import json
 import time
-from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -8,7 +7,6 @@ import pytest
 
 from tests.conftest import EndPointTest
 from toggl_api.modules.meta import CustomDecoder, CustomEncoder, RequestMethod
-from toggl_api.modules.models.models import TogglTracker
 
 
 @pytest.mark.unit()
@@ -89,10 +87,9 @@ def test_query(model_data, tracker_object, faker):
     tracker_object.cache.session.data = []
     tracker_object.cache.commit()
     names = [faker.name() for _ in range(12)]
-    tracker = model_data.pop("tracker")
-    tracker.id = 1
+    t = model_data.pop("tracker")
+    t.id = 1
 
-    t = TogglTracker(**asdict(tracker))
     for i in range(1, 13):
         t.timestamp = datetime.now(timezone.utc)
         tracker_object.cache.session.data.append(t)
