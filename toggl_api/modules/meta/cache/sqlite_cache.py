@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import atexit
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Optional
 
 import sqlalchemy as db
@@ -13,7 +13,6 @@ from .base_cache import TogglCache
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import timedelta
     from pathlib import Path
 
     from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
@@ -42,7 +41,7 @@ class SqliteCache(TogglCache):
     def __init__(
         self,
         path: Path,
-        expire_after: timedelta,
+        expire_after: Optional[timedelta] = None,
         parent: Optional[TogglCachedEndpoint] = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
@@ -65,13 +64,13 @@ class SqliteCache(TogglCache):
             return
         func(entry)
 
-    def load_cache(self, *, expire: bool = True) -> Query[TogglClass]:
+    def load_cache(self) -> Query[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
         query = self.session.query(self.parent.model)
-        if expire:
-            min_ts = datetime.now(timezone.utc) - self._expire_after
+        if self.expire_after is not None:
+            min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
             query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
         return query
 
@@ -79,7 +78,7 @@ class SqliteCache(TogglCache):
         if isinstance(entry, TogglClass):
             entry = (entry,)
         for item in entry:
-            if self.find_entry(item, expire=False):
+            if self.find_entry(item):
                 self.update_entries(item)
                 continue
             self.session.add(item)
@@ -98,18 +97,13 @@ class SqliteCache(TogglCache):
             entry = (entry,)
 
         for item in entry:
-            if self.find_entry(item, expire=False):
+            if self.find_entry(item):
                 self.session.query(
                     self.parent.model,  # type: ignore[union-attr]
                 ).filter_by(id=item.id).delete()
         self.commit()
 
-    def find_entry(
-        self,
-        query: TogglClass | dict,
-        *,
-        expire: bool = True,
-    ) -> Optional[TogglClass]:
+    def find_entry(self, query: TogglClass | dict) -> Optional[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
@@ -118,7 +112,7 @@ class SqliteCache(TogglCache):
             query = {"id": query.id}
 
         search = self.session.query(self.parent.model)
-        if expire:
+        if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
         return search.filter_by(**query).first()  # type: ignore[name-defined]
@@ -128,7 +122,6 @@ class SqliteCache(TogglCache):
         *,
         inverse: bool = False,
         distinct: bool = False,
-        expire: bool = True,
         **query: dict[str, Any],
     ) -> Query[TogglClass]:
         if self.parent is None:
@@ -136,8 +129,8 @@ class SqliteCache(TogglCache):
             raise ValueError(msg)
 
         search = self.session.query(self.parent.model)
-        if expire:
-            min_ts = datetime.now(timezone.utc) - self._expire_after
+        if isinstance(self.expire_after, timedelta):
+            min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
         return search.filter_by(**query)
 

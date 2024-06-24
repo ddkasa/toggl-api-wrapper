@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 from abc import abstractmethod
+from datetime import timedelta
 from typing import TYPE_CHECKING, Any, Optional
 
 from .base_endpoint import TogglEndpoint
@@ -114,7 +115,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         response: list[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
-        if not self.cache.expire_after.total_seconds():
+        if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
             return None
         return self.cache.save_cache(response, method)
 
@@ -123,15 +124,9 @@ class TogglCachedEndpoint(TogglEndpoint):
         *,
         inverse: bool = False,
         distinct: bool = False,
-        expire: bool = True,
         **query: dict[str, Any],
     ) -> Iterable[TogglClass]:
-        return self.cache.query(
-            inverse=inverse,
-            distinct=distinct,
-            expire=expire,
-            **query,
-        )
+        return self.cache.query(inverse=inverse, distinct=distinct, **query)
 
     @property
     @abstractmethod

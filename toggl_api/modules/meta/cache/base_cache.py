@@ -37,7 +37,8 @@ class TogglCache(ABC):
     Attributes:
         _cache_path: Path to the cache file. Will generate the folder if it
             does not exist.
-        _expire_after: Time after which the cache should be refreshed
+        _expire_after: Time after which the cache should be refreshed.
+            If set to None its ignored.
         _parent: Parent TogglCachedEndpoint
     """
 
@@ -46,7 +47,7 @@ class TogglCache(ABC):
     def __init__(
         self,
         path: Path,
-        expire_after: timedelta,
+        expire_after: Optional[timedelta] = None,
         parent: Optional[TogglCachedEndpoint] = None,
     ) -> None:
         path.mkdir(parents=True, exist_ok=True)
@@ -59,7 +60,7 @@ class TogglCache(ABC):
         pass
 
     @abstractmethod
-    def load_cache(self, *, expire: bool = True) -> Iterable[TogglClass]:
+    def load_cache(self) -> Iterable[TogglClass]:
         pass
 
     @abstractmethod
@@ -71,12 +72,7 @@ class TogglCache(ABC):
         pass
 
     @abstractmethod
-    def find_entry(
-        self,
-        entry: TogglClass | dict,
-        *,
-        expire: bool = True,
-    ) -> Optional[TogglClass]:
+    def find_entry(self, entry: TogglClass | dict) -> Optional[TogglClass]:
         pass
 
     @abstractmethod
@@ -106,7 +102,6 @@ class TogglCache(ABC):
         *,
         inverse: bool = False,
         distinct: bool = False,
-        expire: bool = True,
         **query: dict[str, Any],
     ) -> Iterable[TogglClass]:
         # TODO: Implement a data structure to hold query arguments & results.
@@ -118,11 +113,11 @@ class TogglCache(ABC):
         return self._cache_path
 
     @property
-    def expire_after(self) -> timedelta:
+    def expire_after(self) -> Optional[timedelta]:
         return self._expire_after
 
     @expire_after.setter
-    def expire_after(self, value: timedelta) -> None:
+    def expire_after(self, value: Optional[timedelta] = None) -> None:
         self._expire_after = value
 
     @property

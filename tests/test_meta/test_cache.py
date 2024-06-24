@@ -47,10 +47,7 @@ def test_expiration_json(meta_object, model_data):
     meta_object.save_cache(data, RequestMethod.GET)
     assert meta_object.cache.cache_path.exists()
     time.sleep(10)
-    meta_object.cache.session.load(
-        meta_object.cache.cache_path,
-        meta_object.cache.expire_after,
-    )
+    meta_object.cache.session.load(meta_object.cache.cache_path)
     assert not meta_object.load_cache()
 
 
@@ -95,8 +92,7 @@ def test_query(model_data, tracker_object, faker):
         tracker_object.cache.session.data.append(t)
         t.id += i
         t.name = names[i - 1]
+
     tracker_object.cache.commit()
-
     assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
-
     assert tracker_object.query(name=names[-1])[0].name == t.name

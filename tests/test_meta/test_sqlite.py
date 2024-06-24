@@ -99,7 +99,7 @@ def test_find_sqlite(meta_object_sqlite, model_data):
     tracker.id += random.randint(50, 100_000)
     meta_object_sqlite.cache.add_entries(tracker)
 
-    assert tracker == meta_object_sqlite.cache.find_entry(tracker, expire=False)
+    assert tracker == meta_object_sqlite.cache.find_entry(tracker)
 
 
 @pytest.mark.unit()

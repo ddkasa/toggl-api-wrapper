@@ -64,7 +64,7 @@ class JSONSession:
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
-    def load(self, path: Path, expire_after: timedelta) -> None:
+    def load(self, path: Path) -> None:
         if path.exists():
             with path.open("r", encoding="utf-8") as f:
                 data = json.load(f, cls=CustomDecoder)
@@ -86,7 +86,8 @@ class JSONCache(TogglCache):
 
     Args:
         path: Path to the cache file
-        expire_after: Time after which the cache should be refreshed
+        expire_after: Time after which the cache should be refreshed.
+            If set to None the cache will never expire.
         parent: Parent endpoint that will use the cache. Usually assigned
             automatically when supplied to a cached endpoint.
         max_length: Max length of the data to be stored.
@@ -107,12 +108,10 @@ class JSONCache(TogglCache):
 
     __slots__ = ("session",)
 
-    # TODO: Consider creating a 'session' object to manage the cache persistently.
-
     def __init__(
         self,
         path: Path,
-        expire_after: timedelta,
+        expire_after: Optional[timedelta] = None,
         parent: Optional[TogglCachedEndpoint] = None,
         *,
         max_length: int = 10_000,
@@ -133,10 +132,12 @@ class JSONCache(TogglCache):
             func(update)
         self.commit()
 
-    def load_cache(self, *, expire: bool = True) -> list[TogglClass]:
-        self.session.load(self.cache_path, self.expire_after)
+    def load_cache(self) -> list[TogglClass]:
+        self.session.load(self.cache_path)
+        if self.expire_after is None:
+            return self.session.data
         min_ts = datetime.now(timezone.utc) - self.expire_after
-        return [m for m in self.session.data if not expire or m.timestamp >= min_ts]  # type: ignore[operator]
+        return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
 
     def find_entry(
         self,
@@ -150,10 +151,7 @@ class JSONCache(TogglCache):
                 return item
         return None
 
-    def add_entry(
-        self,
-        item: TogglClass,
-    ) -> None:
+    def add_entry(self, item: TogglClass) -> None:
         find_entry = self.find_entry(item)
         if find_entry is None:
             return self.session.data.append(item)
@@ -203,7 +201,6 @@ class JSONCache(TogglCache):
         *,
         inverse: bool = False,
         distinct: bool = False,
-        expire: bool = True,
         **query: dict[str, Any],
     ) -> list[TogglClass]:
         # TODO: Implementation details are still lacking here.
@@ -211,14 +208,14 @@ class JSONCache(TogglCache):
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
 
-        self.session.load(self.cache_path, self.expire_after)
+        self.session.load(self.cache_path)
         search = self.session.data
-        min_ts = datetime.now(timezone.utc) - self.expire_after
+        min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
         results: list[TogglClass] = []
         existing_values: set[Any] = set()
 
         for model in search:
-            if expire and model.timestamp and min_ts >= model.timestamp:
+            if self.expire_after and model.timestamp and min_ts >= model.timestamp:  # type: ignore[operator]
                 continue
             if all(model[key] == value for key, value in query.items()) and (
                 not distinct or all(model[k] not in existing_values for k in query)
@@ -244,7 +241,7 @@ class JSONCache(TogglCache):
     def parent(self, parent: Optional[TogglCachedEndpoint]) -> None:
         self._parent = parent
         if parent is not None:
-            self.session.load(self.cache_path, self.expire_after)
+            self.session.load(self.cache_path)
 
 
 class CustomEncoder(json.encoder.JSONEncoder):
