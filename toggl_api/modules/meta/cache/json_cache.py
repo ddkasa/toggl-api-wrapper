@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Optional
@@ -15,7 +16,7 @@ from toggl_api.modules.models import (
     TogglWorkspace,
     as_dict_custom,
 )
-from toggl_api.utility import format_iso, parse_iso
+from toggl_api.utility import parse_iso
 from toggl_api.version import version
 
 from .base_cache import TogglCache
@@ -42,39 +43,41 @@ class JSONSession:
 
     Attributes:
         max_length: Max length of the data to be stored.
-        timestamp: Timestamp of the data for when it was loaded.
         version: Version of the data structure.
         data: List of Toggl objects stored in memory.
+        modified: Timestamp of when the cache was last modified in nanoseconds.
+            Used for checking if another cache object has updated it recently.
     """
 
-    # TODO: Implement max length of data.
     max_length: int = field(default=10_000)
-    timestamp: datetime = field(init=False)
     version: str = field(init=False, default=version)
     data: list[TogglClass] = field(default_factory=list)
+    modified: int = field(init=False, default=0)
 
     def commit(self, path: Path) -> None:
-        self.timestamp = datetime.now(timezone.utc)
+        if path.exists() and path.stat().st_mtime_ns > self.modified:
+            return
+
         self.version = version
         data = {
-            "timestamp": format_iso(self.timestamp.isoformat()),
             "version": self.version,
             "data": self.process_data(self.data),
         }
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
+        self.modified = path.stat().st_mtime_ns
+
     def load(self, path: Path) -> None:
         if path.exists():
             with path.open("r", encoding="utf-8") as f:
                 data = json.load(f, cls=CustomDecoder)
-            self.timestamp = parse_iso(data["timestamp"])  # type: ignore[assignment]
+            self.modified = path.stat().st_mtime_ns
             self.version = data["version"]
             self.data = self.process_data(data["data"])
-
         else:
-            self.timestamp = datetime.now(timezone.utc)
             self.version = version
+            self.modified = time.time_ns()
 
     def process_data(self, data: list[TogglClass]) -> list[TogglClass]:
         data.sort(key=lambda x: x.timestamp or datetime.now(timezone.utc))
@@ -127,6 +130,8 @@ class JSONCache(TogglCache):
         update: Iterable[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
+        if self.cache_path.exists() and self.cache_path.stat().st_mtime_ns > self.session.modified:
+            self.session.load(self.cache_path)
         func = self.find_method(method)
         if func is not None:
             func(update)
