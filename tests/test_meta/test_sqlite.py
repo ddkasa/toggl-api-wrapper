@@ -2,12 +2,13 @@ import random
 import time
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from toggl_api.modules.meta import RequestMethod
+from toggl_api.modules.meta import RequestMethod, SqliteCache
 from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
 
 
@@ -23,6 +24,12 @@ def db_conn(tmp_path):
 @pytest.fixture()
 def setup_schema(db_conn):
     return register_tables(db_conn)
+
+
+@pytest.mark.unit()
+def test_cache_int_arg():
+    cache = SqliteCache(Path("cache"), 20)
+    assert cache.expire_after.seconds == 20  # noqa: PLR2004
 
 
 @pytest.mark.unit()

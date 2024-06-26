@@ -90,6 +90,7 @@ class JSONCache(TogglCache):
     Args:
         path: Path to the cache file
         expire_after: Time after which the cache should be refreshed.
+            If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
         parent: Parent endpoint that will use the cache. Usually assigned
             automatically when supplied to a cached endpoint.
@@ -114,7 +115,7 @@ class JSONCache(TogglCache):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta] = None,
+        expire_after: Optional[timedelta | int] = None,
         parent: Optional[TogglCachedEndpoint] = None,
         *,
         max_length: int = 10_000,
@@ -208,7 +209,6 @@ class JSONCache(TogglCache):
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> list[TogglClass]:
-        # TODO: Implementation details are still lacking here.
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)

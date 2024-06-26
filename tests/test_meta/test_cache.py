@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import EndPointTest
-from toggl_api.modules.meta import CustomDecoder, CustomEncoder, RequestMethod
+from toggl_api.modules.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
 
 
 @pytest.mark.unit()
@@ -20,6 +20,12 @@ def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
     assert get_sqlite_cache.parent is None
     endpoint = EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
+
+
+@pytest.mark.unit()
+def test_cache_json_int_arg():
+    cache = JSONCache(Path("cache"), 20)
+    assert cache.expire_after.seconds == 20  # noqa: PLR2004
 
 
 @pytest.mark.unit()

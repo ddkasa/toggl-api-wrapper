@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import TYPE_CHECKING, Any, Final, Optional
 
 from toggl_api.modules.meta.enums import RequestMethod
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
-    from datetime import timedelta
     from pathlib import Path
 
     from toggl_api.modules.meta import TogglCachedEndpoint
@@ -38,6 +38,7 @@ class TogglCache(ABC):
         _cache_path: Path to the cache file. Will generate the folder if it
             does not exist.
         _expire_after: Time after which the cache should be refreshed.
+            If using an integer it will be assumed as seconds.
             If set to None its ignored.
         _parent: Parent TogglCachedEndpoint
     """
@@ -47,12 +48,13 @@ class TogglCache(ABC):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta] = None,
+        expire_after: Optional[timedelta | int] = None,
         parent: Optional[TogglCachedEndpoint] = None,
     ) -> None:
         path.mkdir(parents=True, exist_ok=True)
         self._cache_path = path
-        self._expire_after = expire_after
+
+        self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
         self._parent = parent
 
     @abstractmethod
@@ -104,7 +106,6 @@ class TogglCache(ABC):
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> Iterable[TogglClass]:
-        # TODO: Implement a data structure to hold query arguments & results.
         pass
 
     @property

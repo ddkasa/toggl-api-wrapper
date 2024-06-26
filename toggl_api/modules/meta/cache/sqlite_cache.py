@@ -21,6 +21,13 @@ if TYPE_CHECKING:
 class SqliteCache(TogglCache):
     """Class for caching data to a Sqlite database.
 
+    Args:
+        expire_after: Time after which the cache should be refreshed.
+            If using an integer it will be assumed as seconds.
+            If set to None the cache will never expire.
+        parent: Parent endpoint that will use the cache. Usually assigned
+            automatically when supplied to a cached endpoint.
+
     Attributes:
         database: Sqlalchemy database engine.
         metadata: Sqlalchemy metadata.
@@ -41,7 +48,7 @@ class SqliteCache(TogglCache):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta] = None,
+        expire_after: Optional[timedelta | int] = None,
         parent: Optional[TogglCachedEndpoint] = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
