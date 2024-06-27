@@ -1,7 +1,6 @@
 import pytest
 
-from toggl_api import ClientBody
-from toggl_api.modules.models import TogglClient
+from toggl_api import ClientBody, TogglClient
 
 
 @pytest.fixture()
@@ -25,6 +24,17 @@ def test_client_model(get_workspace_id):
 
 
 @pytest.mark.unit()
+def test_client_body(create_client_body, faker):
+    assert isinstance(create_client_body, ClientBody)
+    create_client_body.status = faker.name()
+    create_client_body.notes = faker.name()
+    data = create_client_body.format_body(create_client_body.workspace_id)
+
+    assert data["status"] == create_client_body.status
+    assert data["notes"] == create_client_body.notes
+
+
+@pytest.mark.unit()
 def test_client_name(client_object, create_client_body, monkeypatch):
     monkeypatch.setattr(create_client_body, "name", None)
     with pytest.raises(ValueError):  # noqa: PT011
@@ -33,13 +43,29 @@ def test_client_name(client_object, create_client_body, monkeypatch):
 
 @pytest.mark.integration()
 @pytest.mark.order(after="test_client_model")
-def test_client_get(client_object, get_workspace_id, create_client):
+def test_get_clients(client_object, get_workspace_id, create_client):
     clients = client_object.get_clients(refresh=False)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)
     clients = client_object.get_clients(refresh=True)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)
+
+
+@pytest.mark.integration()
+@pytest.mark.order(after="test_get_clients")
+def test_get_client(client_object, get_workspace_id, create_client):
+    client = client_object.get_client(create_client)
+    assert isinstance(client, TogglClient)
+    assert client.id == create_client.id
+
+    client = client_object.get_client(create_client.id)
+    assert isinstance(client, TogglClient)
+    assert client.id == create_client.id
+
+    client = client_object.get_client(create_client, refresh=True)
+    assert isinstance(client, TogglClient)
+    assert client.id == create_client.id
 
 
 @pytest.mark.integration()

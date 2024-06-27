@@ -1,9 +1,9 @@
-from pathlib import Path
+from configparser import ConfigParser
 
 import pytest
 from httpx import BasicAuth
 
-from toggl_api.config import AuthenticationError, use_togglrc
+from toggl_api.config import AuthenticationError, generate_authentication, use_togglrc
 
 
 @pytest.mark.unit()
@@ -17,21 +17,45 @@ def test_auth_integration(user_object):
 
 
 @pytest.mark.unit()
-def test_use_togglrc():
+def test_generate_authentication_error(config_setup, monkeypatch):
+    monkeypatch.delenv("TOGGL_API_TOKEN")
+    with pytest.raises(AuthenticationError):
+        generate_authentication()
+
+
+@pytest.mark.unit()
+def test_use_togglrc(tmp_path, faker):
     # REFACTOR: Could change this to create config files on fly.
-    rc_folder = Path("files/")
-    rc_folder.mkdir(parents=True, exist_ok=True)
-    assert rc_folder.exists()
     with pytest.raises(AuthenticationError):
-        use_togglrc(rc_folder)
+        use_togglrc(tmp_path)
+    file_path = tmp_path / ".togglrc"
+    file_path.touch()
 
-    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_1")
-    assert rc_folder.exists()
-    assert isinstance(use_togglrc(rc_folder), BasicAuth)
+    config = ConfigParser()
+    config.write(file_path)
 
-    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_2")
-    assert isinstance(use_togglrc(rc_folder), BasicAuth)
-
-    rc_folder = Path(__file__).resolve().parents[0] / Path("extra/test_rc_3")
     with pytest.raises(AuthenticationError):
-        use_togglrc(rc_folder)
+        use_togglrc(tmp_path)
+
+    config.add_section("auth")
+    with file_path.open("w") as f:
+        config.write(f)
+    with pytest.raises(AuthenticationError):
+        use_togglrc(tmp_path)
+
+    config.set("auth", "api_token", faker.name())
+    with file_path.open("w") as f:
+        config.write(f)
+    assert isinstance(use_togglrc(tmp_path), BasicAuth)
+
+    config.remove_option("auth", "api_token")
+    config.set("auth", "email", faker.email())
+    with file_path.open("w") as f:
+        config.write(f)
+    with pytest.raises(AuthenticationError):
+        use_togglrc(tmp_path)
+
+    config.set("auth", "password", faker.password())
+    with file_path.open("w") as f:
+        config.write(f)
+    assert isinstance(use_togglrc(tmp_path), BasicAuth)
