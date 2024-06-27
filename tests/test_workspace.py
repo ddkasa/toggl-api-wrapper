@@ -21,3 +21,13 @@ def test_get_workspace(workspace_object, get_workspace_id):
     assert isinstance(data, TogglWorkspace)
     assert data.id == get_workspace_id
     assert workspace_object.cache.cache_path.exists()
+
+    data = workspace_object.get_workspace()
+    assert isinstance(data, TogglWorkspace)
+    assert data.id == get_workspace_id
+    assert workspace_object.cache.cache_path.exists()
+
+    data = workspace_object.get_workspace(get_workspace_id)
+    assert isinstance(data, TogglWorkspace)
+    assert data.id == get_workspace_id
+    assert workspace_object.cache.cache_path.exists()
