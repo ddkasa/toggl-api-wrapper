@@ -59,7 +59,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         )
         self.cache = cache
 
-    def request(  # type: ignore[override]  # noqa: PLR0913
+    def request(  # type: ignore[override]
         self,
         parameters: str,
         headers: Optional[dict] = None,

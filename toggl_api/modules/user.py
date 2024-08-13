@@ -22,7 +22,7 @@ class UserEndpoint(TogglCachedEndpoint):
 
         return response if isinstance(response, TogglTracker) else None
 
-    def get_trackers(  # noqa: PLR0913
+    def get_trackers(
         self,
         since: Optional[int | datetime] = None,
         before: Optional[date] = None,
