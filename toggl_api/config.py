@@ -31,9 +31,9 @@ def generate_authentication() -> BasicAuth:
 
 # NOTE: For .togglrc compatibility.
 def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
-    """Gathers credentials from environment variables.
+    """Gathers credentials from a .togglrc file.
 
-    Mainly here for backwards compatibility.
+    Mainly here for togglcli backwards compatibility.
 
     Args:
         config_path: Path to .togglrc folder not file. If None, will use
