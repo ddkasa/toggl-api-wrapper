@@ -3,11 +3,10 @@ site_url: https://ddkasa.github.io/toggl-api-wrapper/
 use_directory_urls: false
 site_description: Simple Toggl API wrapper for non-premium features.
 site_author: David Kasakaits
-docs_dir: 'docs/'
+docs_dir: "docs/"
 
 repo_name: ddkasa/toggl-api-wrapper
 repo_url: https://www.github.com/ddkasa/toggl-api-wrapper
-
 
 edit_uri: blob/master/docs/
 
@@ -58,13 +57,13 @@ theme:
 
 nav:
   - Getting Started:
-    - Overview: README.md
-    - Installation: user-guide/installation.md
-    - Examples: user-guide/examples.md
+      - Overview: README.md
+      - Installation: user-guide/installation.md
+      - Examples: user-guide/examples.md
   - API Reference:
       - Overview: api-guide/index.md
-      - Config: api-guide/config.md
-      - Endpoint: api-guide/endpoint.md 
+      - Configuration: api-guide/config.md
+      - Endpoint: api-guide/endpoint.md
       - Cache: api-guide/cache.md
       - Models: api-guide/model.md
       - Workspace: api-guide/workspace.md
@@ -74,16 +73,14 @@ nav:
       - Tags: api-guide/tag.md
   # - Release Notes: about/release-notes.md
   - About:
-    - Contributing: about/CONTRIBUTING.md
-    - License: about/LICENSE.md
+      - Contributing: about/CONTRIBUTING.md
+      - License: about/LICENSE.md
 
 extra_css:
   - stylesheet/extra.css
 
 exclude_docs: |
   *.py
-
-
 
 markdown_extensions:
   - toc:
@@ -95,10 +92,10 @@ markdown_extensions:
       use_pygments: true
   - pymdownx.snippets
   - pymdownx.superfences:
-     custom_fences:
-      - name: mermaid
-        class: mermaid
-        format: !!python/name:mermaid2.fence_mermaid_custom
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - callouts
   - mdx_gh_links:
       user: mkdocs
@@ -110,7 +107,7 @@ markdown_extensions:
 copyright: Copyright &copy; 2024 David Kasakaitis
 
 # hooks:
-  # - docs/hooks.py
+# - docs/hooks.py
 
 plugins:
   - search

@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -10,13 +11,12 @@ class ClientBody:
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
     workspace_id: Optional[int] = field(default=None)
-
     name: Optional[str] = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
     status: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
 
-    def format_body(self, workspace_id: int) -> dict[str, Any]:
+    def format(self, workspace_id: int) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
@@ -26,7 +26,7 @@ class ClientBody:
                 if the body does not contain a workspace_id.
 
         Returns:
-            dict[str, Any]: JSON compatible formatted body.
+            dict: JSON compatible formatted body.
         """
         body: dict[str, Any] = {
             "wid": self.workspace_id or workspace_id,
@@ -40,28 +40,37 @@ class ClientBody:
             body["notes"] = self.notes
         return body
 
+    def format_body(self, workspace_id: int) -> dict[str, Any]:
+        warnings.warn("Deprecated in favour of 'format' method.", DeprecationWarning, stacklevel=1)
+        return self.format(workspace_id)
+
 
 class ClientEndpoint(TogglCachedEndpoint):
-    def create_client(self, body: ClientBody) -> Optional[TogglClient]:
+    def add(self, body: ClientBody) -> TogglClient | None:
         if body.name is None:
             msg = "Name must be set in order to create a client!"
             raise ValueError(msg)
 
         return self.request(
             "",
-            body=body.format_body(self.workspace_id),
+            body=body.format(self.workspace_id),
             method=RequestMethod.POST,
             refresh=True,
         )  # type: ignore[return-value]
 
-    def get_client(
+    def create_client(self, body: ClientBody) -> TogglClient | None:
+        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        return self.add(body)
+
+    def get(
         self,
         client_id: int | TogglClient,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglClient]:
+    ) -> TogglClient | None:
         if isinstance(client_id, TogglClient):
             client_id = client_id.id
+
         if not refresh:
             client = self.cache.find_entry({"id": client_id})
             if isinstance(client, TogglClient):
@@ -74,21 +83,38 @@ class ClientEndpoint(TogglCachedEndpoint):
         )
         return response or None  # type: ignore[return-value]
 
-    def update_client(
+    def get_client(
+        self,
+        client_id: int | TogglClient,
+        *,
+        refresh: bool = False,
+    ) -> TogglClient | None:
+        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        return self.get(client_id, refresh=refresh)
+
+    def edit(
         self,
         client: TogglClient | int,
         body: ClientBody,
-    ) -> Optional[TogglClient]:
+    ) -> TogglClient | None:
         if isinstance(client, TogglClient):
             client = client.id
         return self.request(
             f"/{client}",
-            body=body.format_body(self.workspace_id),
+            body=body.format(self.workspace_id),
             method=RequestMethod.PUT,
             refresh=True,
         )  # type: ignore[return-value]
 
-    def delete_client(self, client: TogglClient | int) -> None:
+    def update_client(
+        self,
+        client: TogglClient | int,
+        body: ClientBody,
+    ) -> TogglClient | None:
+        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
+        return self.edit(client, body)
+
+    def delete(self, client: TogglClient | int) -> None:
         self.request(
             f"/{client if isinstance(client, int) else client.id}",
             method=RequestMethod.DELETE,
@@ -101,7 +127,11 @@ class ClientEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(client)
         self.cache.commit()
 
-    def get_clients(
+    def delete_client(self, client: TogglClient | int) -> None:
+        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        return self.delete(client)
+
+    def collect(
         self,
         status: Optional[str] = None,
         name: Optional[str] = None,
@@ -120,6 +150,16 @@ class ClientEndpoint(TogglCachedEndpoint):
 
         response = self.request(url)
         return response if isinstance(response, list) else []  # type: ignore[return-value]
+
+    def get_clients(
+        self,
+        status: Optional[str] = None,
+        name: Optional[str] = None,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglClient]:
+        warnings.warn("Deprecated in favour of 'collect' method", DeprecationWarning, stacklevel=1)
+        return self.collect(status, name, refresh=refresh)
 
     @property
     def endpoint(self) -> str:

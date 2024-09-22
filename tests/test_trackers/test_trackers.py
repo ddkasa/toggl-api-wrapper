@@ -8,7 +8,7 @@ from toggl_api.modules.models import TogglTracker
 from toggl_api.modules.models.models import TogglTag
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_tracker_kwargs(get_workspace_id, faker):
     data = {
         "id": 1100,
@@ -36,16 +36,16 @@ def test_tracker_kwargs(get_workspace_id, faker):
     assert all(TogglTag.from_kwargs(**tag) for tag in tracker.tags for tag in data["tags"])
 
 
-@pytest.mark.integration()
+@pytest.mark.integration
 def test_tracker_creation(add_tracker):
     assert isinstance(add_tracker, TogglTracker)
 
 
-@pytest.mark.integration()
+@pytest.mark.integration
 def test_tracker_editing(tracker_object, add_tracker, faker):
     new_description = TrackerBody(description=faker.name())
     new_description.tags = [faker.name(), faker.name()]
-    data = tracker_object.edit_tracker(
+    data = tracker_object.edit(
         tracker=add_tracker,
         body=new_description,
     )
@@ -54,17 +54,17 @@ def test_tracker_editing(tracker_object, add_tracker, faker):
     assert all(tag.name in new_description.tags for tag in data.tags)
 
 
-@pytest.mark.integration()
+@pytest.mark.integration
 def test_tracker_stop(tracker_object, add_tracker, user_object):
     diff = 5
     time.sleep(diff)
-    trackstop = tracker_object.stop_tracker(tracker=add_tracker)
+    trackstop = tracker_object.stop(tracker=add_tracker)
     assert trackstop.duration >= timedelta(seconds=diff)
 
 
-@pytest.mark.integration()
+@pytest.mark.integration
 @pytest.mark.order(after="test_tracker_stop")
 def test_tracker_deletion(tracker_object, user_object, add_tracker):
-    tracker_object.delete_tracker(add_tracker)
-    assert add_tracker != user_object.get_tracker(add_tracker.id)
-    assert add_tracker != user_object.get_tracker(add_tracker.id, refresh=True)
+    tracker_object.delete(add_tracker)
+    assert add_tracker != user_object.get(add_tracker.id)
+    assert add_tracker != user_object.get(add_tracker.id, refresh=True)

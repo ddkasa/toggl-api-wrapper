@@ -1,12 +1,13 @@
 ::: toggl_api.modules.project.ProjectBody
     options:
         members:
-            - format_body
+            - format
 
 ::: toggl_api.modules.project.ProjectEndpoint
     options:
         members:
-            - get_projects
-            - delete_project
-            - edit_project
-            - add_project
+            - collect
+            - get
+            - delete
+            - edit
+            - add

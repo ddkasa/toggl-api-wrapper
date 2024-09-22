@@ -96,9 +96,9 @@ def add_tracker(tracker_object, faker):
         description=faker.name(),
         start=datetime.now(tz=timezone.utc),
     )
-    tracker = tracker_object.add_tracker(body=body)
+    tracker = tracker_object.add(body=body)
     yield tracker
-    tracker_object.delete_tracker(tracker)
+    tracker_object.delete(tracker)
 
 
 @pytest.fixture()
@@ -160,10 +160,10 @@ def _tracker_cleanup(cache, wid, config):
 
 def _project_cleanup(cache, wid, config):
     endpoint = ProjectEndpoint(wid, config, cache)
-    projects = endpoint.get_projects(refresh=True)
+    projects = endpoint.collect(refresh=True)
     for project in projects:
         with contextlib.suppress(HTTPError):
-            endpoint.delete_project(project)
+            endpoint.delete(project)
 
 
 def _client_cleanup(cache, wid, config):

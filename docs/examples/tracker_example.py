@@ -14,5 +14,5 @@ cache = SqliteCache(Path("cache"), timedelta(hours=24))
 endpoint = TrackerEndpoint(workspace_id, auth, cache)
 
 body = TrackerBody(workspace_id, "My First Tracker", tags=["My First Tag"])
-tracker = endpoint.add_tracker(body)
+tracker = endpoint.add(body)
 print(tracker)

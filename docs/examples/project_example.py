@@ -20,5 +20,5 @@ body = ProjectBody(
     client_name="My First Client",
     color=color,
 )
-project = endpoint.add_project(body)
+project = endpoint.add(body)
 print(project)

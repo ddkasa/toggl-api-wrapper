@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from .meta import TogglCachedEndpoint
@@ -5,12 +6,12 @@ from .models import TogglWorkspace
 
 
 class WorkspaceEndpoint(TogglCachedEndpoint):
-    def get_workspace(
+    def get(
         self,
         workspace: Optional[TogglWorkspace | int] = None,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglWorkspace]:
+    ) -> TogglWorkspace | None:
         """Get the current workspace based on the workspace_id class attribute."""
         if workspace is None:
             workspace = self.workspace_id
@@ -24,6 +25,15 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             refresh = True
 
         return self.request("", refresh=refresh)  # type: ignore[return-value]
+
+    def get_workspace(
+        self,
+        workspace: Optional[TogglWorkspace | int] = None,
+        *,
+        refresh: bool = False,
+    ) -> TogglWorkspace | None:
+        warnings.warn("Deprecated in favour 'get' method.", DeprecationWarning, stacklevel=1)
+        return self.get(workspace, refresh=refresh)
 
     @property
     def model(self) -> type[TogglWorkspace]:

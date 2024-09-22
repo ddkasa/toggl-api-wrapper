@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Final, Optional
@@ -33,7 +34,7 @@ class ProjectBody:
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    def format_body(self, workspace_id: int) -> dict[str, Any]:
+    def format(self, workspace_id: int) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
@@ -68,6 +69,10 @@ class ProjectBody:
 
         return headers
 
+    def format_body(self, workspace_id: int) -> dict[str, Any]:
+        warnings.warn("Deprecated in favour of 'format' method.", DeprecationWarning, stacklevel=1)
+        return self.format(workspace_id)
+
 
 class ProjectEndpoint(TogglCachedEndpoint):
     BASIC_COLORS: Final[dict[str, str]] = {
@@ -87,19 +92,27 @@ class ProjectEndpoint(TogglCachedEndpoint):
         "gray": "#d80435",
     }
 
+    def collect(
+        self,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglProject]:
+        return self.request("", refresh=refresh)  # type: ignore[return-value]
+
     def get_projects(
         self,
         *,
         refresh: bool = False,
-    ) -> Optional[list[TogglProject]]:
-        return self.request("", refresh=refresh)  # type: ignore[return-value]
+    ) -> list[TogglProject]:
+        warnings.warn("Deprecated in favour of 'collect' method.", DeprecationWarning, stacklevel=1)
+        return self.collect(refresh=refresh)
 
-    def get_project(
+    def get(
         self,
         project_id: int | TogglProject,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglProject]:
+    ) -> TogglProject | None:
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
@@ -116,7 +129,16 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
         return response or None  # type: ignore[return-value]
 
-    def delete_project(self, project: TogglProject | int) -> None:
+    def get_project(
+        self,
+        project_id: int | TogglProject,
+        *,
+        refresh: bool = False,
+    ) -> TogglProject | None:
+        warnings.warn("Deprecated in favour of 'get' method.", DeprecationWarning, stacklevel=1)
+        return self.get(project_id, refresh=refresh)
+
+    def delete(self, project: TogglProject | int) -> None:
         self.request(
             f"/{project if isinstance(project, int) else project.id}",
             method=RequestMethod.DELETE,
@@ -130,33 +152,52 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(project)
         self.cache.commit()
 
-    def edit_project(
+    def delete_project(self, project: TogglProject | int) -> None:
+        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        return self.delete(project)
+
+    def edit(
         self,
         project: TogglProject | int,
         body: ProjectBody,
-    ) -> Optional[TogglProject]:
+    ) -> TogglProject | None:
         if isinstance(project, TogglProject):
             project = project.id
         return self.request(
             f"/{project}",
             method=RequestMethod.PUT,
-            body=body.format_body(self.workspace_id),
+            body=body.format(self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 
-    def add_project(
+    def edit_project(
+        self,
+        project: TogglProject | int,
+        body: ProjectBody,
+    ) -> TogglProject | None:
+        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
+        return self.edit(project, body)
+
+    def add(
         self,
         body: ProjectBody,
-    ) -> Optional[TogglProject]:
+    ) -> TogglProject | None:
         if body.name is None:
             msg = "Name must be set in order to create a project!"
             raise ValueError(msg)
         return self.request(
             "",
             method=RequestMethod.POST,
-            body=body.format_body(self.workspace_id),
+            body=body.format(self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
+
+    def add_project(
+        self,
+        body: ProjectBody,
+    ) -> TogglProject | None:
+        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        return self.add(body)
 
     @classmethod
     def get_color(cls, color: str) -> str:

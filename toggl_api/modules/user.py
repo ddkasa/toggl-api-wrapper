@@ -1,3 +1,4 @@
+import warnings
 from datetime import date, datetime
 from typing import Final, Optional
 
@@ -10,7 +11,7 @@ from .models import TogglTracker
 class UserEndpoint(TogglCachedEndpoint):
     TRACKER_NOT_RUNNING: Final[int] = 405
 
-    def current_tracker(self, *, refresh: bool = True) -> Optional[TogglTracker]:
+    def current(self, *, refresh: bool = True) -> TogglTracker | None:
         """Get current running tracker. Returns None if no tracker is running."""
 
         try:
@@ -22,7 +23,11 @@ class UserEndpoint(TogglCachedEndpoint):
 
         return response if isinstance(response, TogglTracker) else None
 
-    def get_trackers(
+    def current_tracker(self, *, refresh: bool = True) -> TogglTracker | None:
+        warnings.warn("Deprecated in favour of 'current' method.", DeprecationWarning, stacklevel=1)
+        return self.current(refresh=refresh)
+
+    def collect(
         self,
         since: Optional[int | datetime] = None,
         before: Optional[date] = None,
@@ -59,14 +64,26 @@ class UserEndpoint(TogglCachedEndpoint):
         # TODO: Need to filter cached trackers.
         # TODO: Implement sorting of trackers.
 
-        return response if isinstance(response, list) else []  # type: ignore[return-value]
+        return response if isinstance(response, list) else []
 
-    def get_tracker(
+    def get_trackers(
+        self,
+        since: Optional[int | datetime] = None,
+        before: Optional[date] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglTracker]:
+        warnings.warn("Deprecated in favour of 'collect' method.", DeprecationWarning, stacklevel=1)
+        return self.collect(since, before, start_date, end_date, refresh=refresh)
+
+    def get(
         self,
         tracker_id: int | TogglTracker,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglTracker]:
+    ) -> TogglTracker | None:
         """Get a single tracker by ID.
 
         Args:
@@ -95,6 +112,15 @@ class UserEndpoint(TogglCachedEndpoint):
             raise
 
         return response  # type: ignore[return-value]
+
+    def get_tracker(
+        self,
+        tracker_id: int | TogglTracker,
+        *,
+        refresh: bool = False,
+    ) -> TogglTracker | None:
+        warnings.warn("Deprecated in favour of 'get' method.", DeprecationWarning, stacklevel=1)
+        return self.get(tracker_id, refresh=refresh)
 
     def check_authentication(self) -> bool:
         """Check if user is correctly authenticated with the Toggl API."""
