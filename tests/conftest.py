@@ -1,16 +1,15 @@
 # mypy: disable-error-code=override
 
-import contextlib
 import os
 import random
 import time
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 import pytest
 from faker import Faker
-from httpx import BasicAuth, HTTPError
+from httpx import BasicAuth
 
+from scripts.utils import cleanup
 from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientEndpoint
 from toggl_api.modules.meta import JSONCache, SqliteCache, TogglCachedEndpoint
@@ -44,12 +43,12 @@ def config_setup() -> BasicAuth:
     return generate_authentication()
 
 
-@pytest.fixture()
+@pytest.fixture
 def get_sqlite_cache(tmp_path):
     return SqliteCache(tmp_path, timedelta(days=1))
 
 
-@pytest.fixture()
+@pytest.fixture
 def get_json_cache(tmp_path):
     return JSONCache(tmp_path, timedelta(days=1))
 
@@ -59,27 +58,27 @@ def get_workspace_id() -> int:
     return int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def workspace_object(get_workspace_id, config_setup, get_json_cache):
     return WorkspaceEndpoint(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def project_object(get_workspace_id, config_setup, get_json_cache):
     return ProjectEndpoint(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def user_object(get_workspace_id, config_setup, get_json_cache) -> UserEndpoint:
     return UserEndpoint(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracker_object(get_workspace_id, config_setup, get_json_cache, user_object):
     return TrackerEndpoint(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracker_object_sqlite(
     get_workspace_id,
     config_setup,
@@ -89,7 +88,7 @@ def tracker_object_sqlite(
     return TrackerEndpoint(get_workspace_id, config_setup, get_sqlite_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def add_tracker(tracker_object, faker):
     body = TrackerBody(
         tracker_object.workspace_id,
@@ -101,12 +100,12 @@ def add_tracker(tracker_object, faker):
     tracker_object.delete(tracker)
 
 
-@pytest.fixture()
+@pytest.fixture
 def client_object(get_json_cache, get_workspace_id, config_setup):
     return ClientEndpoint(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def tag_object(get_workspace_id, config_setup, get_json_cache):
     return TagEndpoint(get_workspace_id, config_setup, get_json_cache)
 
@@ -130,70 +129,14 @@ class EndPointTest(TogglCachedEndpoint):
         return TogglTracker
 
 
-@pytest.fixture()
+@pytest.fixture
 def meta_object(config_setup, get_workspace_id, get_json_cache):
     return EndPointTest(get_workspace_id, config_setup, get_json_cache)
 
 
-@pytest.fixture()
+@pytest.fixture
 def meta_object_sqlite(config_setup, get_workspace_id, get_sqlite_cache):
     return EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
-
-
-def _path_cleanup(cache_path):
-    for file in cache_path.rglob("*"):
-        if file.is_dir():
-            cleanup(cache_path)
-            continue
-        file.unlink()
-    cache_path.rmdir()
-
-
-def _tracker_cleanup(cache, wid, config):
-    user_object = UserEndpoint(wid, config, cache)
-    trackers = user_object.get_trackers(refresh=True)
-    endpoint = TrackerEndpoint(wid, config, cache)
-    for tracker in trackers:
-        with contextlib.suppress(HTTPError):
-            endpoint.delete_tracker(tracker)
-
-
-def _project_cleanup(cache, wid, config):
-    endpoint = ProjectEndpoint(wid, config, cache)
-    projects = endpoint.collect(refresh=True)
-    for project in projects:
-        with contextlib.suppress(HTTPError):
-            endpoint.delete(project)
-
-
-def _client_cleanup(cache, wid, config):
-    endpoint = ClientEndpoint(wid, config, cache)
-    clients = endpoint.get_clients(refresh=True)
-
-    for client in clients:
-        with contextlib.suppress(HTTPError):
-            endpoint.delete_client(client)
-
-
-def _tag_cleanup(cache, wid, config):
-    endpoint = TagEndpoint(wid, config, cache)
-    tags = endpoint.get_tags(refresh=True)
-    for tag in tags:
-        with contextlib.suppress(HTTPError):
-            endpoint.delete_tag(tag)
-
-
-def cleanup():
-    path = Path(__file__).parent / "cache"
-    wid = int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
-    config = generate_authentication()
-    cache = JSONCache(path, timedelta(days=1))
-
-    _project_cleanup(cache, wid, config)
-    _tracker_cleanup(cache, wid, config)
-    _client_cleanup(cache, wid, config)
-    _tag_cleanup(cache, wid, config)
-    _path_cleanup(path)
 
 
 def pytest_sessionstart(session: pytest.Session):
@@ -208,7 +151,7 @@ def pytest_sessionfinish(session, exitstatus):
         cleanup()
 
 
-@pytest.fixture()
+@pytest.fixture
 def model_data(get_workspace_id, faker):
     workspace = TogglWorkspace(get_workspace_id, "test_workspace")
 
@@ -249,7 +192,7 @@ def model_data(get_workspace_id, faker):
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def get_test_data(get_workspace_id, faker):
     return [
         {
