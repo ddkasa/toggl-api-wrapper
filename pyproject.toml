@@ -20,6 +20,8 @@ classifiers = [
 ]
 packages = [{ include = "toggl_api" }]
 
+[tool.poetry.scripts]
+clean-toggl-account = "scripts.clean_account:main"
 
 [tool.poetry.urls]
 "Homepage" = "https://ddkasa.github.io/toggl-api-wrapper/"
