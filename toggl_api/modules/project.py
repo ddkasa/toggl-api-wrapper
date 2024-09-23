@@ -97,6 +97,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglProject]:
+        """Returns all cached or remote projects."""
         return self.request("", refresh=refresh)  # type: ignore[return-value]
 
     def get_projects(
@@ -113,6 +114,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglProject | None:
+        """Request a projects based on its id."""
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
@@ -139,6 +141,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         return self.get(project_id, refresh=refresh)
 
     def delete(self, project: TogglProject | int) -> None:
+        """Deletes a project based on its id."""
         self.request(
             f"/{project if isinstance(project, int) else project.id}",
             method=RequestMethod.DELETE,
@@ -149,6 +152,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             project = self.cache.find_entry({"id": project})  # type: ignore[assignment]
             if not isinstance(project, TogglProject):
                 return
+
         self.cache.delete_entries(project)
         self.cache.commit()
 
@@ -161,6 +165,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         project: TogglProject | int,
         body: ProjectBody,
     ) -> TogglProject | None:
+        """Edit a project based on its id with the parameters provided in the body."""
         if isinstance(project, TogglProject):
             project = project.id
         return self.request(
@@ -182,6 +187,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self,
         body: ProjectBody,
     ) -> TogglProject | None:
+        """Create a new project based on the parameters provided in the body."""
         if body.name is None:
             msg = "Name must be set in order to create a project!"
             raise ValueError(msg)

@@ -67,9 +67,9 @@ nav:
       - Cache: api-guide/cache.md
       - Models: api-guide/model.md
       - Workspace: api-guide/workspace.md
-      - Client: api-guide/client.md
-      - Projects: api-guide/project.md
       - Trackers: api-guide/tracker.md
+      - Projects: api-guide/project.md
+      - Client: api-guide/client.md
       - Tags: api-guide/tag.md
   # - Release Notes: about/release-notes.md
   - About:

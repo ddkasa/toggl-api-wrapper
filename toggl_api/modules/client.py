@@ -12,11 +12,11 @@ class ClientBody:
 
     workspace_id: Optional[int] = field(default=None)
     name: Optional[str] = field(default=None)
-    """Name of the project. Defaults to None. Will be required if its a POST request."""
+    """Name of the client. Defaults to None. Will be required if its a POST request."""
     status: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
 
-    def format(self, workspace_id: int) -> dict[str, Any]:
+    def format(self, workspace_id: int) -> dict[str, int | str]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
@@ -47,6 +47,8 @@ class ClientBody:
 
 class ClientEndpoint(TogglCachedEndpoint):
     def add(self, body: ClientBody) -> TogglClient | None:
+        """Create a Client based on parameters set in the provided body."""
+
         if body.name is None:
             msg = "Name must be set in order to create a client!"
             raise ValueError(msg)
@@ -68,6 +70,16 @@ class ClientEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglClient | None:
+        """Request a client based on its id.
+
+        Args:
+            client_id: Which client to look for.
+            refresh: Whether to only check cache. It will default to True if id
+                is not found in cache. Defaults to False.
+
+        Returns:
+            TogglClient | None: If the client was found.
+        """
         if isinstance(client_id, TogglClient):
             client_id = client_id.id
 
@@ -97,6 +109,7 @@ class ClientEndpoint(TogglCachedEndpoint):
         client: TogglClient | int,
         body: ClientBody,
     ) -> TogglClient | None:
+        """Edit a client with the supplied parameters from the body."""
         if isinstance(client, TogglClient):
             client = client.id
         return self.request(
@@ -115,6 +128,7 @@ class ClientEndpoint(TogglCachedEndpoint):
         return self.edit(client, body)
 
     def delete(self, client: TogglClient | int) -> None:
+        """Delete a client based on its ID."""
         self.request(
             f"/{client if isinstance(client, int) else client.id}",
             method=RequestMethod.DELETE,
@@ -124,6 +138,7 @@ class ClientEndpoint(TogglCachedEndpoint):
             client = self.cache.find_entry({"id": client})  # type: ignore[assignment]
             if not isinstance(client, TogglClient):
                 return
+
         self.cache.delete_entries(client)
         self.cache.commit()
 
@@ -138,6 +153,7 @@ class ClientEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglClient]:
+        """Request all Clients based on status and name if specified."""
         url = ""
         if status:
             url += f"?{status}"

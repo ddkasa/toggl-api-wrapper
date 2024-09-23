@@ -1,10 +1,10 @@
-### Abstract Base Classes
+### Abstract Classes
 
 ::: toggl_api.modules.models.TogglClass
 
 ::: toggl_api.modules.models.WorkspaceChild
 
-***
+---
 
 ### Main Models
 

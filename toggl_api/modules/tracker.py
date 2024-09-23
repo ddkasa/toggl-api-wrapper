@@ -39,8 +39,8 @@ class TrackerBody:
         Gets called by the endpoint methods before requesting.
 
         Args:
-            workspace_id (int): Alternate Workspace ID for the request
-                if the body does not contain a workspace_id.
+            workspace_id (int): Alternate Workspace ID for the request if the
+                body does not contain a workspace_id.
 
         Returns:
             dict: JSON compatible formatted body.
@@ -91,7 +91,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         tracker: TogglTracker | int,
         body: TrackerBody,
     ) -> TogglTracker | None:
-        """Edit an existing tracker."""
+        """Edit an existing tracker based on the supplied parameters within the body."""
         if (body.tag_ids or body.tags) and not body.tag_action:
             body.tag_action = "add"
 
@@ -118,7 +118,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return self.edit(tracker, body)
 
     def delete(self, tracker: TogglTracker | int) -> None:
-        """Delete tracker from Toggl.
+        """Delete a tracker from Toggl.
 
         Args:
             tracker: Tracker object with ID to delete.

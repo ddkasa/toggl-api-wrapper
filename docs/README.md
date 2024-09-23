@@ -1,19 +1,17 @@
 # Python Toggl API Wrapper
 
-
-![PyPI - Version](https://img.shields.io/pypi/v/toggl-api-wrapper?style=for-the-badge&link=https%3A%2F%2Fpypi.org%2Fproject%2Ftoggl-api-wrapper%2F)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/toggl-api-wrapper?style=for-the-badge)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ddkasa/toggl-api-wrapper/publish.yaml?style=for-the-badge)
-![Codecov](https://img.shields.io/codecov/c/github/ddkasa/toggl-api-wrapper?style=for-the-badge)
-***
-
+<a href="https://pypi.org/project/toggl-api-wrapper">![PyPI - Version](https://img.shields.io/pypi/v/toggl-api-wrapper?link=https%3A%2F%2Fpypi.org%2Fproject%2Ftoggl-api-wrapper%2F)</a>
+<a href="https://pypi.org/project/toggl-api-wrapper">![PyPI - Python Version](https://img.shields.io/pypi/pyversions/toggl-api-wrapper)</a>
+<a href="https://github.com/ddkasa/toggl-api-wrapper/actions/workflows/publish.yaml">![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ddkasa/toggl-api-wrapper/publish.yaml)</a>
+<a href="https://app.codecov.io/gh/ddkasa/toggl-api-wrapper">![Codecov](https://img.shields.io/codecov/c/github/ddkasa/toggl-api-wrapper)</a>
+<a href="https://pypistats.org/packages/toggl-api-wrapper">![PyPI - Downloads](https://img.shields.io/pypi/dm/toggl-api-wrapper)</a>
 
 > [!WARNING]  
-> *Alpha Stage: Anything might change without notice at any moment.*
+> _Alpha Stage: Anything might change without notice at any moment._
 
 Simple Python Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
 
-***
+---
 
 ## Installation
 
@@ -34,13 +32,15 @@ pip install toggl-api-wrapper
 - Currently supports interacting with Trackers, Projects, Clients & Tags and some extras.
 - Designed to be rudimentary to allow simple development of custom commands.
 
-
 ## Documentation
+
 - [API Documentation](https://ddkasa.github.io/toggl-api-wrapper/api-guide/)
 - [User Guide](https://ddkasa.github.io/toggl-api-wrapper/user-guide/)
 
 ## Development
+
 See [CONTRIBUTING](about/CONTRIBUTING.md).
 
 ## License
+
 MIT. Check [LICENSE](about/LICENSE.md) for more information.
