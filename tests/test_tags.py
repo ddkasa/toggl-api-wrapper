@@ -43,3 +43,8 @@ def test_get_tag(tag_object, get_workspace_id, add_tag):
 @pytest.mark.integration
 def test_delete_tag(tag_object, add_tag):
     tag_object.delete(add_tag)
+
+
+@pytest.mark.integration
+def test_delete_tag_int(tag_object, add_tag):
+    tag_object.delete(add_tag.id)
