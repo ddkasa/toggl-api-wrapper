@@ -89,3 +89,10 @@ def test_client_update(client_object, create_client_body, create_client, monkeyp
 def test_client_delete(client_object, get_workspace_id, create_client):
     assert isinstance(create_client, TogglClient)
     client_object.delete(create_client)
+
+
+@pytest.mark.integration
+@pytest.mark.order(after="test_client_delete")
+def test_client_delete_id(client_object, get_workspace_id, create_client):
+    assert isinstance(create_client, TogglClient)
+    client_object.delete(create_client.id)
