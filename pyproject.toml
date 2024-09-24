@@ -240,4 +240,5 @@ omit = [
     "*/.ruff_cache/*",
     "*/.pytest_cache/*",
     "docs/*",
+    "scripts/*",
 ]
