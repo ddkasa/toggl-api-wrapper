@@ -110,7 +110,7 @@ class SqliteCache(TogglCache):
                 ).filter_by(id=item.id).delete()
         self.commit()
 
-    def find_entry(self, query: TogglClass | dict) -> Optional[TogglClass]:
+    def find_entry(self, query: TogglClass | dict) -> TogglClass | None:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)

@@ -67,7 +67,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> Optional[TogglClass | Iterable[TogglClass]]:
+    ) -> TogglClass | Iterable[TogglClass] | None:
         """Overridden request method with builtin cache.
 
         Args:

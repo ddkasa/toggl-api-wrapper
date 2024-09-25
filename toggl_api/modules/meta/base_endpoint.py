@@ -71,7 +71,7 @@ class TogglEndpoint(ABC):
         headers: Optional[dict] = None,
         body: Optional[dict] = None,
         method: RequestMethod = RequestMethod.GET,
-    ) -> Optional[list[TogglClass] | TogglClass]:
+    ) -> list[TogglClass] | TogglClass | None:
         """Main request method which handles putting together the final API
         request.
 

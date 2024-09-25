@@ -149,7 +149,7 @@ class JSONCache(TogglCache):
         self,
         entry: TogglClass | dict,
         **kwargs,
-    ) -> Optional[TogglClass]:
+    ) -> TogglClass | None:
         if not self.session.data or self.parent is None:
             return None
         for item in self.session.data:
