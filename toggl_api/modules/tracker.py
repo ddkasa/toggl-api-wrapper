@@ -7,13 +7,13 @@ from typing import Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError
 
-from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
+from toggl_api.modules.meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from toggl_api.modules.models import TogglTracker
 from toggl_api.utility import format_iso
 
 
 @dataclass
-class TrackerBody:
+class TrackerBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
     workspace_id: Optional[int] = field(default=None)

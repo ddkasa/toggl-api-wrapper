@@ -2,12 +2,12 @@ import warnings
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
-from .meta import RequestMethod, TogglCachedEndpoint
+from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
 
 
 @dataclass
-class ClientBody:
+class ClientBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
     workspace_id: Optional[int] = field(default=None)

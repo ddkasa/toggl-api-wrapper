@@ -5,12 +5,12 @@ from typing import Any, Final, Optional
 
 from toggl_api.utility import format_iso
 
-from .meta import RequestMethod, TogglCachedEndpoint
+from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
 
 
 @dataclass
-class ProjectBody:
+class ProjectBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
     workspace_id: Optional[int] = field(default=None)
