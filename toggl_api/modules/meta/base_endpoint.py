@@ -32,7 +32,7 @@ class TogglEndpoint(ABC):
     NOT_FOUND: Final[int] = 404
     SERVER_ERROR: Final[int] = 5
 
-    BASE_ENDPOINT: Final[str] = "https://api.track.toggl.com/api/v9/"
+    BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
     __slots__ = ("__client", "workspace_id")
