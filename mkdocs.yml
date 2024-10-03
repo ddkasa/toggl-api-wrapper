@@ -71,6 +71,7 @@ nav:
       - Projects: api-guide/project.md
       - Client: api-guide/client.md
       - Tags: api-guide/tag.md
+      - Reports: api-guide/reports.md
   # - Release Notes: about/release-notes.md
   - About:
       - Contributing: about/CONTRIBUTING.md
