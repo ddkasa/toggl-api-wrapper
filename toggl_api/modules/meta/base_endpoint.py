@@ -71,7 +71,9 @@ class TogglEndpoint(ABC):
         headers: Optional[dict] = None,
         body: Optional[dict] = None,
         method: RequestMethod = RequestMethod.GET,
-    ) -> list[TogglClass] | TogglClass | None:
+        *,
+        raw: bool = False,
+    ) -> Any:
         """Main request method which handles putting together the final API
         request.
 
@@ -83,10 +85,10 @@ class TogglEndpoint(ABC):
             body (dict, optional): Request body JSON data for specifying info.
                 Defaults to None. Only used with none-GET or DELETE requests.
             method (RequestMethod): Request method to select. Defaults to GET.
+            raw (bool): Whether to use the raw data. Defaults to False.
 
         Returns:
-            dict | None: Response data or None if request does not return any
-                data.
+            Any: Response data or None if request does not return any data.
         """
 
         url = self.endpoint + parameters
@@ -110,9 +112,12 @@ class TogglEndpoint(ABC):
             response.raise_for_status()
 
         try:
-            data = response.json()
+            data = response if raw else response.json()
         except ValueError:
             return None
+
+        if self.model is None:
+            return data
 
         if isinstance(data, list):
             data = self.process_models(data)

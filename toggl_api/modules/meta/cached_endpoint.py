@@ -59,7 +59,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         )
         self.cache = cache
 
-    def request(  # type: ignore[override]
+    def request(  # type: ignore[override]  # noqa: PLR0913
         self,
         parameters: str,
         headers: Optional[dict] = None,
@@ -67,7 +67,8 @@ class TogglCachedEndpoint(TogglEndpoint):
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
-    ) -> TogglClass | Iterable[TogglClass] | None:
+        raw: bool = False,
+    ) -> Any:
         """Overridden request method with builtin cache.
 
         Args:
@@ -83,7 +84,7 @@ class TogglCachedEndpoint(TogglEndpoint):
                 processed into TogglClass objects.
         """
 
-        data = self.load_cache()
+        data = self.load_cache() if self.model is not None else None
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -98,12 +99,16 @@ class TogglCachedEndpoint(TogglEndpoint):
             method=method,
             headers=headers,
             body=body,
+            raw=raw,
         )
+        if raw:
+            return response
 
         if response is None or method == RequestMethod.DELETE:
             return None
 
-        self.save_cache(response, method)  # type: ignore[arg-type]
+        if self.model is not None:
+            self.save_cache(response, method)  # type: ignore[arg-type]
 
         return response
 
