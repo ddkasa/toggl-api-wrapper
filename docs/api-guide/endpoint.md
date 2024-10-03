@@ -11,7 +11,7 @@
             - process_models
             - endpoint
             - model
-            
+            - api_status
 
 ***
 

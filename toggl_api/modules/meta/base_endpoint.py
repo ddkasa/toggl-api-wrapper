@@ -136,3 +136,13 @@ class TogglEndpoint(ABC):
     @abstractmethod
     def model(self) -> type[TogglClass]:
         return TogglClass
+
+    @staticmethod
+    def api_status() -> bool:
+        """Method for verifying that the Toggl API is up."""
+        try:
+            result = httpx.get("https://api.track.toggl.com/api/v9/status").json()
+        except httpx.HTTPStatusError:
+            return False
+
+        return result.get("status") == "OK"
