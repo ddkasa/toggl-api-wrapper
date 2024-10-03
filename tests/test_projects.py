@@ -7,24 +7,6 @@ from toggl_api.modules.project import ProjectBody, ProjectEndpoint
 from toggl_api.utility import format_iso
 
 
-@pytest.fixture
-def project_body(faker, get_workspace_id):
-    return ProjectBody(
-        workspace_id=get_workspace_id,
-        name=faker.name(),
-        active=True,
-        color=ProjectEndpoint.get_color("red"),
-    )
-
-
-@pytest.fixture
-def create_project(
-    project_object,
-    project_body,
-):
-    return project_object.add(project_body)
-
-
 @pytest.mark.unit
 def test_project_model(get_workspace_id, faker):
     data = {

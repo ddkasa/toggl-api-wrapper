@@ -57,11 +57,12 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         raise AuthenticationError(msg)
 
     config = configparser.ConfigParser()
-    config.read(config_path)
+    config.read(config_path, encoding="utf-8")
 
     if not config.has_section("auth"):
         msg = "No auth section in config file"
         raise AuthenticationError(msg)
+
     try:
         api_token = config.get("auth", "api_token")
         if api_token:

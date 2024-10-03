@@ -14,7 +14,7 @@ from toggl_api.config import generate_authentication
 from toggl_api.modules.client import ClientEndpoint
 from toggl_api.modules.meta import JSONCache, SqliteCache, TogglCachedEndpoint
 from toggl_api.modules.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
-from toggl_api.modules.project import ProjectEndpoint
+from toggl_api.modules.project import ProjectBody, ProjectEndpoint
 from toggl_api.modules.tag import TagEndpoint
 from toggl_api.modules.tracker import TrackerBody, TrackerEndpoint
 from toggl_api.modules.user import UserEndpoint
@@ -214,3 +214,21 @@ def get_test_data(get_workspace_id, faker):
             "tags": [faker.name(), faker.name()],
         },
     ]
+
+
+@pytest.fixture
+def project_body(faker, get_workspace_id):
+    return ProjectBody(
+        workspace_id=get_workspace_id,
+        name=faker.name(),
+        active=True,
+        color=ProjectEndpoint.get_color("red"),
+    )
+
+
+@pytest.fixture
+def create_project(
+    project_object,
+    project_body,
+):
+    return project_object.add(project_body)
