@@ -2,12 +2,15 @@
 
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Generic, Literal, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, Optional, TypeVar
 
 from toggl_api.modules.meta import BaseBody, TogglEndpoint
 from toggl_api.modules.meta.enums import RequestMethod
 from toggl_api.modules.models.models import TogglProject
 from toggl_api.utility import format_iso
+
+if TYPE_CHECKING:
+    from httpx import Response
 
 REPORT_FORMATS = Literal["pdf", "csv"]
 
@@ -248,7 +251,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             method=RequestMethod.POST,
             body=body.format(self.workspace_id),
             raw=True,
-        )
+        ).content
 
     @property
     def endpoint(self) -> str:
@@ -263,8 +266,15 @@ class PaginatedResult(Generic[T]):
     """Generic dataclass for paginated results."""
 
     result: T = field()
-    next_id: int = field()
-    next_row: int = field()
+    next_id: Optional[int] = field(default=None)
+    next_row: Optional[int] = field(default=None)
+
+    def __post_init__(self) -> None:
+        # NOTE: Header types are strings so post init converts to integer.
+        if self.next_id:
+            self.next_id = int(self.next_id)
+        if self.next_row:
+            self.next_row = int(self.next_row)
 
 
 class DetailedReportEndpoint(ReportEndpoint):
@@ -276,6 +286,7 @@ class DetailedReportEndpoint(ReportEndpoint):
     def search_time_entries(
         self,
         body: ReportBody,
+        page_size: int = 50,
         next_id: Optional[int] = None,
         next_row: Optional[int] = None,
     ) -> PaginatedResult:
@@ -285,19 +296,31 @@ class DetailedReportEndpoint(ReportEndpoint):
 
         Args:
             body: JSON body with filters for time entries.
+            page_size: How many results should be returned.
             next_id: Next id of the time entry for pagination.
             next_row: Next row of pagination functionality.
 
         Returns:
             PaginatedResult: data with pagination information if required.
         """
-        data = self.request(
+        formatted_body = body.format(self.workspace_id)
+        formatted_body["page_size"] = page_size
+        if next_id is not None and next_row is not None:
+            formatted_body["first_id"] = next_id
+            formatted_body["first_row_number"] = next_row
+
+        data: Response = self.request(
             "",
-            body=body.format(self.workspace_id),
+            body=formatted_body,
             method=RequestMethod.POST,
+            raw=True,
         )
 
-        return PaginatedResult(data)
+        return PaginatedResult(
+            data.json(),
+            data.headers.get("x-next-id"),
+            data.headers.get("x-next-row-number"),
+        )
 
     def export_report(self, body: ReportBody, extension: REPORT_FORMATS) -> bytes:
         """Downloads detailed report in pdf or csv format.
@@ -317,7 +340,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             body=body.format(self.workspace_id),
             method=RequestMethod.POST,
             raw=True,
-        )
+        ).content
 
     def totals_report(self, body: ReportBody) -> dict[str, int]:
         """Returns totals sums for detailed report.
@@ -329,7 +352,6 @@ class DetailedReportEndpoint(ReportEndpoint):
 
         Returns:
             dict: With the totals relevant to the provided filters.
-
         """
         return self.request(
             "/totals",
@@ -383,7 +405,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             body=body.format(self.workspace_id),
             method=RequestMethod.POST,
             raw=True,
-        )
+        ).content
 
     @property
     def endpoint(self) -> str:
