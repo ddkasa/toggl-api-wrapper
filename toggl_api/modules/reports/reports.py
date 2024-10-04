@@ -2,12 +2,20 @@
 
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Literal, Optional
+from typing import Any, Generic, Literal, Optional, TypeVar
 
 from toggl_api.modules.meta import BaseBody, TogglEndpoint
 from toggl_api.modules.meta.enums import RequestMethod
 from toggl_api.modules.models.models import TogglProject
 from toggl_api.utility import format_iso
+
+REPORT_FORMATS = Literal["pdf", "csv"]
+
+
+def _validate_extension(extension: REPORT_FORMATS) -> None:
+    if extension not in {"pdf", "csv"}:
+        msg = "Extension argument needs to be 'pdf' or 'csv'."
+        raise ValueError(msg)
 
 
 @dataclass
@@ -220,7 +228,7 @@ class SummaryReportEndpoint(ReportEndpoint):
     def export_summary(
         self,
         body: ReportBody,
-        extension: Literal["pdf", "csv"],
+        extension: REPORT_FORMATS,
     ) -> bytes:
         """Downloads summary report in the specified in the specified format: csv or pdf.
 
@@ -233,9 +241,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         Returns:
             object: A format ready to be saved as a file or used for further processing.
         """
-        if extension not in {"pdf", "csv"}:
-            msg = "Extension argument needs to be 'pdf' or 'csv'."
-            raise ValueError(msg)
+        _validate_extension(extension)
 
         return self.request(
             f"summary/time_entries.{extension}",
@@ -247,3 +253,90 @@ class SummaryReportEndpoint(ReportEndpoint):
     @property
     def endpoint(self) -> str:
         return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/"
+
+
+T = TypeVar("T")
+
+
+@dataclass
+class PaginatedResult(Generic[T]):
+    """Generic dataclass for paginated results."""
+
+    result: T = field()
+    next_id: int = field()
+    next_row: int = field()
+
+
+class DetailedReportEndpoint(ReportEndpoint):
+    """Detailed reports endpoint.
+
+    [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports)
+    """
+
+    def search_time_entries(
+        self,
+        body: ReportBody,
+        next_id: Optional[int] = None,
+        next_row: Optional[int] = None,
+    ) -> PaginatedResult:
+        """Returns time entries for detailed report according to the given filters.
+
+        [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
+
+        Args:
+            body: JSON body with filters for time entries.
+            next_id: Next id of the time entry for pagination.
+            next_row: Next row of pagination functionality.
+
+        Returns:
+            PaginatedResult: data with pagination information if required.
+        """
+        data = self.request(
+            "",
+            body=body.format(self.workspace_id),
+            method=RequestMethod.POST,
+        )
+
+        return PaginatedResult(data)
+
+    def export_report(self, body: ReportBody, extension: REPORT_FORMATS) -> bytes:
+        """Downloads detailed report in pdf or csv format.
+
+        [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-export-detailed-report)
+
+        Args:
+            body: JSON body for formatting and filtering the report.
+            extension: Format of the exported report. PDF or CSV.
+
+        Returns:
+            bytes: Report ready to be saved or further processed in python.
+        """
+        _validate_extension(extension)
+        return self.request(
+            f".{extension}",
+            body=body.format(self.workspace_id),
+            method=RequestMethod.POST,
+            raw=True,
+        )
+
+    def totals_report(self, body: ReportBody) -> dict[str, int]:
+        """Returns totals sums for detailed report.
+
+        [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-load-totals-detailed-report)
+
+        Args:
+            body: JSON body for filtering the report.
+
+        Returns:
+            dict: With the totals relevant to the provided filters.
+
+        """
+        return self.request(
+            "/totals",
+            body=body.format(self.workspace_id),
+            method=RequestMethod.POST,
+        )
+
+    @property
+    def endpoint(self) -> str:
+        return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/search/time_entries"
