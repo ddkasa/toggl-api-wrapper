@@ -24,8 +24,7 @@ from toggl_api.modules.workspace import WorkspaceEndpoint
 @pytest.fixture(autouse=True)
 def _rate_limit():
     yield
-    if os.environ.get("GH_ACTION"):
-        time.sleep(1)
+    time.sleep(1)
 
 
 @pytest.fixture(scope="session")

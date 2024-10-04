@@ -1,11 +1,10 @@
 # ruff: noqa: DTZ011
 
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 
 import pytest
 
-from toggl_api import TrackerBody
 from toggl_api.modules.reports.reports import ReportBody, SummaryReportEndpoint
 
 
@@ -14,37 +13,25 @@ def summary_report(get_workspace_id, config_setup):
     return SummaryReportEndpoint(get_workspace_id, config_setup)
 
 
-@pytest.fixture
-def summary_body(get_workspace_id):
-    return ReportBody(get_workspace_id, date.today(), date.today())
-
-
-@pytest.fixture
-def add_multiple_trackers(tracker_object, faker, create_project):
-    for i in range(5, 10):
-        body = TrackerBody(
-            tracker_object.workspace_id,
-            description=faker.name(),
-            project_id=create_project.id,
-            start=datetime.now(tz=timezone.utc).replace(hour=i),
-            stop=datetime.now(tz=timezone.utc).replace(hour=i + 1),
-        )
-        tracker_object.add(body=body)
+@pytest.mark.unit
+def test_verify_summary_endpoint_url(summary_report, get_workspace_id):
+    assert summary_report.workspace_id == get_workspace_id
+    assert summary_report.endpoint.endswith(f"workspace/{get_workspace_id}/")
 
 
 @pytest.mark.unit
-def test_summary_body(summary_body, get_workspace_id):
-    format_body = summary_body.format(get_workspace_id)
+def test_report_body(report_body, get_workspace_id):
+    format_body = report_body.format(get_workspace_id)
 
     assert isinstance(format_body, dict)
     assert format_body["workspace_id"] == get_workspace_id
 
-    summary_body.start_date = date.today()
-    summary_body.end_date = date.today() + timedelta(2)
-    format_body = summary_body.format(random.randint(100000, 999999))
+    report_body.start_date = date.today()
+    report_body.end_date = date.today() + timedelta(2)
+    format_body = report_body.format(random.randint(100000, 999999))
     assert format_body["workspace_id"] == get_workspace_id
-    assert format_body["start_date"] == summary_body.start_date.isoformat()
-    assert format_body["end_date"] == summary_body.end_date.isoformat()
+    assert format_body["start_date"] == report_body.start_date.isoformat()
+    assert format_body["end_date"] == report_body.end_date.isoformat()
 
 
 @pytest.mark.integration
@@ -62,10 +49,10 @@ def test_project_summaries(summary_report, create_project):
 @pytest.mark.integration
 def test_time_entries(
     summary_report: SummaryReportEndpoint,
-    summary_body,
+    report_body,
     add_multiple_trackers,
 ):
-    trackers = summary_report.time_entries(summary_body)
+    trackers = summary_report.time_entries(report_body)
     assert isinstance(trackers, dict)
 
 
@@ -80,7 +67,7 @@ def test_time_entries(
 def test_export_summary(
     extension,
     summary_report: SummaryReportEndpoint,
-    summary_body: ReportBody,
+    report_body: ReportBody,
     add_multiple_trackers,
 ):
-    assert isinstance(summary_report.export_summary(summary_body, extension), bytes)
+    assert isinstance(summary_report.export_summary(report_body, extension), bytes)
