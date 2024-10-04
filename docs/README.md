@@ -6,10 +6,10 @@
 <a href="https://app.codecov.io/gh/ddkasa/toggl-api-wrapper">![Codecov](https://img.shields.io/codecov/c/github/ddkasa/toggl-api-wrapper)</a>
 <a href="https://pypistats.org/packages/toggl-api-wrapper">![PyPI - Downloads](https://img.shields.io/pypi/dm/toggl-api-wrapper)</a>
 
+> Simple Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
+
 > [!WARNING]  
 > _Alpha Stage: Anything might change without notice at any moment._
-
-Simple Python Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
 
 ---
 
