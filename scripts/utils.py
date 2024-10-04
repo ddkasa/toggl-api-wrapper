@@ -26,7 +26,7 @@ def _path_cleanup(cache_path: Path) -> None:
     cache_path.rmdir()
 
 
-def _tracker_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 0) -> None:
+def _tracker_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1) -> None:
     user_object = UserEndpoint(wid, config, cache)
     trackers = user_object.collect(refresh=True)
     endpoint = TrackerEndpoint(wid, config, cache)
@@ -37,7 +37,7 @@ def _tracker_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int 
         time.sleep(delay)
 
 
-def _project_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 0) -> None:
+def _project_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1) -> None:
     endpoint = ProjectEndpoint(wid, config, cache)
     projects = endpoint.collect(refresh=True)
     for project in projects:
@@ -47,7 +47,7 @@ def _project_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int 
         time.sleep(delay)
 
 
-def _client_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 0) -> None:
+def _client_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1) -> None:
     endpoint = ClientEndpoint(wid, config, cache)
     clients = endpoint.collect(refresh=True)
     for client in clients:
@@ -57,7 +57,7 @@ def _client_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int =
         time.sleep(delay)
 
 
-def _tag_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 0) -> None:
+def _tag_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1) -> None:
     endpoint = TagEndpoint(wid, config, cache)
     tags = endpoint.collect(refresh=True)
     for tag in tags:
