@@ -72,10 +72,11 @@ nav:
       - Client: api-guide/client.md
       - Tags: api-guide/tag.md
       - Reports: api-guide/reports.md
-  # - Release Notes: about/release-notes.md
   - About:
-      - Contributing: about/CONTRIBUTING.md
-      - License: about/LICENSE.md
+      - Contributing: CONTRIBUTING.md
+      - License: LICENSE.md
+
+    # - Release Notes: release-notes.md
 
 extra_css:
   - stylesheet/extra.css

@@ -39,8 +39,8 @@ pip install toggl-api-wrapper
 
 ## Development
 
-See [CONTRIBUTING](about/CONTRIBUTING.md).
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## License
 
-MIT. Check [LICENSE](about/LICENSE.md) for more information.
+MIT. Check [LICENSE](LICENSE.md) for more information.
