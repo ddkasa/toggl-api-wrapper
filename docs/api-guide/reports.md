@@ -1,7 +1,26 @@
+> [!NOTE]  
+> Report endpoints are not cached locally.
+
+::: toggl_api.modules.reports.ReportBody
+
+---
+
 ## Summary Reports
 
-::: toggl_api.modules.reports.reports.SummaryBody
+::: toggl_api.modules.reports.ReportEndpoint
 
-::: toggl_api.modules.reports.reports.ReportEndpoint
+::: toggl_api.modules.reports.SummaryReportEndpoint
 
-::: toggl_api.modules.reports.reports.SummaryReportEndpoint
+---
+
+## Detailed Reports
+
+::: toggl_api.modules.reports.reports.PaginatedResult
+
+::: toggl_api.modules.reports.DetailedReportEndpoint
+
+---
+
+## Weekly Reports
+
+::: toggl_api.modules.reports.WeeklyReportEndpoint
