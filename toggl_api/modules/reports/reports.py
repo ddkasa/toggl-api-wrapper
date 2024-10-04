@@ -340,3 +340,51 @@ class DetailedReportEndpoint(ReportEndpoint):
     @property
     def endpoint(self) -> str:
         return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/search/time_entries"
+
+
+class WeeklyReportEndpoint(ReportEndpoint):
+    """Weekly reports endpoint.
+
+    [Official Documentation](https://engineering.toggl.com/docs/reports/weekly_reports)
+    """
+
+    def search_time_entries(self, body: ReportBody) -> list[dict[str, Any]]:
+        """Returns time entries for weekly report according to the given filters.
+
+        [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
+
+        Args:
+            body: JSON body for filtering time entries.
+
+        Returns:
+            list: A List of time entries filted by the formatted body.
+        """
+        return self.request(
+            "",
+            body=body.format(self.workspace_id),
+            method=RequestMethod.POST,
+        )
+
+    def export_report(self, body: ReportBody, extension: REPORT_FORMATS) -> bytes:
+        """Downloads weekly report in pdf or csv format.
+
+        [Official Documentation](https://engineering.toggl.com/docs/reports/weekly_reports#post-export-weekly-report)
+
+        Args:
+            body: JSON body for filtering time entries.
+            extension: extension: Format of the exported report. PDF or CSV.
+
+        Returns:
+            bytes: Report ready to be saved or further processed in python.
+        """
+        _validate_extension(extension)
+        return self.request(
+            f".{extension}",
+            body=body.format(self.workspace_id),
+            method=RequestMethod.POST,
+            raw=True,
+        )
+
+    @property
+    def endpoint(self) -> str:
+        return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/weekly/time_entries"
