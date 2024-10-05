@@ -1,7 +1,9 @@
+from dataclasses import dataclass, field
+
 import httpx
 import pytest
 
-from toggl_api.modules.meta import RequestMethod
+from toggl_api.modules.meta import BaseBody, RequestMethod
 from toggl_api.modules.meta.base_endpoint import TogglEndpoint
 from toggl_api.modules.models import TogglTracker
 
@@ -50,3 +52,32 @@ def test_process_models(meta_object, get_test_data, meta_object_sqlite):
     assert all(isinstance(model, meta_object.model) for model in models)
     assert meta_object_sqlite.process_models(get_test_data) == models
     assert all(isinstance(model, meta_object_sqlite.model) for model in models)
+
+
+@dataclass()
+class BodyTest(BaseBody):
+    parameter: str = field(metadata={"endpoints": frozenset(("generic_endpoint",))})
+
+    def format(self, endpoint: str, **kwargs) -> dict:
+        return kwargs
+
+
+@pytest.mark.parametrize(
+    ("parameter", "endpoint", "expected"),
+    [
+        ("parameter", "generic_endpoint", True),
+        pytest.param(
+            "random_parameter",
+            "wdwad",
+            False,
+            marks=pytest.mark.xfail(
+                reason="Raises ValueError if parameter is not found.",
+                raises=ValueError,
+            ),
+        ),
+        ("parameter", "generic_endpoint_two", False),
+    ],
+)
+@pytest.mark.unit
+def test_base_body(parameter, endpoint, expected):
+    assert BodyTest.verify_endpoint_parameter(parameter, endpoint) is expected
