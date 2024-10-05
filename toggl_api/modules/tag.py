@@ -20,7 +20,11 @@ class TagEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglTag]:
-        warnings.warn("Deprecated in favour of 'collect' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'collect' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.collect(refresh=refresh)
 
     def add(self, name: str) -> TogglTag:
@@ -33,7 +37,11 @@ class TagEndpoint(TogglCachedEndpoint):
         )  # type: ignore[return-value]
 
     def create_tag(self, name: str) -> TogglTag:
-        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'add' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.add(name)
 
     def edit(
@@ -49,12 +57,20 @@ class TagEndpoint(TogglCachedEndpoint):
         )  # type: ignore[return-value]
 
     def update_tag(self, tag: TogglTag) -> TogglTag:
-        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'edit' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.edit(tag)
 
     def delete(self, tag: TogglTag | int) -> None:
         """Deletes a tag based on its ID."""
-        self.request(f"/{tag if isinstance(tag, int) else tag.id}", method=RequestMethod.DELETE, refresh=True)
+        self.request(
+            f"/{tag if isinstance(tag, int) else tag.id}",
+            method=RequestMethod.DELETE,
+            refresh=True,
+        )
 
         if isinstance(tag, int):
             tag = self.cache.find_entry({"id": tag})  # type: ignore[assignment]
@@ -65,7 +81,11 @@ class TagEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def delete_tag(self, tag: TogglTag | int) -> None:
-        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'delete' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.delete(tag)
 
     @property

@@ -16,21 +16,18 @@ class ClientBody(BaseBody):
     status: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
 
-    def format(self, workspace_id: int) -> dict[str, int | str]:
+    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
 
         Args:
-            workspace_id (int): Alternate Workspace ID for the request
-                if the body does not contain a workspace_id.
+            endpoint: API endpoint for filtering purposes.
+            body: Any additonal body content that the endpoint request requires.
 
         Returns:
             dict: JSON compatible formatted body.
         """
-        body: dict[str, Any] = {
-            "wid": self.workspace_id or workspace_id,
-        }
 
         if self.name:
             body["name"] = self.name
@@ -38,11 +35,16 @@ class ClientBody(BaseBody):
             body["status"] = self.status
         if self.notes:
             body["notes"] = self.notes
+
         return body
 
     def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn("Deprecated in favour of 'format' method.", DeprecationWarning, stacklevel=1)
-        return self.format(workspace_id)
+        warnings.warn(
+            "Deprecated in favour of 'format' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return self.format("endpoint", wid=workspace_id)
 
 
 class ClientEndpoint(TogglCachedEndpoint):
@@ -55,13 +57,17 @@ class ClientEndpoint(TogglCachedEndpoint):
 
         return self.request(
             "",
-            body=body.format(self.workspace_id),
+            body=body.format("add", wid=self.workspace_id),
             method=RequestMethod.POST,
             refresh=True,
         )  # type: ignore[return-value]
 
     def create_client(self, body: ClientBody) -> TogglClient | None:
-        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'add' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.add(body)
 
     def get(
@@ -101,7 +107,11 @@ class ClientEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglClient | None:
-        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'add' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.get(client_id, refresh=refresh)
 
     def edit(
@@ -114,7 +124,7 @@ class ClientEndpoint(TogglCachedEndpoint):
             client = client.id
         return self.request(
             f"/{client}",
-            body=body.format(self.workspace_id),
+            body=body.format("edit", wid=self.workspace_id),
             method=RequestMethod.PUT,
             refresh=True,
         )  # type: ignore[return-value]
@@ -124,7 +134,11 @@ class ClientEndpoint(TogglCachedEndpoint):
         client: TogglClient | int,
         body: ClientBody,
     ) -> TogglClient | None:
-        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'edit' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.edit(client, body)
 
     def delete(self, client: TogglClient | int) -> None:
@@ -143,7 +157,11 @@ class ClientEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def delete_client(self, client: TogglClient | int) -> None:
-        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'delete' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.delete(client)
 
     def collect(
@@ -174,7 +192,11 @@ class ClientEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglClient]:
-        warnings.warn("Deprecated in favour of 'collect' method", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'collect' method",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.collect(status, name, refresh=refresh)
 
     @property

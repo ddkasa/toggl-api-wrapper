@@ -34,44 +34,51 @@ class ProjectBody(BaseBody):
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    def format(self, workspace_id: int) -> dict[str, Any]:
+    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
 
         Args:
-            workspace_id (int): Alternate Workspace ID for the request
-                if the body does not contain a workspace_id.
+            endpoint: Name of the endpoint for filtering purposes.
+            body: Additional arguments for the body.
 
         Returns:
             dict[str, Any]: JSON compatible formatted body.
         """
-        headers: dict[str, Any] = {
-            "workspace_id": self.workspace_id or workspace_id,
-            "active": self.active,
-            "is_private": self.is_private,
-        }
+        body.update(
+            {
+                "active": self.active,
+                "is_private": self.is_private,
+            },
+        )
 
         if self.client_id:
-            headers["client_id"] = self.client_id
+            body["client_id"] = self.client_id
         elif self.client_name:
-            headers["client_name"] = self.client_name
+            body["client_name"] = self.client_name
+
         if self.color:
             color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
-            headers["color"] = color
+            body["color"] = color
+
         if self.start_date:
-            headers["start_date"] = format_iso(self.start_date)
+            body["start_date"] = format_iso(self.start_date)
             if self.end_date and self.end_date > self.start_date:
-                headers["end_date"] = format_iso(self.end_date)
+                body["end_date"] = format_iso(self.end_date)
 
         if self.name:
-            headers["name"] = self.name
+            body["name"] = self.name
 
-        return headers
+        return body
 
     def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn("Deprecated in favour of 'format' method.", DeprecationWarning, stacklevel=1)
-        return self.format(workspace_id)
+        warnings.warn(
+            "Deprecated in favour of 'format' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return self.format("endpoint", workspace_id=workspace_id)
 
 
 class ProjectEndpoint(TogglCachedEndpoint):
@@ -105,7 +112,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglProject]:
-        warnings.warn("Deprecated in favour of 'collect' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'collect' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.collect(refresh=refresh)
 
     def get(
@@ -137,7 +148,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglProject | None:
-        warnings.warn("Deprecated in favour of 'get' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'get' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.get(project_id, refresh=refresh)
 
     def delete(self, project: TogglProject | int) -> None:
@@ -157,7 +172,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def delete_project(self, project: TogglProject | int) -> None:
-        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'delete' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.delete(project)
 
     def edit(
@@ -171,7 +190,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         return self.request(
             f"/{project}",
             method=RequestMethod.PUT,
-            body=body.format(self.workspace_id),
+            body=body.format("edit", workspace_id=self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 
@@ -180,7 +199,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         project: TogglProject | int,
         body: ProjectBody,
     ) -> TogglProject | None:
-        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'edit' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.edit(project, body)
 
     def add(
@@ -191,10 +214,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         if body.name is None:
             msg = "Name must be set in order to create a project!"
             raise ValueError(msg)
+
         return self.request(
             "",
             method=RequestMethod.POST,
-            body=body.format(self.workspace_id),
+            body=body.format("add", workspace_id=self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 
@@ -202,7 +226,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self,
         body: ProjectBody,
     ) -> TogglProject | None:
-        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'add' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.add(body)
 
     @classmethod

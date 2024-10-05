@@ -15,7 +15,6 @@ def add_multiple_trackers(tracker_object, faker, create_project):
     for i in range(5, 10):
         time.sleep(1)
         body = TrackerBody(
-            tracker_object.workspace_id,
             description=faker.name(),
             project_id=create_project.id,
             start=datetime.now(tz=timezone.utc).replace(hour=i),

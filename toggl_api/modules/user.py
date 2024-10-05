@@ -24,7 +24,11 @@ class UserEndpoint(TogglCachedEndpoint):
         return response if isinstance(response, TogglTracker) else None
 
     def current_tracker(self, *, refresh: bool = True) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'current' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'current' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.current(refresh=refresh)
 
     def collect(
@@ -75,8 +79,18 @@ class UserEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> list[TogglTracker]:
-        warnings.warn("Deprecated in favour of 'collect' method.", DeprecationWarning, stacklevel=1)
-        return self.collect(since, before, start_date, end_date, refresh=refresh)
+        warnings.warn(
+            "Deprecated in favour of 'collect' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return self.collect(
+            since,
+            before,
+            start_date,
+            end_date,
+            refresh=refresh,
+        )
 
     def get(
         self,
@@ -119,7 +133,11 @@ class UserEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'get' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'get' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.get(tracker_id, refresh=refresh)
 
     def check_authentication(self) -> bool:

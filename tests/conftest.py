@@ -90,7 +90,6 @@ def tracker_object_sqlite(
 @pytest.fixture
 def add_tracker(tracker_object, faker):
     body = TrackerBody(
-        tracker_object.workspace_id,
         description=faker.name(),
         start=datetime.now(tz=timezone.utc),
     )
@@ -218,7 +217,6 @@ def get_test_data(get_workspace_id, faker):
 @pytest.fixture
 def project_body(faker, get_workspace_id):
     return ProjectBody(
-        workspace_id=get_workspace_id,
         name=faker.name(),
         active=True,
         color=ProjectEndpoint.get_color("red"),

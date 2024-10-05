@@ -33,54 +33,61 @@ class TrackerBody(BaseBody):
     shared_with_user_ids: list[int] = field(default_factory=list)
     created_with: str = field(default="toggl-api-wrapper")
 
-    def format(self, workspace_id: int) -> dict[str, Any]:
+    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
 
         Args:
-            workspace_id (int): Alternate Workspace ID for the request if the
-                body does not contain a workspace_id.
+            endpoint: The endpoints name for filtering purposes.
+            body: Additional body arguments that the endpoint requires.
 
         Returns:
             dict: JSON compatible formatted body.
         """
-        headers = {
-            "workspace_id": self.workspace_id or workspace_id,
-            "created_with": self.created_with,
-            "description": self.description,
-        }
+
+        body.update(
+            {
+                "created_with": self.created_with,
+                "description": self.description,
+            },
+        )
 
         if self.duration:
             dur = self.duration.total_seconds() if isinstance(self.duration, timedelta) else self.duration
-            headers["duration"] = dur
+            body["duration"] = dur
         elif not self.stop and self.start:
-            headers["duration"] = -1
+            body["duration"] = -1
 
         if self.project_id:
-            headers["project_id"] = self.project_id
+            body["project_id"] = self.project_id
 
         if self.start:
-            headers["start"] = format_iso(self.start)
+            body["start"] = format_iso(self.start)
         elif self.start_date:
-            headers["start_date"] = format_iso(self.start_date)
+            body["start_date"] = format_iso(self.start_date)
 
         if self.stop:
-            headers["stop"] = format_iso(self.stop)
+            body["stop"] = format_iso(self.stop)
 
         if self.tag_ids:
-            headers["tag_ids"] = self.tag_ids
+            body["tag_ids"] = self.tag_ids
 
         if self.tags:
-            headers["tags"] = self.tags
+            body["tags"] = self.tags
 
         if self.tag_action:
-            headers["tag_action"] = self.tag_action
-        return headers
+            body["tag_action"] = self.tag_action
+
+        return body
 
     def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn("Deprecated in favour of 'format' method.", DeprecationWarning, stacklevel=1)
-        return self.format(workspace_id)
+        warnings.warn(
+            "Deprecated in favour of 'format' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return self.format("endpoint", workspace_id=workspace_id)
 
 
 class TrackerEndpoint(TogglCachedEndpoint):
@@ -101,7 +108,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         data = self.request(
             f"/{tracker}",
             method=RequestMethod.PUT,
-            body=body.format(self.workspace_id),
+            body=body.format("edit", workspace_id=self.workspace_id),
             refresh=True,
         )
         if not isinstance(data, self.model):
@@ -146,7 +153,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
         self.cache.commit()
 
     def delete_tracker(self, tracker: TogglTracker | int) -> None:
-        warnings.warn("Deprecated in favour of 'delete' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'delete' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.delete(tracker)
 
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:
@@ -173,7 +184,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return None
 
     def stop_tracker(self, tracker: TogglTracker | int) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'stop' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'stop' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.stop(tracker)
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
@@ -205,12 +220,16 @@ class TrackerEndpoint(TogglCachedEndpoint):
         return self.request(
             "",
             method=RequestMethod.POST,
-            body=body.format(self.workspace_id),
+            body=body.format("add", workspace_id=self.workspace_id),
             refresh=True,
         )  # type: ignore[return-value]
 
     def add_tracker(self, body: TrackerBody) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'add' method.", DeprecationWarning, stacklevel=1)
+        warnings.warn(
+            "Deprecated in favour of 'add' method.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
         return self.add(body)
 
     @property

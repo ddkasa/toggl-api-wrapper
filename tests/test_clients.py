@@ -5,7 +5,7 @@ from toggl_api import ClientBody, TogglClient
 
 @pytest.fixture
 def create_client_body(get_workspace_id, faker):
-    return ClientBody(name=faker.name(), workspace_id=get_workspace_id)
+    return ClientBody(name=faker.name())
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def test_client_body(create_client_body, faker):
     assert isinstance(create_client_body, ClientBody)
     create_client_body.status = faker.name()
     create_client_body.notes = faker.name()
-    data = create_client_body.format(create_client_body.workspace_id)
+    data = create_client_body.format("endpoint", workspace_id=create_client_body.workspace_id)
 
     assert data["status"] == create_client_body.status
     assert data["notes"] == create_client_body.notes
