@@ -1,6 +1,5 @@
 # ruff: noqa: DTZ011
 
-import random
 from datetime import date, timedelta
 
 import pytest
@@ -21,16 +20,16 @@ def test_verify_summary_endpoint_url(summary_report, get_workspace_id):
 
 @pytest.mark.unit
 def test_report_body(report_body, get_workspace_id):
-    format_body = report_body.format(get_workspace_id)
-
+    format_body = report_body.format("endpoint")
     assert isinstance(format_body, dict)
-    assert format_body["workspace_id"] == get_workspace_id
-
     report_body.start_date = date.today()
     report_body.end_date = date.today() + timedelta(2)
-    format_body = report_body.format(random.randint(100000, 999999))
-    assert format_body["workspace_id"] == get_workspace_id
+    format_body = report_body.format("endpoint")
+
+    assert isinstance(format_body["start_date"], str)
     assert format_body["start_date"] == report_body.start_date.isoformat()
+
+    assert isinstance(format_body["end_date"], str)
     assert format_body["end_date"] == report_body.end_date.isoformat()
 
 

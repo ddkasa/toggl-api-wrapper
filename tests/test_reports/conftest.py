@@ -30,4 +30,4 @@ def add_multiple_trackers(tracker_object, faker, create_project):
 
 @pytest.fixture
 def report_body(get_workspace_id):
-    return ReportBody(get_workspace_id, date.today(), date.today())
+    return ReportBody(date.today(), date.today())

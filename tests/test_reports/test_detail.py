@@ -1,7 +1,7 @@
 import pytest
 
 from toggl_api.modules.reports import DetailedReportEndpoint
-from toggl_api.modules.reports.reports import PaginatedResult
+from toggl_api.modules.reports.reports import PaginatedResult, PaginationOptions
 
 
 @pytest.fixture
@@ -29,21 +29,29 @@ def test_verify_detail_summary_url(get_workspace_id, detail_summary_endpoint):
 
 @pytest.mark.integration
 def test_search_time(detail_summary_endpoint, add_multiple_trackers, report_body):
-    assert isinstance(detail_summary_endpoint.search_time_entries(report_body), PaginatedResult)
+    assert isinstance(
+        detail_summary_endpoint.search_time_entries(
+            report_body,
+            PaginationOptions(),
+        ),
+        PaginatedResult,
+    )
 
 
 @pytest.mark.integration
-def test_search_time_pagination(detail_summary_endpoint, add_multiple_trackers, report_body):
-    result = detail_summary_endpoint.search_time_entries(report_body, page_size=1)
+def test_search_time_pagination(
+    detail_summary_endpoint,
+    add_multiple_trackers,
+    report_body,
+):
+    result = detail_summary_endpoint.search_time_entries(report_body, PaginationOptions(1))
     assert isinstance(result, PaginatedResult)
     assert isinstance(result.next_id, int)
     assert isinstance(result.next_row, int)
     for _ in range(3):
         result = detail_summary_endpoint.search_time_entries(
             report_body,
-            page_size=1,
-            next_id=result.next_id,
-            next_row=result.next_row,
+            result.next_options(1),
         )
         assert isinstance(result, PaginatedResult)
         if result.next_id is None or result.next_row is None:
@@ -66,4 +74,6 @@ def test_totals_report(detail_summary_endpoint, add_multiple_trackers, report_bo
 )
 @pytest.mark.integration
 def test_export_report(extension, detail_summary_endpoint, report_body, add_multiple_trackers):
-    assert isinstance(detail_summary_endpoint.export_report(report_body, extension), bytes)
+    summ = detail_summary_endpoint.export_report(report_body, extension, PaginationOptions())
+    assert isinstance(summ, PaginatedResult)
+    assert isinstance(summ.result, bytes)
