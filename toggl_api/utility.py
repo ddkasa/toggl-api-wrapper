@@ -21,7 +21,7 @@ def format_iso(date_obj: datetime | date | str) -> str:
         return date_obj
     if isinstance(date_obj, date):
         return date_obj.isoformat()
-    return date.isoformat(timespec="seconds")
+    return date_obj.isoformat(timespec="seconds")
 
 
 def parse_iso(date_obj: str | datetime | date) -> datetime | date:
