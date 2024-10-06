@@ -73,10 +73,9 @@ nav:
       - Tags: api-guide/tag.md
       - Reports: api-guide/reports.md
   - About:
+      - Changelog: CHANGELOG.md
       - Contributing: CONTRIBUTING.md
       - License: LICENSE.md
-
-    # - Release Notes: release-notes.md
 
 extra_css:
   - stylesheet/extra.css
