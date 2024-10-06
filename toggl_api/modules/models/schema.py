@@ -1,6 +1,7 @@
 import contextlib
+import warnings
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 import sqlalchemy as db
 from sqlalchemy.engine import Engine
@@ -30,6 +31,14 @@ class UTCDateTime(TypeDecorator):
     impl = DateTime(timezone=True)
     cache_ok = True
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        warnings.warn(
+            "SQLAlchemy will become an optional dependency in v1.0.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
     def process_bind_param(  # type: ignore[override]
         self,
         value: datetime,
@@ -55,6 +64,12 @@ class UTCDateTime(TypeDecorator):
 
 
 def register_tables(engine: Engine) -> db.MetaData:
+    warnings.warn(
+        "SQLAlchemy will become an optional dependency in v1.0.0",
+        DeprecationWarning,
+        stacklevel=1,
+    )
+
     metadata = db.MetaData()
 
     workspace = db.Table(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import atexit
+import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -57,6 +58,12 @@ class SqliteCache(TogglCache):
 
         self.session = Session(self.database)
         atexit.register(self.session.close)
+
+        warnings.warn(
+            "SQLAlchemy will become an optional dependency in v1.0.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     def commit(self) -> None:
         self.session.commit()
