@@ -11,6 +11,8 @@ classDiagram
   }
   class base_endpoint {
   }
+  class body {
+  }
   class cache {
   }
   class base_cache {
@@ -30,6 +32,10 @@ classDiagram
   class schema {
   }
   class project {
+  }
+  class reports {
+  }
+  class reports {
   }
   class tag {
   }
@@ -57,6 +63,7 @@ classDiagram
   client --> meta
   client --> models
   meta --> base_endpoint
+  meta --> body
   meta --> cache
   meta --> cached_endpoint
   meta --> enums
@@ -81,6 +88,11 @@ classDiagram
   project --> meta
   project --> models
   project --> utility
+  reports --> reports
+  reports --> meta
+  reports --> enums
+  reports --> models
+  reports --> utility
   tag --> meta
   tag --> models
   tracker --> meta
