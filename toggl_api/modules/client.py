@@ -16,6 +16,14 @@ class ClientBody(BaseBody):
     status: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
 
+    def __post_init__(self) -> None:
+        if self.workspace_id is not None:
+            warnings.warn(
+                "The 'workspace_id' parameter will be be removed in v1.0.0",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
 

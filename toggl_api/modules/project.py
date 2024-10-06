@@ -34,6 +34,14 @@ class ProjectBody(BaseBody):
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
 
+    def __post_init__(self) -> None:
+        if self.workspace_id is not None:
+            warnings.warn(
+                "The 'workspace_id' parameter will be be removed in v1.0.0",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
 
