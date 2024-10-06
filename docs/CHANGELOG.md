@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### ⚙️ Miscellaneous Tasks
+
+- *(actions)* Fix release workflow
+
+## [0.5.0] - 2024-10-06
+
 ### 🚀 Features
 
 - *(endpoint)* Api status endpoint
