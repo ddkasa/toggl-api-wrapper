@@ -1,9 +1,9 @@
-::: toggl_api.modules.project.ProjectBody
+::: toggl_api.ProjectBody
     options:
         members:
             - format
 
-::: toggl_api.modules.project.ProjectEndpoint
+::: toggl_api.ProjectEndpoint
     options:
         members:
             - collect

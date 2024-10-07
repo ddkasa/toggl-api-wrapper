@@ -6,6 +6,8 @@ from .models import TogglWorkspace
 
 
 class WorkspaceEndpoint(TogglCachedEndpoint):
+    """Specific endpoints for retrieving workspaces."""
+
     def get(
         self,
         workspace: Optional[TogglWorkspace | int] = None,

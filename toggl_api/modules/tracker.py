@@ -99,6 +99,11 @@ class TrackerBody(BaseBody):
 
 
 class TrackerEndpoint(TogglCachedEndpoint):
+    """Endpoint for modifying and creating trackers.
+
+    See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
+    """
+
     TRACKER_ALREADY_STOPPED: Final[int] = 409
 
     def edit(

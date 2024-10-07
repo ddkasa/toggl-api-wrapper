@@ -56,6 +56,8 @@ class ClientBody(BaseBody):
 
 
 class ClientEndpoint(TogglCachedEndpoint):
+    """Specific endpoints for retrieving and modifying clients."""
+
     def add(self, body: ClientBody) -> TogglClient | None:
         """Create a Client based on parameters set in the provided body."""
 

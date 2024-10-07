@@ -1,6 +1,6 @@
-::: toggl_api.modules.client.ClientBody
+::: toggl_api.ClientBody
 
-::: toggl_api.modules.client.ClientEndpoint
+::: toggl_api.ClientEndpoint
     options:
         members:
             - add

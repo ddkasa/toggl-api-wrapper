@@ -7,6 +7,8 @@ from .models import TogglTag
 
 
 class TagEndpoint(TogglCachedEndpoint):
+    """Specific endpoints for retrieving and modifying tags."""
+
     def collect(
         self,
         *,

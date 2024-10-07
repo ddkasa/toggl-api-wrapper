@@ -1,4 +1,4 @@
-::: toggl_api.modules.tag.TagEndpoint
+::: toggl_api.TagEndpoint
     options:
         members:
             - collect

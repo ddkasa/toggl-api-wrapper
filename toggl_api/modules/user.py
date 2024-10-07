@@ -9,6 +9,11 @@ from .models import TogglTracker
 
 
 class UserEndpoint(TogglCachedEndpoint):
+    """Endpoint for retrieving and fetching trackers with GET requests.
+
+    See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.
+    """
+
     TRACKER_NOT_RUNNING: Final[int] = 405
 
     def current(self, *, refresh: bool = True) -> TogglTracker | None:

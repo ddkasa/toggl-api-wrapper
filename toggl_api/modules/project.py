@@ -90,6 +90,8 @@ class ProjectBody(BaseBody):
 
 
 class ProjectEndpoint(TogglCachedEndpoint):
+    """Specific endpoints for retrieving and modifying projects."""
+
     BASIC_COLORS: Final[dict[str, str]] = {
         "blue": "#0b83d9",
         "violet": "#9e5bd9",

@@ -1,9 +1,9 @@
-::: toggl_api.modules.tracker.TrackerBody
+::: toggl_api.TrackerBody
     options:
         members:
             - format
 
-::: toggl_api.modules.tracker.TrackerEndpoint 
+::: toggl_api.TrackerEndpoint 
     options:
         members:
             - edit
@@ -11,7 +11,7 @@
             - stop
             - add
 
-::: toggl_api.modules.user.UserEndpoint
+::: toggl_api.UserEndpoint
     options:
         show_source: true
         members:

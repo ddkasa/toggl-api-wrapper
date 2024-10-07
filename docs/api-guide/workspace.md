@@ -1,4 +1,4 @@
-::: toggl_api.modules.workspace.WorkspaceEndpoint
+::: toggl_api.WorkspaceEndpoint
     options:
         members:
             - get
