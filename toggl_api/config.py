@@ -56,7 +56,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         msg = f"Config file not found: {config_path}"
         raise AuthenticationError(msg)
 
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     config.read(config_path, encoding="utf-8")
 
     if not config.has_section("auth"):

@@ -31,7 +31,7 @@ def test_use_togglrc(tmp_path, faker):
     file_path = tmp_path / ".togglrc"
     file_path.touch()
 
-    config = ConfigParser()
+    config = ConfigParser(interpolation=None)
     config.write(file_path)
 
     with pytest.raises(AuthenticationError):
