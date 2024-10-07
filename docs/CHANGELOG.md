@@ -2,11 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.5.1] - 2024-10-07
+
+### 🐛 Bug Fixes
+
+- *(config)* Removed interpolation
+
+### 📚 Documentation
+
+- Update contributing
+- *(endpoints)* Improve docstrings
 
 ### ⚙️ Miscellaneous Tasks
 
 - *(actions)* Fix release workflow
+- *(precommit)* Add gh action validator to pre commit
+- *(precommit)* Upgrade ruff
 
 ## [0.5.0] - 2024-10-06
 
