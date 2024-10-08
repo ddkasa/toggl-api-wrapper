@@ -24,11 +24,11 @@ def test_client_model(get_workspace_id):
 
 
 @pytest.mark.unit
-def test_client_body(create_client_body, faker):
+def test_client_body(create_client_body, faker, get_workspace_id):
     assert isinstance(create_client_body, ClientBody)
     create_client_body.status = faker.name()
     create_client_body.notes = faker.name()
-    data = create_client_body.format("endpoint", workspace_id=create_client_body.workspace_id)
+    data = create_client_body.format("endpoint", workspace_id=get_workspace_id)
 
     assert data["status"] == create_client_body.status
     assert data["notes"] == create_client_body.notes

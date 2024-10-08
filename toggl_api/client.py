@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -10,19 +9,10 @@ from .models import TogglClient
 class ClientBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    workspace_id: Optional[int] = field(default=None)
     name: Optional[str] = field(default=None)
     """Name of the client. Defaults to None. Will be required if its a POST request."""
     status: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
-
-    def __post_init__(self) -> None:
-        if self.workspace_id is not None:
-            warnings.warn(
-                "The 'workspace_id' parameter will be be removed in v1.0.0",
-                DeprecationWarning,
-                stacklevel=2,
-            )
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.

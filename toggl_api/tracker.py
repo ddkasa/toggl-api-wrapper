@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Final, Literal, Optional
@@ -16,7 +15,6 @@ from toggl_api.utility import format_iso
 class TrackerBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    workspace_id: Optional[int] = field(default=None)
     description: Optional[str] = field(default=None)
     duration: Optional[int | timedelta] = field(default=None)
     """Duration set in a timedelta or in seconds if using an integer."""
@@ -32,14 +30,6 @@ class TrackerBody(BaseBody):
     tags: list[str] = field(default_factory=list)
     shared_with_user_ids: list[int] = field(default_factory=list)
     created_with: str = field(default="toggl-api-wrapper")
-
-    def __post_init__(self) -> None:
-        if self.workspace_id is not None:
-            warnings.warn(
-                "The 'workspace_id' parameter will be be removed in v1.0.0",
-                DeprecationWarning,
-                stacklevel=2,
-            )
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.

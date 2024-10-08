@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Final, Optional
@@ -13,7 +12,6 @@ from .models import TogglProject
 class ProjectBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    workspace_id: Optional[int] = field(default=None)
     name: Optional[str] = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
 
@@ -33,14 +31,6 @@ class ProjectBody(BaseBody):
     end_date: Optional[datetime | date] = field(default=None)
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
-
-    def __post_init__(self) -> None:
-        if self.workspace_id is not None:
-            warnings.warn(
-                "The 'workspace_id' parameter will be be removed in v1.0.0",
-                DeprecationWarning,
-                stacklevel=2,
-            )
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
