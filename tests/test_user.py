@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from toggl_api import TogglTracker
@@ -17,6 +18,28 @@ def test_current_tracker(user_object, add_tracker, tracker_object):
     assert current.name == add_tracker.name
     assert current.id == add_tracker.id
     assert current.start == add_tracker.start
+
+    tracker_object.stop(add_tracker)
+    assert user_object.current() is None
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("status_code"),
+    [
+        405,
+        pytest.param(
+            440,
+            marks=pytest.mark.xfail(
+                raises=httpx.HTTPStatusError,
+                reason="Anything that is not a 200 or 405 code should raise a HTTPStatusError.",
+            ),
+        ),
+    ],
+)
+def test_current_tracker_not_running(status_code, user_object, httpx_mock):
+    httpx_mock.add_response(status_code=status_code)
+    assert user_object.current(refresh=True) is None
 
 
 @pytest.mark.integration
