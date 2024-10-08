@@ -8,34 +8,31 @@
 
 > Simple Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
 
-> [!WARNING]  
-> _Alpha Stage: Anything might change without notice at any moment._
-
 ---
 
 ## Installation
 
-### Poetry
-
-```
-poetry add toggl-api-wrapper
-```
-
-### Pip
+Install with pip:
 
 ```
 pip install toggl-api-wrapper
 ```
 
+Or if using SQLite cache:
+
+```
+pip install "toggl-api-wrapper[sqlite]"
+```
+
 ## Usage
 
-- Currently supports interacting with Trackers, Projects, Clients & Tags and some extras.
+- Currently supports interacting with Trackers, Projects, Clients, Tags, Reports and some extras.
 - Designed to be rudimentary to allow simple development of custom commands.
 
 ## Documentation
 
 - [API Documentation](https://ddkasa.github.io/toggl-api-wrapper/api-guide/)
-- [User Guide](https://ddkasa.github.io/toggl-api-wrapper/user-guide/)
+- [User Guide](https://ddkasa.github.io/toggl-api-wrapper/index.html)
 
 ## Development
 
