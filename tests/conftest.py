@@ -12,7 +12,8 @@ from httpx import BasicAuth
 from scripts.utils import cleanup
 from toggl_api.client import ClientEndpoint
 from toggl_api.config import generate_authentication
-from toggl_api.meta import JSONCache, SqliteCache, TogglCachedEndpoint
+from toggl_api.meta import JSONCache, TogglCachedEndpoint
+from toggl_api.meta.cache.sqlite_cache import SqliteCache
 from toggl_api.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.project import ProjectBody, ProjectEndpoint
 from toggl_api.tag import TagEndpoint

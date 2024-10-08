@@ -1,14 +1,20 @@
+# ruff: noqa: E402
+
 from __future__ import annotations
 
 import atexit
-import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Optional
 
-import sqlalchemy as db
-from sqlalchemy.orm import Query, Session
+try:
+    import sqlalchemy as db
+    from sqlalchemy.orm import Query, Session
+except ImportError:
+    pass
 
-from toggl_api.models import TogglClass, register_tables
+from toggl_api.models import TogglClass
+from toggl_api.models.schema import register_tables
+from toggl_api.utility import requires
 
 from .base_cache import TogglCache
 
@@ -19,6 +25,7 @@ if TYPE_CHECKING:
     from toggl_api.meta import RequestMethod, TogglCachedEndpoint
 
 
+@requires("sqlalchemy")
 class SqliteCache(TogglCache):
     """Class for caching data to a Sqlite database.
 
@@ -58,12 +65,6 @@ class SqliteCache(TogglCache):
 
         self.session = Session(self.database)
         atexit.register(self.session.close)
-
-        warnings.warn(
-            "SQLAlchemy will become an optional dependency in v1.0.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
 
     def commit(self) -> None:
         self.session.commit()

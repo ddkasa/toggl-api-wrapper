@@ -5,17 +5,19 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
-import sqlalchemy as db
+import sqlalchemy
 from sqlalchemy.orm import Session
 
-from toggl_api.meta import RequestMethod, SqliteCache
-from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
+from toggl_api.meta import RequestMethod
+from toggl_api.meta.cache.sqlite_cache import SqliteCache
+from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace
+from toggl_api.models.schema import register_tables
 
 
 @pytest.fixture
 def db_conn(tmp_path):
     cache_path = tmp_path / "cache.sqlite"
-    engine = db.create_engine(f"sqlite:///{cache_path}")
+    engine = sqlalchemy.create_engine(f"sqlite:///{cache_path}")
     conn = engine.connect()
     yield engine
     conn.close()
@@ -33,9 +35,18 @@ def test_cache_int_arg():
 
 
 @pytest.mark.unit
-def test_schema(setup_schema):
-    tables = {"workspace", "client", "project", "tag", "tracker"}
-    assert all(table in setup_schema.tables for table in tables)
+@pytest.mark.parametrize(
+    "table",
+    [
+        "workspace",
+        "client",
+        "project",
+        "tag",
+        "tracker",
+    ],
+)
+def test_schema(table, setup_schema):
+    assert table in setup_schema.tables
 
 
 @pytest.mark.unit
