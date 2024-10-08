@@ -75,6 +75,11 @@ def test_get_project(create_project, project_object):
     assert check_project.name == create_project.name
     assert check_project.color == create_project.color
 
+    check_project = project_object.get(create_project)
+    assert isinstance(check_project, TogglProject)
+    assert check_project.name == create_project.name
+    assert check_project.color == create_project.color
+
 
 @pytest.mark.integration
 def test_edit_project(project_object, create_project, faker, project_body):
@@ -88,3 +93,17 @@ def test_edit_project(project_object, create_project, faker, project_body):
     assert isinstance(project, TogglProject)
     assert project.name == project_body.name
     assert project.color == project_body.color
+
+
+@pytest.mark.integration
+def test_delete_project_id(create_project, project_object):
+    assert isinstance(create_project, TogglProject)
+    project_object.delete(create_project.id)
+    assert project_object.get(create_project.id) is None
+
+
+@pytest.mark.integration
+def test_delete_project_model(create_project, project_object):
+    assert isinstance(create_project, TogglProject)
+    project_object.delete(create_project)
+    assert project_object.get(create_project) is None
