@@ -3,9 +3,7 @@ from datetime import timedelta
 
 import pytest
 
-from toggl_api import TrackerBody
-from toggl_api.modules.models import TogglTracker
-from toggl_api.modules.models.models import TogglTag
+from toggl_api import TogglTag, TogglTracker, TrackerBody
 
 
 @pytest.mark.unit

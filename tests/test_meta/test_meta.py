@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 import httpx
 import pytest
 
-from toggl_api.modules.meta import BaseBody, RequestMethod
-from toggl_api.modules.meta.base_endpoint import TogglEndpoint
-from toggl_api.modules.models import TogglTracker
+from toggl_api.meta import BaseBody, RequestMethod
+from toggl_api.meta.base_endpoint import TogglEndpoint
+from toggl_api.models import TogglTracker
 
 
 @pytest.mark.integration

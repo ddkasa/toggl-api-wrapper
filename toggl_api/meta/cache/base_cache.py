@@ -4,14 +4,14 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, Final, Optional
 
-from toggl_api.modules.meta.enums import RequestMethod
+from toggl_api.meta.enums import RequestMethod
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from pathlib import Path
 
-    from toggl_api.modules.meta import TogglCachedEndpoint
-    from toggl_api.modules.models import TogglClass
+    from toggl_api.meta import TogglCachedEndpoint
+    from toggl_api.models import TogglClass
 
 
 class TogglCache(ABC):

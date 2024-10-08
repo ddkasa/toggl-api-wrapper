@@ -8,8 +8,8 @@ import pytest
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from toggl_api.modules.meta import RequestMethod, SqliteCache
-from toggl_api.modules.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
+from toggl_api.meta import RequestMethod, SqliteCache
+from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
 
 
 @pytest.fixture

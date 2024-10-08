@@ -6,9 +6,9 @@ from typing import Any, Generic, Literal, Optional, TypeVar
 
 from httpx import Response
 
-from toggl_api.modules.meta import BaseBody, TogglEndpoint
-from toggl_api.modules.meta.enums import RequestMethod
-from toggl_api.modules.models.models import TogglProject
+from toggl_api.meta import BaseBody, TogglEndpoint
+from toggl_api.meta.enums import RequestMethod
+from toggl_api.models.models import TogglProject
 from toggl_api.utility import format_iso
 
 REPORT_FORMATS = Literal["pdf", "csv"]

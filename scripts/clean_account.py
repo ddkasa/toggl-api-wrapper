@@ -11,7 +11,7 @@ from toggl_api import (
     generate_authentication,
 )
 from toggl_api.config import AuthenticationError
-from toggl_api.modules.meta.cache.json_cache import JSONCache
+from toggl_api.meta.cache.json_cache import JSONCache
 
 from .utils import _client_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
 

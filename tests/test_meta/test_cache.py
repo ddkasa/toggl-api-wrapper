@@ -6,29 +6,29 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import EndPointTest
-from toggl_api.modules.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
+from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_path(meta_object):
     assert isinstance(meta_object.cache.cache_path, Path)
     assert meta_object.cache.cache_path.parent.exists()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
     assert get_sqlite_cache.parent is None
     endpoint = EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_json_int_arg():
     cache = JSONCache(Path("cache"), 20)
     assert cache.expire_after.seconds == 20  # noqa: PLR2004
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_functionality_json(meta_object, model_data):
     model_data = model_data["tracker"]
     if meta_object.cache.cache_path.exists():
@@ -38,14 +38,14 @@ def test_cache_functionality_json(meta_object, model_data):
     meta_object.cache.cache_path.unlink()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_expire_after_setter(meta_object):
     assert meta_object.cache.expire_after == timedelta(days=1)
     meta_object.cache.expire_after = timedelta(days=3600)
     assert meta_object.cache.expire_after == timedelta(days=3600)
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_expiration_json(meta_object, model_data):
     model_data.pop("model")
     data = list(model_data.values())
@@ -57,7 +57,7 @@ def test_expiration_json(meta_object, model_data):
     assert not meta_object.load_cache()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_encoder_json(model_data, tmp_path):
     model_data.pop("model")
     cache_file = tmp_path / "encoder.json"
@@ -67,7 +67,7 @@ def test_encoder_json(model_data, tmp_path):
         assert json.load(f, cls=CustomDecoder) == model_data
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_max_length(model_data, get_json_cache):
     get_json_cache.session.data = []
     assert get_json_cache.session.max_length == 10000  # noqa: PLR2004
@@ -84,7 +84,7 @@ def test_max_length(model_data, get_json_cache):
     assert len(get_json_cache.load_cache()) == 10  # noqa: PLR2004
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_query(model_data, tracker_object, faker):
     tracker_object.cache.session.max_length = 20
     tracker_object.cache.session.data = []

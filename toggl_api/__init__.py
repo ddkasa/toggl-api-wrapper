@@ -1,25 +1,19 @@
+from .client import ClientBody, ClientEndpoint
 from .config import generate_authentication
-from .modules import (
-    ClientBody,
-    ClientEndpoint,
-    JSONCache,
-    ProjectBody,
-    ProjectEndpoint,
-    SqliteCache,
-    TagEndpoint,
-    TrackerBody,
-    TrackerEndpoint,
-    UserEndpoint,
-    WorkspaceEndpoint,
-)
-from .modules.models import (
+from .meta import JSONCache
+from .models import (
     TogglClient,
     TogglProject,
     TogglTag,
     TogglTracker,
     TogglWorkspace,
 )
+from .project import ProjectBody, ProjectEndpoint
+from .tag import TagEndpoint
+from .tracker import TrackerBody, TrackerEndpoint
+from .user import UserEndpoint
 from .version import version
+from .workspace import WorkspaceEndpoint
 
 __author__ = "David Kasakaitis"
 __version__ = version
@@ -32,7 +26,6 @@ __all__ = [
     "JSONCache",
     "ProjectBody",
     "ProjectEndpoint",
-    "SqliteCache",
     "TagEndpoint",
     "TogglClient",
     "TogglProject",

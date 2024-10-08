@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from toggl_api.modules.reports.reports import ReportBody, SummaryReportEndpoint
+from toggl_api.reports import ReportBody, SummaryReportEndpoint
 
 
 @pytest.fixture

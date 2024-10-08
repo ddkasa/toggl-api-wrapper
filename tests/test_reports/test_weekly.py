@@ -1,7 +1,7 @@
 import pytest
 from httpx import HTTPStatusError
 
-from toggl_api.modules.reports import WeeklyReportEndpoint
+from toggl_api.reports import WeeklyReportEndpoint
 
 
 @pytest.fixture

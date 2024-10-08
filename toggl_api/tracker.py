@@ -7,8 +7,8 @@ from typing import Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError
 
-from toggl_api.modules.meta import BaseBody, RequestMethod, TogglCachedEndpoint
-from toggl_api.modules.models import TogglTracker
+from toggl_api.meta import BaseBody, RequestMethod, TogglCachedEndpoint
+from toggl_api.models import TogglTracker
 from toggl_api.utility import format_iso
 
 

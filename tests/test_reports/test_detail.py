@@ -1,7 +1,7 @@
 import pytest
 
-from toggl_api.modules.reports import DetailedReportEndpoint
-from toggl_api.modules.reports.reports import PaginatedResult, PaginationOptions
+from toggl_api.reports import DetailedReportEndpoint
+from toggl_api.reports.reports import PaginatedResult, PaginationOptions
 
 
 @pytest.fixture

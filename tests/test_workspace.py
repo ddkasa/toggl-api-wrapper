@@ -1,6 +1,6 @@
 import pytest
 
-from toggl_api.modules.models import TogglWorkspace
+from toggl_api.models import TogglWorkspace
 
 
 @pytest.mark.unit

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Optional
 
-from toggl_api.modules.models import (
+from toggl_api.models import (
     TogglClass,
     TogglClient,
     TogglProject,
@@ -25,8 +25,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from toggl_api.modules.meta import RequestMethod
-    from toggl_api.modules.meta.cached_endpoint import TogglCachedEndpoint
+    from toggl_api.meta import RequestMethod
+    from toggl_api.meta.cached_endpoint import TogglCachedEndpoint
 
 
 @dataclass

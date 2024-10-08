@@ -2,8 +2,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from toggl_api.modules.models import TogglProject
-from toggl_api.modules.project import ProjectBody, ProjectEndpoint
+from toggl_api.models import TogglProject
+from toggl_api.project import ProjectBody, ProjectEndpoint
 from toggl_api.utility import format_iso
 
 

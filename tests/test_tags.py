@@ -1,6 +1,6 @@
 import pytest
 
-from toggl_api.modules.models import TogglTag
+from toggl_api import TogglTag
 
 
 @pytest.fixture

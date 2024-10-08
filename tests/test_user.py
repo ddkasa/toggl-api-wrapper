@@ -1,6 +1,6 @@
 import pytest
 
-from toggl_api.modules.models.models import TogglTracker
+from toggl_api import TogglTracker
 
 
 @pytest.mark.order("first")

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Optional
 import sqlalchemy as db
 from sqlalchemy.orm import Query, Session
 
-from toggl_api.modules.models import TogglClass, register_tables
+from toggl_api.models import TogglClass, register_tables
 
 from .base_cache import TogglCache
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from toggl_api.modules.meta import RequestMethod, TogglCachedEndpoint
+    from toggl_api.meta import RequestMethod, TogglCachedEndpoint
 
 
 class SqliteCache(TogglCache):

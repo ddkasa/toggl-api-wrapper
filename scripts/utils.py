@@ -7,14 +7,14 @@ from pathlib import Path
 
 from httpx import BasicAuth, HTTPError
 
+from toggl_api.client import ClientEndpoint
 from toggl_api.config import generate_authentication
-from toggl_api.modules.client import ClientEndpoint
-from toggl_api.modules.meta import JSONCache
-from toggl_api.modules.meta.cache import TogglCache
-from toggl_api.modules.project import ProjectEndpoint
-from toggl_api.modules.tag import TagEndpoint
-from toggl_api.modules.tracker import TrackerEndpoint
-from toggl_api.modules.user import UserEndpoint
+from toggl_api.meta import JSONCache
+from toggl_api.meta.cache import TogglCache
+from toggl_api.project import ProjectEndpoint
+from toggl_api.tag import TagEndpoint
+from toggl_api.tracker import TrackerEndpoint
+from toggl_api.user import UserEndpoint
 
 
 def _path_cleanup(cache_path: Path) -> None:

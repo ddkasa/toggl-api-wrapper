@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
 
-from toggl_api.modules.models.models import TogglClass
+from toggl_api.models import TogglClass
 
 from .enums import RequestMethod
 
