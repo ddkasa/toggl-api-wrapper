@@ -89,14 +89,6 @@ class TrackerBody(BaseBody):
 
         return body
 
-    def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn(
-            "Deprecated in favour of 'format' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.format("endpoint", workspace_id=workspace_id)
-
 
 class TrackerEndpoint(TogglCachedEndpoint):
     """Endpoint for modifying and creating trackers.
@@ -129,14 +121,6 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         return data
 
-    def edit_tracker(
-        self,
-        tracker: TogglTracker | int,
-        body: TrackerBody,
-    ) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
-        return self.edit(tracker, body)
-
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
 
@@ -165,14 +149,6 @@ class TrackerEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(tracker)
         self.cache.commit()
 
-    def delete_tracker(self, tracker: TogglTracker | int) -> None:
-        warnings.warn(
-            "Deprecated in favour of 'delete' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.delete(tracker)
-
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:
         """Stops a running tracker.
 
@@ -186,7 +162,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
         try:
-            return self.request(  # type: ignore[return-value]
+            return self.request(
                 f"/{tracker}/stop",
                 method=RequestMethod.PATCH,
                 refresh=True,
@@ -195,14 +171,6 @@ class TrackerEndpoint(TogglCachedEndpoint):
             if err.response.status_code != self.TRACKER_ALREADY_STOPPED:
                 raise
         return None
-
-    def stop_tracker(self, tracker: TogglTracker | int) -> TogglTracker | None:
-        warnings.warn(
-            "Deprecated in favour of 'stop' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.stop(tracker)
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
         """Add a new tracker.
@@ -235,15 +203,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
             method=RequestMethod.POST,
             body=body.format("add", workspace_id=self.workspace_id),
             refresh=True,
-        )  # type: ignore[return-value]
-
-    def add_tracker(self, body: TrackerBody) -> TogglTracker | None:
-        warnings.warn(
-            "Deprecated in favour of 'add' method.",
-            DeprecationWarning,
-            stacklevel=1,
         )
-        return self.add(body)
 
     @property
     def endpoint(self) -> str:

@@ -80,14 +80,6 @@ class ProjectBody(BaseBody):
 
         return body
 
-    def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn(
-            "Deprecated in favour of 'format' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.format("endpoint", workspace_id=workspace_id)
-
 
 class ProjectEndpoint(TogglCachedEndpoint):
     """Specific endpoints for retrieving and modifying projects."""
@@ -115,19 +107,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
     ) -> list[TogglProject]:
         """Returns all cached or remote projects."""
-        return self.request("", refresh=refresh)  # type: ignore[return-value]
-
-    def get_projects(
-        self,
-        *,
-        refresh: bool = False,
-    ) -> list[TogglProject]:
-        warnings.warn(
-            "Deprecated in favour of 'collect' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.collect(refresh=refresh)
+        return self.request("", refresh=refresh)
 
     def get(
         self,
@@ -150,20 +130,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             refresh=refresh,
         )
 
-        return response or None  # type: ignore[return-value]
-
-    def get_project(
-        self,
-        project_id: int | TogglProject,
-        *,
-        refresh: bool = False,
-    ) -> TogglProject | None:
-        warnings.warn(
-            "Deprecated in favour of 'get' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.get(project_id, refresh=refresh)
+        return response or None
 
     def delete(self, project: TogglProject | int) -> None:
         """Deletes a project based on its id."""
@@ -181,14 +148,6 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(project)
         self.cache.commit()
 
-    def delete_project(self, project: TogglProject | int) -> None:
-        warnings.warn(
-            "Deprecated in favour of 'delete' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.delete(project)
-
     def edit(
         self,
         project: TogglProject | int,
@@ -202,19 +161,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             method=RequestMethod.PUT,
             body=body.format("edit", workspace_id=self.workspace_id),
             refresh=True,
-        )  # type: ignore[return-value]
-
-    def edit_project(
-        self,
-        project: TogglProject | int,
-        body: ProjectBody,
-    ) -> TogglProject | None:
-        warnings.warn(
-            "Deprecated in favour of 'edit' method.",
-            DeprecationWarning,
-            stacklevel=1,
         )
-        return self.edit(project, body)
 
     def add(
         self,
@@ -230,18 +177,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             method=RequestMethod.POST,
             body=body.format("add", workspace_id=self.workspace_id),
             refresh=True,
-        )  # type: ignore[return-value]
-
-    def add_project(
-        self,
-        body: ProjectBody,
-    ) -> TogglProject | None:
-        warnings.warn(
-            "Deprecated in favour of 'add' method.",
-            DeprecationWarning,
-            stacklevel=1,
         )
-        return self.add(body)
 
     @classmethod
     def get_color(cls, color: str) -> str:

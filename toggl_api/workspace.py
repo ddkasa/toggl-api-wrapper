@@ -1,4 +1,3 @@
-import warnings
 from typing import Optional
 
 from .meta import TogglCachedEndpoint
@@ -21,21 +20,12 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             workspace = workspace.id
 
         if not refresh:
-            tracker = self.cache.find_entry({"id": workspace})
-            if isinstance(tracker, TogglWorkspace):
-                return tracker
+            workspace = self.cache.find_entry({"id": workspace})
+            if isinstance(workspace, TogglWorkspace):
+                return workspace
             refresh = True
 
-        return self.request("", refresh=refresh)  # type: ignore[return-value]
-
-    def get_workspace(
-        self,
-        workspace: Optional[TogglWorkspace | int] = None,
-        *,
-        refresh: bool = False,
-    ) -> TogglWorkspace | None:
-        warnings.warn("Deprecated in favour 'get' method.", DeprecationWarning, stacklevel=1)
-        return self.get(workspace, refresh=refresh)
+        return self.request("", refresh=refresh)
 
     @property
     def model(self) -> type[TogglWorkspace]:
