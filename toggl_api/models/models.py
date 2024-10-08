@@ -109,7 +109,7 @@ class TogglProject(WorkspaceChild):
 
     Attributes:
         color: Color of the project. Defaults to blue. Refer to
-            [ProjectEndpoint][toggl_api.modules.project.ProjectEndpoint] for
+            [ProjectEndpoint][toggl_api.ProjectEndpoint] for
             all colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.

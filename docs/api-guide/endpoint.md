@@ -1,8 +1,8 @@
-::: toggl_api.modules.meta.enums.RequestMethod
+::: toggl_api.meta.enums.RequestMethod
 
 ***
 
-::: toggl_api.modules.meta.base_endpoint.TogglEndpoint
+::: toggl_api.meta.base_endpoint.TogglEndpoint
     options:
         show_source: true
         members:
@@ -15,7 +15,7 @@
 
 ***
 
-::: toggl_api.modules.meta.cached_endpoint.TogglCachedEndpoint
+::: toggl_api.meta.cached_endpoint.TogglCachedEndpoint
     options:
         show_source: true
         members:

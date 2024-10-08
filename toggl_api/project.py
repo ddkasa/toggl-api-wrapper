@@ -90,12 +90,9 @@ class ProjectEndpoint(TogglCachedEndpoint):
         "red": "#d92b2b",
         "gray": "#d80435",
     }
+    """Basic colors available for projects in order."""
 
-    def collect(
-        self,
-        *,
-        refresh: bool = False,
-    ) -> list[TogglProject]:
+    def collect(self, *, refresh: bool = False) -> list[TogglProject]:
         """Returns all cached or remote projects."""
         return self.request("", refresh=refresh)
 
@@ -171,10 +168,12 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
     @classmethod
     def get_color(cls, color: str) -> str:
+        """Get a color by name. Defaults to gray."""
         return cls.BASIC_COLORS.get(color, "#d80435")
 
     @classmethod
     def get_color_id(cls, color: str) -> int:
+        """Get a color id by name."""
         colors = list(cls.BASIC_COLORS.values())
         return colors.index(color)
 

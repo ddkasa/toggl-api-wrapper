@@ -1,19 +1,19 @@
 ### Abstract Classes
 
-::: toggl_api.modules.models.TogglClass
+::: toggl_api.models.TogglClass
 
-::: toggl_api.modules.models.WorkspaceChild
+::: toggl_api.models.WorkspaceChild
 
 ---
 
 ### Main Models
 
-::: toggl_api.modules.models.TogglWorkspace
+::: toggl_api.TogglWorkspace
 
-::: toggl_api.modules.models.TogglClient
+::: toggl_api.TogglClient
 
-::: toggl_api.modules.models.TogglProject
+::: toggl_api.TogglProject
 
-::: toggl_api.modules.models.TogglTracker
+::: toggl_api.TogglTracker
 
-::: toggl_api.modules.models.TogglTag
+::: toggl_api.TogglTag

@@ -1,18 +1,20 @@
-
 ## General Cache Flow
+
 ```mermaid
 {% include "static/mermaid/cache.mmd" %}
 ```
 
+::: toggl_api.meta.cache.TogglCache
 
-::: toggl_api.modules.meta.cache.TogglCache
+---
 
-***
+> [!INFO]
+> Make sure to install sqlalchemy if using SqliteCache with `pip install toggl-api-wrapper[sqlite]`
 
-::: toggl_api.modules.meta.cache.SqliteCache
+::: toggl_api.meta.cache.sqlite_cache.SqliteCache
 
-***
+---
 
-::: toggl_api.modules.meta.cache.json_cache.JSONSession
+::: toggl_api.meta.cache.json_cache.JSONSession
 
-::: toggl_api.modules.meta.cache.JSONCache
+::: toggl_api.JSONCache
