@@ -30,7 +30,7 @@ class TogglEndpoint(ABC):
 
     OK_RESPONSE: Final[int] = 200
     NOT_FOUND: Final[int] = 404
-    SERVER_ERROR: Final[int] = 5
+    SERVER_ERROR: Final[int] = 500
 
     BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -65,7 +65,7 @@ class TogglEndpoint(ABC):
         }
         return match_dict.get(method, self.__client.get)
 
-    def request(
+    def request(  # noqa: PLR0913
         self,
         parameters: str,
         headers: Optional[dict] = None,
@@ -73,6 +73,7 @@ class TogglEndpoint(ABC):
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
+        retries: int = 3,
     ) -> Any:
         """Main request method which handles putting together the final API
         request.
@@ -86,6 +87,7 @@ class TogglEndpoint(ABC):
                 Defaults to None. Only used with none-GET or DELETE requests.
             method (RequestMethod): Request method to select. Defaults to GET.
             raw (bool): Whether to use the raw data. Defaults to False.
+            retries (int): For recursive calls if the server fails multiple times.
 
         Returns:
             Any: Response data or None if request does not return any data.
@@ -103,11 +105,25 @@ class TogglEndpoint(ABC):
             # TODO: Toggl API return code lookup.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
-            if response.status_code % 100 == self.SERVER_ERROR:
+
+            if response.status_code >= self.SERVER_ERROR and retries:
                 delay = random.randint(1, 5)
-                log.error("Status code is a server error. Retrying request in %s seconds", delay)
+                log.error(
+                    "Status code %s is a server error. Retrying request in %s seconds",
+                    response.status_code,
+                    delay,
+                )
+                # NOTE: According to https://engineering.toggl.com/docs/#generic-responses
                 time.sleep(delay)
-                return self.request(parameters, headers, body, method)
+                return TogglEndpoint.request(
+                    self,
+                    parameters,
+                    headers,
+                    body,
+                    method,
+                    raw=raw,
+                    retries=retries - 1,
+                )
 
             response.raise_for_status()
 
