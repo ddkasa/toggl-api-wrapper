@@ -15,7 +15,6 @@ endpoint = ProjectEndpoint(workspace_id, auth, cache)
 
 color = ProjectEndpoint.get_color("red")
 body = ProjectBody(
-    workspace_id,
     "My First Project",
     client_name="My First Client",
     color=color,
