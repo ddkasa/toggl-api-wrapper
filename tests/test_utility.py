@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 
@@ -9,6 +9,8 @@ from toggl_api.utility import format_iso, get_workspace, parse_iso, requires
 def test_format_iso():
     iso = format_iso(datetime.now(tz=timezone.utc))
     assert isinstance(iso, str)
+    assert isinstance(format_iso(iso), str)
+    assert isinstance(format_iso(date.today()), str)  # noqa: DTZ011
 
 
 @pytest.mark.unit

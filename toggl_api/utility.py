@@ -40,9 +40,9 @@ def get_workspace(data: dict) -> int:
 def format_iso(date_obj: datetime | date | str) -> str:
     if isinstance(date_obj, str):
         return date_obj
-    if isinstance(date_obj, date):
-        return date_obj.isoformat()
-    return date_obj.isoformat(timespec="seconds")
+    if isinstance(date_obj, datetime):
+        return date_obj.isoformat(timespec="seconds")
+    return date_obj.isoformat()
 
 
 def parse_iso(date_obj: str | datetime | date) -> datetime | date:
