@@ -39,6 +39,17 @@ def test_tracker_creation(add_tracker):
     assert isinstance(add_tracker, TogglTracker)
 
 
+@pytest.mark.unit
+def test_tracker_creation_description(tracker_object):
+    body = TrackerBody()
+    with pytest.raises(TypeError):
+        tracker_object.add(body)
+
+    body.description = ""
+    with pytest.raises(TypeError):
+        tracker_object.add(body)
+
+
 @pytest.mark.integration
 def test_tracker_editing(tracker_object, add_tracker, faker):
     new_description = TrackerBody(description=faker.name())

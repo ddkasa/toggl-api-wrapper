@@ -177,9 +177,9 @@ class TrackerEndpoint(TogglCachedEndpoint):
         Returns:
             TogglTracker | None: The tracker that was created.
         """
-        if not isinstance(body.description, str):
+        if not isinstance(body.description, str) or not body.description:
             msg = "Description must be set in order to create a tracker!"
-            raise ValueError(msg)  # noqa: TRY004
+            raise TypeError(msg)
 
         if body.start is None and body.start_date is None:
             body.start = datetime.now(tz=timezone.utc)
