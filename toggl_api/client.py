@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Literal, Optional, get_args
 
 from httpx import HTTPStatusError
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
+
+CLIENT_STATUS = Literal["active", "archived", "both"]
 
 
 @dataclass
@@ -13,7 +15,8 @@ class ClientBody(BaseBody):
 
     name: Optional[str] = field(default=None)
     """Name of the client. Defaults to None. Will be required if its a POST request."""
-    status: Optional[str] = field(default=None)
+    status: Optional[CLIENT_STATUS] = field(default=None)
+    """Status of the client. API defaults to active. Premium Feature."""
     notes: Optional[str] = field(default=None)
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
@@ -24,14 +27,15 @@ class ClientBody(BaseBody):
         Args:
             endpoint: API endpoint for filtering purposes.
             body: Any additonal body content that the endpoint request requires.
+                If passing workspace id to client endpoints use 'wid' instead.
 
         Returns:
             dict: JSON compatible formatted body.
         """
 
-        if self.name:
+        if isinstance(self.name, str):
             body["name"] = self.name
-        if self.status:
+        if self.status in get_args(CLIENT_STATUS):
             body["status"] = self.status
         if self.notes:
             body["notes"] = self.notes
@@ -116,32 +120,27 @@ class ClientEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
         if isinstance(client, int):
-            client = self.cache.find_entry({"id": client})  # type: ignore[assignment]
-            if not isinstance(client, TogglClient):
+            clt = self.cache.find_entry({"id": client})
+            if not isinstance(clt, TogglClient):
                 return
+            client = clt
 
         self.cache.delete_entries(client)
         self.cache.commit()
 
-    def collect(
-        self,
-        status: Optional[str] = None,
-        name: Optional[str] = None,
-        *,
-        refresh: bool = False,
-    ) -> list[TogglClient]:
-        """Request all Clients based on status and name if specified."""
+    def collect(self, body: Optional[ClientBody] = None, *, refresh: bool = False) -> list[TogglClient]:
+        """Request all Clients based on status and name if specified in the body."""
         url = ""
-        if status:
-            url += f"?{status}"
-        if name:
-            if status:
+        if body and body.status:
+            url += f"?{body.status}"
+        if body and body.name:
+            if body.status:
                 url += "&"
             else:
                 url += "?"
-            url += f"{name}"
+            url += f"{body.name}"
 
-        response = self.request(url)
+        response = self.request(url, method=RequestMethod.GET)
         return response if isinstance(response, list) else []
 
     @property
