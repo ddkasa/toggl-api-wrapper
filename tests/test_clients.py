@@ -24,14 +24,24 @@ def test_client_model(get_workspace_id):
 
 
 @pytest.mark.unit
-def test_client_body(create_client_body, faker, get_workspace_id):
-    assert isinstance(create_client_body, ClientBody)
-    create_client_body.status = faker.name()
-    create_client_body.notes = faker.name()
-    data = create_client_body.format("endpoint", workspace_id=get_workspace_id)
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        ("active", "active"),
+        ("archived", "archived"),
+        ("both", "both"),
+        ("Random", None),
+    ],
+)
+def test_client_body(status, expected, faker, get_workspace_id):
+    body = ClientBody(faker.name(), status, faker.sentence())
+    assert isinstance(body, ClientBody)
+    data = body.format("endpoint", wid=get_workspace_id)
 
-    assert data["status"] == create_client_body.status
-    assert data["notes"] == create_client_body.notes
+    assert data["wid"] == get_workspace_id
+    assert data["name"] == body.name
+    assert data.get("status") == expected
+    assert data["notes"] == body.notes
 
 
 @pytest.mark.unit
@@ -43,7 +53,7 @@ def test_client_name(client_object, create_client_body, monkeypatch):
 
 @pytest.mark.integration
 @pytest.mark.order(after="test_client_model")
-def test_gets(client_object, get_workspace_id, create_client):
+def test_client_collect(client_object, get_workspace_id, create_client):
     clients = client_object.collect(refresh=False)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)
@@ -53,8 +63,8 @@ def test_gets(client_object, get_workspace_id, create_client):
 
 
 @pytest.mark.integration
-@pytest.mark.order(after="test_gets")
-def test_get(client_object, get_workspace_id, create_client):
+@pytest.mark.order(after="test_client_collect")
+def test_client_get(client_object, get_workspace_id, create_client):
     client = client_object.get(create_client)
     assert isinstance(client, TogglClient)
     assert client.id == create_client.id
