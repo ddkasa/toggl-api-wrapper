@@ -2,11 +2,38 @@ import pytest
 from httpx import HTTPStatusError
 
 from toggl_api.reports import WeeklyReportEndpoint
+from toggl_api.reports.reports import _validate_extension  # noqa: PLC2701
 
 
 @pytest.fixture
 def weekly_report_endpoint(get_workspace_id, config_setup):
     return WeeklyReportEndpoint(get_workspace_id, config_setup)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("extension"),
+    [
+        ("pdf"),
+        ("csv"),
+        pytest.param(
+            "xlsx",
+            marks=pytest.mark.xfail(
+                reason="Excel format is a premium feature.",
+                raises=ValueError,
+            ),
+        ),
+        pytest.param(
+            "tsv",
+            marks=pytest.mark.xfail(
+                reason="TSV not supported by the API.",
+                raises=ValueError,
+            ),
+        ),
+    ],
+)
+def test_validate_extension(extension):
+    assert _validate_extension(extension) is None
 
 
 @pytest.mark.unit
