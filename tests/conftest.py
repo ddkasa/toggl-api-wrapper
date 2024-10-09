@@ -24,9 +24,10 @@ from toggl_api.workspace import WorkspaceEndpoint
 
 
 @pytest.fixture(autouse=True)
-def _rate_limit():
+def _rate_limit(request):
     yield
-    time.sleep(1)
+    if "integration" in request.keywords:
+        time.sleep(1)
 
 
 @pytest.fixture(scope="session")
