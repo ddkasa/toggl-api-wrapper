@@ -22,7 +22,7 @@ class TogglCache(ABC):
 
     Methods:
         commit: Commits the cache to disk, database or other form.
-            Basically method for finalising the cache. Abstract.
+            Method for finalising the cache. Abstract.
         load_cache: Loads the cache from disk, database or other form. Abstract.
         save_cache: Saves and preforms action depending on request type. Abstract.
         find_entry: Looks for a TogglClass in the cache. Abstract.
@@ -35,12 +35,12 @@ class TogglCache(ABC):
         query: Queries the cache for various varibles. Abstract.
 
     Attributes:
-        _cache_path: Path to the cache file. Will generate the folder if it
+        cache_path: Path to the cache file. Will generate the folder if it
             does not exist.
-        _expire_after: Time after which the cache should be refreshed.
+        expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None its ignored.
-        _parent: Parent TogglCachedEndpoint
+        parent: Parent TogglCachedEndpoint
     """
 
     __slots__ = ("_cache_path", "_expire_after", "_parent")
@@ -58,45 +58,35 @@ class TogglCache(ABC):
         self._parent = parent
 
     @abstractmethod
-    def commit(self) -> None:
-        pass
+    def commit(self) -> None: ...
 
     @abstractmethod
-    def load_cache(self) -> Iterable[TogglClass]:
-        pass
+    def load_cache(self) -> Iterable[TogglClass]: ...
 
     @abstractmethod
     def save_cache(
         self,
         entry: list[TogglClass] | TogglClass,
         method: RequestMethod,
-    ) -> None:
-        pass
+    ) -> None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TogglClass | dict) -> Optional[TogglClass]:
-        pass
+    def find_entry(self, entry: TogglClass | dict) -> Optional[TogglClass]: ...
 
     @abstractmethod
     def add_entries(
         self,
         update: list[TogglClass],
-    ) -> None:
-        pass
+    ) -> None: ...
 
     @abstractmethod
     def update_entries(
         self,
         update: list[TogglClass] | TogglClass,
-    ) -> None:
-        pass
+    ) -> None: ...
 
     @abstractmethod
-    def delete_entries(
-        self,
-        update: list[TogglClass] | TogglClass,
-    ) -> None:
-        pass
+    def delete_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
 
     @abstractmethod
     def query(
@@ -105,8 +95,7 @@ class TogglCache(ABC):
         inverse: bool = False,
         distinct: bool = False,
         **query: dict[str, Any],
-    ) -> Iterable[TogglClass]:
-        pass
+    ) -> Iterable[TogglClass]: ...
 
     @property
     @abstractmethod
