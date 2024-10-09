@@ -93,6 +93,15 @@ def test_add_entries_sqlite(meta_object_sqlite, model_data):
 
 
 @pytest.mark.unit
+def test_add_entries_sqlite_parent(meta_object_sqlite, model_data):
+    tracker = model_data["tracker"]
+    meta_object_sqlite.cache.add_entries(tracker)
+    meta_object_sqlite.cache.parent = None
+    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+        assert tracker in meta_object_sqlite.cache.load_cache()
+
+
+@pytest.mark.unit
 @pytest.mark.order(after="test_add_entries_sqlite")
 def test_update_entries_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
@@ -116,8 +125,14 @@ def test_find_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     tracker.id += random.randint(50, 100_000)
     meta_object_sqlite.cache.add_entries(tracker)
-
     assert tracker == meta_object_sqlite.cache.find_entry(tracker)
+
+
+@pytest.mark.unit
+def test_find_sqlite_parent(meta_object_sqlite):
+    meta_object_sqlite.cache.parent = None
+    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+        meta_object_sqlite.cache.find_entry({"id": 5})
 
 
 @pytest.mark.unit
@@ -137,6 +152,13 @@ def test_query_sqlite(tracker_object_sqlite, model_data, faker):
     tracker_object_sqlite.cache.commit()
     assert tracker_object_sqlite.load_cache().count() == 11  # noqa: PLR2004
     assert tracker_object_sqlite.query(name=tracker.name)[0] == tracker
+
+
+@pytest.mark.unit
+def test_query_sqlite_parent(meta_object_sqlite):
+    meta_object_sqlite.cache.parent = None
+    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+        meta_object_sqlite.cache.find_entry({"id": 5})
 
 
 @pytest.mark.unit
@@ -174,3 +196,10 @@ def test_tracker_cache(
 
     data = user_object_sqlite.get(tracker_id, refresh=True)
     assert TogglTracker.from_kwargs(**tracker) == data
+
+
+@pytest.mark.unit
+def test_sqlite_save(tmp_path, get_workspace_id):
+    cache = SqliteCache(Path(tmp_path))
+
+    assert cache.save_cache(TogglTag(0, "awdad", None, get_workspace_id), object()) is None
