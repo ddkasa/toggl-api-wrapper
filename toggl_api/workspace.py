@@ -20,12 +20,12 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             workspace = workspace.id
 
         if not refresh:
-            workspace = self.cache.find_entry({"id": workspace})
-            if isinstance(workspace, TogglWorkspace):
-                return workspace
+            wspace = self.cache.find_entry({"id": workspace})
+            if isinstance(wspace, TogglWorkspace):
+                return wspace
             refresh = True
 
-        return self.request("", refresh=refresh)
+        return self.request(f"{workspace}", refresh=refresh)
 
     @property
     def model(self) -> type[TogglWorkspace]:
@@ -33,4 +33,4 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return f"workspaces/{self.workspace_id}"
+        return "workspaces/"
