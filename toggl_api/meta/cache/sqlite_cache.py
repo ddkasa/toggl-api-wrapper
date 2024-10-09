@@ -81,7 +81,7 @@ class SqliteCache(TogglCache):
 
     def load_cache(self) -> Query[TogglClass]:
         if self.parent is None:
-            msg = "Cannot load cache without parent!"
+            msg = "Cannot load cache without parent set!"
             raise ValueError(msg)
         query = self.session.query(self.parent.model)
         if self.expire_after is not None:
@@ -118,9 +118,9 @@ class SqliteCache(TogglCache):
                 ).filter_by(id=item.id).delete()
         self.commit()
 
-    def find_entry(self, query: TogglClass | dict) -> TogglClass | None:
+    def find_entry(self, query: TogglClass | dict[str, Any]) -> TogglClass | None:
         if self.parent is None:
-            msg = "Cannot load cache without parent!"
+            msg = "Cannot load cache without parent set!"
             raise ValueError(msg)
 
         if isinstance(query, TogglClass):
@@ -140,7 +140,7 @@ class SqliteCache(TogglCache):
         **query: dict[str, Any],
     ) -> Query[TogglClass]:
         if self.parent is None:
-            msg = "Cannot load cache without parent!"
+            msg = "Cannot load cache without parent set!"
             raise ValueError(msg)
 
         search = self.session.query(self.parent.model)
