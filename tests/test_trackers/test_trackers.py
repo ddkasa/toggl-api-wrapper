@@ -2,6 +2,7 @@ import time
 from datetime import timedelta
 
 import pytest
+from httpx import HTTPStatusError
 
 from toggl_api import TogglTag, TogglTracker, TrackerBody
 
@@ -69,6 +70,16 @@ def test_tracker_stop(tracker_object, add_tracker, user_object):
     time.sleep(diff)
     trackstop = tracker_object.stop(tracker=add_tracker)
     assert trackstop.duration >= timedelta(seconds=diff)
+
+
+@pytest.mark.unit
+def test_tracker_stop_mock(tracker_object, httpx_mock, number):
+    httpx_mock.add_response(status_code=tracker_object.TRACKER_ALREADY_STOPPED, method="PATCH")
+    assert tracker_object.stop(tracker=number) is None
+
+    httpx_mock.add_response(status_code=401, method="PATCH")
+    with pytest.raises(HTTPStatusError):
+        assert tracker_object.stop(tracker=number)
 
 
 @pytest.mark.integration

@@ -2,6 +2,7 @@
 
 import os
 import random
+import sys
 import time
 from datetime import datetime, timedelta, timezone
 
@@ -35,7 +36,7 @@ def faker():
 
 @pytest.fixture(scope="session")
 def number():
-    return random.randint(1, 100_000)
+    return random.randint(1, sys.maxsize)
 
 
 @pytest.fixture(scope="session")

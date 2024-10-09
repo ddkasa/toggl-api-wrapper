@@ -132,9 +132,10 @@ class TrackerEndpoint(TogglCachedEndpoint):
                 raise
 
         if isinstance(tracker, int):
-            tracker = self.cache.find_entry({"id": tracker})  # type: ignore[assignment]
-            if not isinstance(tracker, TogglTracker):
+            trk = self.cache.find_entry({"id": tracker})
+            if not isinstance(trk, TogglTracker):
                 return
+            tracker = trk
 
         self.cache.delete_entries(tracker)
         self.cache.commit()
