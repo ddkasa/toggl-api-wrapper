@@ -172,8 +172,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
                 to -1 for a running tracker.
 
         Raises:
-            ValueError: Description must be set in order to create a new
-                tracker.
+            ValueError: Description must be set in order to create a new tracker.
 
         Returns:
             TogglTracker | None: The tracker that was created.

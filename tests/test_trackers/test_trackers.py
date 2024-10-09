@@ -41,6 +41,13 @@ def test_tracker_creation(add_tracker):
 
 
 @pytest.mark.unit
+def test_tracker_creation_dates(tracker_object, faker, httpx_mock):
+    body = TrackerBody(faker.name())
+    httpx_mock.add_response(status_code=200)
+    assert tracker_object.add(body) is None
+
+
+@pytest.mark.unit
 def test_tracker_creation_description(tracker_object):
     body = TrackerBody()
     with pytest.raises(TypeError):
