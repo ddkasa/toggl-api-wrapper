@@ -1,11 +1,9 @@
 classDiagram
   class toggl_api {
   }
-  class config {
-  }
-  class modules {
-  }
   class client {
+  }
+  class config {
   }
   class meta {
   }
@@ -43,23 +41,22 @@ classDiagram
   }
   class user {
   }
-  class workspace {
-  }
   class utility {
   }
   class version {
   }
+  class workspace {
+  }
+  toggl_api --> client
   toggl_api --> config
-  toggl_api --> modules
+  toggl_api --> meta
   toggl_api --> models
+  toggl_api --> project
+  toggl_api --> tag
+  toggl_api --> tracker
+  toggl_api --> user
   toggl_api --> version
-  modules --> client
-  modules --> meta
-  modules --> project
-  modules --> tag
-  modules --> tracker
-  modules --> user
-  modules --> workspace
+  toggl_api --> workspace
   client --> meta
   client --> models
   meta --> base_endpoint
@@ -79,12 +76,15 @@ classDiagram
   json_cache --> version
   sqlite_cache --> base_cache
   sqlite_cache --> models
+  sqlite_cache --> schema
+  sqlite_cache --> utility
   cached_endpoint --> base_endpoint
   cached_endpoint --> enums
   models --> models
   models --> schema
   models --> utility
   schema --> models
+  schema --> utility
   project --> meta
   project --> models
   project --> utility
@@ -108,4 +108,3 @@ classDiagram
   json_cache ..> cached_endpoint
   sqlite_cache ..> meta
   cached_endpoint ..> cache
-  cached_endpoint ..> models
