@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Final, Optional
 
+from httpx import HTTPStatusError
+
 from toggl_api.utility import format_iso
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
@@ -112,10 +114,15 @@ class ProjectEndpoint(TogglCachedEndpoint):
                 return project
             refresh = True
 
-        response = self.request(
-            f"/{project_id}",
-            refresh=refresh,
-        )
+        try:
+            response = self.request(
+                f"/{project_id}",
+                refresh=refresh,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code == self.NOT_FOUND:
+                return None
+            raise
 
         return response or None
 

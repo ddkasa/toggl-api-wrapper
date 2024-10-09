@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
+from httpx import HTTPStatusError
+
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
 
@@ -79,10 +81,16 @@ class ClientEndpoint(TogglCachedEndpoint):
                 return client
             refresh = True
 
-        response = self.request(
-            f"/{client_id}",
-            refresh=refresh,
-        )
+        try:
+            response = self.request(
+                f"/{client_id}",
+                refresh=refresh,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code == self.NOT_FOUND:
+                return None
+            raise
+
         return response or None
 
     def edit(

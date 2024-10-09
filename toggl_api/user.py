@@ -99,7 +99,7 @@ class UserEndpoint(TogglCachedEndpoint):
                 return None
             raise
 
-        return response  # type: ignore[return-value]
+        return response
 
     def check_authentication(self) -> bool:
         """Check if user is correctly authenticated with the Toggl API."""
