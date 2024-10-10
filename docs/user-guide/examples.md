@@ -50,6 +50,18 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
     )
 ```
 
+### Report Example
+
+- With **Plotly**, **Pandas** and **Kaleidoscope** installed.
+
+```python
+{% include "examples/reports_example.py" %}
+```
+
+**Outputs**:
+
+![Total recorded monthly minutes spent on Toggl API Wrapper in 2024](../static/images/total-minutes-may-to-october-2024.svg)
+
 ## Applications Using Toggl API Wrapper
 
 - [Ulauncher Toggl Extension](https://github.com/ddkasa/ulauncher-toggl-extension)
