@@ -66,6 +66,7 @@ mkdocs-glightbox = "^0.4.0"
 mkdocs-mermaid2-plugin = "^1.1.1"
 mkdocs-macros-plugin = "^1.0.5"
 pygments = "^2.18.0"
+mkdocs-panzoom-plugin = "^0.1.1"
 
 [tool.poetry.group.types.dependencies]
 types-sqlalchemy = "^1.4.53.38"
