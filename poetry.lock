@@ -924,6 +924,21 @@ setuptools = ">=18.5"
 test = ["mkdocs-material"]
 
 [[package]]
+name = "mkdocs-panzoom-plugin"
+version = "0.1.1"
+description = "MkDocs Plugin to enable pan & zoom on images and mermaid diagrams"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "mkdocs_panzoom_plugin-0.1.1-py3-none-any.whl", hash = "sha256:28d6777b509703b023e3f2cf3fdbc63eb3d746a088aac78d16f3ba0f54ba189a"},
+    {file = "mkdocs_panzoom_plugin-0.1.1.tar.gz", hash = "sha256:68c7b04041a9b413c3ffea5ebf9278fed96142fed741270222fa1a5429e32fdb"},
+]
+
+[package.dependencies]
+beautifulsoup4 = ">=4.9.0"
+mkdocs = ">=1.0.4"
+
+[[package]]
 name = "mkdocs-redirects"
 version = "1.2.1"
 description = "A MkDocs plugin for dynamic page redirects to prevent broken links."
@@ -1776,4 +1791,4 @@ sqlite = ["sqlalchemy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "edd75b6e1c0a55405e04b129b12ddb96a8a1ff3f8b99493656f1379fcccd6601"
+content-hash = "9a7de2c1bc9f4380d7fc0b87370fc9adb5334c7f8c3e8f6e475d08792e5452c1"
