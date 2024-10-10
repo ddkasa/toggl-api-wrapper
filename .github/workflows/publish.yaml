@@ -39,7 +39,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     env:
       TOGGL_WORKSPACE_ID: ${{ secrets.TOGGL_WORKSPACE_ID }}
