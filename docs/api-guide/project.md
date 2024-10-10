@@ -1,10 +1,9 @@
 ::: toggl_api.ProjectBody
-    options:
-        members:
-            - format
+
 
 ::: toggl_api.ProjectEndpoint
     options:
+        show_source: true
         members:
             - BASIC_COLORS
             - collect

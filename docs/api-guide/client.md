@@ -2,6 +2,7 @@
 
 ::: toggl_api.ClientEndpoint
     options:
+        show_source: true
         members:
             - add
             - get

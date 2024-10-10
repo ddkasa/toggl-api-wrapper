@@ -1,5 +1,6 @@
 ::: toggl_api.TagEndpoint
     options:
+        show_source: true
         members:
             - collect
             - add
