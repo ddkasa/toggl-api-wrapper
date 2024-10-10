@@ -5,6 +5,7 @@
 
 ::: toggl_api.TrackerEndpoint 
     options:
+        show_source: true
         members:
             - edit
             - delete
