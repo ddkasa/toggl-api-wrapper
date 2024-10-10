@@ -84,6 +84,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
     """Endpoint for modifying and creating trackers.
 
     See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/time_entries)
     """
 
     TRACKER_ALREADY_STOPPED: Final[int] = 409
@@ -93,7 +95,17 @@ class TrackerEndpoint(TogglCachedEndpoint):
         tracker: TogglTracker | int,
         body: TrackerBody,
     ) -> TogglTracker | None:
-        """Edit an existing tracker based on the supplied parameters within the body."""
+        """Edit an existing tracker based on the supplied parameters within the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#put-timeentries)
+
+        Args:
+            tracker: Target tracker model or id to edit.
+            body: Updated content to add.
+
+        Returns:
+            TogglTracker | None: A new model if successful else None.
+        """
         if (body.tag_ids or body.tags) and not body.tag_action:
             body.tag_action = "add"
 
@@ -113,6 +125,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#delete-timeentries)
 
         Args:
             tracker: Tracker object with ID to delete.
@@ -143,6 +157,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:
         """Stops a running tracker.
 
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#patch-stop-timeentry)
+
         Args:
             tracker: Tracker object with IP to stop.
 
@@ -165,6 +181,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
         """Add a new tracker.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#post-timeentries)
 
         Args:
             body: Body of the request. Description must be set. If start date
