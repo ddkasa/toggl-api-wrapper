@@ -19,7 +19,7 @@ classifiers = [
     "Natural Language :: English",
     "Typing :: Typed",
 ]
-packages = [{ include = "toggl_api" }]
+packages = [{ include = "toggl_api" }, { include = "toggl_api/py.typed" }]
 
 [tool.poetry.scripts]
 clean-toggl-account = "scripts.clean_account:main"
@@ -159,11 +159,11 @@ select = [
 ignore = [
     "S101",    # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-    "SIM102",  # sometimes it's better to nest
+    "SIM102",  # Sometimes it's better to nest
     "UP007",   # Useless `typing` imports
     "N802",
     "PLW2901",
-    "UP017",   # Python 3.10 backwards compatiblity
+    "UP017",   # Python 3.10 backwards compatibility
     "PLR6301", # Class Method Suggestion
     "S311",    # Unsafe pseudo-random generator
 ]
