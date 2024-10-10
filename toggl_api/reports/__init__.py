@@ -1,7 +1,15 @@
-from .reports import DetailedReportEndpoint, ReportBody, ReportEndpoint, SummaryReportEndpoint, WeeklyReportEndpoint
+from .reports import (
+    DetailedReportEndpoint,
+    PaginationOptions,
+    ReportBody,
+    ReportEndpoint,
+    SummaryReportEndpoint,
+    WeeklyReportEndpoint,
+)
 
 __all__ = (
     "DetailedReportEndpoint",
+    "PaginationOptions",
     "ReportBody",
     "ReportEndpoint",
     "SummaryReportEndpoint",
