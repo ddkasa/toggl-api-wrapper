@@ -71,7 +71,7 @@ class TogglCache(ABC):
     ) -> None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TogglClass | dict) -> Optional[TogglClass]: ...
+    def find_entry(self, entry: TogglClass | dict[str, Any]) -> TogglClass | None: ...
 
     @abstractmethod
     def add_entries(
@@ -103,7 +103,7 @@ class TogglCache(ABC):
         return self._cache_path
 
     @property
-    def expire_after(self) -> Optional[timedelta]:
+    def expire_after(self) -> timedelta | None:
         return self._expire_after
 
     @expire_after.setter
