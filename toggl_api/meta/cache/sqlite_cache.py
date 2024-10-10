@@ -12,6 +12,8 @@ try:
 except ImportError:
     pass
 
+import contextlib
+
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
 from toggl_api.utility import requires
@@ -154,4 +156,5 @@ class SqliteCache(TogglCache):
         return super().cache_path / "cache.sqlite"
 
     def __del__(self) -> None:
-        self.session.close()
+        with contextlib.suppress(AttributeError, TypeError):
+            self.session.close()
