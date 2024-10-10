@@ -11,12 +11,17 @@ class UserEndpoint(TogglCachedEndpoint):
     """Endpoint for retrieving and fetching trackers with GET requests.
 
     See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/me)
     """
 
     TRACKER_NOT_RUNNING: Final[int] = 405
 
     def current(self, *, refresh: bool = True) -> TogglTracker | None:
-        """Get current running tracker. Returns None if no tracker is running."""
+        """Get current running tracker. Returns None if no tracker is running.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-current-time-entry)
+        """
 
         try:
             response = self.request("time_entries/current", refresh=refresh)
@@ -37,6 +42,8 @@ class UserEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
     ) -> list[TogglTracker]:
         """Get a set of trackers depending on specified parameters.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-timeentries)
 
         Args:
             since: Get entries modified since this date using UNIX timestamp,
@@ -74,6 +81,8 @@ class UserEndpoint(TogglCachedEndpoint):
     ) -> TogglTracker | None:
         """Get a single tracker by ID.
 
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-a-time-entry-by-id)
+
         Args:
             tracker_id: ID of the tracker to get.
             refresh: Whether to refresh the cache or not.
@@ -102,7 +111,10 @@ class UserEndpoint(TogglCachedEndpoint):
         return response
 
     def check_authentication(self) -> bool:
-        """Check if user is correctly authenticated with the Toggl API."""
+        """Check if user is correctly authenticated with the Toggl API.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
+        """
         try:
             TogglCachedEndpoint.request(self, "logged")
         except HTTPError:

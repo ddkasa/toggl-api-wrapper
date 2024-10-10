@@ -5,18 +5,23 @@ from .models import TogglTag
 
 
 class TagEndpoint(TogglCachedEndpoint):
-    """Specific endpoints for retrieving and modifying tags."""
+    """Specific endpoints for retrieving and modifying tags.
 
-    def collect(
-        self,
-        *,
-        refresh: bool = False,
-    ) -> list[TogglTag]:
-        """Gather all tags."""
+    [Official Documentation](https://engineering.toggl.com/docs/api/tags)
+    """
+
+    def collect(self, *, refresh: bool = False) -> list[TogglTag]:
+        """Gather all tags.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/tags#get-tags)
+        """
         return self.request("", refresh=refresh)
 
     def add(self, name: str) -> TogglTag:
-        """Create a new tag."""
+        """Create a new tag.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/tags#post-create-tag)
+        """
         return self.request(
             "",
             body={"name": name},
@@ -24,11 +29,11 @@ class TagEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
 
-    def edit(
-        self,
-        tag: TogglTag,
-    ) -> TogglTag:
-        """Sets the name of the tag based on the tag object."""
+    def edit(self, tag: TogglTag) -> TogglTag:
+        """Sets the name of the tag based on the tag object.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/tags#put-update-tag)
+        """
         return self.request(
             f"/{tag.id}",
             body={"name": tag.name},
@@ -37,7 +42,10 @@ class TagEndpoint(TogglCachedEndpoint):
         )
 
     def delete(self, tag: TogglTag | int) -> None:
-        """Deletes a tag based on its ID."""
+        """Deletes a tag based on its ID.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/tags#delete-delete-tag)
+        """
         self.request(
             f"/{tag if isinstance(tag, int) else tag.id}",
             method=RequestMethod.DELETE,

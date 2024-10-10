@@ -74,7 +74,10 @@ class ProjectBody(BaseBody):
 
 
 class ProjectEndpoint(TogglCachedEndpoint):
-    """Specific endpoints for retrieving and modifying projects."""
+    """Specific endpoints for retrieving and modifying projects.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/projects)
+    """
 
     BASIC_COLORS: Final[dict[str, str]] = {
         "blue": "#0b83d9",
@@ -95,7 +98,10 @@ class ProjectEndpoint(TogglCachedEndpoint):
     """Basic colors available for projects in order."""
 
     def collect(self, *, refresh: bool = False) -> list[TogglProject]:
-        """Returns all cached or remote projects."""
+        """Returns all cached or remote projects.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceprojects)
+        """
         return self.request("", refresh=refresh)
 
     def get(
@@ -104,7 +110,10 @@ class ProjectEndpoint(TogglCachedEndpoint):
         *,
         refresh: bool = False,
     ) -> TogglProject | None:
-        """Request a projects based on its id."""
+        """Request a projects based on its id.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceproject)
+        """
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
@@ -127,7 +136,10 @@ class ProjectEndpoint(TogglCachedEndpoint):
         return response or None
 
     def delete(self, project: TogglProject | int) -> None:
-        """Deletes a project based on its id."""
+        """Deletes a project based on its id.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/projects#delete-workspaceproject)
+        """
         self.request(
             f"/{project if isinstance(project, int) else project.id}",
             method=RequestMethod.DELETE,
@@ -142,12 +154,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(project)
         self.cache.commit()
 
-    def edit(
-        self,
-        project: TogglProject | int,
-        body: ProjectBody,
-    ) -> TogglProject | None:
-        """Edit a project based on its id with the parameters provided in the body."""
+    def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject | None:
+        """Edit a project based on its id with the parameters provided in the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/projects#put-workspaceproject)
+        """
         if isinstance(project, TogglProject):
             project = project.id
         return self.request(
@@ -157,11 +168,11 @@ class ProjectEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
 
-    def add(
-        self,
-        body: ProjectBody,
-    ) -> TogglProject | None:
-        """Create a new project based on the parameters provided in the body."""
+    def add(self, body: ProjectBody) -> TogglProject | None:
+        """Create a new project based on the parameters provided in the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/projects#post-workspaceprojects)
+        """
         if body.name is None:
             msg = "Name must be set in order to create a project!"
             raise ValueError(msg)

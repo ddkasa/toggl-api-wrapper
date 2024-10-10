@@ -44,10 +44,25 @@ class ClientBody(BaseBody):
 
 
 class ClientEndpoint(TogglCachedEndpoint):
-    """Specific endpoints for retrieving and modifying clients."""
+    """Specific endpoints for retrieving and modifying clients.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/clients)
+    """
 
     def add(self, body: ClientBody) -> TogglClient | None:
-        """Create a Client based on parameters set in the provided body."""
+        """Create a Client based on parameters set in the provided body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/clients#post-create-client)
+
+        Args:
+            body: New parameters for the client to be created.
+
+        Raises:
+            ValueError: If no name was set as its required.
+
+        Returns:
+            TogglClient: Newly created client with specified parameters.
+        """
 
         if body.name is None:
             msg = "Name must be set in order to create a client!"
@@ -67,6 +82,8 @@ class ClientEndpoint(TogglCachedEndpoint):
         refresh: bool = False,
     ) -> TogglClient | None:
         """Request a client based on its id.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-load-client-from-id)
 
         Args:
             client_id: Which client to look for.
@@ -102,7 +119,20 @@ class ClientEndpoint(TogglCachedEndpoint):
         client: TogglClient | int,
         body: ClientBody,
     ) -> TogglClient | None:
-        """Edit a client with the supplied parameters from the body."""
+        """Edit a client with the supplied parameters from the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/clients#put-change-client)
+
+        Args:
+            client: Target client to edit.
+            body: New parameters to use. Ignore client status.
+
+        Returns:
+            TogglClient | None: Newly edited client or None if not found.
+        """
+        if body.status:
+            body.status = None
+
         if isinstance(client, TogglClient):
             client = client.id
         return self.request(
@@ -113,7 +143,10 @@ class ClientEndpoint(TogglCachedEndpoint):
         )
 
     def delete(self, client: TogglClient | int) -> None:
-        """Delete a client based on its ID."""
+        """Delete a client based on its ID.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)
+        """
         self.request(
             f"/{client if isinstance(client, int) else client.id}",
             method=RequestMethod.DELETE,
@@ -128,8 +161,23 @@ class ClientEndpoint(TogglCachedEndpoint):
         self.cache.delete_entries(client)
         self.cache.commit()
 
-    def collect(self, body: Optional[ClientBody] = None, *, refresh: bool = False) -> list[TogglClient]:
-        """Request all Clients based on status and name if specified in the body."""
+    def collect(
+        self,
+        body: Optional[ClientBody] = None,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglClient]:
+        """Request all Clients based on status and name if specified in the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)
+
+        Args:
+            body: Status and name to target. Ignores notes.
+            refresh: Whether to refresh cache.
+
+        Returns:
+            list[TogglClient]: A list of clients. Empty if not found.
+        """
         url = ""
         if body and body.status:
             url += f"?{body.status}"
