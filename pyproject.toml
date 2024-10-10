@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: MIT License",
@@ -198,7 +199,7 @@ addopts = "--report-log=logs/pytest.jsonl --cov --cov-append  --cov-report xml"
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = ruff, mypy, py310, py311, py312
+envlist = ruff, mypy,  py312, py311, py310, py313
 
 [testenv]
 skip_install = true
@@ -220,6 +221,7 @@ python =
     3.10: py310
     3.11: py311
     3.12: ruff, mypy, py312
+    3.13: py313
 
 [testenv:mypy]
 allowlist_externals = mypy, poetry
