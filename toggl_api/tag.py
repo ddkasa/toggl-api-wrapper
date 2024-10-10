@@ -53,9 +53,10 @@ class TagEndpoint(TogglCachedEndpoint):
         )
 
         if isinstance(tag, int):
-            tag = self.cache.find_entry({"id": tag})  # type: ignore[assignment]
-            if not isinstance(tag, TogglTag):
+            tag_model = self.cache.find_entry({"id": tag})
+            if not isinstance(tag_model, TogglTag):
                 return
+            tag = tag_model
 
         self.cache.delete_entries(tag)
         self.cache.commit()
