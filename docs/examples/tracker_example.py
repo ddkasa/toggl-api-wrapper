@@ -8,10 +8,10 @@ from toggl_api import (
 )
 from toggl_api.meta.cache.sqlite_cache import SqliteCache
 
-workspace_id = 2313123123
-auth = generate_authentication()
+WORKSPACE_ID = 2313123123
+AUTH = generate_authentication()
 cache = SqliteCache(Path("cache"), timedelta(hours=24))
-endpoint = TrackerEndpoint(workspace_id, auth, cache)
+endpoint = TrackerEndpoint(WORKSPACE_ID, AUTH, cache)
 
 body = TrackerBody("My First Tracker", tags=["My First Tag"])
 tracker = endpoint.add(body)

@@ -1,12 +1,12 @@
 ### Install using pip:
 
-```
+```bash
 pip install toggl-api-wrapper
 ```
 
-### Or If using SQLite cache:
+### Or if using SQLite cache:
 
-```
+```bash
 pip install "toggl-api-wrapper[sqlite]"
 ```
 

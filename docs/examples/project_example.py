@@ -8,10 +8,10 @@ from toggl_api import (
     generate_authentication,
 )
 
-workspace_id = 2313123123
-auth = generate_authentication()
+WORKSPACE_ID = 2313123123
+AUTH = generate_authentication()
 cache = JSONCache(Path("cache"), timedelta(hours=24))
-endpoint = ProjectEndpoint(workspace_id, auth, cache)
+endpoint = ProjectEndpoint(WORKSPACE_ID, AUTH, cache)
 
 color = ProjectEndpoint.get_color("red")
 body = ProjectBody(

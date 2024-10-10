@@ -18,7 +18,7 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 **Outputs**:
 
-```
+```python
 >>> TogglTracker(
         id=3482231563,
         name="My First Tracker",
@@ -39,7 +39,7 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 **Outputs**:
 
-```
+```python
 >>> TogglProject(
         id=203366783,
         name='My First Project',
@@ -49,6 +49,18 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
         active=True,
     )
 ```
+
+### Report Example
+
+- With **Plotly**, **Pandas** and **Kaleidoscope** installed.
+
+```python
+{% include "examples/reports_example.py" %}
+```
+
+**Outputs**:
+
+![Total recorded monthly minutes spent on Toggl API Wrapper in 2024](../static/images/total-minutes-may-to-october-2024.svg)
 
 ## Applications Using Toggl API Wrapper
 
