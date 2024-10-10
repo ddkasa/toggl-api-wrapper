@@ -130,5 +130,7 @@ plugins:
             show_signature_annotations: true
             show_symbol_type_heading: true
   - callouts
+  - panzoom:
+      full_screen: true
 watch:
   - toggl_api
