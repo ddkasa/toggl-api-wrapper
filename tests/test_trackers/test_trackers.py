@@ -71,6 +71,14 @@ def test_tracker_editing(tracker_object, add_tracker, faker):
     assert all(tag.name in new_description.tags for tag in data.tags)
 
 
+@pytest.mark.unit
+def test_tracker_editing_mock(tracker_object, httpx_mock, faker, number):
+    new_description = TrackerBody(description=faker.name())
+    new_description.tags = [faker.name(), faker.name()]
+    httpx_mock.add_response(json=None, method="PUT")
+    assert tracker_object.edit(tracker=number, body=new_description) is None
+
+
 @pytest.mark.integration
 def test_tracker_stop(tracker_object, add_tracker, user_object):
     diff = 5
@@ -93,5 +101,31 @@ def test_tracker_stop_mock(tracker_object, httpx_mock, number):
 @pytest.mark.order(after="test_tracker_stop")
 def test_tracker_deletion(tracker_object, user_object, add_tracker):
     tracker_object.delete(add_tracker)
-    assert add_tracker != user_object.get(add_tracker.id)
     assert add_tracker != user_object.get(add_tracker.id, refresh=True)
+    assert add_tracker != user_object.get(add_tracker.id)
+
+
+@pytest.mark.integration
+def test_tracker_deletion_id(tracker_object, user_object, add_tracker):
+    tracker_object.delete(add_tracker.id)
+    assert add_tracker != user_object.get(add_tracker.id)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("error"),
+    [
+        pytest.param(
+            499,
+            marks=pytest.mark.xfail(
+                HTTPStatusError,
+                reason="Raising any error thats not 200 or 409.",
+            ),
+        ),
+        404,
+        200,
+    ],
+)
+def test_tracker_deletion_mock(tracker_object, number, httpx_mock, error):
+    httpx_mock.add_response(status_code=error)
+    assert tracker_object.delete(number) is None

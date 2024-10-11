@@ -1,4 +1,5 @@
 import json
+import random
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -7,6 +8,8 @@ import pytest
 
 from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
+from toggl_api.models.models import TogglTracker
+from toggl_api.user import UserEndpoint
 
 
 @pytest.mark.unit
@@ -102,3 +105,41 @@ def test_query(model_data, tracker_object, faker):
     tracker_object.cache.commit()
     assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
     assert tracker_object.query(name=names[-1])[0].name == t.name
+
+
+@pytest.mark.unit
+def test_query_parent(tmp_path):
+    cache = JSONCache(Path(tmp_path))
+
+    with pytest.raises(ValueError, match="Cannot load cache without parent!"):
+        cache.query()
+
+
+@pytest.mark.unit
+def test_cache_sync(  # noqa: PLR0913, PLR0917
+    tmp_path,
+    user_object,
+    get_test_data,
+    httpx_mock,
+    get_workspace_id,
+    config_setup,
+):
+    cache1 = JSONCache(Path(tmp_path))
+
+    user_object.cache = cache1
+    tracker = get_test_data[1]
+    tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
+    tracker_id = tracker["id"]
+    httpx_mock.add_response(
+        json=tracker,
+        status_code=200,
+        url=user_object.BASE_ENDPOINT + user_object.endpoint + f"time_entries/{tracker_id}",
+    )
+
+    cache2 = JSONCache(Path(tmp_path))
+    endpoint = UserEndpoint(get_workspace_id, config_setup, cache2)
+    assert len(cache2.load_cache()) == 0
+
+    tracker = user_object.get(tracker_id, refresh=True)
+    assert isinstance(tracker, TogglTracker)
+    assert endpoint.get(tracker_id) == tracker

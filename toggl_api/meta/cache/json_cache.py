@@ -250,14 +250,14 @@ class JSONCache(TogglCache):
 
 
 class CustomEncoder(json.encoder.JSONEncoder):
-    def default(self, o: Any) -> Any:
-        if isinstance(o, datetime):
-            return o.isoformat()
-        if isinstance(o, timedelta):
-            return timedelta.total_seconds(o)
-        if isinstance(o, TogglClass):
-            return as_dict_custom(o)
-        return super().default(o)
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, timedelta):
+            return timedelta.total_seconds(obj)
+        if isinstance(obj, TogglClass):
+            return as_dict_custom(obj)
+        return super().default(obj)
 
 
 class CustomDecoder(json.decoder.JSONDecoder):

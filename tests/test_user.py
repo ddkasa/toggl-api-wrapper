@@ -5,7 +5,16 @@ from toggl_api import TogglTracker
 
 
 @pytest.mark.order("first")
-@pytest.mark.tryfirst
+@pytest.mark.unit
+def test_user_endpoint_mock(user_object, httpx_mock):
+    httpx_mock.create_response(status_code=200)
+    assert user_object.check_authentication()
+
+    httpx_mock.create_response(status_code=400)
+    assert not user_object.check_authentication()
+
+
+@pytest.mark.order("second")
 @pytest.mark.integration
 def test_user_endpoint(user_object):
     assert isinstance(user_object.check_authentication(), bool)
@@ -55,3 +64,10 @@ def test_tracker_get(user_object, add_tracker):
     assert t.name == add_tracker.name
     assert t.id == add_tracker.id
     assert t.start == add_tracker.start
+
+
+@pytest.mark.unit
+def test_tracker_get_error(user_object, httpx_mock):
+    httpx_mock.add_response(status_code=460)
+    with pytest.raises(httpx.HTTPStatusError):
+        user_object.get(1, refresh=True)
