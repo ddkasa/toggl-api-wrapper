@@ -1,10 +1,11 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Final, Optional
 
 from httpx import HTTPError, HTTPStatusError
 
 from .meta import TogglCachedEndpoint
 from .models import TogglTracker
+from .utility import format_iso
 
 
 class UserEndpoint(TogglCachedEndpoint):
@@ -56,20 +57,33 @@ class UserEndpoint(TogglCachedEndpoint):
                 with time in RFC3339 format. To be used with start_date.
             refresh: Whether to refresh the cache or not.
 
+        Raises:
+            ValueError: If the dates are not in the correct ranges.
+
         Returns:
             list[TogglTracker]: List of TogglTracker objects that are within
                 specified parameters. Empty if none matched.
         """
 
         params = "time_entries"
-        if since and before:
-            params = f"?since={since}&before={before}"
+        if since:
+            format_since = int(since.timestamp()) if isinstance(since, datetime) else since
+            params += f"?since={format_since}"
+        if before:
+            params += "&" if since else "?"
+            params += f"before={format_iso(before)}"
         elif start_date and end_date:
-            params = f"?start_date={start_date}&end_date={end_date}"
+            if end_date < start_date:
+                msg = "end_date must be after the start_date!"
+                raise ValueError(msg)
+            if start_date > datetime.now(tz=timezone.utc):
+                msg = "start_date must not be earlier than the current date!"
+                raise ValueError(msg)
+
+            params += f"?start_date={format_iso(start_date)}&end_date={format_iso(end_date)}"
         response = self.request(params, refresh=refresh)
 
         # TODO: Need to filter cached trackers.
-        # TODO: Implement sorting of trackers.
 
         return response if isinstance(response, list) else []
 

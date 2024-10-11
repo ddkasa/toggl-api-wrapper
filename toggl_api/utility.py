@@ -41,7 +41,7 @@ def format_iso(date_obj: datetime | date | str) -> str:
     if isinstance(date_obj, str):
         return date_obj
     if isinstance(date_obj, datetime):
-        return date_obj.isoformat(timespec="seconds")
+        return date_obj.strftime("%FT%TZ")
     return date_obj.isoformat()
 
 

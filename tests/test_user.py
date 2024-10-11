@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import httpx
 import pytest
 
@@ -7,10 +9,10 @@ from toggl_api import TogglTracker
 @pytest.mark.order("first")
 @pytest.mark.unit
 def test_user_endpoint_mock(user_object, httpx_mock):
-    httpx_mock.create_response(status_code=200)
+    httpx_mock.add_response(status_code=200)
     assert user_object.check_authentication()
 
-    httpx_mock.create_response(status_code=400)
+    httpx_mock.add_response(status_code=400)
     assert not user_object.check_authentication()
 
 
@@ -71,3 +73,63 @@ def test_tracker_get_error(user_object, httpx_mock):
     httpx_mock.add_response(status_code=460)
     with pytest.raises(httpx.HTTPStatusError):
         user_object.get(1, refresh=True)
+
+
+@pytest.mark.integration
+def test_tracker_collection_param_since(user_object, add_tracker):
+    ts = datetime.now(tz=timezone.utc)
+    collection = user_object.collect(since=int(ts.timestamp()), refresh=True)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+    collection = user_object.collect(since=ts)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+
+@pytest.mark.integration
+def test_tracker_collection_param_before(user_object, add_tracker):
+    ts = datetime.now(tz=timezone.utc)
+    collect = user_object.collect(before=ts.date(), refresh=True)
+    assert not any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+    collect = user_object.collect(before=ts)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+
+@pytest.mark.integration
+def test_tracker_collection_date(user_object, add_tracker):
+    ts = datetime.now(tz=timezone.utc)
+    collect = user_object.collect(
+        start_date=ts.replace(hour=(ts.hour - 1) % 24),
+        end_date=ts.replace(year=ts.year + 1),
+        refresh=True,
+    )
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("start_date", "end_date", "match"),
+    [
+        (
+            lambda x: x,
+            lambda x: x.replace(month=(x.month - 1) % 12),
+            "end_date must be after the start_date!",
+        ),
+        (
+            lambda x: x.replace(year=x.year + 1),
+            lambda x: x.replace(year=x.year + 2),
+            "start_date must not be earlier than the current date!",
+        ),
+    ],
+)
+def test_tracker_collection_errors(user_object, start_date, end_date, match):
+    now = datetime.now(tz=timezone.utc)
+    with pytest.raises(
+        ValueError,
+        match=match,
+    ):
+        user_object.collect(
+            start_date=start_date(now),
+            end_date=end_date(now),
+            refresh=True,
+        )
