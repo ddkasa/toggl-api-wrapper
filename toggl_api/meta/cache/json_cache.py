@@ -205,7 +205,6 @@ class JSONCache(TogglCache):
     def query(
         self,
         *,
-        inverse: bool = False,
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> list[TogglClass]:
@@ -228,8 +227,6 @@ class JSONCache(TogglCache):
                 if distinct:
                     existing_values.add(query.values())
                 results.append(model)
-        if inverse:
-            results.reverse()
         return results
 
     @property

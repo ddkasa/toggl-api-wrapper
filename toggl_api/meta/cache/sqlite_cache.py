@@ -137,7 +137,6 @@ class SqliteCache(TogglCache):
     def query(
         self,
         *,
-        inverse: bool = False,
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> Query[TogglClass]:

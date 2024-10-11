@@ -92,7 +92,6 @@ class TogglCache(ABC):
     def query(
         self,
         *,
-        inverse: bool = False,
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> Iterable[TogglClass]: ...

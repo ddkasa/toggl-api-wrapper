@@ -128,11 +128,10 @@ class TogglCachedEndpoint(TogglEndpoint):
     def query(
         self,
         *,
-        inverse: bool = False,
         distinct: bool = False,
         **query: dict[str, Any],
     ) -> Iterable[TogglClass]:
-        return self.cache.query(inverse=inverse, distinct=distinct, **query)
+        return self.cache.query(distinct=distinct, **query)
 
     @property
     @abstractmethod
