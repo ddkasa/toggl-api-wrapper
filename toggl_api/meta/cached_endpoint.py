@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     import httpx
 
+    from toggl_api.meta.cache.base_cache import TogglQuery
     from toggl_api.modules.models import TogglClass
 
     from .cache import TogglCache
@@ -125,13 +126,8 @@ class TogglCachedEndpoint(TogglEndpoint):
             return None
         return self.cache.save_cache(response, method)
 
-    def query(
-        self,
-        *,
-        distinct: bool = False,
-        **query: dict[str, Any],
-    ) -> Iterable[TogglClass]:
-        return self.cache.query(distinct=distinct, **query)
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]:
+        return self.cache.query(*query, distinct=distinct)
 
     @property
     @abstractmethod

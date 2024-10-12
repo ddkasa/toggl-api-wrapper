@@ -111,37 +111,22 @@ class TogglCache(ABC):
     def load_cache(self) -> Iterable[TogglClass]: ...
 
     @abstractmethod
-    def save_cache(
-        self,
-        entry: list[TogglClass] | TogglClass,
-        method: RequestMethod,
-    ) -> None: ...
+    def save_cache(self, entry: list[TogglClass] | TogglClass, method: RequestMethod) -> None: ...
 
     @abstractmethod
     def find_entry(self, entry: TogglClass | dict[str, Any]) -> TogglClass | None: ...
 
     @abstractmethod
-    def add_entries(
-        self,
-        update: list[TogglClass],
-    ) -> None: ...
+    def add_entries(self, update: list[TogglClass]) -> None: ...
 
     @abstractmethod
-    def update_entries(
-        self,
-        update: list[TogglClass] | TogglClass,
-    ) -> None: ...
+    def update_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
 
     @abstractmethod
     def delete_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
 
     @abstractmethod
-    def query(
-        self,
-        *,
-        distinct: bool = False,
-        **query: dict[str, Any],
-    ) -> Iterable[TogglClass]: ...
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]: ...
 
     @property
     @abstractmethod
