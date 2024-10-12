@@ -8,8 +8,41 @@ import pytest
 
 from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
+from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.models.models import TogglTracker
 from toggl_api.user import UserEndpoint
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("value", "comparison"),
+    [
+        (0, Comparison.EQUAL),
+        ("test_value", Comparison.EQUAL),
+        pytest.param(
+            "testvalue",
+            Comparison.GREATER_THEN,
+            marks=pytest.mark.xfail(
+                reason="None EQUAL(s) comparison with a string.",
+                raises=TypeError,
+            ),
+        ),
+        (0, Comparison.LESS_THEN),
+        (timedelta(0), Comparison.GREATER_THEN),
+        (datetime.now(tz=timezone.utc), Comparison.LESS_THEN_OR_EQUAL),
+        pytest.param(
+            ["test_value"],
+            Comparison.GREATER_THEN,
+            marks=pytest.mark.xfail(
+                reason="None EQUAL(s) comparison with a sequence.",
+                raises=TypeError,
+            ),
+        ),
+        (["test_value"], Comparison.EQUAL),
+    ],
+)
+def test_cache_query(faker, value, comparison):
+    assert TogglQuery(faker.name(), value, comparison)
 
 
 @pytest.mark.unit

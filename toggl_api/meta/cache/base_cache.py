@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import enum
 from abc import ABC, abstractmethod
-from datetime import timedelta
-from typing import TYPE_CHECKING, Any, Final, Optional
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, timezone
+from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 from toggl_api.meta.enums import RequestMethod
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable, Iterable, Sequence
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
@@ -21,6 +22,43 @@ class Comparison(enum.Enum):
     LESS_THEN_OR_EQUAL = enum.auto()
     GREATER_THEN = enum.auto()
     GREATER_THEN_OR_EQUAL = enum.auto()
+
+
+T = TypeVar("T")
+
+
+@dataclass
+class TogglQuery(Generic[T]):
+    """Dataclass for querying cached Toggl models."""
+
+    key: str = field()
+    """Name of the target column to compare against."""
+    value: T | Sequence[T] = field()
+    """Value to compare against."""
+    comparison: Comparison = field(default=Comparison.EQUAL)
+    """The way the value should be compared. None 'EQUALS' comparisons for None numeric or time based values."""
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.value, date | int | timedelta) and self.comparison != Comparison.EQUAL:
+            msg = "None 'EQUAL' comparisons only available for time or numeric based values."
+            raise TypeError(msg)
+
+        if isinstance(self.value, date) and not isinstance(self.value, datetime):
+            if self.comparison in {
+                Comparison.LESS_THEN,
+                Comparison.GREATER_THEN_OR_EQUAL,
+            }:
+                self.value = datetime.combine(  # type: ignore[assignment]
+                    self.value,
+                    datetime.min.time(),
+                    tzinfo=timezone.utc,
+                )
+            else:
+                self.value = datetime.combine(  # type: ignore[assignment]
+                    self.value,
+                    datetime.max.time(),
+                    tzinfo=timezone.utc,
+                )
 
 
 class TogglCache(ABC):

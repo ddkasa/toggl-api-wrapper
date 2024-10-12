@@ -1,6 +1,7 @@
 from .client import ClientBody, ClientEndpoint
 from .config import generate_authentication
 from .meta import JSONCache
+from .meta.cache import Comparison, TogglQuery
 from .models import (
     TogglClient,
     TogglProject,
@@ -23,12 +24,14 @@ __typed__ = True
 __all__ = [
     "ClientBody",
     "ClientEndpoint",
+    "Comparison",
     "JSONCache",
     "ProjectBody",
     "ProjectEndpoint",
     "TagEndpoint",
     "TogglClient",
     "TogglProject",
+    "TogglQuery",
     "TogglTag",
     "TogglTracker",
     "TogglWorkspace",
