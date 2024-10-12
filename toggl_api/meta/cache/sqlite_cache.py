@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -13,12 +14,13 @@ except ImportError:
     pass
 
 import contextlib
+from collections.abc import Sequence
 
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
 from toggl_api.utility import requires
 
-from .base_cache import TogglCache
+from .base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -136,9 +138,8 @@ class SqliteCache(TogglCache):
 
     def query(
         self,
-        *,
+        *query: TogglQuery,
         distinct: bool = False,
-        **query: dict[str, Any],
     ) -> Query[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent set!"
@@ -148,7 +149,36 @@ class SqliteCache(TogglCache):
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
-        return search.filter_by(**query)
+        search = self._query_helper(list(query), search)
+        if distinct:
+            data = [q.key for q in query]
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                search = search.distinct(*data).group_by(*data)
+        return search
+
+    def _query_helper(self, query: list[TogglQuery], query_obj: Query[TogglClass]) -> Query[TogglClass]:
+        if query:
+            query_obj = self._match_query(query.pop(0), query_obj)
+            return self._query_helper(query, query_obj)
+        return query_obj
+
+    def _match_query(self, query: TogglQuery, query_obj: Query[TogglClass]) -> Query[TogglClass]:
+        value = getattr(self.parent.model, query.key)  # type: ignore[union-attr]
+        if query.comparison == Comparison.EQUAL:
+            if isinstance(query.value, Sequence) and not isinstance(query.value, str):
+                return query_obj.filter(value.in_(query.value))
+            return query_obj.filter(value == query.value)
+        if query.comparison == Comparison.LESS_THEN:
+            return query_obj.filter(value < query.value)
+        if query.comparison == Comparison.LESS_THEN_OR_EQUAL:
+            return query_obj.filter(value <= query.value)
+        if query.comparison == Comparison.GREATER_THEN:
+            return query_obj.filter(value > query.value)
+        if query.comparison == Comparison.GREATER_THEN_OR_EQUAL:
+            return query_obj.filter(value >= query.value)
+        msg = f"{query.comparison} is not implemented!"
+        raise NotImplementedError(msg)
 
     @property
     def cache_path(self) -> Path:
