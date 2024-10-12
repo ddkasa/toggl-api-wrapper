@@ -3,6 +3,8 @@ from __future__ import annotations
 import contextlib
 import json
 import time
+from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Optional
@@ -19,7 +21,7 @@ from toggl_api.models import (
 from toggl_api.utility import parse_iso
 from toggl_api.version import version
 
-from .base_cache import TogglCache
+from .base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -202,32 +204,54 @@ class JSONCache(TogglCache):
             self.delete_entry(entry)
         return None
 
-    def query(
-        self,
-        *,
-        distinct: bool = False,
-        **query: dict[str, Any],
-    ) -> list[TogglClass]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> list[TogglClass]:
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
 
+        min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
         self.session.load(self.cache_path)
         search = self.session.data
-        min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
-        results: list[TogglClass] = []
-        existing_values: set[Any] = set()
+        existing: defaultdict[str, set[Any]] = defaultdict(set)
 
-        for model in search:
-            if self.expire_after and model.timestamp and min_ts >= model.timestamp:  # type: ignore[operator]
-                continue
-            if all(model[key] == value for key, value in query.items()) and (
-                not distinct or all(model[k] not in existing_values for k in query)
-            ):
-                if distinct:
-                    existing_values.add(query.values())
-                results.append(model)
-        return results
+        return [model for model in search if self._query_helper(model, query, existing, min_ts)]
+
+    def _query_helper(
+        self,
+        model: TogglClass,
+        queries: tuple[TogglQuery, ...],
+        existing: dict[str, set[Any]],
+        min_ts: Optional[datetime],
+    ) -> bool:
+        if self.expire_after and min_ts and model.timestamp and min_ts >= model.timestamp:
+            return False
+
+        for query in queries:
+            if model[query.key] in existing[query.key] or not self._match_query(model, query):
+                return False
+
+        for query in queries:
+            existing[query.key].add(model[query.key])
+
+        return True
+
+    @staticmethod
+    def _match_query(model: TogglClass, query: TogglQuery) -> bool:
+        if query.comparison == Comparison.EQUAL:
+            if isinstance(query.value, Sequence) and not isinstance(query.value, str):
+                value = model[query.key]
+                return any(value == comp for comp in query.value)
+            return model[query.key] == query.value
+        if query.comparison == Comparison.LESS_THEN:
+            return model[query.key] < query.value
+        if query.comparison == Comparison.LESS_THEN_OR_EQUAL:
+            return model[query.key] <= query.value
+        if query.comparison == Comparison.GREATER_THEN:
+            return model[query.key] > query.value
+        if query.comparison == Comparison.GREATER_THEN_OR_EQUAL:
+            return model[query.key] >= query.value
+        msg = f"{query.comparison} is not implemented!"
+        raise NotImplementedError(msg)
 
     @property
     def cache_path(self) -> Path:

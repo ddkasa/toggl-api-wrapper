@@ -1,6 +1,7 @@
 import json
 import random
 import time
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -122,6 +123,7 @@ def test_max_length(model_data, get_json_cache):
 
 @pytest.mark.unit
 def test_query(model_data, tracker_object, faker):
+    tracker_object.cache.expire_after = None
     tracker_object.cache.session.max_length = 20
     tracker_object.cache.session.data = []
     tracker_object.cache.commit()
@@ -129,15 +131,17 @@ def test_query(model_data, tracker_object, faker):
     t = model_data.pop("tracker")
     t.id = 1
 
+    d = asdict(t)
     for i in range(1, 13):
-        t.timestamp = datetime.now(timezone.utc)
-        tracker_object.cache.session.data.append(t)
-        t.id += i
-        t.name = names[i - 1]
+        d["id"] += i
+        d["name"] = names[i - 1]
+        d["timestamp"] = datetime.now(timezone.utc)
+        tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
 
     tracker_object.cache.commit()
     assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
-    assert tracker_object.query(name=names[-1])[0].name == t.name
+    assert tracker_object.query(TogglQuery("name", names[0]))[0].name == names[0]
+    assert len(tracker_object.query(TogglQuery("name", names[:5]))) == 5  # noqa: PLR2004
 
 
 @pytest.mark.unit
