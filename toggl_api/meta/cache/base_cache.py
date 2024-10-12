@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, Final, Optional
@@ -12,6 +13,14 @@ if TYPE_CHECKING:
 
     from toggl_api.meta import TogglCachedEndpoint
     from toggl_api.models import TogglClass
+
+
+class Comparison(enum.Enum):
+    EQUAL = enum.auto()
+    LESS_THEN = enum.auto()
+    LESS_THEN_OR_EQUAL = enum.auto()
+    GREATER_THEN = enum.auto()
+    GREATER_THEN_OR_EQUAL = enum.auto()
 
 
 class TogglCache(ABC):
