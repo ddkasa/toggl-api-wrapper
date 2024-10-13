@@ -94,8 +94,8 @@ class JSONCache(TogglCache):
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
-        parent: Parent endpoint that will use the cache. Usually assigned
-            automatically when supplied to a cached endpoint.
+        parent: Parent endpoint that will use the cache. Assigned automatically
+            when supplied to a cached endpoint.
         max_length: Max length of the data to be stored.
 
     Methods:
@@ -205,6 +205,23 @@ class JSONCache(TogglCache):
         return None
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> list[TogglClass]:
+        """Query method for filtering Toggl objects from cache.
+
+        Filters cached toggl objects by set of supplied queries.
+
+        Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
+        enumeration.
+
+        Args:
+            query: Any positional argument that is used becomes query argument.
+            distinct: Whether to keep the same values around.
+
+        Raises:
+            ValueError: If parent has not been set.
+
+        Returns:
+            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
+        """
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)

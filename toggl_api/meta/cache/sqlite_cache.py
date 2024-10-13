@@ -37,7 +37,7 @@ class SqliteCache(TogglCache):
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
-        parent: Parent endpoint that will use the cache. Usually assigned
+        parent: Parent endpoint that will use the cache. Assigned
             automatically when supplied to a cached endpoint.
 
     Attributes:
@@ -48,7 +48,6 @@ class SqliteCache(TogglCache):
     Methods:
         load_cache: Loads the data from disk and stores it in the data
             attribute. Invalidates any entries older than expire argument.
-
     """
 
     __slots__ = (
@@ -136,11 +135,24 @@ class SqliteCache(TogglCache):
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
         return search.filter_by(**query).first()  # type: ignore[name-defined]
 
-    def query(
-        self,
-        *query: TogglQuery,
-        distinct: bool = False,
-    ) -> Query[TogglClass]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Query[TogglClass]:
+        """Query method for filtering Toggl objects from cache.
+
+        Filters cached toggl objects by set of supplied queries.
+
+        Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
+        enumeration.
+
+        Args:
+            query: Any positional argument that is used becomes query argument.
+            distinct: Whether to keep the same values around.
+
+        Raises:
+            ValueError: If parent has not been set.
+
+        Returns:
+            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
+        """
         if self.parent is None:
             msg = "Cannot load cache without parent set!"
             raise ValueError(msg)
@@ -149,6 +161,7 @@ class SqliteCache(TogglCache):
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+
         search = self._query_helper(list(query), search)
         if distinct:
             data = [q.key for q in query]
