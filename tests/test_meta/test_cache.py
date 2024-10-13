@@ -2,7 +2,7 @@ import json
 import random
 import time
 from dataclasses import asdict
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -44,6 +44,36 @@ from toggl_api.user import UserEndpoint
 )
 def test_cache_query(faker, value, comparison):
     assert TogglQuery(faker.name(), value, comparison)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("value", "expected", "comparison"),
+    [
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.min.time()),  # noqa: DTZ002
+            Comparison.LESS_THEN,
+        ),
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.max.time()),  # noqa: DTZ002
+            Comparison.GREATER_THEN,
+        ),
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.min.time()),  # noqa: DTZ002
+            Comparison.GREATER_THEN_OR_EQUAL,
+        ),
+    ],
+)
+def test_cache_query_conversion(faker, value, expected, comparison):
+    q = TogglQuery(faker.name(), value, comparison)
+
+    assert isinstance(q.value, datetime)
+    assert q.value.hour == expected.hour
+    assert q.value.minute == expected.minute
+    assert q.value.second == expected.second
 
 
 @pytest.mark.unit
@@ -180,3 +210,30 @@ def test_cache_sync(  # noqa: PLR0913, PLR0917
     tracker = user_object.get(tracker_id, refresh=True)
     assert isinstance(tracker, TogglTracker)
     assert endpoint.get(tracker_id) == tracker
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "comparison",
+    [
+        pytest.param(
+            None,
+            marks=pytest.mark.xfail(
+                reason="Not a comparison enumeration.",
+                raises=NotImplementedError,
+            ),
+        ),
+        Comparison.LESS_THEN,
+        Comparison.GREATER_THEN,
+        Comparison.GREATER_THEN_OR_EQUAL,
+        Comparison.LESS_THEN_OR_EQUAL,
+        Comparison.EQUAL,
+    ],
+)
+def test_match_query_helper(tracker_object, comparison, tmp_path, faker, number):
+    cache = tracker_object.cache
+    params = TogglQuery("start", datetime.now(tz=timezone.utc), comparison)
+
+    model = TogglTracker(number, faker.name())
+
+    assert isinstance(cache._match_query(model, params), bool)  # noqa: SLF001
