@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+import time
+from datetime import datetime, timedelta, timezone
 
 import httpx
 import pytest
@@ -77,18 +78,22 @@ def test_tracker_get_error(user_object, httpx_mock):
 
 @pytest.mark.integration
 def test_tracker_collection_param_since(user_object, add_tracker):
-    ts = datetime.now(tz=timezone.utc)
-    collection = user_object.collect(since=int(ts.timestamp()), refresh=True)
+    collection = user_object.collect(since=int(datetime.now(tz=timezone.utc).timestamp()), refresh=True)
     assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
 
-    collection = user_object.collect(since=ts)
+    time.sleep(1)
+
+    collection = user_object.collect(since=datetime.now(tz=timezone.utc) - timedelta(1))
     assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
 
 
 @pytest.mark.integration
-def test_tracker_collection_param_before(user_object, add_tracker):
+def test_tracker_collection_param_before(user_object, add_tracker, tracker_object):
+    tracker_object.stop(add_tracker)
+
     ts = datetime.now(tz=timezone.utc)
-    collect = user_object.collect(before=ts.date(), refresh=True)
+    before = ts - timedelta(weeks=1)
+    collect = user_object.collect(before=before.date(), refresh=False)
     assert not any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
 
     collect = user_object.collect(before=ts)
@@ -102,6 +107,12 @@ def test_tracker_collection_date(user_object, add_tracker):
         start_date=ts.replace(hour=(ts.hour - 1) % 24),
         end_date=ts.replace(year=ts.year + 1),
         refresh=True,
+    )
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+    collect = user_object.collect(
+        start_date=ts.replace(hour=(ts.hour - 1) % 24),
+        end_date=ts.replace(year=ts.year + 1),
     )
     assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
 
@@ -124,10 +135,7 @@ def test_tracker_collection_date(user_object, add_tracker):
 )
 def test_tracker_collection_errors(user_object, start_date, end_date, match):
     now = datetime.now(tz=timezone.utc)
-    with pytest.raises(
-        ValueError,
-        match=match,
-    ):
+    with pytest.raises(ValueError, match=match):
         user_object.collect(
             start_date=start_date(now),
             end_date=end_date(now),

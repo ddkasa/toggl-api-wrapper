@@ -3,6 +3,8 @@ from typing import Final, Optional
 
 from httpx import HTTPError, HTTPStatusError
 
+from toggl_api import Comparison, TogglQuery
+
 from .meta import TogglCachedEndpoint
 from .models import TogglTracker
 from .utility import format_iso
@@ -33,6 +35,36 @@ class UserEndpoint(TogglCachedEndpoint):
 
         return response if isinstance(response, TogglTracker) else None
 
+    def _collect_cache(
+        self,
+        since: Optional[int | datetime] = None,
+        before: Optional[date] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> list[TogglTracker]:
+        cache: list[TogglTracker] = []
+        if since or before:
+            queries: list[TogglQuery[date]] = []
+
+            if since:
+                since = datetime.fromtimestamp(since, tz=timezone.utc) if isinstance(since, int) else since
+                queries.append(TogglQuery("timestamp", since, Comparison.GREATER_THEN))
+
+            if before:
+                queries.append(TogglQuery("start", before, Comparison.LESS_THEN))
+
+            cache.extend(self.query(*queries))
+
+        elif start_date and end_date:
+            cache.extend(
+                self.query(
+                    TogglQuery("start", start_date, Comparison.GREATER_THEN_OR_EQUAL),
+                    TogglQuery("start", end_date, Comparison.LESS_THEN_OR_EQUAL),
+                ),
+            )
+
+        return cache
+
     def collect(
         self,
         since: Optional[int | datetime] = None,
@@ -46,9 +78,12 @@ class UserEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-timeentries)
 
+        Missing meta and include_sharing query flags not supported by wrapper at
+        the moment.
+
         Args:
-            since: Get entries modified since this date using UNIX timestamp,
-                including deleted ones.
+            since: Get entries modified since this date using UNIX timestamp.
+                Includes deleted ones if refreshing.
             before: Get entries with start time, before given date (YYYY-MM-DD)
                 or with time in RFC3339 format.
             start_date: Get entries with start time, from start_date YYYY-MM-DD
@@ -62,17 +97,10 @@ class UserEndpoint(TogglCachedEndpoint):
 
         Returns:
             list[TogglTracker]: List of TogglTracker objects that are within
-                specified parameters. Empty if none matched.
+                specified parameters. Empty if none is matched.
         """
 
-        params = "time_entries"
-        if since:
-            format_since = int(since.timestamp()) if isinstance(since, datetime) else since
-            params += f"?since={format_since}"
-        if before:
-            params += "&" if since else "?"
-            params += f"before={format_iso(before)}"
-        elif start_date and end_date:
+        if start_date and end_date:
             if end_date < start_date:
                 msg = "end_date must be after the start_date!"
                 raise ValueError(msg)
@@ -80,10 +108,23 @@ class UserEndpoint(TogglCachedEndpoint):
                 msg = "start_date must not be earlier than the current date!"
                 raise ValueError(msg)
 
-            params += f"?start_date={format_iso(start_date)}&end_date={format_iso(end_date)}"
-        response = self.request(params, refresh=refresh)
+        if not refresh:
+            return self._collect_cache(since, before, start_date, end_date)
 
-        # TODO: Need to filter cached trackers.
+        params = "time_entries"
+        if since or before:
+            if since:
+                format_since = int(since.timestamp()) if isinstance(since, datetime) else since
+                params += f"?since={format_since}"
+
+            if before:
+                params += "&" if since else "?"
+                params += f"before={format_iso(before)}"
+
+        elif start_date and end_date:
+            params += f"?start_date={format_iso(start_date)}&end_date={format_iso(end_date)}"
+
+        response = self.request(params)
 
         return response if isinstance(response, list) else []
 
