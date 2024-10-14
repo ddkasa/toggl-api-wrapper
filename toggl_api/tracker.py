@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Final, Literal, Optional
@@ -9,6 +10,8 @@ from httpx import HTTPStatusError
 from toggl_api.meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from toggl_api.models import TogglTracker
 from toggl_api.utility import format_iso
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 @dataclass
@@ -90,11 +93,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     TRACKER_ALREADY_STOPPED: Final[int] = 409
 
-    def edit(
-        self,
-        tracker: TogglTracker | int,
-        body: TrackerBody,
-    ) -> TogglTracker | None:
+    def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
         """Edit an existing tracker based on the supplied parameters within the body.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#put-timeentries)
@@ -119,6 +118,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
         if not isinstance(data, self.model):
+            log.error("Failed to edit tracker with the id %s!", tracker, extra={"body": body})
             return None
 
         return data
@@ -134,16 +134,16 @@ class TrackerEndpoint(TogglCachedEndpoint):
         Returns:
             None: If the tracker was deleted or not found at all.
         """
-
+        tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
-            self.request(
-                f"/{tracker if isinstance(tracker, int) else tracker.id}",
-                method=RequestMethod.DELETE,
-                refresh=True,
-            )
+            self.request(f"/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
             if err.response.status_code != self.NOT_FOUND:
                 raise
+            log.warning(
+                "Tracker with id %s was either already deleted or did not exist in the first place!",
+                tracker_id,
+            )
 
         if isinstance(tracker, int):
             trk = self.cache.find_entry({"id": tracker})
@@ -163,8 +163,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
             tracker: Tracker object with IP to stop.
 
         Returns:
-            TogglTracker: If the tracker was stopped or if the tracker wasn't
-                running it will return None.
+            TogglTracker | None: If the tracker was stopped or if the tracker
+                wasn't running it will return None.
         """
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
@@ -177,6 +177,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
         except HTTPStatusError as err:
             if err.response.status_code != self.TRACKER_ALREADY_STOPPED:
                 raise
+            log.warning("Tracker with id %s was already stopped!", tracker)
         return None
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
@@ -201,6 +202,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         if body.start is None and body.start_date is None:
             body.start = datetime.now(tz=timezone.utc)
+            log.info(
+                "Body is missing a start. Setting to %s...",
+                body.start,
+                extra={"body": body},
+            )
             if body.stop is None:
                 body.duration = -1
 

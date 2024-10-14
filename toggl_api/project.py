@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Final, Optional
@@ -8,6 +9,8 @@ from toggl_api.utility import format_iso
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 @dataclass
@@ -104,12 +107,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         """
         return self.request("", refresh=refresh)
 
-    def get(
-        self,
-        project_id: int | TogglProject,
-        *,
-        refresh: bool = False,
-    ) -> TogglProject | None:
+    def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
         """Request a projects based on its id.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceproject)
@@ -130,6 +128,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             )
         except HTTPStatusError as err:
             if err.response.status_code == self.NOT_FOUND:
+                log.warning("Project with id %s was not found!", project_id)
                 return None
             raise
 
@@ -140,11 +139,21 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#delete-workspaceproject)
         """
-        self.request(
-            f"/{project if isinstance(project, int) else project.id}",
-            method=RequestMethod.DELETE,
-            refresh=True,
-        )
+
+        project_id = project if isinstance(project, int) else project.id
+        try:
+            self.request(
+                f"/{project_id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code != self.NOT_FOUND:
+                raise
+            log.warning(
+                "Project with id %s was either already deleted or did not exist in the first place!",
+                project_id,
+            )
 
         if isinstance(project, int):
             project = self.cache.find_entry({"id": project})  # type: ignore[assignment]

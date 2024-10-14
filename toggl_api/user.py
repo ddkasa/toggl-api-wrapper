@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime, timezone
 from typing import Final, Optional
 
@@ -8,6 +9,8 @@ from toggl_api import Comparison, TogglQuery
 from .meta import TogglCachedEndpoint
 from .models import TogglTracker
 from .utility import format_iso
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 class UserEndpoint(TogglCachedEndpoint):
@@ -30,6 +33,7 @@ class UserEndpoint(TogglCachedEndpoint):
             response = self.request("time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
             if err.response.status_code == self.TRACKER_NOT_RUNNING:
+                log.warning("No tracker is currently running!")
                 return None
             raise
 
@@ -160,6 +164,7 @@ class UserEndpoint(TogglCachedEndpoint):
             )
         except HTTPStatusError as err:
             if err.response.status_code == self.NOT_FOUND:
+                log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise
 
@@ -173,6 +178,8 @@ class UserEndpoint(TogglCachedEndpoint):
         try:
             TogglCachedEndpoint.request(self, "logged")
         except HTTPError:
+            log.critical("Failed to verify authentication!")
+            log.exception("%s")
             return False
 
         return True

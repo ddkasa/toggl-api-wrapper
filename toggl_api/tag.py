@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import logging
+
+from httpx import HTTPStatusError
+
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 class TagEndpoint(TogglCachedEndpoint):
@@ -46,11 +52,20 @@ class TagEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#delete-delete-tag)
         """
-        self.request(
-            f"/{tag if isinstance(tag, int) else tag.id}",
-            method=RequestMethod.DELETE,
-            refresh=True,
-        )
+        tag_id = tag if isinstance(tag, int) else tag.id
+        try:
+            self.request(
+                f"/{tag_id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code != self.NOT_FOUND:
+                raise
+            log.warning(
+                "Tag with id %s was either already deleted or did not exist in the first place!",
+                tag_id,
+            )
 
         if isinstance(tag, int):
             tag_model = self.cache.find_entry({"id": tag})

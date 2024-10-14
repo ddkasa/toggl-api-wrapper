@@ -22,7 +22,7 @@ from .enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-log = logging.getLogger("toggl-api")
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 class TogglEndpoint(ABC):
@@ -108,10 +108,16 @@ class TogglEndpoint(ABC):
 
             if response.status_code >= self.SERVER_ERROR and retries:
                 delay = random.randint(1, 5)
+                retries -= 1
                 log.error(
-                    "Status code %s is a server error. Retrying request in %s seconds",
+                    (
+                        "Status code %s is a server error. "
+                        "Retrying request in %s seconds. "
+                        "There are %s retries left."
+                    ),
                     response.status_code,
                     delay,
+                    retries,
                 )
                 # NOTE: According to https://engineering.toggl.com/docs/#generic-responses
                 time.sleep(delay)
@@ -122,7 +128,7 @@ class TogglEndpoint(ABC):
                     body,
                     method,
                     raw=raw,
-                    retries=retries - 1,
+                    retries=retries,
                 )
 
             response.raise_for_status()
@@ -164,6 +170,8 @@ class TogglEndpoint(ABC):
         try:
             result = httpx.get("https://api.track.toggl.com/api/v9/status").json()
         except httpx.HTTPStatusError:
+            log.critical("Failed to get a response from the Toggl API!")
+            log.exception("%s")
             return False
 
-        return result.get("status") == "OK"
+        return bool(result) and result.get("status") == "OK"

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional, get_args
 
@@ -5,6 +6,9 @@ from httpx import HTTPStatusError
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
+
 
 CLIENT_STATUS = Literal["active", "archived", "both"]
 
@@ -75,12 +79,7 @@ class ClientEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
 
-    def get(
-        self,
-        client_id: int | TogglClient,
-        *,
-        refresh: bool = False,
-    ) -> TogglClient | None:
+    def get(self, client_id: int | TogglClient, *, refresh: bool = False) -> TogglClient | None:
         """Request a client based on its id.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-load-client-from-id)
@@ -109,16 +108,13 @@ class ClientEndpoint(TogglCachedEndpoint):
             )
         except HTTPStatusError as err:
             if err.response.status_code == self.NOT_FOUND:
+                log.warning("Client with id %s does not exist!", client_id)
                 return None
             raise
 
         return response or None
 
-    def edit(
-        self,
-        client: TogglClient | int,
-        body: ClientBody,
-    ) -> TogglClient | None:
+    def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient | None:
         """Edit a client with the supplied parameters from the body.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#put-change-client)
@@ -131,6 +127,7 @@ class ClientEndpoint(TogglCachedEndpoint):
             TogglClient | None: Newly edited client or None if not found.
         """
         if body.status:
+            log.warning("Client status not supported by edit endpoint")
             body.status = None
 
         if isinstance(client, TogglClient):
@@ -147,11 +144,16 @@ class ClientEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)
         """
-        self.request(
-            f"/{client if isinstance(client, int) else client.id}",
-            method=RequestMethod.DELETE,
-            refresh=True,
-        )
+        client_id = client if isinstance(client, int) else client.id
+        try:
+            self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
+        except HTTPStatusError as err:
+            if err.response.status_code != self.NOT_FOUND:
+                raise
+            log.warning(
+                "Client with id %s was either already deleted or did not exist in the first place!",
+                client_id,
+            )
         if isinstance(client, int):
             clt = self.cache.find_entry({"id": client})
             if not isinstance(clt, TogglClient):
