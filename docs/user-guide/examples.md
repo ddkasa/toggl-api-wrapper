@@ -62,6 +62,19 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 ![Total recorded monthly minutes spent on Toggl API Wrapper in 2024](../static/images/total-minutes-may-to-october-2024.svg)
 
+### Logging Example
+
+```python
+{% include "examples/logging_example.py" %}
+```
+
+**Outputs**:
+
+```
+INFO [2024-10-15 12:08:21] toggl-api-wrapper - Detected an api token as authentication.
+INFO [2024-10-15 12:08:21] httpx - HTTP Request: GET https://api.track.toggl.com/api/v9/me/logged "HTTP/1.1 200 OK"
+```
+
 ## Applications Using Toggl API Wrapper
 
 - [Ulauncher Toggl Extension](https://github.com/ddkasa/ulauncher-toggl-extension)
