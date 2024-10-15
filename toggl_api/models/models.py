@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -10,6 +11,9 @@ from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
     from typing import Optional
+
+
+log = logging.getLogger("toggl-api-wrapper.model")
 
 
 @dataclass
@@ -194,11 +198,16 @@ class TogglTracker(WorkspaceChild):
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglTracker:
+        start = kwargs.get("start")
+        if start is None:
+            start = datetime.now(tz=timezone.utc)
+            log.info("No start time provided. Using current time as start time: %s", start)
+
         return cls(
             id=kwargs["id"],
             name=kwargs.get("description", kwargs.get("name", "")),
             workspace=get_workspace(kwargs),
-            start=kwargs.get("start", datetime.now(tz=timezone.utc)),
+            start=start,
             duration=kwargs.get("duration"),
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id", kwargs.get("project")),

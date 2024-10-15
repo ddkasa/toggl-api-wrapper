@@ -1,9 +1,12 @@
 import configparser
+import logging
 import os
 from pathlib import Path
 from typing import Optional
 
 from httpx import BasicAuth
+
+log = logging.getLogger("toggl-api-wrapper")
 
 
 class AuthenticationError(ValueError):
@@ -30,6 +33,11 @@ def generate_authentication() -> BasicAuth:
 
     password = os.getenv("TOGGL_PASSWORD", "api_token")
 
+    if password == "api_token":  # noqa: S105
+        log.info("Detected an api token as authentication.")
+    else:
+        log.info("Detected an email and password combo as authentication.")
+
     return BasicAuth(api_token, password)
 
 
@@ -50,7 +58,9 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         BasicAuth: BasicAuth object that is used with httpx client.
     """
     if config_path is None:
+        log.debug("Using default path for .togglrc configuration.")
         config_path = Path.home()
+
     config_path /= ".togglrc"
     if not config_path.exists():
         msg = f"Config file not found: {config_path}"

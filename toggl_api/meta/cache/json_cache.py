@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
 import time
 from collections import defaultdict
 from collections.abc import Sequence
@@ -29,6 +30,8 @@ if TYPE_CHECKING:
 
     from toggl_api.meta import RequestMethod
     from toggl_api.meta.cached_endpoint import TogglCachedEndpoint
+
+log = logging.getLogger("toggl-api-wrapper.cache")
 
 
 @dataclass
@@ -96,7 +99,7 @@ class JSONCache(TogglCache):
             If set to None the cache will never expire.
         parent: Parent endpoint that will use the cache. Assigned automatically
             when supplied to a cached endpoint.
-        max_length: Max length of the data to be stored.
+        max_length: Max length list of the data to be stored permanently.
 
     Methods:
         commit: Wrapper for JSONSession.save() that saves the current json data
@@ -126,6 +129,7 @@ class JSONCache(TogglCache):
         self.session = JSONSession(max_length=max_length)
 
     def commit(self) -> None:
+        log.debug("Saving cache to disk!")
         self.session.commit(self.cache_path)
 
     def save_cache(
@@ -168,22 +172,14 @@ class JSONCache(TogglCache):
         self.session.data[index] = item
         return None
 
-    def add_entries(
-        self,
-        update: list[TogglClass] | TogglClass,
-        **kwargs,
-    ) -> None:
+    def add_entries(self, update: list[TogglClass] | TogglClass, **kwargs) -> None:
         if isinstance(update, TogglClass):
             return self.add_entry(update)
         for item in update:
             self.add_entry(item)
         return None
 
-    def update_entries(
-        self,
-        update: list[TogglClass] | TogglClass,
-        **kwargs,
-    ) -> None:
+    def update_entries(self, update: list[TogglClass] | TogglClass, **kwargs) -> None:
         self.add_entries(update)
 
     def delete_entry(self, entry: TogglClass) -> None:
@@ -225,6 +221,8 @@ class JSONCache(TogglCache):
         if self.parent is None:
             msg = "Cannot load cache without parent!"
             raise ValueError(msg)
+
+        log.debug("Querying cache with %s parameters.", len(query), extra={"query": query})
 
         min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
         self.session.load(self.cache_path)

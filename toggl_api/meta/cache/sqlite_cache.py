@@ -89,12 +89,13 @@ class SqliteCache(TogglCache):
         query = self.session.query(self.parent.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
-            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, union-attr, operator]
         return query
 
     def add_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
         if isinstance(entry, TogglClass):
             entry = (entry,)
+
         for item in entry:
             if self.find_entry(item):
                 self.update_entries(item)
@@ -132,7 +133,7 @@ class SqliteCache(TogglCache):
         search = self.session.query(self.parent.model)
         if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, operator]
         return search.filter_by(**query).first()  # type: ignore[name-defined]
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Query[TogglClass]:
@@ -151,7 +152,8 @@ class SqliteCache(TogglCache):
             ValueError: If parent has not been set.
 
         Returns:
-            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
+            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.:WA
+
         """
         if self.parent is None:
             msg = "Cannot load cache without parent set!"
@@ -160,14 +162,14 @@ class SqliteCache(TogglCache):
         search = self.session.query(self.parent.model)
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[operator]
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, operator]
 
         search = self._query_helper(list(query), search)
         if distinct:
             data = [q.key for q in query]
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", DeprecationWarning)
-                search = search.distinct(*data).group_by(*data)
+                search = search.distinct(*data).group_by(*data)  # type: ignore[arg-type]
         return search
 
     def _query_helper(self, query: list[TogglQuery], query_obj: Query[TogglClass]) -> Query[TogglClass]:
