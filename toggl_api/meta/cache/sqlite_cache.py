@@ -88,8 +88,8 @@ class SqliteCache(TogglCache):
             raise ValueError(msg)
         query = self.session.query(self.parent.model)
         if self.expire_after is not None:
-            min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
-            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, union-attr, operator]
+            min_ts = datetime.now(timezone.utc) - self.expire_after
+            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
         return query
 
     def add_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
@@ -133,8 +133,8 @@ class SqliteCache(TogglCache):
         search = self.session.query(self.parent.model)
         if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, operator]
-        return search.filter_by(**query).first()  # type: ignore[name-defined]
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
+        return search.filter_by(**query).first()
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Query[TogglClass]:
         """Query method for filtering Toggl objects from cache.
@@ -161,8 +161,8 @@ class SqliteCache(TogglCache):
 
         search = self.session.query(self.parent.model)
         if isinstance(self.expire_after, timedelta):
-            min_ts = datetime.now(timezone.utc) - self._expire_after  # type: ignore[operator]
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type, operator]
+            min_ts = datetime.now(timezone.utc) - self.expire_after
+            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
 
         search = self._query_helper(list(query), search)
         if distinct:
