@@ -152,8 +152,7 @@ class SqliteCache(TogglCache):
             ValueError: If parent has not been set.
 
         Returns:
-            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.:WA
-
+            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
         """
         if self.parent is None:
             msg = "Cannot load cache without parent set!"
