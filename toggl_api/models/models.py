@@ -29,7 +29,7 @@ class TogglClass(ABC):
     __tablename__ = "base"
     id: int
     name: str
-    timestamp: Optional[datetime] = field(
+    timestamp: datetime = field(
         compare=False,
         repr=False,
         default_factory=partial(
@@ -52,7 +52,7 @@ class TogglClass(ABC):
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
     def __getitem__(self, item: str) -> Any:
@@ -93,7 +93,7 @@ class WorkspaceChild(TogglClass):
             id=kwargs["id"],
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
 
@@ -140,7 +140,7 @@ class TogglProject(WorkspaceChild):
             color=kwargs["color"],
             client=kwargs.get("client_id", kwargs.get("client")),
             active=kwargs["active"],
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
 
@@ -212,7 +212,7 @@ class TogglTracker(WorkspaceChild):
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id", kwargs.get("project")),
             tags=TogglTracker.get_tags(**kwargs),
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
     @staticmethod
