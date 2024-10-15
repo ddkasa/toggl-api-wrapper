@@ -6,9 +6,9 @@ from typing import Any, Generic, Literal, Optional, TypeVar
 
 from httpx import Response
 
-from toggl_api.modules.meta import BaseBody, TogglEndpoint
-from toggl_api.modules.meta.enums import RequestMethod
-from toggl_api.modules.models.models import TogglProject
+from toggl_api.meta import BaseBody, TogglEndpoint
+from toggl_api.meta.enums import RequestMethod
+from toggl_api.models.models import TogglProject
 from toggl_api.utility import format_iso
 
 REPORT_FORMATS = Literal["pdf", "csv"]
@@ -479,7 +479,7 @@ class DetailedReportEndpoint(ReportEndpoint):
     def search_time_entries(
         self,
         body: ReportBody,
-        pagination: PaginationOptions,
+        pagination: Optional[PaginationOptions] = None,
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[list]:
@@ -495,6 +495,8 @@ class DetailedReportEndpoint(ReportEndpoint):
         Returns:
             PaginatedResult: data with pagination information if required.
         """
+
+        pagination = pagination or PaginationOptions()
 
         request: Response = self.request(
             "",
@@ -516,7 +518,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         self,
         body: ReportBody,
         extension: REPORT_FORMATS,
-        pagination: PaginationOptions,
+        pagination: Optional[PaginationOptions] = None,
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[bytes]:
@@ -534,6 +536,8 @@ class DetailedReportEndpoint(ReportEndpoint):
             bytes: Report ready to be saved or further processed in python.
         """
         _validate_extension(extension)
+
+        pagination = pagination or PaginationOptions()
         request = self.request(
             f".{extension}",
             body=self._paginate_body(

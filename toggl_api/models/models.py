@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -10,6 +11,9 @@ from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
     from typing import Optional
+
+
+log = logging.getLogger("toggl-api-wrapper.model")
 
 
 @dataclass
@@ -25,7 +29,7 @@ class TogglClass(ABC):
     __tablename__ = "base"
     id: int
     name: str
-    timestamp: Optional[datetime] = field(
+    timestamp: datetime = field(
         compare=False,
         repr=False,
         default_factory=partial(
@@ -48,7 +52,7 @@ class TogglClass(ABC):
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
     def __getitem__(self, item: str) -> Any:
@@ -89,7 +93,7 @@ class WorkspaceChild(TogglClass):
             id=kwargs["id"],
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
 
@@ -109,7 +113,7 @@ class TogglProject(WorkspaceChild):
 
     Attributes:
         color: Color of the project. Defaults to blue. Refer to
-            [ProjectEndpoint][toggl_api.modules.project.ProjectEndpoint] for
+            [ProjectEndpoint][toggl_api.ProjectEndpoint] for
             all colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
@@ -136,7 +140,7 @@ class TogglProject(WorkspaceChild):
             color=kwargs["color"],
             client=kwargs.get("client_id", kwargs.get("client")),
             active=kwargs["active"],
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
 
@@ -194,16 +198,21 @@ class TogglTracker(WorkspaceChild):
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglTracker:
+        start = kwargs.get("start")
+        if start is None:
+            start = datetime.now(tz=timezone.utc)
+            log.info("No start time provided. Using current time as start time: %s", start)
+
         return cls(
             id=kwargs["id"],
             name=kwargs.get("description", kwargs.get("name", "")),
             workspace=get_workspace(kwargs),
-            start=kwargs.get("start", datetime.now(tz=timezone.utc)),
+            start=start,
             duration=kwargs.get("duration"),
             stop=kwargs.get("stop"),
             project=kwargs.get("project_id", kwargs.get("project")),
             tags=TogglTracker.get_tags(**kwargs),
-            timestamp=kwargs.get("timestamp"),
+            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
         )
 
     @staticmethod

@@ -1,4 +1,5 @@
 import pytest
+from httpx import HTTPStatusError
 
 from toggl_api import ClientBody, TogglClient
 
@@ -24,14 +25,24 @@ def test_client_model(get_workspace_id):
 
 
 @pytest.mark.unit
-def test_client_body(create_client_body, faker):
-    assert isinstance(create_client_body, ClientBody)
-    create_client_body.status = faker.name()
-    create_client_body.notes = faker.name()
-    data = create_client_body.format("endpoint", workspace_id=create_client_body.workspace_id)
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        ("active", "active"),
+        ("archived", "archived"),
+        ("both", "both"),
+        ("Random", None),
+    ],
+)
+def test_client_body(status, expected, faker, get_workspace_id):
+    body = ClientBody(faker.name(), status, faker.sentence())
+    assert isinstance(body, ClientBody)
+    data = body.format("endpoint", wid=get_workspace_id)
 
-    assert data["status"] == create_client_body.status
-    assert data["notes"] == create_client_body.notes
+    assert data["wid"] == get_workspace_id
+    assert data["name"] == body.name
+    assert data.get("status") == expected
+    assert data["notes"] == body.notes
 
 
 @pytest.mark.unit
@@ -43,18 +54,25 @@ def test_client_name(client_object, create_client_body, monkeypatch):
 
 @pytest.mark.integration
 @pytest.mark.order(after="test_client_model")
-def test_gets(client_object, get_workspace_id, create_client):
-    clients = client_object.collect(refresh=False)
-    assert len(clients) > 0
-    assert any(client.name == create_client.name for client in clients)
-    clients = client_object.collect(refresh=True)
+@pytest.mark.parametrize(
+    ("body"),
+    [
+        ClientBody("test"),
+        ClientBody(status="active"),
+        ClientBody(notes="resting"),
+    ],
+)
+def test_client_collect(body, client_object, get_workspace_id, create_client):
+    body = ClientBody(create_client.name, "active")
+
+    clients = client_object.collect(body=body, refresh=True)
     assert len(clients) > 0
     assert any(client.name == create_client.name for client in clients)
 
 
 @pytest.mark.integration
-@pytest.mark.order(after="test_gets")
-def test_get(client_object, get_workspace_id, create_client):
+@pytest.mark.order(after="test_client_collect")
+def test_client_get(client_object, get_workspace_id, create_client):
     client = client_object.get(create_client)
     assert isinstance(client, TogglClient)
     assert client.id == create_client.id
@@ -68,6 +86,26 @@ def test_get(client_object, get_workspace_id, create_client):
     assert client.id == create_client.id
 
 
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("error"),
+    [
+        pytest.param(
+            500,
+            marks=pytest.mark.xfail(
+                HTTPStatusError,
+                reason="Raising any error thats not 200 or 409.",
+            ),
+        ),
+        404,
+        200,
+    ],
+)
+def test_client_get_errors(error, httpx_mock, client_object, number):
+    httpx_mock.add_response(status_code=error)
+    assert client_object.get(number, refresh=True) is None
+
+
 @pytest.mark.integration
 @pytest.mark.order(after="test_client_get")
 def test_client_create(client_object, create_client_body, create_client):
@@ -78,6 +116,7 @@ def test_client_create(client_object, create_client_body, create_client):
 @pytest.mark.integration
 @pytest.mark.order(after="test_client_create")
 def test_client_update(client_object, create_client_body, create_client, monkeypatch):
+    create_client_body.status = "active"
     monkeypatch.setattr(create_client_body, "name", create_client_body.name + "_2")
     client = client_object.edit(create_client, body=create_client_body)
     assert isinstance(client, TogglClient)
@@ -96,3 +135,10 @@ def test_client_delete(client_object, get_workspace_id, create_client):
 def test_client_delete_id(client_object, get_workspace_id, create_client):
     assert isinstance(create_client, TogglClient)
     client_object.delete(create_client.id)
+
+
+@pytest.mark.unit
+def test_client_delete_error(httpx_mock, client_object, number):
+    httpx_mock.add_response(status_code=500)
+    with pytest.raises(HTTPStatusError):
+        client_object.delete(number)

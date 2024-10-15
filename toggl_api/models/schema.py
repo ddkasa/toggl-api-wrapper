@@ -1,75 +1,32 @@
-import contextlib
-import warnings
-from datetime import datetime, timezone
-from typing import Any, Optional
+# ruff: noqa: E402
 
-import sqlalchemy as db
-from sqlalchemy.engine import Engine
-from sqlalchemy.exc import ArgumentError
-from sqlalchemy.orm import registry, relationship
-from sqlalchemy.sql import func
-from sqlalchemy.types import DateTime, TypeDecorator
+from __future__ import annotations
+
+import contextlib
+from typing import TYPE_CHECKING, Optional
+
+with contextlib.suppress(ImportError):
+    import sqlalchemy as db
+    from sqlalchemy.exc import ArgumentError
+    from sqlalchemy.orm import registry, relationship
+    from sqlalchemy.sql import func
+
+
+from toggl_api.utility import requires
 
 from .models import TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 
-
-# NOTE: From sqlalchemy-utc package.
-class UTCDateTime(TypeDecorator):
-    """Almost equivalent to :class:`~sqlalchemy.types.DateTime` with
-    ``timezone=True`` option, but it differs from that by:
-
-    - Never silently take naive :class:`~datetime.datetime`, instead it
-      always raise :exc:`ValueError` unless time zone aware value.
-    - :class:`~datetime.datetime` value's :attr:`~datetime.datetime.tzinfo`
-      is always converted to UTC.
-    - Unlike SQLAlchemy's built-in :class:`~sqlalchemy.types.DateTime`,
-      it never return naive :class:`~datetime.datetime`, but time zone
-      aware value, even with SQLite or MySQL.
-
-    """
-
-    impl = DateTime(timezone=True)
-    cache_ok = True
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        warnings.warn(
-            "SQLAlchemy will become an optional dependency in v1.0.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-    def process_bind_param(  # type: ignore[override]
-        self,
-        value: datetime,
-        _,
-    ) -> Optional[datetime]:
-        if value is not None:
-            if not isinstance(value, datetime):
-                raise TypeError("expected datetime.datetime, not " + repr(value))
-            if value.tzinfo is None:
-                msg = "naive datetime is disallowed"
-                raise ValueError(msg)
-            return value.astimezone(timezone.utc)
-        return None
-
-    def process_result_value(  # type: ignore[override]
-        self,
-        value: Optional[datetime],
-        _,
-    ) -> Optional[datetime]:
-        if value is not None:
-            value = value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
-        return value
+with contextlib.suppress(ImportError):
+    from ._decorators import UTCDateTime
 
 
-def register_tables(engine: Engine) -> db.MetaData:
-    warnings.warn(
-        "SQLAlchemy will become an optional dependency in v1.0.0",
-        DeprecationWarning,
-        stacklevel=1,
-    )
+if TYPE_CHECKING:
+    from sqlalchemy import MetaData, Table
+    from sqlalchemy.engine import Engine
 
+
+@requires("sqlalchemy")
+def register_tables(engine: Engine) -> MetaData:
     metadata = db.MetaData()
 
     workspace = db.Table(
@@ -154,12 +111,13 @@ def register_tables(engine: Engine) -> db.MetaData:
     return metadata
 
 
+@requires("sqlalchemy")
 def _map_imperatively(
     cls: type,
-    table: db.Table,
+    table: Table,
     properties: Optional[dict] = None,
 ) -> None:
     mapper_registry = registry()
-    properties = {} if properties is None else properties
+    properties = properties or {}
     with contextlib.suppress(ArgumentError):
         mapper_registry.map_imperatively(cls, table, properties=properties)

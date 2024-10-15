@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     import httpx
 
+    from toggl_api.meta.cache.base_cache import TogglQuery
     from toggl_api.modules.models import TogglClass
 
     from .cache import TogglCache
@@ -78,6 +79,7 @@ class TogglCachedEndpoint(TogglEndpoint):
                 Defaults to None.
             method: Request method. Defaults to GET.
             refresh: Whether to refresh the cache or not. Defaults to False.
+            raw (bool): Whether to use the raw data. Defaults to False.
 
         Returns:
             TogglClass | Iterable[TogglClass] | None: Toggl API response data
@@ -124,14 +126,8 @@ class TogglCachedEndpoint(TogglEndpoint):
             return None
         return self.cache.save_cache(response, method)
 
-    def query(
-        self,
-        *,
-        inverse: bool = False,
-        distinct: bool = False,
-        **query: dict[str, Any],
-    ) -> Iterable[TogglClass]:
-        return self.cache.query(inverse=inverse, distinct=distinct, **query)
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]:
+        return self.cache.query(*query, distinct=distinct)
 
     @property
     @abstractmethod

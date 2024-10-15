@@ -2,6 +2,85 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2024-10-15
+
+### 🚀 Features
+
+- *(utility)* Requires decorator
+- Python 3.13 support
+- *(cache)* Comparison enumeration
+- *(cache)* Toggl query dataclass
+
+### 🐛 Bug Fixes
+
+- *(tracker)* Adjust error type
+- *(utility)* Swap datetime conditional
+- *(endpoint)* Refactor server error retry logic
+- *(endpoints)* Return none on 404
+- *(cache)* Sqlite delete method
+- *(user)* Collect method not correctly formatting time arguments
+
+### 🚜 Refactor
+
+- [**breaking**] Merge modules with toggl_api
+- *(endpoints)* [**breaking**] Remove deprecated methods
+- *(body)* [**breaking**] Remove deprecated workspace_id parameter
+- *(deps)* [**breaking**] Convert sqlalchemy to optional dependency
+- *(workspace)* Improved get endpoint
+- *(client)* Use literal for typing status strings
+- *(tag)* Delete endpoint typing
+- *(reports)* Make pagination options optional
+- *(cache)* [**breaking**] Remove inverse flag
+- *(cache)* Abstract class query method
+- *(cache)* Json query method
+- *(cache)* Sqlite query method
+- *(user)* Fully implement collect method cache retrieval
+- *(endpoints)* Logging for caught exceptions
+- Additional debug logging
+- *(models)* Remove optional type from timestamp
+- *(cache)* Fix typing issues
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+- *(readme)* Update readme
+- *(api)* Update docs to new directory structure
+- Update examples
+- *(mermaid)* Update diagrams
+- *(cache)* Improved metaclass
+- *(panzoom)* Full screen enabled
+- *(endpoints)* Add official api links
+- Show source on endpoints
+- *(example)* Reports example
+- *(readme)* Add examples
+- *(cache)* Query docstrings added
+- *(example)* Logging example
+- *(contributing)* Additional instructions
+
+### 🎨 Styling
+
+- *(cache)* Remove optional type annotation as return
+
+### ⚙️ Miscellaneous Tasks
+
+- Update coverage config
+- *(precommit)* Added mypy
+- *(nvim)* Function for generating official docstrings
+- *(actions)* Simplify workflows
+- *(typing)* Add py.typed file
+
+### 🧪 Testing
+
+- *(user)* Additional status code tests
+- *(endpoints)* Additional argument types
+- *(reports)* Validate extensions
+- *(tracker)* Mock http status code logic
+- *(sqlite)* Additional tests
+- *(conftest)* Only delay on integration tests
+- *(tracker)* Verify creation dates logic
+- More coverage
+- *(cache)* Query conversion
+
 ## [0.5.1] - 2024-10-07
 
 ### 🐛 Bug Fixes

@@ -129,9 +129,8 @@ plugins:
             show_source: false
             show_signature_annotations: true
             show_symbol_type_heading: true
-  # - mkdocs_github_changelog:
-  #     token: !ENV GITHUB_TOKEN
-  #     enabled: True
   - callouts
+  - panzoom:
+      full_screen: true
 watch:
   - toggl_api

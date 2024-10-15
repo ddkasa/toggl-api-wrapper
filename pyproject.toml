@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "toggl-api-wrapper"
-version = "0.5.1"
+version = "1.0.0"
 description = "Simple Toggl API wrapper for non-premium features."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 license = "MIT"
@@ -10,15 +10,16 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: MIT License",
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Typing :: Typed",
 ]
-packages = [{ include = "toggl_api" }]
+packages = [{ include = "toggl_api" }, { include = "toggl_api/py.typed" }]
 
 [tool.poetry.scripts]
 clean-toggl-account = "scripts.clean_account:main"
@@ -31,7 +32,10 @@ clean-toggl-account = "scripts.clean_account:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 httpx = "^0.27.0"
-sqlalchemy = "^2.0.30"
+sqlalchemy = { version = "^2.0.30", optional = true }
+
+[tool.poetry.extras]
+sqlite = ["sqlalchemy"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
@@ -47,7 +51,6 @@ pytest-cov = "^5.0.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.0"
-
 mkdocs-callouts = "^1.13.2"
 pymdown-extensions = "^10.8.1"
 markdown = "^3.6"
@@ -64,6 +67,7 @@ mkdocs-glightbox = "^0.4.0"
 mkdocs-mermaid2-plugin = "^1.1.1"
 mkdocs-macros-plugin = "^1.0.5"
 pygments = "^2.18.0"
+mkdocs-panzoom-plugin = "^0.1.1"
 
 [tool.poetry.group.types.dependencies]
 types-sqlalchemy = "^1.4.53.38"
@@ -72,8 +76,6 @@ types-sqlalchemy = "^1.4.53.38"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.extras]
-test = ["pytest"]
 
 [tool.ruff]
 exclude = [
@@ -157,11 +159,11 @@ select = [
 ignore = [
     "S101",    # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-    "SIM102",  # sometimes it's better to nest
+    "SIM102",  # Sometimes it's better to nest
     "UP007",   # Useless `typing` imports
     "N802",
     "PLW2901",
-    "UP017",   # Python 3.10 backwards compatiblity
+    "UP017",   # Python 3.10 backwards compatibility
     "PLR6301", # Class Method Suggestion
     "S311",    # Unsafe pseudo-random generator
 ]
@@ -197,7 +199,7 @@ addopts = "--report-log=logs/pytest.jsonl --cov --cov-append  --cov-report xml"
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = ruff, mypy, py310, py311, py312
+envlist = ruff, mypy,  py312, py311, py310, py313
 
 [testenv]
 skip_install = true
@@ -219,6 +221,7 @@ python =
     3.10: py310
     3.11: py311
     3.12: ruff, mypy, py312
+    3.13: py313
 
 [testenv:mypy]
 allowlist_externals = mypy, poetry
@@ -240,4 +243,22 @@ omit = [
     "*/.pytest_cache/*",
     "docs/*",
     "scripts/*",
+    "*/.github/*",
+    "*/.tox/*",
+    "*/.git/*",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "except ImportError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
 ]

@@ -1,22 +1,23 @@
 from __future__ import annotations
 
-import warnings
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError
 
-from toggl_api.modules.meta import BaseBody, RequestMethod, TogglCachedEndpoint
-from toggl_api.modules.models import TogglTracker
+from toggl_api.meta import BaseBody, RequestMethod, TogglCachedEndpoint
+from toggl_api.models import TogglTracker
 from toggl_api.utility import format_iso
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 @dataclass
 class TrackerBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    workspace_id: Optional[int] = field(default=None)
     description: Optional[str] = field(default=None)
     duration: Optional[int | timedelta] = field(default=None)
     """Duration set in a timedelta or in seconds if using an integer."""
@@ -32,14 +33,6 @@ class TrackerBody(BaseBody):
     tags: list[str] = field(default_factory=list)
     shared_with_user_ids: list[int] = field(default_factory=list)
     created_with: str = field(default="toggl-api-wrapper")
-
-    def __post_init__(self) -> None:
-        if self.workspace_id is not None:
-            warnings.warn(
-                "The 'workspace_id' parameter will be be removed in v1.0.0",
-                DeprecationWarning,
-                stacklevel=2,
-            )
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -89,29 +82,29 @@ class TrackerBody(BaseBody):
 
         return body
 
-    def format_body(self, workspace_id: int) -> dict[str, Any]:
-        warnings.warn(
-            "Deprecated in favour of 'format' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.format("endpoint", workspace_id=workspace_id)
-
 
 class TrackerEndpoint(TogglCachedEndpoint):
     """Endpoint for modifying and creating trackers.
 
     See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/time_entries)
     """
 
     TRACKER_ALREADY_STOPPED: Final[int] = 409
 
-    def edit(
-        self,
-        tracker: TogglTracker | int,
-        body: TrackerBody,
-    ) -> TogglTracker | None:
-        """Edit an existing tracker based on the supplied parameters within the body."""
+    def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
+        """Edit an existing tracker based on the supplied parameters within the body.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#put-timeentries)
+
+        Args:
+            tracker: Target tracker model or id to edit.
+            body: Updated content to add.
+
+        Returns:
+            TogglTracker | None: A new model if successful else None.
+        """
         if (body.tag_ids or body.tags) and not body.tag_action:
             body.tag_action = "add"
 
@@ -125,20 +118,15 @@ class TrackerEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
         if not isinstance(data, self.model):
+            log.error("Failed to edit tracker with the id %s!", tracker, extra={"body": body})
             return None
 
         return data
 
-    def edit_tracker(
-        self,
-        tracker: TogglTracker | int,
-        body: TrackerBody,
-    ) -> TogglTracker | None:
-        warnings.warn("Deprecated in favour of 'edit' method.", DeprecationWarning, stacklevel=1)
-        return self.edit(tracker, body)
-
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#delete-timeentries)
 
         Args:
             tracker: Tracker object with ID to delete.
@@ -146,47 +134,42 @@ class TrackerEndpoint(TogglCachedEndpoint):
         Returns:
             None: If the tracker was deleted or not found at all.
         """
-
+        tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
-            self.request(
-                f"/{tracker if isinstance(tracker, int) else tracker.id}",
-                method=RequestMethod.DELETE,
-                refresh=True,
-            )
+            self.request(f"/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
             if err.response.status_code != self.NOT_FOUND:
                 raise
+            log.warning(
+                "Tracker with id %s was either already deleted or did not exist in the first place!",
+                tracker_id,
+            )
 
         if isinstance(tracker, int):
-            tracker = self.cache.find_entry({"id": tracker})  # type: ignore[assignment]
-            if not isinstance(tracker, TogglTracker):
+            trk = self.cache.find_entry({"id": tracker})
+            if not isinstance(trk, TogglTracker):
                 return
+            tracker = trk
 
         self.cache.delete_entries(tracker)
         self.cache.commit()
 
-    def delete_tracker(self, tracker: TogglTracker | int) -> None:
-        warnings.warn(
-            "Deprecated in favour of 'delete' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.delete(tracker)
-
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:
         """Stops a running tracker.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#patch-stop-timeentry)
 
         Args:
             tracker: Tracker object with IP to stop.
 
         Returns:
-            TogglTracker: If the tracker was stopped or if the tracker wasn't
-                running it will return None.
+            TogglTracker | None: If the tracker was stopped or if the tracker
+                wasn't running it will return None.
         """
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
         try:
-            return self.request(  # type: ignore[return-value]
+            return self.request(
                 f"/{tracker}/stop",
                 method=RequestMethod.PATCH,
                 refresh=True,
@@ -194,18 +177,13 @@ class TrackerEndpoint(TogglCachedEndpoint):
         except HTTPStatusError as err:
             if err.response.status_code != self.TRACKER_ALREADY_STOPPED:
                 raise
+            log.warning("Tracker with id %s was already stopped!", tracker)
         return None
-
-    def stop_tracker(self, tracker: TogglTracker | int) -> TogglTracker | None:
-        warnings.warn(
-            "Deprecated in favour of 'stop' method.",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-        return self.stop(tracker)
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
         """Add a new tracker.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#post-timeentries)
 
         Args:
             body: Body of the request. Description must be set. If start date
@@ -213,18 +191,22 @@ class TrackerEndpoint(TogglCachedEndpoint):
                 to -1 for a running tracker.
 
         Raises:
-            ValueError: Description must be set in order to create a new
-                tracker.
+            ValueError: Description must be set in order to create a new tracker.
 
         Returns:
             TogglTracker | None: The tracker that was created.
         """
-        if not isinstance(body.description, str):
+        if not isinstance(body.description, str) or not body.description:
             msg = "Description must be set in order to create a tracker!"
-            raise ValueError(msg)  # noqa: TRY004
+            raise TypeError(msg)
 
         if body.start is None and body.start_date is None:
             body.start = datetime.now(tz=timezone.utc)
+            log.info(
+                "Body is missing a start. Setting to %s...",
+                body.start,
+                extra={"body": body},
+            )
             if body.stop is None:
                 body.duration = -1
 
@@ -235,15 +217,7 @@ class TrackerEndpoint(TogglCachedEndpoint):
             method=RequestMethod.POST,
             body=body.format("add", workspace_id=self.workspace_id),
             refresh=True,
-        )  # type: ignore[return-value]
-
-    def add_tracker(self, body: TrackerBody) -> TogglTracker | None:
-        warnings.warn(
-            "Deprecated in favour of 'add' method.",
-            DeprecationWarning,
-            stacklevel=1,
         )
-        return self.add(body)
 
     @property
     def endpoint(self) -> str:

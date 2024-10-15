@@ -18,7 +18,7 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 **Outputs**:
 
-```
+```python
 >>> TogglTracker(
         id=3482231563,
         name="My First Tracker",
@@ -39,7 +39,7 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 **Outputs**:
 
-```
+```python
 >>> TogglProject(
         id=203366783,
         name='My First Project',
@@ -48,6 +48,31 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
         client=65298912,
         active=True,
     )
+```
+
+### Report Example
+
+- With **Plotly**, **Pandas** and **Kaleidoscope** installed.
+
+```python
+{% include "examples/reports_example.py" %}
+```
+
+**Outputs**:
+
+![Total recorded monthly minutes spent on Toggl API Wrapper in 2024](../static/images/total-minutes-may-to-october-2024.svg)
+
+### Logging Example
+
+```python
+{% include "examples/logging_example.py" %}
+```
+
+**Outputs**:
+
+```
+INFO [2024-10-15 12:08:21] toggl-api-wrapper - Detected an api token as authentication.
+INFO [2024-10-15 12:08:21] httpx - HTTP Request: GET https://api.track.toggl.com/api/v9/me/logged "HTTP/1.1 200 OK"
 ```
 
 ## Applications Using Toggl API Wrapper

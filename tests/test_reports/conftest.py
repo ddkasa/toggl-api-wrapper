@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 import pytest
 
 from toggl_api import TrackerBody
-from toggl_api.modules.reports import ReportBody
+from toggl_api.reports import ReportBody
 
 
 @pytest.fixture

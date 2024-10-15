@@ -1,34 +1,101 @@
 import json
+import random
 import time
-from datetime import datetime, timedelta, timezone
+from dataclasses import asdict
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
 
 from tests.conftest import EndPointTest
-from toggl_api.modules.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
+from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
+from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
+from toggl_api.models.models import TogglTracker
+from toggl_api.user import UserEndpoint
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("value", "comparison"),
+    [
+        (0, Comparison.EQUAL),
+        ("test_value", Comparison.EQUAL),
+        pytest.param(
+            "testvalue",
+            Comparison.GREATER_THEN,
+            marks=pytest.mark.xfail(
+                reason="None EQUAL(s) comparison with a string.",
+                raises=TypeError,
+            ),
+        ),
+        (0, Comparison.LESS_THEN),
+        (timedelta(0), Comparison.GREATER_THEN),
+        (datetime.now(tz=timezone.utc), Comparison.LESS_THEN_OR_EQUAL),
+        pytest.param(
+            ["test_value"],
+            Comparison.GREATER_THEN,
+            marks=pytest.mark.xfail(
+                reason="None EQUAL(s) comparison with a sequence.",
+                raises=TypeError,
+            ),
+        ),
+        (["test_value"], Comparison.EQUAL),
+    ],
+)
+def test_cache_query(faker, value, comparison):
+    assert TogglQuery(faker.name(), value, comparison)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("value", "expected", "comparison"),
+    [
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.min.time()),  # noqa: DTZ002
+            Comparison.LESS_THEN,
+        ),
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.max.time()),  # noqa: DTZ002
+            Comparison.GREATER_THEN,
+        ),
+        (
+            date.today(),  # noqa: DTZ011
+            datetime.combine(datetime.today(), datetime.min.time()),  # noqa: DTZ002
+            Comparison.GREATER_THEN_OR_EQUAL,
+        ),
+    ],
+)
+def test_cache_query_conversion(faker, value, expected, comparison):
+    q = TogglQuery(faker.name(), value, comparison)
+
+    assert isinstance(q.value, datetime)
+    assert q.value.hour == expected.hour
+    assert q.value.minute == expected.minute
+    assert q.value.second == expected.second
+
+
+@pytest.mark.unit
 def test_cache_path(meta_object):
     assert isinstance(meta_object.cache.cache_path, Path)
     assert meta_object.cache.cache_path.parent.exists()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
     assert get_sqlite_cache.parent is None
     endpoint = EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_json_int_arg():
     cache = JSONCache(Path("cache"), 20)
     assert cache.expire_after.seconds == 20  # noqa: PLR2004
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_cache_functionality_json(meta_object, model_data):
     model_data = model_data["tracker"]
     if meta_object.cache.cache_path.exists():
@@ -38,14 +105,14 @@ def test_cache_functionality_json(meta_object, model_data):
     meta_object.cache.cache_path.unlink()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_expire_after_setter(meta_object):
     assert meta_object.cache.expire_after == timedelta(days=1)
     meta_object.cache.expire_after = timedelta(days=3600)
     assert meta_object.cache.expire_after == timedelta(days=3600)
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_expiration_json(meta_object, model_data):
     model_data.pop("model")
     data = list(model_data.values())
@@ -57,7 +124,7 @@ def test_expiration_json(meta_object, model_data):
     assert not meta_object.load_cache()
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_encoder_json(model_data, tmp_path):
     model_data.pop("model")
     cache_file = tmp_path / "encoder.json"
@@ -67,7 +134,7 @@ def test_encoder_json(model_data, tmp_path):
         assert json.load(f, cls=CustomDecoder) == model_data
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_max_length(model_data, get_json_cache):
     get_json_cache.session.data = []
     assert get_json_cache.session.max_length == 10000  # noqa: PLR2004
@@ -84,8 +151,9 @@ def test_max_length(model_data, get_json_cache):
     assert len(get_json_cache.load_cache()) == 10  # noqa: PLR2004
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 def test_query(model_data, tracker_object, faker):
+    tracker_object.cache.expire_after = None
     tracker_object.cache.session.max_length = 20
     tracker_object.cache.session.data = []
     tracker_object.cache.commit()
@@ -93,12 +161,79 @@ def test_query(model_data, tracker_object, faker):
     t = model_data.pop("tracker")
     t.id = 1
 
+    d = asdict(t)
     for i in range(1, 13):
-        t.timestamp = datetime.now(timezone.utc)
-        tracker_object.cache.session.data.append(t)
-        t.id += i
-        t.name = names[i - 1]
+        d["id"] += i
+        d["name"] = names[i - 1]
+        d["timestamp"] = datetime.now(timezone.utc)
+        tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
 
     tracker_object.cache.commit()
     assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
-    assert tracker_object.query(name=names[-1])[0].name == t.name
+    assert tracker_object.query(TogglQuery("name", names[0]))[0].name == names[0]
+    assert len(tracker_object.query(TogglQuery("name", names[:5]))) == 5  # noqa: PLR2004
+
+
+@pytest.mark.unit
+def test_query_parent(tmp_path):
+    cache = JSONCache(Path(tmp_path))
+
+    with pytest.raises(ValueError, match="Cannot load cache without parent!"):
+        cache.query()
+
+
+@pytest.mark.unit
+def test_cache_sync(  # noqa: PLR0913, PLR0917
+    tmp_path,
+    user_object,
+    get_test_data,
+    httpx_mock,
+    get_workspace_id,
+    config_setup,
+):
+    cache1 = JSONCache(Path(tmp_path))
+
+    user_object.cache = cache1
+    tracker = get_test_data[1]
+    tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
+    tracker_id = tracker["id"]
+    httpx_mock.add_response(
+        json=tracker,
+        status_code=200,
+        url=user_object.BASE_ENDPOINT + user_object.endpoint + f"time_entries/{tracker_id}",
+    )
+
+    cache2 = JSONCache(Path(tmp_path))
+    endpoint = UserEndpoint(get_workspace_id, config_setup, cache2)
+    assert len(cache2.load_cache()) == 0
+
+    tracker = user_object.get(tracker_id, refresh=True)
+    assert isinstance(tracker, TogglTracker)
+    assert endpoint.get(tracker_id) == tracker
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "comparison",
+    [
+        pytest.param(
+            None,
+            marks=pytest.mark.xfail(
+                reason="Not a comparison enumeration.",
+                raises=NotImplementedError,
+            ),
+        ),
+        Comparison.LESS_THEN,
+        Comparison.GREATER_THEN,
+        Comparison.GREATER_THEN_OR_EQUAL,
+        Comparison.LESS_THEN_OR_EQUAL,
+        Comparison.EQUAL,
+    ],
+)
+def test_match_query_helper(tracker_object, comparison, tmp_path, faker, number):
+    cache = tracker_object.cache
+    params = TogglQuery("start", datetime.now(tz=timezone.utc), comparison)
+
+    model = TogglTracker(number, faker.name())
+
+    assert isinstance(cache._match_query(model, params), bool)  # noqa: SLF001

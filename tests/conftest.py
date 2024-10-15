@@ -2,6 +2,7 @@
 
 import os
 import random
+import sys
 import time
 from datetime import datetime, timedelta, timezone
 
@@ -10,21 +11,23 @@ from faker import Faker
 from httpx import BasicAuth
 
 from scripts.utils import cleanup
+from toggl_api.client import ClientEndpoint
 from toggl_api.config import generate_authentication
-from toggl_api.modules.client import ClientEndpoint
-from toggl_api.modules.meta import JSONCache, SqliteCache, TogglCachedEndpoint
-from toggl_api.modules.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
-from toggl_api.modules.project import ProjectBody, ProjectEndpoint
-from toggl_api.modules.tag import TagEndpoint
-from toggl_api.modules.tracker import TrackerBody, TrackerEndpoint
-from toggl_api.modules.user import UserEndpoint
-from toggl_api.modules.workspace import WorkspaceEndpoint
+from toggl_api.meta import JSONCache, TogglCachedEndpoint
+from toggl_api.meta.cache.sqlite_cache import SqliteCache
+from toggl_api.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from toggl_api.project import ProjectBody, ProjectEndpoint
+from toggl_api.tag import TagEndpoint
+from toggl_api.tracker import TrackerBody, TrackerEndpoint
+from toggl_api.user import UserEndpoint
+from toggl_api.workspace import WorkspaceEndpoint
 
 
 @pytest.fixture(autouse=True)
-def _rate_limit():
+def _rate_limit(request):
     yield
-    time.sleep(1)
+    if "integration" in request.keywords:
+        time.sleep(1)
 
 
 @pytest.fixture(scope="session")
@@ -34,7 +37,7 @@ def faker():
 
 @pytest.fixture(scope="session")
 def number():
-    return random.randint(1, 100_000)
+    return random.randint(1, sys.maxsize)
 
 
 @pytest.fixture(scope="session")

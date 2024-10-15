@@ -8,36 +8,116 @@
 
 > Simple Toggl API wrapper for non-premium features primarily focused on creating a cached framework for developing custom commands.
 
-> [!WARNING]  
-> _Alpha Stage: Anything might change without notice at any moment._
-
 ---
 
 ## Installation
 
-### Poetry
+Install with pip:
 
-```
-poetry add toggl-api-wrapper
-```
-
-### Pip
-
-```
+```bash
 pip install toggl-api-wrapper
+```
+
+Or if using SQLite cache:
+
+```bash
+pip install "toggl-api-wrapper[sqlite]"
 ```
 
 ## Usage
 
-- Currently supports interacting with Trackers, Projects, Clients & Tags and some extras.
+- Currently supports interacting with Trackers, Projects, Clients, Tags, Reports and some extras.
 - Designed to be rudimentary to allow simple development of custom commands.
+
+## Examples
+
+<details>
+  <summary>Tracker Endpoint</summary>
+
+```python
+from datetime import timedelta
+from pathlib import Path
+
+from toggl_api import (
+    TrackerBody,
+    TrackerEndpoint,
+    generate_authentication,
+    JSONCache
+)
+
+WORKSPACE_ID = 2313123123
+AUTH = generate_authentication()
+cache = JSONCache(Path("cache"), timedelta(hours=24))
+endpoint = TrackerEndpoint(WORKSPACE_ID, AUTH, cache)
+
+body = TrackerBody("My First Tracker", tags=["My First Tag"])
+tracker = endpoint.add(body)
+print(tracker)
+```
+
+<strong>Outputs:</strong>
+
+```python
+>>> TogglTracker(
+        id=3482231563,
+        name="My First Tracker",
+        workspace=2313123123,
+        start=datetime.datetime(2024, 6, 10, 14, 59, 20, tzinfo=datetime.timezone.utc),
+        duration=datetime.timedelta(seconds=1, microseconds=179158),
+        stop=None,
+        project=None,
+        tags=[],
+    )
+```
+
+</details>
+
+<details>
+  <summary>User Endpoint</summary>
+
+```python
+from datetime import timedelta
+from pathlib import Path
+
+from toggl_api import (
+    UserEndpoint,
+    generate_authentication,
+    JSONCache,
+)
+
+WORKSPACE_ID = 2313123123
+AUTH = generate_authentication()
+cache = JSONCache(Path("cache"), timedelta(weeks=1))
+endpoint = UserEndpoint(workspace_id, AUTH, CACHE)
+
+tracker = endpoint.get(3482231563, refresh=True)
+print(tracker)
+```
+
+<strong>Outputs:</strong>
+
+```python
+>>> TogglTracker(
+        id=3482231563,
+        name="My First Tracker",
+        workspace=2313123123,
+        start=datetime.datetime(2024, 6, 10, 14, 59, 20, tzinfo=datetime.timezone.utc),
+        duration=datetime.timedelta(seconds=1, microseconds=179158),
+        stop=None,
+        project=None,
+        tags=[],
+    )
+```
+
+</details>
 
 ## Documentation
 
+- [Examples](https://ddkasa.github.io/toggl-api-wrapper/user-guide/examples.html)
 - [API Documentation](https://ddkasa.github.io/toggl-api-wrapper/api-guide/)
-- [User Guide](https://ddkasa.github.io/toggl-api-wrapper/user-guide/)
+- [User Guide](https://ddkasa.github.io/toggl-api-wrapper/index.html)
 
-## Development
+## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
