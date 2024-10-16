@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2024-10-16
+
+### 🐛 Bug Fixes
+
+- *(endpoint)* Logger name
+- *(user)* Collect endpoint not returning anything without parameters
+
+### 📚 Documentation
+
+- *(cache)* Fix docstring
+
+### ⚙️ Miscellaneous Tasks
+
+- *(precommit)* Added gitleaks
+- *(config)* Additional urls
+
+### 🧪 Testing
+
+- *(user)* Collect method with no parameters
+
 ## [1.0.0] - 2024-10-15
 
 ### 🚀 Features
