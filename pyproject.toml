@@ -26,8 +26,10 @@ clean-toggl-account = "scripts.clean_account:main"
 
 [tool.poetry.urls]
 "Homepage" = "https://ddkasa.github.io/toggl-api-wrapper/"
+"Documentation" = "https://ddkasa.github.io/toggl-api-wrapper/api-guide/index.html"
 "Source" = "https://github.com/ddkasa/toggl-api-wrapper"
 "Bug Tracker" = "https://github.com/ddkasa/toggl-api-wrapper/issues"
+"Changelog" = "https://ddkasa.github.io/toggl-api-wrapper/CHANGELOG.html"
 
 [tool.poetry.dependencies]
 python = "^3.10"
