@@ -1,0 +1,298 @@
+classDiagram
+  class AuthenticationError {
+  }
+  class BaseBody {
+    format(endpoint: str)* dict[str, Any]
+    verify_endpoint_parameter(parameter: str, endpoint: str) bool
+  }
+  class ClientBody {
+    name : Optional[str]
+    notes : Optional[str]
+    status : Optional[CLIENT_STATUS]
+    format(endpoint: str) dict[str, Any]
+  }
+  class ClientEndpoint {
+    endpoint
+    model
+    add(body: ClientBody) TogglClient | None
+    collect(body: Optional[ClientBody]) list[TogglClient]
+    delete(client: TogglClient | int) None
+    edit(client: TogglClient | int, body: ClientBody) TogglClient | None
+    get(client_id: int | TogglClient) TogglClient | None
+  }
+  class CustomDecoder {
+    MATCH_DICT : Final[dict[str, type[TogglClass]]]
+    decode(obj: Any) Any
+  }
+  class CustomEncoder {
+    default(o: Any) Any
+  }
+  class DetailedReportEndpoint {
+    endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: PaginationOptions) PaginatedResult[list]
+    totals_report(body: ReportBody) dict[str, int]
+  }
+  class JSONCache {
+    cache_path
+    parent
+    session
+    add_entries(update: list[TogglClass] | TogglClass) None
+    add_entry(item: TogglClass) None
+    commit() None
+    delete_entries(update: list[TogglClass] | TogglClass) None
+    delete_entry(entry: TogglClass) None
+    find_entry(entry: TogglClass | dict) TogglClass | None
+    load_cache() list[TogglClass]
+    query() list[TogglClass]
+    save_cache(update: Iterable[TogglClass] | TogglClass, method: RequestMethod) None
+    update_entries(update: list[TogglClass] | TogglClass) None
+  }
+  class JSONSession {
+    data : list[TogglClass]
+    max_length : int
+    modified : int
+    version : str
+    commit(path: Path) None
+    load(path: Path) None
+    process_data(data: list[TogglClass]) list[TogglClass]
+  }
+  class PaginatedResult {
+    next_id : Optional[int]
+    next_row : Optional[int]
+    result : T
+    next_options(page_size: int) PaginationOptions
+  }
+  class PaginationOptions {
+    next_id : Optional[int]
+    next_row : Optional[int]
+    page_size : int
+  }
+  class ProjectBody {
+    active : bool
+    client_id : Optional[int]
+    client_name : Optional[str]
+    color : Optional[str]
+    end_date : Optional[datetime | date]
+    is_private : Optional[bool]
+    name : Optional[str]
+    start_date : Optional[datetime | date]
+    format(endpoint: str) dict[str, Any]
+  }
+  class ProjectEndpoint {
+    BASIC_COLORS : Final[dict[str, str]]
+    endpoint
+    model
+    add(body: ProjectBody) TogglProject | None
+    collect() list[TogglProject]
+    delete(project: TogglProject | int) None
+    edit(project: TogglProject | int, body: ProjectBody) TogglProject | None
+    get(project_id: int | TogglProject) TogglProject | None
+    get_color(color: str) str
+    get_color_id(color: str) int
+  }
+  class ReportBody {
+    client_ids : list[int | None]
+    date_format : Literal['MM/DD/YYYY', 'DD-MM-YYYY', 'MM-DD-YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY', 'DD.MM.YYYY']
+    description : Optional[str]
+    duration_format : Literal['classic', 'decimal', 'improved']
+    end_date : Optional[date]
+    enrich_response : bool
+    group_ids : list[int]
+    grouped : bool
+    grouping : Optional[str]
+    include_time_entry_ids : bool
+    max_duration_seconds : Optional[int]
+    min_duration_seconds : Optional[int]
+    order_by : Optional[Literal['title', 'duration']]
+    order_dir : Optional[Literal['ASC', 'DESC']]
+    project_ids : list[int | None]
+    resolution : Optional[str]
+    rounding : Optional[int]
+    rounding_minutes : Optional[Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240]]
+    start_date : Optional[date]
+    sub_grouping : Optional[str]
+    tag_ids : list[int | None]
+    time_entry_ids : list[int]
+    user_ids : list[int]
+    format(endpoint: str) dict[str, Any]
+  }
+  class ReportEndpoint {
+    BASE_ENDPOINT : str
+    model
+  }
+  class RequestMethod {
+    name
+  }
+  class SqliteCache {
+    cache_path
+    database
+    metadata
+    session
+    add_entries(entry: Iterable[TogglClass] | TogglClass) None
+    commit() None
+    delete_entries(entry: Iterable[TogglClass] | TogglClass) None
+    find_entry(query: TogglClass | dict[str, Any]) TogglClass | None
+    load_cache() Query[TogglClass]
+    query() Query[TogglClass]
+    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod) None
+    update_entries(entry: Iterable[TogglClass] | TogglClass) None
+  }
+  class SummaryReportEndpoint {
+    endpoint
+    export_summary(body: ReportBody, extension: REPORT_FORMATS) bytes
+    project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
+    project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) list[dict[str, int]]
+    time_entries(body: ReportBody) list[dict[str, int]]
+  }
+  class TagEndpoint {
+    endpoint
+    model
+    add(name: str) TogglTag
+    collect() list[TogglTag]
+    delete(tag: TogglTag | int) None
+    edit(tag: TogglTag) TogglTag
+  }
+  class TogglCache {
+    cache_path
+    expire_after
+    parent
+    add_entries(update: list[TogglClass])* None
+    commit()* None
+    delete_entries(update: list[TogglClass] | TogglClass)* None
+    find_entry(entry: TogglClass | dict)* Optional[TogglClass]
+    find_method(method: RequestMethod) Callable | None
+    load_cache()* Iterable[TogglClass]
+    query()* Iterable[TogglClass]
+    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod)* None
+    update_entries(update: list[TogglClass] | TogglClass)* None
+  }
+  class TogglCachedEndpoint {
+    cache
+    endpoint
+    load_cache() Iterable[TogglClass]
+    query() Iterable[TogglClass]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Any
+    save_cache(response: list[TogglClass] | TogglClass, method: RequestMethod) None
+  }
+  class TogglClass {
+    id : int
+    name : str
+    timestamp : Optional[datetime]
+    from_kwargs()* TogglClass
+  }
+  class TogglClient {
+  }
+  class TogglEndpoint {
+    BASE_ENDPOINT : str
+    HEADERS : Final[dict]
+    NOT_FOUND : Final[int]
+    OK_RESPONSE : Final[int]
+    SERVER_ERROR : Final[int]
+    endpoint
+    model
+    workspace_id : int
+    api_status() bool
+    method(method: RequestMethod) Callable
+    process_models(data: list[dict[str, Any]]) list[TogglClass]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Any
+  }
+  class TogglProject {
+    active : bool
+    client : Optional[int]
+    color : str
+    from_kwargs() TogglProject
+  }
+  class TogglTag {
+    from_kwargs() TogglTag
+  }
+  class TogglTracker {
+    duration : Optional[timedelta]
+    project : Optional[int]
+    start : datetime
+    stop : Optional[datetime | str]
+    tags : list[TogglTag]
+    from_kwargs() TogglTracker
+    get_tags() list[TogglTag]
+    running() bool
+  }
+  class TogglWorkspace {
+    from_kwargs() TogglWorkspace
+  }
+  class TrackerBody {
+    created_with : str
+    description : Optional[str]
+    duration : Optional[int | timedelta]
+    project_id : Optional[int]
+    shared_with_user_ids : list[int]
+    start : Optional[datetime]
+    start_date : Optional[date]
+    stop : Optional[datetime]
+    tag_action : Optional[Literal['add', 'remove']]
+    tag_ids : list[int]
+    tags : list[str]
+    format(endpoint: str) dict[str, Any]
+  }
+  class TrackerEndpoint {
+    TRACKER_ALREADY_STOPPED : Final[int]
+    endpoint
+    model
+    add(body: TrackerBody) TogglTracker | None
+    delete(tracker: TogglTracker | int) None
+    edit(tracker: TogglTracker | int, body: TrackerBody) TogglTracker | None
+    stop(tracker: TogglTracker | int) TogglTracker | None
+  }
+  class UTCDateTime {
+    cache_ok : bool
+    impl
+    process_bind_param(value: datetime, _) datetime | None
+    process_result_value(value: Optional[datetime], _) datetime | None
+  }
+  class UserEndpoint {
+    TRACKER_NOT_RUNNING : Final[int]
+    endpoint
+    model
+    check_authentication() bool
+    collect(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
+    current() TogglTracker | None
+    get(tracker_id: int | TogglTracker) TogglTracker | None
+  }
+  class WeeklyReportEndpoint {
+    endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    search_time_entries(body: ReportBody) list[dict[str, Any]]
+  }
+  class WorkspaceChild {
+    workspace : int
+    from_kwargs() WorkspaceChild
+  }
+  class WorkspaceEndpoint {
+    endpoint
+    model
+    get(workspace: Optional[TogglWorkspace | int]) TogglWorkspace | None
+  }
+  ClientBody --|> BaseBody
+  ClientEndpoint --|> TogglCachedEndpoint
+  JSONCache --|> TogglCache
+  SqliteCache --|> TogglCache
+  TogglCachedEndpoint --|> TogglEndpoint
+  TogglClient --|> WorkspaceChild
+  TogglProject --|> WorkspaceChild
+  TogglTag --|> WorkspaceChild
+  TogglTracker --|> WorkspaceChild
+  TogglWorkspace --|> TogglClass
+  WorkspaceChild --|> TogglClass
+  ProjectBody --|> BaseBody
+  ProjectEndpoint --|> TogglCachedEndpoint
+  DetailedReportEndpoint --|> ReportEndpoint
+  ReportBody --|> BaseBody
+  ReportEndpoint --|> TogglEndpoint
+  SummaryReportEndpoint --|> ReportEndpoint
+  WeeklyReportEndpoint --|> ReportEndpoint
+  TagEndpoint --|> TogglCachedEndpoint
+  TrackerBody --|> BaseBody
+  TrackerEndpoint --|> TogglCachedEndpoint
+  UserEndpoint --|> TogglCachedEndpoint
+  WorkspaceEndpoint --|> TogglCachedEndpoint
+  JSONSession --* JSONCache : session
+  TogglCache --o TogglCachedEndpoint : _cache
