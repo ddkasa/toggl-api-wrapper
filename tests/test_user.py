@@ -77,6 +77,17 @@ def test_tracker_get_error(user_object, httpx_mock):
 
 
 @pytest.mark.integration
+def test_tracker_collection(user_object, add_tracker):
+    collection = user_object.collect(refresh=True)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+    time.sleep(1)
+
+    collection = user_object.collect()
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+
+@pytest.mark.integration
 def test_tracker_collection_param_since(user_object, add_tracker):
     collection = user_object.collect(since=int(datetime.now(tz=timezone.utc).timestamp()), refresh=True)
     assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
