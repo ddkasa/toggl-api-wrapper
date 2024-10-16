@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
     from .cache import TogglCache
 
-log = logging.getLogger("toggl-api")
+log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 # REFACTOR: Possibly turn this into a mixin to avoid duplication and more flexibility.
