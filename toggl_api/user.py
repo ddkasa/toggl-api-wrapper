@@ -66,6 +66,8 @@ class UserEndpoint(TogglCachedEndpoint):
                     TogglQuery("start", end_date, Comparison.LESS_THEN_OR_EQUAL),
                 ),
             )
+        else:
+            cache.extend(self.load_cache())
 
         return cache
 
