@@ -116,6 +116,7 @@ print(tracker)
 - [Examples](https://ddkasa.github.io/toggl-api-wrapper/user-guide/examples.html)
 - [API Documentation](https://ddkasa.github.io/toggl-api-wrapper/api-guide/)
 - [User Guide](https://ddkasa.github.io/toggl-api-wrapper/index.html)
+- [Changelog](https://ddkasa.github.io/toggl-api-wrapper/CHANGELOG.html)
 
 ## Contributing
 
