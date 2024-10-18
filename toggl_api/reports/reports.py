@@ -447,6 +447,9 @@ class SummaryReportEndpoint(ReportEndpoint):
             extension: What format to use for the report. CSV or PDF.
             collapse: Whether collapse others. Inserted into body.
 
+        Raises:
+            ValueError: If extension is not pdf or csv.
+
         Returns:
             object: A format ready to be saved as a file or used for further processing.
         """
@@ -480,6 +483,9 @@ class SummaryReportEndpoint(ReportEndpoint):
             body: Body parameters to filter the report by.
             extension: What format to use for the report. CSV or PDF.
             collapse: Whether collapse others. Inserted into body.
+
+        Raises:
+            ValueError: If extension is not pdf or csv.
 
         Returns:
             object: A format ready to be saved as a file or used for further processing.
@@ -578,6 +584,9 @@ class DetailedReportEndpoint(ReportEndpoint):
             pagination: Pagination options containing page size, next_id and next_row.
             hide_amounts: Whether amounts should be hidden.
 
+        Raises:
+            ValueError: If extension is not pdf or csv.
+
         Returns:
             bytes: Report ready to be saved or further processed in python.
         """
@@ -668,6 +677,9 @@ class WeeklyReportEndpoint(ReportEndpoint):
         Args:
             body: JSON body for filtering time entries.
             extension: extension: Format of the exported report. PDF or CSV.
+
+        Raises:
+            ValueError: If extension is not pdf or csv.
 
         Returns:
             bytes: Report ready to be saved or further processed in python.
