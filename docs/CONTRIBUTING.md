@@ -12,7 +12,7 @@
 
 - Lint with `ruff toggl_api`
 - Check typing with `mypy toggl_api`
-- Make sure to install pre-commit hook with `pre-commit install`.
+- Make sure to install pre-commit hook with `pre-commit install`
 
 ## Testing
 
@@ -28,8 +28,10 @@
 ## Git
 
 - Commit messages are based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- Versioning follows [Semver](https://semver.org) conventions
 
 ## Documentation
 
 - Run `mkdocs serve --strict` to build and preview documentation
 - Run `git cliff -o docs/CHANGELOG.md` to generate new changelog. _Requires git-cliff to be installed._
+- Use Google [styleguide](https://google.github.io/styleguide/pyguide.html) for docstring format
