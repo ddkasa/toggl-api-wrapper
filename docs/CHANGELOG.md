@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2024-10-18
+
+### 🕸 Deprecations
+
+- *(reports)* Rename methods to be consistent across reports
+
+### 📚 Documentation
+
+- *(readme)* Add changelog to links
+- *(reports)* Add raises to docstrings
+- *(api)* Small formatting changes
+
+### ⚙️ Miscellaneous Tasks
+
+- *(config)* Coverage url
+- *(cliff)* Fix toml escape characters
+
 ## [1.0.1] - 2024-10-16
 
 ### 🐛 Bug Fixes
@@ -62,7 +79,6 @@ All notable changes to this project will be documented in this file.
 
 ### 📚 Documentation
 
-- *(changelog)* Update changelog
 - *(readme)* Update readme
 - *(api)* Update docs to new directory structure
 - Update examples
