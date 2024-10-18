@@ -2,13 +2,14 @@
 > Report endpoints are not cached locally.
 
 ::: toggl_api.reports.ReportBody
-
----
-
-## Summary Reports
+    options:
+        show_source: true
 
 ::: toggl_api.reports.ReportEndpoint
 
+---
+
+# Summary Reports
 
 ::: toggl_api.reports.SummaryReportEndpoint
     options:
@@ -16,13 +17,13 @@
 
 ---
 
-## Detailed Reports
+# Detailed Reports
 
 ::: toggl_api.reports.reports.PaginatedResult
     options:
         show_source: true
 
-::: toggl_api.reports.reports.PaginationOptions
+::: toggl_api.reports.PaginationOptions
     options:
         show_source: true
 
@@ -32,7 +33,7 @@
 
 ---
 
-## Weekly Reports
+# Weekly Reports
 
 ::: toggl_api.reports.WeeklyReportEndpoint
     options:

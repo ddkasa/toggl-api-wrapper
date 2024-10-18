@@ -1,4 +1,4 @@
-### Abstract Classes
+# Abstract Classes
 
 ::: toggl_api.models.TogglClass
 
@@ -6,7 +6,7 @@
 
 ---
 
-### Main Models
+# Main Models
 
 ::: toggl_api.TogglWorkspace
 
