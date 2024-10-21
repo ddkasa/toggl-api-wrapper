@@ -137,6 +137,8 @@ class ProjectEndpoint(TogglCachedEndpoint):
     def delete(self, project: TogglProject | int) -> None:
         """Deletes a project based on its id.
 
+        This endpoint always hit the external API in order to keep projects consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#delete-workspaceproject)
         """
 
@@ -166,6 +168,8 @@ class ProjectEndpoint(TogglCachedEndpoint):
     def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject | None:
         """Edit a project based on its id with the parameters provided in the body.
 
+        This endpoint always hit the external API in order to keep projects consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#put-workspaceproject)
         """
         if isinstance(project, TogglProject):
@@ -179,6 +183,8 @@ class ProjectEndpoint(TogglCachedEndpoint):
 
     def add(self, body: ProjectBody) -> TogglProject | None:
         """Create a new project based on the parameters provided in the body.
+
+        This endpoint always hit the external API in order to keep projects consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#post-workspaceprojects)
         """

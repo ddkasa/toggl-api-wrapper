@@ -96,6 +96,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
     def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
         """Edit an existing tracker based on the supplied parameters within the body.
 
+        This endpoint always hit the external API in order to keep trackers consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#put-timeentries)
 
         Args:
@@ -125,6 +127,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
+
+        This endpoint always hit the external API in order to keep trackers consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#delete-timeentries)
 
@@ -157,6 +161,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:
         """Stops a running tracker.
 
+        This endpoint always hit the external API in order to keep trackers consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#patch-stop-timeentry)
 
         Args:
@@ -182,6 +188,8 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
     def add(self, body: TrackerBody) -> TogglTracker | None:
         """Add a new tracker.
+
+        This endpoint always hit the external API in order to keep trackers consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#post-timeentries)
 

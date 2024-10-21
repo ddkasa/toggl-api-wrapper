@@ -26,6 +26,8 @@ class TagEndpoint(TogglCachedEndpoint):
     def add(self, name: str) -> TogglTag:
         """Create a new tag.
 
+        This endpoint always hit the external API in order to keep tags consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#post-create-tag)
         """
         return self.request(
@@ -38,6 +40,8 @@ class TagEndpoint(TogglCachedEndpoint):
     def edit(self, tag: TogglTag) -> TogglTag:
         """Sets the name of the tag based on the tag object.
 
+        This endpoint always hit the external API in order to keep tags consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#put-update-tag)
         """
         return self.request(
@@ -49,6 +53,8 @@ class TagEndpoint(TogglCachedEndpoint):
 
     def delete(self, tag: TogglTag | int) -> None:
         """Deletes a tag based on its ID.
+
+        This endpoint always hit the external API in order to keep tags consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#delete-delete-tag)
         """

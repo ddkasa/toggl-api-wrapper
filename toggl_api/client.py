@@ -56,6 +56,8 @@ class ClientEndpoint(TogglCachedEndpoint):
     def add(self, body: ClientBody) -> TogglClient | None:
         """Create a Client based on parameters set in the provided body.
 
+        This endpoint always hit the external API in order to keep clients consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#post-create-client)
 
         Args:
@@ -117,6 +119,8 @@ class ClientEndpoint(TogglCachedEndpoint):
     def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient | None:
         """Edit a client with the supplied parameters from the body.
 
+        This endpoint always hit the external API in order to keep clients consistent.
+
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#put-change-client)
 
         Args:
@@ -141,6 +145,8 @@ class ClientEndpoint(TogglCachedEndpoint):
 
     def delete(self, client: TogglClient | int) -> None:
         """Delete a client based on its ID.
+
+        This endpoint always hit the external API in order to keep clients consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)
         """
