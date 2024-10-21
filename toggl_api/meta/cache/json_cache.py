@@ -153,9 +153,11 @@ class JSONCache(TogglCache):
 
     def find_entry(
         self,
-        entry: TogglClass | dict,
+        entry: TogglClass | dict[str, int],
         **kwargs,
     ) -> TogglClass | None:
+        if self.cache_path.exists() and self.cache_path.stat().st_mtime_ns > self.session.modified:
+            self.session.load(self.cache_path)
         if not self.session.data or self.parent is None:
             return None
         for item in self.session.data:

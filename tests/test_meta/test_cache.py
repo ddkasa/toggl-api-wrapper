@@ -183,32 +183,29 @@ def test_query_parent(tmp_path):
 
 
 @pytest.mark.unit
-def test_cache_sync(  # noqa: PLR0913, PLR0917
-    tmp_path,
-    user_object,
+def test_cache_sync(
+    tmpdir,
     get_test_data,
     httpx_mock,
     get_workspace_id,
     config_setup,
 ):
-    cache1 = JSONCache(Path(tmp_path))
-
-    user_object.cache = cache1
-    tracker = get_test_data[1]
-    tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
-    tracker_id = tracker["id"]
-    httpx_mock.add_response(
-        json=tracker,
-        status_code=200,
-        url=user_object.BASE_ENDPOINT + user_object.endpoint + f"time_entries/{tracker_id}",
-    )
-
-    cache2 = JSONCache(Path(tmp_path))
+    path = Path(tmpdir)
+    cache2 = JSONCache(path)
     endpoint = UserEndpoint(get_workspace_id, config_setup, cache2)
     assert len(cache2.load_cache()) == 0
 
+    cache1 = JSONCache(path)
+    user_object = UserEndpoint(get_workspace_id, config_setup, cache1)
+    assert len(user_object.cache.load_cache()) == 0
+
+    tracker = get_test_data[1]
+    tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
+    tracker_id = tracker["id"]
+    httpx_mock.add_response(json=tracker)
     tracker = user_object.get(tracker_id, refresh=True)
     assert isinstance(tracker, TogglTracker)
+
     assert endpoint.get(tracker_id) == tracker
 
 
