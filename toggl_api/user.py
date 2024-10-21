@@ -155,10 +155,8 @@ class UserEndpoint(TogglCachedEndpoint):
             tracker_id = tracker_id.id
 
         if not refresh:
-            tracker = self.cache.find_entry({"id": tracker_id})
-            if isinstance(tracker, TogglTracker):
-                return tracker
-            refresh = True
+            return self.cache.find_entry({"id": tracker_id})  # type: ignore[return-value]
+
         try:
             response = self.request(
                 f"time_entries/{tracker_id}",

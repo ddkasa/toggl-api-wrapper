@@ -26,10 +26,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             workspace = workspace.id
 
         if not refresh:
-            wspace = self.cache.find_entry({"id": workspace})
-            if isinstance(wspace, TogglWorkspace):
-                return wspace
-            refresh = True
+            return self.cache.find_entry({"id": workspace})  # type: ignore[return-value]
 
         return self.request(f"{workspace}", refresh=refresh)
 

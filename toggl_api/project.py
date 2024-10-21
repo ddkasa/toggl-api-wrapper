@@ -116,10 +116,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
             project_id = project_id.id
 
         if not refresh:
-            project = self.cache.find_entry({"id": project_id})
-            if isinstance(project, TogglProject):
-                return project
-            refresh = True
+            return self.cache.find_entry({"id": project_id})  # type: ignore[return-value]
 
         try:
             response = self.request(
@@ -158,9 +155,10 @@ class ProjectEndpoint(TogglCachedEndpoint):
             )
 
         if isinstance(project, int):
-            project = self.cache.find_entry({"id": project})  # type: ignore[assignment]
-            if not isinstance(project, TogglProject):
+            proj = self.cache.find_entry({"id": project})
+            if not isinstance(proj, TogglProject):
                 return
+            project = proj
 
         self.cache.delete_entries(project)
         self.cache.commit()
