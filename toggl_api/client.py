@@ -196,7 +196,7 @@ class ClientEndpoint(TogglCachedEndpoint):
                 url += "?"
             url += f"{body.name}"
 
-        response = self.request(url, method=RequestMethod.GET)
+        response = self.request(url, method=RequestMethod.GET, refresh=refresh)
         return response if isinstance(response, list) else []
 
     @property
