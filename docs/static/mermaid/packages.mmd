@@ -25,6 +25,8 @@ classDiagram
   }
   class models {
   }
+  class _decorators {
+  }
   class models {
   }
   class schema {
@@ -50,6 +52,7 @@ classDiagram
   toggl_api --> client
   toggl_api --> config
   toggl_api --> meta
+  toggl_api --> cache
   toggl_api --> models
   toggl_api --> project
   toggl_api --> tag
@@ -68,7 +71,6 @@ classDiagram
   base_endpoint --> models
   cache --> base_cache
   cache --> json_cache
-  cache --> sqlite_cache
   base_cache --> enums
   json_cache --> base_cache
   json_cache --> models
@@ -81,8 +83,8 @@ classDiagram
   cached_endpoint --> base_endpoint
   cached_endpoint --> enums
   models --> models
-  models --> schema
   models --> utility
+  schema --> _decorators
   schema --> models
   schema --> utility
   project --> meta
@@ -98,8 +100,10 @@ classDiagram
   tracker --> meta
   tracker --> models
   tracker --> utility
+  user --> toggl_api
   user --> meta
   user --> models
+  user --> utility
   workspace --> meta
   workspace --> models
   base_cache ..> meta
@@ -108,3 +112,4 @@ classDiagram
   json_cache ..> cached_endpoint
   sqlite_cache ..> meta
   cached_endpoint ..> cache
+  cached_endpoint ..> base_cache

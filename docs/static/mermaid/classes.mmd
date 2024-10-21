@@ -20,17 +20,20 @@ classDiagram
     edit(client: TogglClient | int, body: ClientBody) TogglClient | None
     get(client_id: int | TogglClient) TogglClient | None
   }
+  class Comparison {
+    name
+  }
   class CustomDecoder {
     MATCH_DICT : Final[dict[str, type[TogglClass]]]
     decode(obj: Any) Any
   }
   class CustomEncoder {
-    default(o: Any) Any
+    default(obj: Any) Any
   }
   class DetailedReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions) PaginatedResult[bytes]
-    search_time_entries(body: ReportBody, pagination: PaginationOptions) PaginatedResult[list]
+    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: Optional[PaginationOptions]) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: Optional[PaginationOptions]) PaginatedResult[list]
     totals_report(body: ReportBody) dict[str, int]
   }
   class JSONCache {
@@ -42,7 +45,7 @@ classDiagram
     commit() None
     delete_entries(update: list[TogglClass] | TogglClass) None
     delete_entry(entry: TogglClass) None
-    find_entry(entry: TogglClass | dict) TogglClass | None
+    find_entry(entry: TogglClass | dict[str, int]) TogglClass | None
     load_cache() list[TogglClass]
     query() list[TogglClass]
     save_cache(update: Iterable[TogglClass] | TogglClass, method: RequestMethod) None
@@ -140,9 +143,11 @@ classDiagram
   }
   class SummaryReportEndpoint {
     endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
     export_summary(body: ReportBody, extension: REPORT_FORMATS) bytes
     project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
     project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) list[dict[str, int]]
+    search_time_entries(body: ReportBody) list[dict[str, int]]
     time_entries(body: ReportBody) list[dict[str, int]]
   }
   class TagEndpoint {
@@ -160,7 +165,7 @@ classDiagram
     add_entries(update: list[TogglClass])* None
     commit()* None
     delete_entries(update: list[TogglClass] | TogglClass)* None
-    find_entry(entry: TogglClass | dict)* Optional[TogglClass]
+    find_entry(entry: TogglClass | dict[str, Any])* TogglClass | None
     find_method(method: RequestMethod) Callable | None
     load_cache()* Iterable[TogglClass]
     query()* Iterable[TogglClass]
@@ -178,7 +183,7 @@ classDiagram
   class TogglClass {
     id : int
     name : str
-    timestamp : Optional[datetime]
+    timestamp : datetime
     from_kwargs()* TogglClass
   }
   class TogglClient {
@@ -202,6 +207,11 @@ classDiagram
     client : Optional[int]
     color : str
     from_kwargs() TogglProject
+  }
+  class TogglQuery {
+    comparison
+    key : str
+    value : T | Sequence[T]
   }
   class TogglTag {
     from_kwargs() TogglTag
@@ -294,5 +304,6 @@ classDiagram
   TrackerEndpoint --|> TogglCachedEndpoint
   UserEndpoint --|> TogglCachedEndpoint
   WorkspaceEndpoint --|> TogglCachedEndpoint
+  Comparison --* TogglQuery : comparison
   JSONSession --* JSONCache : session
   TogglCache --o TogglCachedEndpoint : _cache
