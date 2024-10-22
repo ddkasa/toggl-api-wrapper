@@ -245,3 +245,68 @@ class TogglTag(WorkspaceChild):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglTag:
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+
+@dataclass
+class TogglSubscription(WorkspaceChild):
+    __tablename__ = "subscription"
+
+    enabled: bool = field(default=True)
+    event_filters: list[str] = field(default_factory=list)
+    has_pending_events: bool = field(default=False)
+    secret: Optional[str] = field(default=None)
+    callback: Optional[str] = field(default=None)
+
+    validated_at: datetime = field(
+        default_factory=partial(
+            datetime.now,
+            tz=timezone.utc,
+        ),
+    )
+    deleted_at: datetime = field(
+        default_factory=partial(
+            datetime.now,
+            tz=timezone.utc,
+        ),
+    )
+    updated_at: datetime = field(
+        default_factory=partial(
+            datetime.now,
+            tz=timezone.utc,
+        ),
+    )
+    created_at: datetime = field(
+        default_factory=partial(
+            datetime.now,
+            tz=timezone.utc,
+        ),
+    )
+
+    def __post_init__(self) -> None:
+        if isinstance(self.validated_at, str):
+            self.validated_at = parse_iso(self.validated_at)
+        if isinstance(self.deleted_at, str):
+            self.deleted_at = parse_iso(self.deleted_at)
+        if isinstance(self.updated_at, str):
+            self.updated_at = parse_iso(self.updated_at)
+        if isinstance(self.created_at, str):
+            self.created_at = parse_iso(self.created_at)
+
+        return super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs) -> WorkspaceChild:
+        return cls(
+            id=kwargs.get("subscription_id", 0),
+            name=kwargs.get("description", ""),
+            workspace=kwargs.get("workspace_id", 0),
+            enabled=kwargs.get("enabled", False),
+            event_filters=kwargs.get("event_filters", []),
+            has_pending_events=kwargs.get("has_pending_events", False),
+            secret=kwargs.get("secret"),
+            callback=kwargs.get("url_callback"),
+            validated_at=kwargs.get("validated_at"),  # type: ignore[arg-type]
+            deleted_at=kwargs.get("deleted_at"),  # type: ignore[arg-type]
+            updated_at=kwargs.get("updated_at"),  # type: ignore[arg-type]
+            created_at=kwargs.get("created_at"),  # type: ignore[arg-type]
+        )
