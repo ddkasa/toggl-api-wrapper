@@ -1,4 +1,5 @@
 import random
+import sys
 import time
 from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
@@ -157,7 +158,7 @@ def test_find_sqlite_parent(meta_object_sqlite):
 )
 def test_match_query_helper(tracker_object_sqlite, comparison, tmp_path, number):
     cache = tracker_object_sqlite.cache
-    params = TogglQuery("name", number, comparison)
+    params = TogglQuery("name", number.randint(100, sys.maxsize), comparison)
     query = cache.query(params)
 
     assert isinstance(cache._match_query(params, query), Query)  # noqa: SLF001

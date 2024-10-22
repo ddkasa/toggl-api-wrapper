@@ -1,3 +1,4 @@
+import sys
 import time
 from datetime import timedelta
 
@@ -128,4 +129,4 @@ def test_tracker_deletion_id(tracker_object, user_object, add_tracker):
 )
 def test_tracker_deletion_mock(tracker_object, number, httpx_mock, error):
     httpx_mock.add_response(status_code=error)
-    assert tracker_object.delete(number) is None
+    assert tracker_object.delete(number.randint(100, sys.maxsize)) is None

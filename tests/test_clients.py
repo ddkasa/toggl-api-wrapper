@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from httpx import HTTPStatusError
 
@@ -103,7 +105,7 @@ def test_client_get(client_object, get_workspace_id, create_client):
 )
 def test_client_get_errors(error, httpx_mock, client_object, number):
     httpx_mock.add_response(status_code=error)
-    assert client_object.get(number, refresh=True) is None
+    assert client_object.get(number.randint(100, sys.maxsize), refresh=True) is None
 
 
 @pytest.mark.integration
@@ -141,4 +143,4 @@ def test_client_delete_id(client_object, get_workspace_id, create_client):
 def test_client_delete_error(httpx_mock, client_object, number):
     httpx_mock.add_response(status_code=500)
     with pytest.raises(HTTPStatusError):
-        client_object.delete(number)
+        client_object.delete(number.randint(100, sys.maxsize))

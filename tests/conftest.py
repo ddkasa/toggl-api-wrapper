@@ -37,7 +37,7 @@ def faker():
 
 @pytest.fixture(scope="session")
 def number():
-    return random.randint(1, sys.maxsize)
+    return random.Random()
 
 
 @pytest.fixture(scope="session")
@@ -194,10 +194,10 @@ def model_data(get_workspace_id, faker):
 
 
 @pytest.fixture
-def get_test_data(get_workspace_id, faker):
+def get_test_data(get_workspace_id, faker, number):
     return [
         {
-            "id": 2,
+            "id": number.randint(100, sys.maxsize),
             "workspace_id": get_workspace_id,
             "description": faker.name(),
             "start": "2020-01-01T00:00:00Z",
@@ -206,7 +206,7 @@ def get_test_data(get_workspace_id, faker):
             "tags": [faker.name(), faker.name()],
         },
         {
-            "id": 3,
+            "id": number.randint(100, sys.maxsize),
             "workspace_id": get_workspace_id,
             "description": faker.name(),
             "start": "2020-01-01T00:00:00Z",
