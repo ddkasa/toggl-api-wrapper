@@ -1295,6 +1295,21 @@ pytest = "*"
 dev = ["pre-commit", "tox"]
 
 [[package]]
+name = "pytest-rerunfailures"
+version = "14.0"
+description = "pytest plugin to re-run tests to eliminate flaky failures"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest-rerunfailures-14.0.tar.gz", hash = "sha256:4a400bcbcd3c7a4ad151ab8afac123d90eca3abe27f98725dc4d9702887d2e92"},
+    {file = "pytest_rerunfailures-14.0-py3-none-any.whl", hash = "sha256:4197bdd2eaeffdbf50b5ea6e7236f47ff0e44d1def8dae08e409f536d84e7b32"},
+]
+
+[package.dependencies]
+packaging = ">=17.1"
+pytest = ">=7.2"
+
+[[package]]
 name = "pytest-sqlalchemy-mock"
 version = "0.1.7"
 description = "pytest sqlalchemy plugin for mock"
@@ -1864,4 +1879,4 @@ sqlite = ["sqlalchemy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4686c07317cdc962bc7c37c9d8713db273c3527744025b9de7de9265fd9a95e0"
+content-hash = "49a63d64a91b262dc456ccef3ca50e2309508fd7cb25282665c6ba5a45be6508"
