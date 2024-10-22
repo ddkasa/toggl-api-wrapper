@@ -35,6 +35,13 @@ def test_current_tracker(user_object, add_tracker, tracker_object):
     assert user_object.current() is None
 
 
+@pytest.mark.integration
+def test_current_tracker_cached(user_object, add_tracker, tracker_object):
+    current = user_object.current(refresh=False)
+    assert current.id == add_tracker.id
+    assert current.name == add_tracker.name
+
+
 @pytest.mark.unit
 @pytest.mark.parametrize(
     ("status_code"),

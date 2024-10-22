@@ -29,6 +29,10 @@ class UserEndpoint(TogglCachedEndpoint):
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-current-time-entry)
         """
 
+        if not refresh:
+            query = list(self.cache.query(TogglQuery("stop", None)))
+            return query[0] if query else None  # type: ignore[return-value]
+
         try:
             response = self.request("time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
