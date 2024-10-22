@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "toggl-api-wrapper"
-version = "1.0.2"
+version = "1.0.3"
 description = "Simple Toggl API wrapper for non-premium features."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 license = "MIT"

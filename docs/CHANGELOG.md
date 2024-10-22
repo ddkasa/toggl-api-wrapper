@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2024-10-22
+
+### 🐛 Bug Fixes
+
+- *(client)* Collect method not passing on refresh
+- *(endpoint)* Methods are abiding refresh argument
+- *(user)* Current tracker actually using cache
+- *(cache)* Json not refreshing in find method
+
+### 📚 Documentation
+
+- *(contributing)* Add more references
+- *(endpoint)* Add a note for methods using external api every time
+- *(api)* Update mermaid graphs
+- *(api)* Project structure
+
+### 🧪 Testing
+
+- *(conftest)* Change number fixture
+
 ## [1.0.2] - 2024-10-18
 
 ### 🕸 Deprecations
