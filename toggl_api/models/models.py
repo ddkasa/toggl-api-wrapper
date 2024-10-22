@@ -61,6 +61,9 @@ class TogglClass(ABC):
     def __setitem__(self, item: str, value: Any) -> None:
         setattr(self, item, value)
 
+    def __int__(self) -> int:
+        return self.id
+
 
 @dataclass
 class TogglWorkspace(TogglClass):
