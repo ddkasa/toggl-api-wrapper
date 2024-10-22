@@ -1264,6 +1264,20 @@ files = [
 pytest = {version = ">=6.2.4", markers = "python_version >= \"3.10\""}
 
 [[package]]
+name = "pytest-replay"
+version = "1.5.2"
+description = "Saves previous test runs and allow re-execute previous pytest runs to reproduce crashes or flaky tests"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest_replay-1.5.2-py3-none-any.whl", hash = "sha256:c7872ade771f3311fd89af1b210d559448b386f2bedffbc8fab53eed10c3efbc"},
+    {file = "pytest_replay-1.5.2.tar.gz", hash = "sha256:43f3d0381314a116d4cb02b328534754bb8fb9bcd7cbfed4920815f297506239"},
+]
+
+[package.dependencies]
+pytest = "*"
+
+[[package]]
 name = "pytest-reportlog"
 version = "0.4.0"
 description = "Replacement for the --resultlog option, focused in simplicity and extensibility"
@@ -1850,4 +1864,4 @@ sqlite = ["sqlalchemy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "581628824c483681de1ceff625912a9aaf8addab3ff120084b27cbe7fadf4d4d"
+content-hash = "4686c07317cdc962bc7c37c9d8713db273c3527744025b9de7de9265fd9a95e0"
