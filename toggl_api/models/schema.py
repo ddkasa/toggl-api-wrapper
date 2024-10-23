@@ -14,7 +14,7 @@ with contextlib.suppress(ImportError):
 
 from toggl_api.utility import requires
 
-from .models import TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from .models import TogglClient, TogglProject, TogglSubscription, TogglTag, TogglTracker, TogglWorkspace
 
 with contextlib.suppress(ImportError):
     from ._decorators import UTCDateTime
@@ -105,6 +105,26 @@ def register_tables(engine: Engine) -> MetaData:
         tracker,
         properties={"tags": relationship(TogglTag, secondary=tracker_tag)},
     )
+
+    subscription = db.Table(
+        "subscription",
+        metadata,
+        db.Column("id", db.Integer, primary_key=True),
+        db.Column("timestamp", UTCDateTime),
+        db.Column("name", db.String(255)),
+        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
+        db.Column("enabled", db.Boolean),
+        db.Column("event_filters", db.JSON, default="[]"),
+        db.Column("has_pending_events", db.Boolean),
+        db.Column("secret", db.String),
+        db.Column("callback", db.String),
+        db.Column("validated_at", UTCDateTime),
+        db.Column("deleted_at", UTCDateTime),
+        db.Column("updated_at", UTCDateTime),
+        db.Column("created_at", UTCDateTime),
+    )
+
+    _map_imperatively(TogglSubscription, subscription)
 
     metadata.create_all(engine)
 
