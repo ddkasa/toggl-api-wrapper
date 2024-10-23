@@ -5,6 +5,7 @@ from .meta.cache import Comparison, TogglQuery
 from .models import (
     TogglClient,
     TogglProject,
+    TogglSubscription,
     TogglTag,
     TogglTracker,
     TogglWorkspace,
@@ -14,6 +15,7 @@ from .tag import TagEndpoint
 from .tracker import TrackerBody, TrackerEndpoint
 from .user import UserEndpoint
 from .version import version
+from .webhooks import SubscriptionEndpoint, WebhookBody, WebhookEndpoint
 from .workspace import WorkspaceEndpoint
 
 __author__ = "David Kasakaitis"
@@ -28,10 +30,12 @@ __all__ = [
     "JSONCache",
     "ProjectBody",
     "ProjectEndpoint",
+    "SubscriptionEndpoint",
     "TagEndpoint",
     "TogglClient",
     "TogglProject",
     "TogglQuery",
+    "TogglSubscription",
     "TogglTag",
     "TogglTracker",
     "TogglWorkspace",
@@ -39,6 +43,8 @@ __all__ = [
     "TrackerEndpoint",
     "UserEndpoint",
     "UserEndpoint",
+    "WebhookBody",
+    "WebhookEndpoint",
     "WorkspaceEndpoint",
     "generate_authentication",
 ]
