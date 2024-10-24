@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2024-10-24
+
+### 🐛 Bug Fixes
+
+- *(cache)* Json commit not syncing correctly
+
+### 📚 Documentation
+
+- *(cache)* Improve json docstring
+
 ## [1.0.3] - 2024-10-22
 
 ### 🐛 Bug Fixes
