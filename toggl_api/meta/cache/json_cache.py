@@ -59,24 +59,38 @@ class JSONSession:
     data: list[TogglClass] = field(default_factory=list)
     modified: int = field(init=False, default=0)
 
+    def _save(self, path: Path, data: dict[str, Any]):
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, cls=CustomEncoder)
+
     def commit(self, path: Path) -> None:
         if path.exists() and path.stat().st_mtime_ns > self.modified:
-            return
+            self.data = self._diff(self._load(path)["data"])
 
         self.version = version
         data = {
             "version": self.version,
             "data": self.process_data(self.data),
         }
-        with path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, cls=CustomEncoder)
+        self._save(path, data)
 
         self.modified = path.stat().st_mtime_ns
 
+    def _diff(self, comp: list[TogglClass]) -> list[TogglClass]:
+        new_models = {m.id: m for m in comp}
+
+        return [
+            new_models[m.id] if m.id in new_models and new_models[m.id].timestamp > new_models[m.id].timestamp else m
+            for m in self.data
+        ]
+
+    def _load(self, path: Path) -> dict[str, Any]:
+        with path.open("r", encoding="utf-8") as f:
+            return json.load(f, cls=CustomDecoder)
+
     def load(self, path: Path) -> None:
         if path.exists():
-            with path.open("r", encoding="utf-8") as f:
-                data = json.load(f, cls=CustomDecoder)
+            data = self._load(path)
             self.modified = path.stat().st_mtime_ns
             self.version = data["version"]
             self.data = self.process_data(data["data"])
