@@ -40,6 +40,12 @@ class JSONSession:
 
     Similar to a SQL session as its meant to have the same/similar interface.
 
+    This dataclass doesn't require interaction from the library user and will
+    be created the json cache object.
+
+    Examples:
+        >>> cache = JSONSession(max_length=5000)
+
     Methods:
         save: Saves the data to a JSON file. Setting current timestamp and
             version.
@@ -52,6 +58,7 @@ class JSONSession:
         data: List of Toggl objects stored in memory.
         modified: Timestamp of when the cache was last modified in nanoseconds.
             Used for checking if another cache object has updated it recently.
+
     """
 
     max_length: int = field(default=10_000)
@@ -105,6 +112,13 @@ class JSONSession:
 
 class JSONCache(TogglCache):
     """Class for caching Toggl data to disk in JSON format.
+
+    Examples:
+        >>> JSONCache(Path("cache"))
+
+        >>> cache = JSONCache(Path("cache"), 3600)
+
+        >>> cache = JSONCache(Path("cache"), timedelta(weeks=2))
 
     Args:
         path: Path to the cache file
