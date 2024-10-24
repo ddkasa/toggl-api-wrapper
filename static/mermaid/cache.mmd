@@ -1,0 +1,13 @@
+flowchart TD
+    request <--> load
+    request <-->|if delete request|delete <--> find
+    request <--> |if get or put request|add <--> find
+    request <---> |if patch or post request|update  <--> find
+    request <---> |if cache is valid and get request| find
+
+    request[request method] --> valid[\valid?/] --> save
+    valid ----> returnn
+    save -----> returnl[return list of objects]
+    save -----> returnn[return none]
+    save -----> returno[return single object]
+
