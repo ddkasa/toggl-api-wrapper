@@ -38,7 +38,7 @@ jobs:
       max-parallel: 1
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [windows-latest, ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     env:
@@ -93,3 +93,15 @@ jobs:
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
           poetry_install_options: "--without=dev,docs"
+
+  release:
+    needs: test
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yaml
+
+  documentation:
+    needs: test
+    permissions:
+      contents: write
+    uses: ./.github/workflows/documentation.yaml

@@ -4,10 +4,8 @@ env:
   PYTHON_VERSION: "3.12"
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   publish:
