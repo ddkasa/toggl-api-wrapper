@@ -20,6 +20,10 @@ def generate_authentication() -> BasicAuth:
 
     If using email as authentication: `TOGGL_API_TOKEN` & `TOGGL_PASSWORD`.
 
+    Examples:
+        >>> generate_authentication()
+        <httpx.BasicAuth object at 0x...>
+
     Raises:
         AuthenticationError: If credentials are not set or invalid.
 
@@ -46,6 +50,13 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     """Gathers credentials from a .togglrc file.
 
     Mainly here for togglcli backwards compatibility.
+
+    Examples:
+        >>> use_togglrc()
+        <httpx.BasicAuth object at 0x...>
+
+        >>> use_togglrc(Path("home/dk/.config/"))
+        <httpx.BasicAuth object at 0x...>
 
     Args:
         config_path: Path to .togglrc folder not file. If None, will use
