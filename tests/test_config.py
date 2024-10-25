@@ -1,10 +1,16 @@
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 
 import pytest
 from httpx import BasicAuth
 
-from toggl_api.config import AuthenticationError, generate_authentication, retrieve_workspace_id, use_togglrc
+from toggl_api.config import (
+    AuthenticationError,
+    generate_authentication,
+    retrieve_togglrc_workspace_id,
+    retrieve_workspace_id,
+    use_togglrc,
+)
 
 
 @pytest.mark.unit
@@ -41,16 +47,18 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 
 @pytest.mark.unit
 def test_use_togglrc(tmp_path, faker):
-    # REFACTOR: Could change this to create config files on fly.
-
     path = Path.home() / ".togglrc"
     if not path.exists():
+        with pytest.raises(FileNotFoundError):
+            use_togglrc()
+
         path.touch()
         with pytest.raises(AuthenticationError):
             use_togglrc()
+
         path.unlink(missing_ok=True)
 
-    with pytest.raises(AuthenticationError):
+    with pytest.raises(FileNotFoundError):
         use_togglrc(tmp_path)
     file_path = tmp_path / ".togglrc"
     file_path.touch()
@@ -83,3 +91,31 @@ def test_use_togglrc(tmp_path, faker):
     with file_path.open("w", encoding="utf-8") as f:
         config.write(f)
     assert isinstance(use_togglrc(tmp_path), BasicAuth)
+
+
+@pytest.mark.unit
+def test_use_togglrc_workspace_id(tmp_path, faker, get_workspace_id):
+    with pytest.raises(FileNotFoundError):
+        retrieve_togglrc_workspace_id(tmp_path)
+
+    file_path = tmp_path / ".togglrc"
+    file_path.touch()
+
+    config = ConfigParser(interpolation=None)
+    config.write(file_path)
+
+    with pytest.raises(NoSectionError):
+        retrieve_togglrc_workspace_id(tmp_path)
+
+    config.add_section("options")
+    with file_path.open("w", encoding="utf-8") as f:
+        config.write(f)
+
+    with pytest.raises(NoOptionError):
+        assert retrieve_togglrc_workspace_id(tmp_path)
+
+    config.set("options", "default_wid", str(get_workspace_id))
+    with file_path.open("w", encoding="utf-8") as f:
+        config.write(f)
+
+    assert retrieve_togglrc_workspace_id(tmp_path) == get_workspace_id

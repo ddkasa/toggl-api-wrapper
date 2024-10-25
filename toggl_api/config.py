@@ -52,8 +52,8 @@ def _get_togglrc(config_path: Optional[Path] = None) -> ConfigParser:
 
     config_path /= ".togglrc"
     if not config_path.exists():
-        msg = f"Config file not found: {config_path}"
-        raise AuthenticationError(msg)
+        msg = f"Config file not found at: {config_path}"
+        raise FileNotFoundError(msg)
 
     config = ConfigParser(interpolation=None)
     config.read(config_path, encoding="utf-8")
@@ -79,6 +79,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
             $HOME/.togglrc for the default location.
 
     Raises:
+        FileNotFoundError: If a togglrc file has not been found.
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
@@ -137,6 +138,30 @@ def retrieve_workspace_id(default: Optional[int] = None) -> int:
         raise ValueError(msg)
 
     return int(workspace)
+
+
+def retrieve_togglrc_workspace_id(config_path: Optional[Path] = None) -> int:
+    """Helper function that collects the default workspace id from a togglrc file.
+
+    Examples:
+        >>> retrieve_togglrc_workspace_id()
+
+    Args:
+        config_path: Alternative path to folder that contains the togglrc file.
+
+    Raises:
+        FileNotFoundError: If a togglrc file has not been found.
+        NoSectionError: If no option section is found in the config file.
+        NoOptionError: If no 'default_wid' section is found in the config file.
+        ValueError: If the workspace is not an integer.
+
+    Returns:
+        int: The id of the workspace.
+    """
+
+    config = _get_togglrc(config_path)
+
+    return int(config.get("options", "default_wid"))
 
 
 if __name__ == "__main__":
