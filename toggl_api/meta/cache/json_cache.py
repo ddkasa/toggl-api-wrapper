@@ -66,14 +66,18 @@ class JSONSession:
     data: list[TogglClass] = field(default_factory=list)
     modified: int = field(init=False, default=0)
 
+    def refresh(self, path: Path) -> bool:
+        if path.exists() and path.stat().st_mtime_ns > self.modified:
+            self.data = self._diff(self._load(path)["data"])
+            return True
+        return False
+
     def _save(self, path: Path, data: dict[str, Any]):
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
     def commit(self, path: Path) -> None:
-        if path.exists() and path.stat().st_mtime_ns > self.modified:
-            self.data = self._diff(self._load(path)["data"])
-
+        self.refresh(path)
         self.version = version
         data = {
             "version": self.version,
@@ -165,8 +169,7 @@ class JSONCache(TogglCache):
         update: Iterable[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
-        if self.cache_path.exists() and self.cache_path.stat().st_mtime_ns > self.session.modified:
-            self.session.load(self.cache_path)
+        self.session.refresh(self.cache_path)
         func = self.find_method(method)
         if func is not None:
             func(update)
@@ -184,8 +187,7 @@ class JSONCache(TogglCache):
         entry: TogglClass | dict[str, int],
         **kwargs,
     ) -> TogglClass | None:
-        if self.cache_path.exists() and self.cache_path.stat().st_mtime_ns > self.session.modified:
-            self.session.load(self.cache_path)
+        self.session.refresh(self.cache_path)
         if not self.session.data or self.parent is None:
             return None
         for item in self.session.data:
