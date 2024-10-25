@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2024-10-25
+
+### 🚀 Features
+
+- *(cache)* Json session refresh method
+- *(config)* Get workspace helper function
+- *(config)* Togglrc workspace retrieve helper function
+
+### 🐛 Bug Fixes
+
+- *(cache)* Json session diff method not including completely new models
+
+### 🚜 Refactor
+
+- *(config)* Extract togglrc retriever
+
+### 📚 Documentation
+
+- *(config)* Add example to config helper functions
+- *(config)* Add new helper functions
+
+### 🧪 Testing
+
+- *(cache)* Test session refresh method and diffing
+- Validate more errors
+
 ## [1.0.4] - 2024-10-24
 
 ### 🐛 Bug Fixes
