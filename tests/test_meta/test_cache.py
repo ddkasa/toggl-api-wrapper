@@ -1,6 +1,7 @@
 import json
 import random
 import time
+from copy import deepcopy
 from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -10,6 +11,7 @@ import pytest
 from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
+from toggl_api.meta.cache.json_cache import JSONSession
 from toggl_api.models.models import TogglTracker
 from toggl_api.user import UserEndpoint
 
@@ -234,3 +236,46 @@ def test_match_query_helper(tracker_object, comparison, tmp_path, faker, number)
     model = TogglTracker(number, faker.name())
 
     assert isinstance(cache._match_query(model, params), bool)  # noqa: SLF001
+
+
+@pytest.mark.unit
+def test_json_session_refresh(model_data, tmpdir):
+    tracker = model_data["tracker"]
+
+    path = Path(tmpdir) / "model.json"
+
+    trackers = []
+    for i in range(50, 100):
+        tracker = deepcopy(tracker)
+        tracker["id"] = i
+        tracker["timestamp"] = datetime.now(tz=timezone.utc)
+        trackers.append(tracker)
+
+    session = JSONSession()
+    session.load(path)
+    session.commit(path)
+    assert not session.refresh(path)
+    session.data = trackers
+
+    new_trackers = []
+    for i in range(75, 150):
+        tracker = deepcopy(tracker)
+        tracker["id"] = i
+        tracker["timestamp"] = datetime.now(tz=timezone.utc)
+        new_trackers.append(tracker)
+    new_session = JSONSession()
+    new_session.load(path)
+    new_session.data = new_trackers
+
+    assert not new_session.refresh(path)
+    assert not session.refresh(path)
+
+    new_session.commit(path)
+
+    tracker = deepcopy(tracker)
+    tracker["id"] = 149
+    tracker["timestamp"] = datetime.now(tz=timezone.utc)
+    session.data.append(tracker)
+
+    assert session.refresh(path)
+    assert len(session.data) == 100  # noqa: PLR2004
