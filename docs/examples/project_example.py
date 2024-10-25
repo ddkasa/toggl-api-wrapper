@@ -5,11 +5,11 @@ from toggl_api import (
     JSONCache,
     ProjectBody,
     ProjectEndpoint,
-    generate_authentication,
 )
+from toggl_api.config import retrieve_togglrc_workspace_id, use_togglrc
 
-WORKSPACE_ID = 2313123123
-AUTH = generate_authentication()
+WORKSPACE_ID = retrieve_togglrc_workspace_id()
+AUTH = use_togglrc()
 cache = JSONCache(Path("cache"), timedelta(hours=24))
 endpoint = ProjectEndpoint(WORKSPACE_ID, AUTH, cache)
 

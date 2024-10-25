@@ -84,8 +84,9 @@ from toggl_api import (
     generate_authentication,
     JSONCache,
 )
+from toggl_api.config import retrieve_workspace_id
 
-WORKSPACE_ID = 2313123123
+WORKSPACE_ID = retrieve_workspace_id()
 AUTH = generate_authentication()
 cache = JSONCache(Path("cache"), timedelta(weeks=1))
 endpoint = UserEndpoint(workspace_id, AUTH, CACHE)
