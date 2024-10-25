@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from pathlib import Path
 
 import pytest
 from httpx import BasicAuth
@@ -26,6 +27,14 @@ def test_generate_authentication_error(config_setup, monkeypatch):
 @pytest.mark.unit
 def test_use_togglrc(tmp_path, faker):
     # REFACTOR: Could change this to create config files on fly.
+
+    path = Path.home() / ".togglrc"
+    if not path.exists():
+        path.touch()
+        with pytest.raises(AuthenticationError):
+            use_togglrc()
+        path.unlink(missing_ok=True)
+
     with pytest.raises(AuthenticationError):
         use_togglrc(tmp_path)
     file_path = tmp_path / ".togglrc"

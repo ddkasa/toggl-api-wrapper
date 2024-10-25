@@ -1,6 +1,8 @@
+import sys
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from httpx import HTTPStatusError
 
 from toggl_api.models import TogglProject
 from toggl_api.project import ProjectBody, ProjectEndpoint
@@ -66,6 +68,16 @@ def test_create_project(create_project):
     assert create_project.active
 
 
+@pytest.mark.unit
+def test_project_name_validation(project_object):
+    body = ProjectBody()
+    with pytest.raises(
+        ValueError,
+        match="Name must be set in order to create a project!",
+    ):
+        project_object.add(body)
+
+
 @pytest.mark.integration
 def test_get_project(create_project, project_object):
     assert isinstance(create_project, TogglProject)
@@ -79,6 +91,16 @@ def test_get_project(create_project, project_object):
     assert isinstance(check_project, TogglProject)
     assert check_project.name == create_project.name
     assert check_project.color == create_project.color
+
+
+@pytest.mark.unit
+def test_get_project_raise(project_object, httpx_mock, number):
+    httpx_mock.add_response(status_code=450)
+    with pytest.raises(HTTPStatusError):
+        project_object.get(number.randint(50, sys.maxsize), refresh=True)
+
+    httpx_mock.add_response(status_code=project_object.NOT_FOUND)
+    assert project_object.get(number.randint(50, sys.maxsize), refresh=True) is None
 
 
 @pytest.mark.integration
@@ -107,3 +129,19 @@ def test_delete_project_model(create_project, project_object):
     assert isinstance(create_project, TogglProject)
     project_object.delete(create_project)
     assert project_object.get(create_project) is None
+
+
+@pytest.mark.unit
+def test_delete_project_raise(httpx_mock, project_object, number):
+    httpx_mock.add_response(status_code=project_object.NOT_FOUND)
+    assert project_object.delete(number.randint(1, sys.maxsize)) is None
+
+    httpx_mock.add_response(status_code=450)
+    with pytest.raises(HTTPStatusError):
+        assert project_object.delete(number.randint(1, sys.maxsize)) is None
+
+
+@pytest.mark.unit
+def test_get_color_id():
+    for i, key in enumerate(ProjectEndpoint.BASIC_COLORS.values()):
+        assert i == ProjectEndpoint.get_color_id(key)
