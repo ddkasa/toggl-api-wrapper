@@ -106,5 +106,32 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     return BasicAuth(email, password)
 
 
+def retrieve_workspace_id(default: Optional[int] = None) -> int:
+    """Helper function that collect the default workspace from the environment.
+
+    Examples:
+        >>> retrieve_workspace_id()
+
+        >>> retrieve_workspace_id(214812815)
+
+    Args:
+        default: Workspace id alternative if not set through environment.
+
+    Raises:
+        ValueError: If no workspace was found at the **TOGGL_WORKSPACE_ID**
+            variable or the workspace set is not an integer.
+
+    Returns:
+        int: The id of the workspace.
+    """
+
+    workspace = os.environ.get("TOGGL_WORKSPACE_ID", default)
+    if workspace is None:
+        msg = "Default workspace has not been set in the environment variables."
+        raise ValueError(msg)
+
+    return int(workspace)
+
+
 if __name__ == "__main__":
     pass

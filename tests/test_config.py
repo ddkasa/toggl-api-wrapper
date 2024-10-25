@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from httpx import BasicAuth
 
-from toggl_api.config import AuthenticationError, generate_authentication, use_togglrc
+from toggl_api.config import AuthenticationError, generate_authentication, retrieve_workspace_id, use_togglrc
 
 
 @pytest.mark.unit
@@ -22,6 +22,21 @@ def test_generate_authentication_error(config_setup, monkeypatch):
     monkeypatch.delenv("TOGGL_API_TOKEN")
     with pytest.raises(AuthenticationError):
         generate_authentication()
+
+
+@pytest.mark.unit
+def test_get_workspace_id(get_workspace_id, monkeypatch):
+    assert retrieve_workspace_id() == get_workspace_id
+
+    monkeypatch.delenv("TOGGL_WORKSPACE_ID")
+
+    with pytest.raises(
+        ValueError,
+        match="Default workspace has not been set in the environment variables.",
+    ):
+        assert retrieve_workspace_id()
+
+    assert retrieve_workspace_id(get_workspace_id) == get_workspace_id
 
 
 @pytest.mark.unit
