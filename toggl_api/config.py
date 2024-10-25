@@ -1,5 +1,6 @@
 import logging
 import os
+import warnings
 from configparser import ConfigParser, NoOptionError
 from pathlib import Path
 from typing import Optional
@@ -79,13 +80,20 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
             $HOME/.togglrc for the default location.
 
     Raises:
-        FileNotFoundError: If a togglrc file has not been found.
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
         BasicAuth: BasicAuth object that is used with httpx client.
     """
-    config = _get_togglrc(config_path)
+    try:
+        config = _get_togglrc(config_path)
+    except FileNotFoundError as err:
+        warnings.warn(
+            "DEPRECATED: AuthenticationError will be switched for a FileNotFoundError.",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        raise AuthenticationError from err
 
     if not config.has_section("auth"):
         msg = "No auth section in config file"
@@ -153,7 +161,7 @@ def retrieve_togglrc_workspace_id(config_path: Optional[Path] = None) -> int:
         FileNotFoundError: If a togglrc file has not been found.
         NoSectionError: If no option section is found in the config file.
         NoOptionError: If no 'default_wid' section is found in the config file.
-        ValueError: If the workspace is not an integer.
+        ValueError: If the workspace value is not an integer.
 
     Returns:
         int: The id of the workspace.

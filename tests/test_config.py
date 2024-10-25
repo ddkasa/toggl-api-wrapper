@@ -49,7 +49,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 def test_use_togglrc(tmp_path, faker):
     path = Path.home() / ".togglrc"
     if not path.exists():
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(AuthenticationError):
             use_togglrc()
 
         path.touch()
@@ -58,7 +58,7 @@ def test_use_togglrc(tmp_path, faker):
 
         path.unlink(missing_ok=True)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(AuthenticationError):
         use_togglrc(tmp_path)
     file_path = tmp_path / ".togglrc"
     file_path.touch()
