@@ -68,7 +68,8 @@ class JSONSession:
 
     def refresh(self, path: Path) -> bool:
         if path.exists() and path.stat().st_mtime_ns > self.modified:
-            self.data = self._diff(self._load(path)["data"])
+            self.modified = path.stat().st_mtime_ns
+            self.data = self._diff(self._load(path)["data"], self.modified)
             return True
         return False
 
@@ -87,7 +88,7 @@ class JSONSession:
 
         self.modified = path.stat().st_mtime_ns
 
-    def _diff(self, comp: list[TogglClass]) -> list[TogglClass]:
+    def _diff(self, comp: list[TogglClass], mtime: int) -> list[TogglClass]:
         old_models = {m.id: m for m in self.data}
         new_models = {m.id: m for m in comp}
 
@@ -98,13 +99,9 @@ class JSONSession:
         for mid in model_ids:
             old = old_models.get(mid)
             new = new_models.get(mid)
-            if old is None and new is not None:
+            if (old is None and new is not None) or (new and old and new.timestamp >= old.timestamp):
                 new_data.append(new)
-            elif new is None and old is not None:
-                new_data.append(old)
-            elif new and old and new.timestamp >= old.timestamp:
-                new_data.append(new)
-            elif old:
+            elif old and old.timestamp.timestamp() * 10**9 >= mtime:
                 new_data.append(old)
 
         return new_data

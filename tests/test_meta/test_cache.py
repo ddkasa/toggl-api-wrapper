@@ -250,7 +250,6 @@ def test_json_session_refresh(model_data, tmpdir):
         tracker["id"] = i
         tracker["timestamp"] = datetime.now(tz=timezone.utc)
         trackers.append(tracker)
-
     session = JSONSession()
     session.load(path)
     session.commit(path)
@@ -274,8 +273,13 @@ def test_json_session_refresh(model_data, tmpdir):
 
     tracker = deepcopy(tracker)
     tracker["id"] = 149
-    tracker["timestamp"] = datetime.now(tz=timezone.utc)
+    tracker["timestamp"] = datetime.now(tz=timezone.utc) + timedelta(days=1)
+    session.data.append(tracker)
+
+    tracker = deepcopy(tracker)
+    tracker["id"] = 170
+    tracker["timestamp"] = datetime.now(tz=timezone.utc) + timedelta(days=1)
     session.data.append(tracker)
 
     assert session.refresh(path)
-    assert len(session.data) == 100  # noqa: PLR2004
+    assert len(session.data) == 76  # noqa: PLR2004
