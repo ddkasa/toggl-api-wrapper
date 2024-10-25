@@ -1,6 +1,6 @@
-import configparser
 import logging
 import os
+from configparser import ConfigParser, NoOptionError
 from pathlib import Path
 from typing import Optional
 
@@ -45,6 +45,22 @@ def generate_authentication() -> BasicAuth:
     return BasicAuth(api_token, password)
 
 
+def _get_togglrc(config_path: Optional[Path] = None) -> ConfigParser:
+    if config_path is None:
+        log.debug("Using default path for .togglrc configuration.")
+        config_path = Path.home()
+
+    config_path /= ".togglrc"
+    if not config_path.exists():
+        msg = f"Config file not found: {config_path}"
+        raise AuthenticationError(msg)
+
+    config = ConfigParser(interpolation=None)
+    config.read(config_path, encoding="utf-8")
+
+    return config
+
+
 # NOTE: For .togglrc compatibility.
 def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     """Gathers credentials from a .togglrc file.
@@ -68,17 +84,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     Returns:
         BasicAuth: BasicAuth object that is used with httpx client.
     """
-    if config_path is None:
-        log.debug("Using default path for .togglrc configuration.")
-        config_path = Path.home()
-
-    config_path /= ".togglrc"
-    if not config_path.exists():
-        msg = f"Config file not found: {config_path}"
-        raise AuthenticationError(msg)
-
-    config = configparser.ConfigParser(interpolation=None)
-    config.read(config_path, encoding="utf-8")
+    config = _get_togglrc(config_path)
 
     if not config.has_section("auth"):
         msg = "No auth section in config file"
@@ -88,18 +94,18 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         api_token = config.get("auth", "api_token")
         if api_token:
             return BasicAuth(api_token, "api_token")
-    except configparser.NoOptionError:
+    except NoOptionError:
         pass
 
     try:
         email = config.get("auth", "email")
-    except configparser.NoOptionError as err:
+    except NoOptionError as err:
         msg = "No email in config file"
         raise AuthenticationError(msg) from err
 
     try:
         password = config.get("auth", "password")
-    except configparser.NoOptionError as err:
+    except NoOptionError as err:
         msg = "No password set in config file"
         raise AuthenticationError(msg) from err
 
