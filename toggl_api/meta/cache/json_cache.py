@@ -88,12 +88,26 @@ class JSONSession:
         self.modified = path.stat().st_mtime_ns
 
     def _diff(self, comp: list[TogglClass]) -> list[TogglClass]:
+        old_models = {m.id: m for m in self.data}
         new_models = {m.id: m for m in comp}
 
-        return [
-            new_models[m.id] if m.id in new_models and new_models[m.id].timestamp > new_models[m.id].timestamp else m
-            for m in self.data
-        ]
+        model_ids: set[int] = set(old_models)
+        model_ids.update(new_models)
+
+        new_data: list[TogglClass] = []
+        for mid in model_ids:
+            old = old_models.get(mid)
+            new = new_models.get(mid)
+            if old is None and new is not None:
+                new_data.append(new)
+            elif new is None and old is not None:
+                new_data.append(old)
+            elif new and old and new.timestamp >= old.timestamp:
+                new_data.append(new)
+            elif old:
+                new_data.append(old)
+
+        return new_data
 
     def _load(self, path: Path) -> dict[str, Any]:
         with path.open("r", encoding="utf-8") as f:
