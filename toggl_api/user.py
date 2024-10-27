@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import warnings
 from datetime import date, datetime, timezone
 from typing import Any, Final, Optional
 
@@ -181,8 +182,15 @@ class UserEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
         """
+        warnings.warn(
+            (
+                "DEPRECATED: 'check_authentication' is being removed. "
+                "Use the static method 'verify_authentication instead!"
+            ),
+            stacklevel=3,
+        )
         try:
-            TogglEndpoint.request(self, "logged")
+            TogglEndpoint.request(self, "/logged")
         except HTTPStatusError as err:
             log.critical("Failed to verify authentication!")
             log.exception("%s")
