@@ -24,6 +24,14 @@ def test_user_endpoint(user_object):
 
 
 @pytest.mark.integration
+def test_user_information(user_object, get_workspace_id):
+    details = user_object.get_details()
+    assert isinstance(details, dict)
+    assert details["fullname"] == "dk-test"
+    assert details["default_workspace_id"] == get_workspace_id
+
+
+@pytest.mark.integration
 def test_current_tracker(user_object, add_tracker, tracker_object):
     current = user_object.current()
     assert isinstance(current, TogglTracker)

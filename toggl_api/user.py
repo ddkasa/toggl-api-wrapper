@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timezone
-from typing import Final, Optional
+from typing import Any, Final, Optional
 
 from httpx import HTTPStatusError, codes
 
@@ -192,6 +192,13 @@ class UserEndpoint(TogglCachedEndpoint):
             return False
 
         return True
+
+    def get_details(self) -> dict[str, Any]:
+        """Check if user is correctly authenticated with the Toggl API.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-me)
+        """
+        return TogglEndpoint.request(self, "", raw=True).json()
 
     @property
     def endpoint(self) -> str:
