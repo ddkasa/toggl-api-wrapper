@@ -5,7 +5,8 @@ import warnings
 from datetime import date, datetime, timezone
 from typing import Any, Final, Optional
 
-from httpx import HTTPStatusError, codes
+import httpx
+from httpx import BasicAuth, HTTPStatusError, codes
 
 from toggl_api import Comparison, TogglQuery
 
@@ -24,7 +25,7 @@ class UserEndpoint(TogglCachedEndpoint):
     [Official Documentation](https://engineering.toggl.com/docs/api/me)
     """
 
-    TRACKER_NOT_RUNNING: Final[int] = 405
+    TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED
 
     def current(self, *, refresh: bool = True) -> TogglTracker | None:
         """Get current running tracker. Returns None if no tracker is running.
@@ -201,8 +202,26 @@ class UserEndpoint(TogglCachedEndpoint):
 
         return True
 
-    def get_details(self) -> dict[str, Any]:
+    @staticmethod
+    def verify_authentication(auth: BasicAuth) -> bool:
         """Check if user is correctly authenticated with the Toggl API.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
+        """
+        try:
+            httpx.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()
+        except HTTPStatusError as err:
+            log.critical("Failed to verify authentication!")
+            log.exception("%s")
+            if err.response.status_code != codes.FORBIDDEN:
+                raise
+
+            return False
+
+        return True
+
+    def get_details(self) -> dict[str, Any]:
+        """Returns details for the current user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-me)
         """

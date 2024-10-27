@@ -9,18 +9,22 @@ from toggl_api import TogglTracker
 
 @pytest.mark.order("first")
 @pytest.mark.unit
-def test_user_endpoint_mock(user_object, httpx_mock):
+def test_user_endpoint_mock(user_object, httpx_mock, config_setup):
     httpx_mock.add_response(status_code=200)
-    assert user_object.check_authentication()
+    assert user_object.verify_authentication(config_setup)
+
+    httpx_mock.add_response(status_code=403)
+    assert not user_object.verify_authentication(config_setup)
 
     httpx_mock.add_response(status_code=400)
-    assert not user_object.check_authentication()
+    with pytest.raises(httpx.HTTPStatusError):
+        assert not user_object.verify_authentication(config_setup)
 
 
 @pytest.mark.order("second")
 @pytest.mark.integration
-def test_user_endpoint(user_object):
-    assert isinstance(user_object.check_authentication(), bool)
+def test_user_endpoint(user_object, config_setup):
+    assert isinstance(user_object.verify_authentication(config_setup), bool)
 
 
 @pytest.mark.integration
