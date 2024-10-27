@@ -14,6 +14,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
+from httpx import codes
 
 from toggl_api.models import TogglClass
 
@@ -28,9 +29,9 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class TogglEndpoint(ABC):
     """Base class with basic functionality for all API requests."""
 
-    OK_RESPONSE: Final[int] = 200
-    NOT_FOUND: Final[int] = 404
-    SERVER_ERROR: Final[int] = 500
+    OK_RESPONSE: Final[int] = codes.OK
+    NOT_FOUND: Final[int] = codes.NOT_FOUND
+    SERVER_ERROR: Final[int] = codes.INTERNAL_SERVER_ERROR
 
     BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -101,12 +102,12 @@ class TogglEndpoint(ABC):
         else:
             response = self.method(method)(url, headers=headers)
 
-        if response.status_code != self.OK_RESPONSE:
+        if codes.is_error(response.status_code):
             # TODO: Toggl API return code lookup.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
 
-            if response.status_code >= self.SERVER_ERROR and retries:
+            if codes.is_server_error(response.status_code) and retries:
                 delay = random.randint(1, 5)
                 retries -= 1
                 log.error(
