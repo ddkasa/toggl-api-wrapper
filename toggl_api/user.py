@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import logging
 from datetime import date, datetime, timezone
 from typing import Final, Optional
 
-from httpx import HTTPError, HTTPStatusError
+from httpx import HTTPStatusError, codes
 
 from toggl_api import Comparison, TogglQuery
 
-from .meta import TogglCachedEndpoint
+from .meta import TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
 from .utility import format_iso
 
@@ -180,10 +182,13 @@ class UserEndpoint(TogglCachedEndpoint):
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
         """
         try:
-            TogglCachedEndpoint.request(self, "logged")
-        except HTTPError:
+            TogglEndpoint.request(self, "logged")
+        except HTTPStatusError as err:
             log.critical("Failed to verify authentication!")
             log.exception("%s")
+            if err.response.status_code != codes.FORBIDDEN:
+                raise
+
             return False
 
         return True
