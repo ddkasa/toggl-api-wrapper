@@ -243,7 +243,7 @@ def test_tracker_cache(
     httpx_mock.add_response(
         json=tracker,
         status_code=200,
-        url=user_object_sqlite.BASE_ENDPOINT + user_object_sqlite.endpoint + f"time_entries/{tracker_id}",
+        url=user_object_sqlite.BASE_ENDPOINT + user_object_sqlite.endpoint + f"/time_entries/{tracker_id}",
     )
 
     data = user_object_sqlite.get(tracker_id, refresh=True)

@@ -38,7 +38,7 @@ class UserEndpoint(TogglCachedEndpoint):
             return query[0] if query else None  # type: ignore[return-value]
 
         try:
-            response = self.request("time_entries/current", refresh=refresh)
+            response = self.request("/time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
             if err.response.status_code == self.TRACKER_NOT_RUNNING:
                 log.warning("No tracker is currently running!")
@@ -125,7 +125,7 @@ class UserEndpoint(TogglCachedEndpoint):
         if not refresh:
             return self._collect_cache(since, before, start_date, end_date)
 
-        params = "time_entries"
+        params = "/time_entries"
         if since or before:
             if since:
                 format_since = int(since.timestamp()) if isinstance(since, datetime) else since
@@ -167,7 +167,7 @@ class UserEndpoint(TogglCachedEndpoint):
 
         try:
             response = self.request(
-                f"time_entries/{tracker_id}",
+                f"/time_entries/{tracker_id}",
                 refresh=refresh,
             )
         except HTTPStatusError as err:
@@ -229,7 +229,7 @@ class UserEndpoint(TogglCachedEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return "me/"
+        return "me"
 
     @property
     def model(self) -> type[TogglTracker]:
