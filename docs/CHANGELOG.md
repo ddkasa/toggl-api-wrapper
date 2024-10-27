@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2024-10-27
+
+### 🚀 Features
+
+- *(user)* User details endpoint
+- *(user)* Verify authentication static method
+
+### 🐛 Bug Fixes
+
+- *(user)* Authentication verifier using wrong endpoint
+
+### 🚜 Refactor
+
+- *(endpoint)* User httpx error codes
+- *(user)* Remove endpoint property forward slash
+
+### 🕸 Deprecations
+
+- *(user)* Check authentication method convert to staticmethod
+
+### 📚 Documentation
+
+- *(user)* Update documentation
+
 ## [1.1.1] - 2024-10-25
 
 ### 🐛 Bug Fixes
