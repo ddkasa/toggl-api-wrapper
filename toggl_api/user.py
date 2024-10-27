@@ -95,6 +95,13 @@ class UserEndpoint(TogglCachedEndpoint):
         Missing meta and include_sharing query flags not supported by wrapper at
         the moment.
 
+        Examples:
+            >>> collect(since=17300032362, before=date(2024, 11, 27))
+
+            >>> collect(refresh=True)
+
+            >>> collect(start_date=date(2024, 11, 27), end_date=date(2024, 12, 27))
+
         Args:
             since: Get entries modified since this date using UNIX timestamp.
                 Includes deleted ones if refreshing.
@@ -207,6 +214,25 @@ class UserEndpoint(TogglCachedEndpoint):
         """Check if user is correctly authenticated with the Toggl API.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
+
+        Examples:
+            >>> UserEndpoint.verify_authentication(auth)
+            True
+
+            >>> auth = generate_authentication()
+            >>> UserEndpoint.verify_authentication(auth)
+            True
+
+        Args:
+            auth: Basic authentication object either created manually or one
+                of the provided authentication utilities.
+
+        Raises:
+            HTTPStatusError: If anything that an error that is not a FORBIDDEN code.
+
+        Returns:
+            bool: True if successfully verified authentication else False.
+
         """
         try:
             httpx.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()

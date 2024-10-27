@@ -19,4 +19,5 @@
             - current
             - collect
             - get
-            - check_authentication
+            - verify_authentication
+            - get_details
