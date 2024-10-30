@@ -189,6 +189,26 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
         return self.request(f"workspaces/{workspace}", refresh=refresh)
 
+    def add(self, body: WorkspaceBody) -> TogglWorkspace:
+        """Create a new workspace.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#post-create-a-new-workspace)
+
+        Enterprise plan feature.
+
+        Args:
+            body: All settings for the workspace to be attached to as a body.
+
+        Returns:
+            TogglWorkspace: A newly created workspace with the supplied params.
+        """
+        return self.request(
+            f"organizations/{self.organization_id}/workspaces",
+            body=body.format("add", organization_id=self.organization_id),
+            method=RequestMethod.POST,
+            refresh=True,
+        )
+
     @property
     def model(self) -> type[TogglWorkspace]:
         return TogglWorkspace
