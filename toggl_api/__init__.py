@@ -14,14 +14,14 @@ from .tag import TagEndpoint
 from .tracker import TrackerBody, TrackerEndpoint
 from .user import UserEndpoint
 from .version import version
-from .workspace import WorkspaceEndpoint
+from .workspace import WorkspaceBody, WorkspaceEndpoint
 
 __author__ = "David Kasakaitis"
 __version__ = version
 __typed__ = True
 
 
-__all__ = [
+__all__ = (
     "ClientBody",
     "ClientEndpoint",
     "Comparison",
@@ -39,6 +39,7 @@ __all__ = [
     "TrackerEndpoint",
     "UserEndpoint",
     "UserEndpoint",
+    "WorkspaceBody",
     "WorkspaceEndpoint",
     "generate_authentication",
-]
+)
