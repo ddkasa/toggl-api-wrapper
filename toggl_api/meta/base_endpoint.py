@@ -11,10 +11,11 @@ import logging
 import random
 import time
 from abc import ABC, abstractmethod
+from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
-from httpx import codes
+from httpx import HTTPStatusError, codes
 
 from toggl_api.models import TogglClass
 
@@ -170,7 +171,7 @@ class TogglEndpoint(ABC):
         """Method for verifying that the Toggl API is up."""
         try:
             result = httpx.get("https://api.track.toggl.com/api/v9/status").json()
-        except httpx.HTTPStatusError:
+        except (HTTPStatusError, JSONDecodeError):
             log.critical("Failed to get a response from the Toggl API!")
             log.exception("%s")
             return False

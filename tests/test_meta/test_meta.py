@@ -8,9 +8,18 @@ from toggl_api.meta.base_endpoint import TogglEndpoint
 from toggl_api.models import TogglTracker
 
 
-@pytest.mark.integration
-def test_api_status():
-    assert isinstance(TogglEndpoint.api_status(), bool)
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("body", "status_code", "expected"),
+    [
+        ({"status": "OK"}, 200, True),
+        (None, 401, False),
+        (None, 501, False),
+    ],
+)
+def test_api_status(body, status_code, expected, httpx_mock):
+    httpx_mock.add_response(json=body, status_code=status_code)
+    assert TogglEndpoint.api_status() is expected
 
 
 @pytest.mark.unit
