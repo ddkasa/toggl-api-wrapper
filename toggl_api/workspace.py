@@ -216,7 +216,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-single-workspace)
         """
+
         if workspace is None:
+            warnings.warn(
+                "DEPRECATION: The 'workspace' argument will become required.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             workspace = self.workspace_id
         elif isinstance(workspace, TogglWorkspace):
             workspace = workspace.id
