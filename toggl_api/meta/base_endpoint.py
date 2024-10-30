@@ -1,7 +1,7 @@
 """Metaclass for requesting and modiftying data from the Toggl API.
 
 Classes:
-    TogglRequest: Base class with basic functionality for all API requests.
+    TogglEndpoint: Base class with basic functionality for all API requests.
 """
 
 from __future__ import annotations
