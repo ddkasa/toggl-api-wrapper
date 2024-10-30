@@ -1,5 +1,3 @@
-from dataclasses import asdict
-
 import pytest
 from httpx import HTTPStatusError
 
@@ -21,7 +19,7 @@ def test_workspace_body(get_workspace_id, faker):
     body = WorkspaceBody(faker.name())
 
     formatted_body = body.format("add")
-    assert formatted_body["name"] == body.name
+    assert formatted_body["name"] == body.name.replace(" ", "-")
 
 
 @pytest.mark.unit
@@ -69,7 +67,7 @@ def test_edit_workspace(workspace_object, number, faker, request, get_workspace_
     assert workspace.name != wdata["name"]
     body.name = faker.name()
     workspace = workspace_object.edit(workspace, body)
-    assert workspace.name == body.name
+    assert workspace.name == body.name.replace(" ", "-")
     assert workspace.name != wdata["name"]
 
 

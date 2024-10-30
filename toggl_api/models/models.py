@@ -96,10 +96,30 @@ class TogglWorkspace(TogglClass):
 
     def __post_init__(self) -> None:
         super().__post_init__()
+        try:
+            TogglWorkspace.validate_name(self.name)
+        except ValueError as err:
+            if str(err) != "No spaces allowed in the workspace name!":
+                raise
+            log.warning(err)
+            self.name = self.name.replace(" ", "-")
+            log.warning("Updated to new name: %s!", self.name)
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglWorkspace:
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+    @staticmethod
+    def validate_name(name: str, *, max_len: int = 140) -> None:
+        if not name:
+            msg = "The workspace name need at least have one character!"
+            raise ValueError(msg)
+        if max_len and len(name) > max_len:
+            msg = f"The max workspace name length is {max_len}!"
+            raise ValueError(msg)
+        if " " in name:
+            msg = "No spaces allowed in the workspace name!"
+            raise ValueError(msg)
 
 
 @dataclass
