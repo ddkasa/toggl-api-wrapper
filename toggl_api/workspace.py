@@ -348,3 +348,11 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
     @property
     def endpoint(self) -> str:
         return ""
+
+    @property
+    def organization_id(self) -> int:
+        return self.workspace_id
+
+    @organization_id.setter
+    def organization_id(self, value: int) -> None:
+        self.workspace_id = value
