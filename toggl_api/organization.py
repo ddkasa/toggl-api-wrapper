@@ -140,6 +140,47 @@ class OrganizationEndpoint(TogglCachedEndpoint):
         """
         return self.request("me/organizations", refresh=refresh)
 
+    def delete(self, organization: TogglOrganization | int) -> None:
+        """Leaves organization, effectively delete user account in org and
+        delete organization if it is last user.
+
+        Deletion might not be instant on the API end and might take a few
+        seconds to propogate, so the object might appear in the 'get' or
+        'collect' method.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#delete-leaves-organization)
+
+        Args:
+            organization: Organization to delete.
+
+        Raises:
+            HTTPStatusError: If the response status_code is not '200' or '404'.
+        """
+        org_id = organization if isinstance(organization, int) else organization.id
+        try:
+            self.request(
+                f"organizations/{org_id}/users/leave",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if err.response.status_code != codes.NOT_FOUND:
+                raise
+            log.exception("%s")
+            log.warning(
+                "Organization with id %s was either already deleted or did not exist in the first place!",
+                org_id,
+            )
+
+        if isinstance(organization, int):
+            org = self.cache.find_entry({"id": organization})
+            if not isinstance(org, TogglOrganization):
+                return
+            organization = org
+
+        self.cache.delete_entries(organization)
+        self.cache.commit()
+
     @property
     def model(self) -> type[TogglOrganization]:
         return TogglOrganization
