@@ -63,10 +63,26 @@ class TogglClass(ABC):
 
 
 @dataclass
+class TogglOrganization(TogglClass):
+    """Data structure for Toggl organizations."""
+
+    ___tablename__ = "organization"
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs) -> TogglOrganization:
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+
+@dataclass
 class TogglWorkspace(TogglClass):
     """Data structure for Toggl workspaces."""
 
     ___tablename__ = "workspace"
+
+    organization: int = field(default=0)
 
     def __post_init__(self) -> None:
         super().__post_init__()
