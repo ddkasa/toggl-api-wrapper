@@ -8,10 +8,14 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict
 
 from toggl_api.meta.body import BaseBody
+from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.meta.enums import RequestMethod
 
 from .meta import TogglCachedEndpoint
 from .models import TogglWorkspace
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -208,6 +212,44 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             method=RequestMethod.POST,
             refresh=True,
         )
+
+    def _collect_cache(self, since: int | None) -> list[TogglWorkspace]:
+        if isinstance(since, int):
+            ts = datetime.fromtimestamp(since, timezone.utc)
+            cache = self.query(TogglQuery("timestamp", ts, Comparison.GREATER_THEN))
+        else:
+            cache = self.load_cache()
+
+        return list(cache)
+
+    def _validate_collect_since(self, since: datetime | int) -> int:
+        since = since if isinstance(since, int) else int(time.mktime(since.timetuple()))
+        now = int(time.mktime(datetime.now(tz=timezone.utc).timetuple()))
+        if since > now:
+            msg = "The 'since' argument needs to be before the current time!"
+            raise ValueError(msg)
+        return since
+
+    def collect(
+        self,
+        since: Optional[datetime | int] = None,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglWorkspace]:
+        """Lists workspaces for given user.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-workspaces)
+        """
+
+        if since is not None:
+            since = self._validate_collect_since(since)
+
+        if not refresh:
+            return self._collect_cache(since)
+
+        body = {"since": since} if since else None
+
+        return self.request("me/workspaces", body=body, refresh=refresh)
 
     @property
     def model(self) -> type[TogglWorkspace]:
