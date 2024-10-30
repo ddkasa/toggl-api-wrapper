@@ -1,4 +1,7 @@
+import sys
+
 import pytest
+from httpx import HTTPStatusError
 
 from toggl_api import TogglTag
 
@@ -47,4 +50,13 @@ def test_delete_tag(tag_object, add_tag):
 
 @pytest.mark.integration
 def test_delete_tag_int(tag_object, add_tag):
-    tag_object.delete(add_tag.id)
+    assert tag_object.delete(add_tag.id) is None
+
+    assert tag_object.delete(add_tag.id) is None
+
+
+@pytest.mark.unit
+def test_delete_tag_raise(tag_object, number, httpx_mock):
+    httpx_mock.add_response(status_code=450)
+    with pytest.raises(HTTPStatusError):
+        assert tag_object.delete(number.randint(10, sys.maxsize)) is None
