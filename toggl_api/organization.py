@@ -100,6 +100,33 @@ class OrganizationEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
 
+    def edit(self, organization: TogglOrganization | int, name: str) -> TogglOrganization:
+        """Updates an existing organization.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#put-updates-an-existing-organization)
+
+        Args:
+            organization: The id of the organization to edit.
+            name: What name to change the org to.
+
+        Raises:
+            ValueError: If the new name is invalid.
+
+        Returns:
+            TogglOrganization: The newly edited organization.
+        """
+        if isinstance(organization, TogglOrganization):
+            organization = organization.id
+
+        TogglOrganization.validate_name(name)
+
+        self.request(
+            f"organizations/{organization}",
+            body={"name": name},
+            refresh=True,
+            method=RequestMethod.PUT,
+        )
+
     @property
     def model(self) -> type[TogglOrganization]:
         return TogglOrganization
