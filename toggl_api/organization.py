@@ -127,6 +127,19 @@ class OrganizationEndpoint(TogglCachedEndpoint):
             method=RequestMethod.PUT,
         )
 
+    def collect(self, *, refresh: bool = False) -> list[TogglOrganization]:
+        """Get all organizations a given user is part of.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-organizations-that-a-user-is-part-of)
+
+        Args:
+            refresh: Whether to use cache or not.
+
+        Returns:
+            list: A list of organization objects or empty if none found.
+        """
+        return self.request("me/organizations", refresh=refresh)
+
     @property
     def model(self) -> type[TogglOrganization]:
         return TogglOrganization
