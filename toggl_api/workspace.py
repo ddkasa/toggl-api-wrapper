@@ -13,11 +13,11 @@ from toggl_api.meta.body import BaseBody
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.meta.enums import RequestMethod
 
-from .meta import TogglCachedEndpoint
+from .meta import TogglCache, TogglCachedEndpoint
 from .models import TogglWorkspace
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    from httpx import BasicAuth
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -184,7 +184,27 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
     """Specific endpoints for retrieving workspaces.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)
+
+    Args:
+        organization_id: Workspace endpoint takes an organization id instead of
+            a workspace id.
     """
+
+    def __init__(
+        self,
+        organization_id: int,
+        auth: BasicAuth,
+        cache: TogglCache,
+        *,
+        timeout: int = 20,
+        **kwargs,
+    ) -> None:
+        warnings.warn(
+            "DEPRECATED: The 'workspace_id' is becoming a required 'organization_id' in the 'WorkspaceEndpoint'!",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        super().__init__(organization_id, auth, cache, timeout=timeout, **kwargs)
 
     def get(
         self,
