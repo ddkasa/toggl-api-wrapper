@@ -8,7 +8,8 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 ---
 
-- With environment variables setup correctly.
+> [!INFO]
+> With environment variables setup correctly.
 
 ### Tracker Example
 
@@ -32,6 +33,9 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 ```
 
 ### Project Example
+
+> [!INFO]
+> Using an existing togglrc file.
 
 ```python
 {% include "examples/project_example.py" %}
