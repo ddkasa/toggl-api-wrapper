@@ -28,7 +28,46 @@ class OrganizationEndpoint(TogglCachedEndpoint):
     def __init__(self, auth: BasicAuth, cache: TogglCache, *, timeout: int = 20, **kwargs) -> None:
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
 
-    def add(self, name: str, workspace_name: str = "Default Workspace") -> TogglOrganization:
+    def get(
+        self,
+        organization: TogglOrganization | int,
+        *,
+        refresh: bool = False,
+    ) -> TogglOrganization | None:
+        """Creates a new organization with a single workspace and assigns
+        current user as the organization owner
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#get-organization-data)
+
+        Args:
+            organization: Organization to retrieve.
+            refresh: Whether to ignore cache completely.
+
+        Raises:
+            HTTPStatusError: If any error except a '404' was received.
+
+        Returns:
+            TogglOrganization | None: Organization object that was retrieve or
+                None if not found.
+        """
+
+        if isinstance(organization, TogglOrganization):
+            organization = organization.id
+
+        if not refresh:
+            return self.cache.find_entry({"id": organization})  # type: ignore[return-value]
+
+        try:
+            response = self.request(f"organizations/{organization}", refresh=refresh)
+        except HTTPStatusError as err:
+            if err.response.status_code in {codes.NOT_FOUND, codes.FORBIDDEN}:
+                log.warning(err)
+                return None
+            raise
+
+        return response
+
+    def add(self, name: str, workspace_name: str = "Default-Workspace") -> TogglOrganization:
         """Creates a new organization with a single workspace and assigns
         current user as the organization owner
 
