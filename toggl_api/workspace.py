@@ -251,6 +251,21 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
         return self.request("me/workspaces", body=body, refresh=refresh)
 
+    def edit(self, workspace_id: TogglWorkspace | int, body: WorkspaceBody) -> TogglWorkspace:
+        """Update a specific workspace.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#put-update-workspace)
+        """
+        if isinstance(workspace_id, TogglWorkspace):
+            workspace_id = workspace_id.id
+
+        return self.request(
+            f"workspaces/{workspace_id}",
+            body=body.format("edit"),
+            method=RequestMethod.PUT,
+            refresh=True,
+        )
+
     @property
     def model(self) -> type[TogglWorkspace]:
         return TogglWorkspace
