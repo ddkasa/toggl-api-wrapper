@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional, get_args
 
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, codes
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
@@ -106,7 +106,7 @@ class ClientEndpoint(TogglCachedEndpoint):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == self.NOT_FOUND:
+            if err.response.status_code == codes.NOT_FOUND:
                 log.warning("Client with id %s does not exist!", client_id)
                 return None
             raise
@@ -151,7 +151,7 @@ class ClientEndpoint(TogglCachedEndpoint):
         try:
             self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
-            if err.response.status_code != self.NOT_FOUND:
+            if err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Client with id %s was either already deleted or did not exist in the first place!",

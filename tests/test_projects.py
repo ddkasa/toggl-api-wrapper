@@ -2,7 +2,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, codes
 
 from toggl_api.models import TogglProject
 from toggl_api.project import ProjectBody, ProjectEndpoint
@@ -99,7 +99,7 @@ def test_get_project_raise(project_object, httpx_mock, number):
     with pytest.raises(HTTPStatusError):
         project_object.get(number.randint(50, sys.maxsize), refresh=True)
 
-    httpx_mock.add_response(status_code=project_object.NOT_FOUND)
+    httpx_mock.add_response(status_code=codes.NOT_FOUND)
     assert project_object.get(number.randint(50, sys.maxsize), refresh=True) is None
 
 
@@ -133,7 +133,7 @@ def test_delete_project_model(create_project, project_object):
 
 @pytest.mark.unit
 def test_delete_project_raise(httpx_mock, project_object, number):
-    httpx_mock.add_response(status_code=project_object.NOT_FOUND)
+    httpx_mock.add_response(status_code=codes.NOT_FOUND)
     assert project_object.delete(number.randint(1, sys.maxsize)) is None
 
     httpx_mock.add_response(status_code=450)

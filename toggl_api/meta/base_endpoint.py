@@ -30,10 +30,6 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class TogglEndpoint(ABC):
     """Base class with basic functionality for all API requests."""
 
-    OK_RESPONSE: Final[int] = codes.OK
-    NOT_FOUND: Final[int] = codes.NOT_FOUND
-    SERVER_ERROR: Final[int] = codes.INTERNAL_SERVER_ERROR
-
     BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 

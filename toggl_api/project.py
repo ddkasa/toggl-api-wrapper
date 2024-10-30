@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Final, Optional
 
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, codes
 
 from toggl_api.utility import format_iso
 
@@ -124,7 +124,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == self.NOT_FOUND:
+            if err.response.status_code == codes.NOT_FOUND:
                 log.warning("Project with id %s was not found!", project_id)
                 return None
             raise
@@ -147,7 +147,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != self.NOT_FOUND:
+            if err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Project with id %s was either already deleted or did not exist in the first place!",

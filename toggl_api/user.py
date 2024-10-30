@@ -178,7 +178,7 @@ class UserEndpoint(TogglCachedEndpoint):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == self.NOT_FOUND:
+            if err.response.status_code == codes.NOT_FOUND:
                 log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise
