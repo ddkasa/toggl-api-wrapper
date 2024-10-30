@@ -1,3 +1,5 @@
+"""All endpoint functionality related modifiying and handling workspaces."""
+
 from __future__ import annotations
 
 import logging
@@ -265,6 +267,31 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             method=RequestMethod.PUT,
             refresh=True,
         )
+
+    def tracker_constraints(self, workspace_id: TogglWorkspace | int) -> dict[str, bool]:
+        """Get the time entry constraints for a given workspace.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-workspace-time-entry-constraints)
+
+        Examples:
+            >>> .get_workspace_constraints(24214214)
+            {
+                "description_present": True,
+                "project_present": False,
+                "tag_present": False",
+                "task_present": False,
+                "time_entry_constraints_enabled": True,
+            }
+        """
+
+        if isinstance(workspace_id, TogglWorkspace):
+            workspace_id = workspace_id.id
+
+        return self.request(
+            f"workspaces/{workspace_id}/time_entry_constraints",
+            raw=True,
+            refresh=True,
+        ).json()
 
     @property
     def model(self) -> type[TogglWorkspace]:
