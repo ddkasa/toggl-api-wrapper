@@ -69,11 +69,21 @@ class TogglOrganization(TogglClass):
     ___tablename__ = "organization"
 
     def __post_init__(self) -> None:
+        self.validate_name(self.name)
         super().__post_init__()
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglOrganization:
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+    @staticmethod
+    def validate_name(name: str, *, max_len: int = 140) -> None:
+        if not name:
+            msg = "The organization name need at least have one letter!"
+            raise ValueError(msg)
+        if max_len and len(name) > max_len:
+            msg = f"Max organization name length is {max_len}!"
+            raise ValueError(msg)
 
 
 @dataclass
