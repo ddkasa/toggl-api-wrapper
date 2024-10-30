@@ -169,6 +169,17 @@ class WorkspaceBody(BaseBody):
         return body
 
 
+class User(TypedDict):
+    user_id: int
+    name: str
+
+
+class WorkspaceStatistics(TypedDict):
+    admins: list[User]
+    groups_count: int
+    members_count: int
+
+
 class WorkspaceEndpoint(TogglCachedEndpoint):
     """Specific endpoints for retrieving workspaces.
 
@@ -292,6 +303,17 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             raw=True,
             refresh=True,
         ).json()
+
+    def statistics(self, workspace_id: TogglWorkspace | int) -> WorkspaceStatistics:
+        """Returns workspace admins list, members count and groups count.
+
+        [Official Documentation](https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/statistics)
+        """
+
+        if isinstance(workspace_id, TogglWorkspace):
+            workspace_id = workspace_id.id
+
+        return self.request(f"workspaces/{workspace_id}/statistics", refresh=True, raw=True).json()
 
     @property
     def model(self) -> type[TogglWorkspace]:
