@@ -115,10 +115,11 @@ class OrganizationEndpoint(TogglCachedEndpoint):
         Returns:
             TogglOrganization: The newly edited organization.
         """
-        if isinstance(organization, TogglOrganization):
-            organization = organization.id
 
         TogglOrganization.validate_name(name)
+
+        if isinstance(organization, TogglOrganization):
+            organization = organization.id
 
         self.request(
             f"organizations/{organization}",
@@ -126,6 +127,12 @@ class OrganizationEndpoint(TogglCachedEndpoint):
             refresh=True,
             method=RequestMethod.PUT,
         )
+
+        edit = TogglOrganization(organization, name)
+        self.cache.update_entries(edit)
+        self.cache.commit()
+
+        return edit
 
     def collect(self, *, refresh: bool = False) -> list[TogglOrganization]:
         """Get all organizations a given user is part of.
