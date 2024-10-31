@@ -66,6 +66,7 @@ nav:
       - Endpoint: api-guide/endpoint.md
       - Cache: api-guide/cache.md
       - Models: api-guide/model.md
+      - Organization: api-guide/organization.md
       - Workspace: api-guide/workspace.md
       - Trackers: api-guide/tracker.md
       - Projects: api-guide/project.md

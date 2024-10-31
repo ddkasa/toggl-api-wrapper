@@ -8,6 +8,8 @@
 
 # Main Models
 
+::: toggl_api.TogglOrganization
+
 ::: toggl_api.TogglWorkspace
 
 ::: toggl_api.TogglClient
