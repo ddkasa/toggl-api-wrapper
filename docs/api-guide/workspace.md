@@ -13,3 +13,14 @@
             - edit
             - tracker_constraints
             - statistics
+
+
+# Types
+
+::: toggl_api.workspace.User
+    options:
+        show_source: true
+
+::: toggl_api.workspace.WorkspaceStatistics
+    options:
+        show_source: true
