@@ -17,4 +17,4 @@ class BaseBody(ABC):
             msg = "Validating a non-existant field!"
             raise ValueError(msg)
         endpoints = field.metadata.get("endpoints", frozenset())
-        return not field or endpoint in endpoints
+        return not endpoints or endpoint in endpoints
