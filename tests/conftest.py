@@ -66,8 +66,8 @@ def organization_id() -> int:
 
 
 @pytest.fixture
-def workspace_object(get_workspace_id, config_setup, get_json_cache):
-    return WorkspaceEndpoint(get_workspace_id, config_setup, get_json_cache)
+def workspace_object(organization_id, config_setup, get_json_cache):
+    return WorkspaceEndpoint(organization_id, config_setup, get_json_cache)
 
 
 @pytest.fixture
