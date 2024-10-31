@@ -31,6 +31,8 @@ classDiagram
   }
   class schema {
   }
+  class organization {
+  }
   class project {
   }
   class reports {
@@ -87,6 +89,9 @@ classDiagram
   schema --> _decorators
   schema --> models
   schema --> utility
+  organization --> meta
+  organization --> meta
+  organization --> models
   project --> meta
   project --> models
   project --> utility
@@ -105,6 +110,9 @@ classDiagram
   user --> models
   user --> utility
   workspace --> meta
+  workspace --> body
+  workspace --> base_cache
+  workspace --> enums
   workspace --> models
   base_cache ..> meta
   base_cache ..> models
@@ -113,3 +121,4 @@ classDiagram
   sqlite_cache ..> meta
   cached_endpoint ..> cache
   cached_endpoint ..> base_cache
+  organization ..> base_cache

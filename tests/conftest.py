@@ -60,9 +60,19 @@ def get_workspace_id() -> int:
     return int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
 
 
+@pytest.fixture(scope="session")
+def organization_id() -> int:
+    return int(os.getenv("TOGGL_ORGANIZATION_ID", "0"))
+
+
+@pytest.fixture(scope="session")
+def user_id() -> int:
+    return int(os.getenv("TOGGL_USER_ID", "0"))
+
+
 @pytest.fixture
-def workspace_object(get_workspace_id, config_setup, get_json_cache):
-    return WorkspaceEndpoint(get_workspace_id, config_setup, get_json_cache)
+def workspace_object(organization_id, config_setup, get_json_cache):
+    return WorkspaceEndpoint(organization_id, config_setup, get_json_cache)
 
 
 @pytest.fixture

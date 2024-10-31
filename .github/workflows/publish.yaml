@@ -44,6 +44,8 @@ jobs:
     env:
       TOGGL_WORKSPACE_ID: ${{ secrets.TOGGL_WORKSPACE_ID }}
       TOGGL_API_TOKEN: ${{ secrets.TOGGL_API_TOKEN }}
+      TOGGL_ORGANIZATION_ID: ${{ secrets.TOGGL_ORGANIZATION_ID }}
+      TOGGL_USER_ID: ${{ secrets.TOGGL_USER_ID }}
       GH_ACTION: "ACTION"
 
     steps:

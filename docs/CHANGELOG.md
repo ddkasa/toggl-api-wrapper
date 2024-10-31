@@ -2,6 +2,73 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2024-10-31
+
+### 🚀 Features
+
+- *(workspace)* Workspace body dataclass
+- *(workspace)* Add workspace endpoint
+- *(workspace)* Collect workspaces endpoint
+- *(workspace)* Edit workspace endpoint
+- *(workspace)* Get time constraints
+- *(workspace)* Statistics endpoint
+- *(models)* Organization model
+- *(schema)* Added organization model
+- *(endpoint)* Added organization endpoint
+- *(organization)* Add endpoint method
+- *(organization)* Get endpoint method
+- *(models)* Validate organization name
+- *(models)* Validate workspace name
+- *(organization)* Edit endpoint method
+- *(organization)* Collect endpoint method
+- *(organization)* Delete endpoint method
+- *(workspace)* Organization id property
+- *(utility)* Add org endpoint to cleanup
+- Add organization objects to __init__
+
+### 🐛 Bug Fixes
+
+- *(endpoint)* Api status not catching json decode error
+- *(body)* Verifying wrong variable
+- *(organization)* Make sure edit method stores and returns model
+
+### 🚜 Refactor
+
+- *(workspace)* Use a blank endpoint property
+- *(endpoint)* [**breaking**] Remove unnecessary class variables
+- *(workspace)* Improve get method error handling
+
+### 🕸 Deprecations
+
+- *(workspace)* Accept organization instead of workspace
+- *(workspace)* Turn get method workspace argument optional
+
+### 📚 Documentation
+
+- *(examples)* Improve authentication information
+- *(workspace)* Document new workspace features
+- *(workspace)* Improve docstrings
+- *(api)* Update project structure and mermaid
+- *(organization)* Add organization to api reference
+- *(workspace)* Add typed dicts to api documentation
+- *(config)* Reword deprecation
+- *(models)* Improve model documentation
+
+### ⚙️ Miscellaneous Tasks
+
+- *(dev-deps)* Pytest dependency added
+- *(actions)* Add new secrets to environment
+
+### 🧪 Testing
+
+- *(conftest)* Organization id fixture
+- *(workspace)* Cover new endpoint methods
+- *(tags)* Extra delete method validation
+- *(user)* Fix test date creation
+- *(workspace)* Use org id instead
+- *(organization)* Test all functionality
+- *(conftest)* User id fixture
+
 ## [1.2.0] - 2024-10-27
 
 ### 🚀 Features

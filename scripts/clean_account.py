@@ -7,18 +7,16 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from toggl_api import (
-    generate_authentication,
-)
+from toggl_api import generate_authentication
 from toggl_api.config import AuthenticationError
 from toggl_api.meta.cache.json_cache import JSONCache
 
-from .utils import _client_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
+from .utils import _client_cleanup, _org_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-DEFAULT_OBJECT: frozenset[str] = frozenset({"tracker", "project", "tag", "client"})
+DEFAULT_OBJECT: frozenset[str] = frozenset({"tracker", "project", "tag", "client", "org"})
 
 
 def _target_objects() -> set[str]:
@@ -55,6 +53,10 @@ def _clean(args: set[str], auth: BasicAuth, workspace: int) -> None:
         log.info("Cleaning clients...")
         _client_cleanup(cache, workspace, auth, 1)
 
+    if "org" in args:
+        log.info("Cleaning organizations...")
+        _org_cleanup(cache, auth, 1)
+
     log.info("Cleaning cache...")
     _path_cleanup(cache_loc)
 
@@ -70,6 +72,8 @@ def main() -> None:
     log.basicConfig(encoding="utf-8", level=log.INFO, format=fmt)
     log.info("Starting to clean toggl-account!")
 
+    args = _target_objects()
+
     try:
         auth = generate_authentication()
     except AuthenticationError as err:
@@ -81,7 +85,6 @@ def main() -> None:
         log.critical("Default toggl worspace not set at 'TOGGL_WORKSPACE_ID'.")
         sys.exit(1)
 
-    args = _target_objects()
     while True:
         print(f"Are you sure you want to remove all {', '.join(args)} models?")  # noqa: T201
         choice = input("[y/N] > ")

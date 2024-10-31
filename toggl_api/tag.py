@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, codes
 
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
@@ -66,7 +66,7 @@ class TagEndpoint(TogglCachedEndpoint):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != self.NOT_FOUND:
+            if err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Tag with id %s was either already deleted or did not exist in the first place!",

@@ -59,6 +59,16 @@ classDiagram
     commit(path: Path) None
     load(path: Path) None
     process_data(data: list[TogglClass]) list[TogglClass]
+    refresh(path: Path) bool
+  }
+  class OrganizationEndpoint {
+    endpoint
+    model
+    add(name: str, workspace_name: str) TogglOrganization
+    collect() list[TogglOrganization]
+    delete(organization: TogglOrganization | int) None
+    edit(organization: TogglOrganization | int, name: str) TogglOrganization
+    get(organization: TogglOrganization | int) TogglOrganization | None
   }
   class PaginatedResult {
     next_id : Optional[int]
@@ -191,9 +201,6 @@ classDiagram
   class TogglEndpoint {
     BASE_ENDPOINT : str
     HEADERS : Final[dict]
-    NOT_FOUND : Final[int]
-    OK_RESPONSE : Final[int]
-    SERVER_ERROR : Final[int]
     endpoint
     model
     workspace_id : int
@@ -201,6 +208,10 @@ classDiagram
     method(method: RequestMethod) Callable
     process_models(data: list[dict[str, Any]]) list[TogglClass]
     request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Any
+  }
+  class TogglOrganization {
+    from_kwargs() TogglOrganization
+    validate_name(name: str) None
   }
   class TogglProject {
     active : bool
@@ -227,7 +238,10 @@ classDiagram
     running() bool
   }
   class TogglWorkspace {
+    name : str
+    organization : int
     from_kwargs() TogglWorkspace
+    validate_name(name: str) None
   }
   class TrackerBody {
     created_with : str
@@ -258,6 +272,10 @@ classDiagram
     process_bind_param(value: datetime, _) datetime | None
     process_result_value(value: Optional[datetime], _) datetime | None
   }
+  class User {
+    name : str
+    user_id : int
+  }
   class UserEndpoint {
     TRACKER_NOT_RUNNING : Final[int]
     endpoint
@@ -266,11 +284,29 @@ classDiagram
     collect(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
     current() TogglTracker | None
     get(tracker_id: int | TogglTracker) TogglTracker | None
+    get_details() dict[str, Any]
+    verify_authentication(auth: BasicAuth) bool
   }
   class WeeklyReportEndpoint {
     endpoint
     export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
     search_time_entries(body: ReportBody) list[dict[str, Any]]
+  }
+  class WorkspaceBody {
+    admins : list[int]
+    name : Optional[str]
+    only_admins_may_create_projects : bool
+    only_admins_may_create_tags : bool
+    only_admins_see_billable_rates : bool
+    only_admins_see_team_dashboard : bool
+    projects_billable_by_default : bool
+    projects_enforce_billable : bool
+    projects_private_by_default : bool
+    rate_change_mode : Optional[Literal['start-today', 'override-current', 'override-all']]
+    reports_collapse : bool
+    rounding : Optional[int]
+    rounding_minutes : Optional[int]
+    format(endpoint: str) dict[str, Any]
   }
   class WorkspaceChild {
     workspace : int
@@ -279,7 +315,18 @@ classDiagram
   class WorkspaceEndpoint {
     endpoint
     model
+    organization_id
+    add(organization_id: int, body: WorkspaceBody) TogglWorkspace
+    collect(since: Optional[datetime | int]) list[TogglWorkspace]
+    edit(workspace_id: TogglWorkspace | int, body: WorkspaceBody) TogglWorkspace
     get(workspace: Optional[TogglWorkspace | int]) TogglWorkspace | None
+    statistics(workspace_id: TogglWorkspace | int) WorkspaceStatistics
+    tracker_constraints(workspace_id: TogglWorkspace | int) dict[str, bool]
+  }
+  class WorkspaceStatistics {
+    admins : list[User]
+    groups_count : int
+    members_count : int
   }
   ClientBody --|> BaseBody
   ClientEndpoint --|> TogglCachedEndpoint
@@ -287,11 +334,13 @@ classDiagram
   SqliteCache --|> TogglCache
   TogglCachedEndpoint --|> TogglEndpoint
   TogglClient --|> WorkspaceChild
+  TogglOrganization --|> TogglClass
   TogglProject --|> WorkspaceChild
   TogglTag --|> WorkspaceChild
   TogglTracker --|> WorkspaceChild
   TogglWorkspace --|> TogglClass
   WorkspaceChild --|> TogglClass
+  OrganizationEndpoint --|> TogglCachedEndpoint
   ProjectBody --|> BaseBody
   ProjectEndpoint --|> TogglCachedEndpoint
   DetailedReportEndpoint --|> ReportEndpoint
@@ -303,6 +352,7 @@ classDiagram
   TrackerBody --|> BaseBody
   TrackerEndpoint --|> TogglCachedEndpoint
   UserEndpoint --|> TogglCachedEndpoint
+  WorkspaceBody --|> BaseBody
   WorkspaceEndpoint --|> TogglCachedEndpoint
   Comparison --* TogglQuery : comparison
   JSONSession --* JSONCache : session

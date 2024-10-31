@@ -153,18 +153,19 @@ def test_tracker_collection_date(user_object, add_tracker):
     [
         (
             lambda x: x,
-            lambda x: x.replace(month=(x.month - 1) % 12),
+            lambda x: x - timedelta(weeks=4),
             "end_date must be after the start_date!",
         ),
         (
-            lambda x: x.replace(year=x.year + 1),
-            lambda x: x.replace(year=x.year + 2),
+            lambda x: x + timedelta(weeks=55),
+            lambda x: x + timedelta(weeks=110),
             "start_date must not be earlier than the current date!",
         ),
     ],
 )
 def test_tracker_collection_errors(user_object, start_date, end_date, match):
     now = datetime.now(tz=timezone.utc)
+
     with pytest.raises(ValueError, match=match):
         user_object.collect(
             start_date=start_date(now),

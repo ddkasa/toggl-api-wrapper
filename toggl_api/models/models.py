@@ -63,17 +63,65 @@ class TogglClass(ABC):
 
 
 @dataclass
+class TogglOrganization(TogglClass):
+    """Data structure for Toggl organizations."""
+
+    ___tablename__ = "organization"
+
+    def __post_init__(self) -> None:
+        self.validate_name(self.name)
+        super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs) -> TogglOrganization:
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+    @staticmethod
+    def validate_name(name: str, *, max_len: int = 140) -> None:
+        """Checks if a organization name is valid for the API."""
+        if not name:
+            msg = "The organization name need at least have one letter!"
+            raise ValueError(msg)
+        if max_len and len(name) > max_len:
+            msg = f"Max organization name length is {max_len}!"
+            raise ValueError(msg)
+
+
+@dataclass
 class TogglWorkspace(TogglClass):
     """Data structure for Toggl workspaces."""
 
     ___tablename__ = "workspace"
 
+    organization: int = field(default=0)
+
     def __post_init__(self) -> None:
         super().__post_init__()
+        try:
+            TogglWorkspace.validate_name(self.name)
+        except ValueError as err:
+            if str(err) != "No spaces allowed in the workspace name!":
+                raise
+            log.warning(err)
+            self.name = self.name.replace(" ", "-")
+            log.warning("Updated to new name: %s!", self.name)
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglWorkspace:
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+
+    @staticmethod
+    def validate_name(name: str, *, max_len: int = 140) -> None:
+        """Checks if a workspace name is valid for the API."""
+        if not name:
+            msg = "The workspace name need at least have one character!"
+            raise ValueError(msg)
+        if max_len and len(name) > max_len:
+            msg = f"The max workspace name length is {max_len}!"
+            raise ValueError(msg)
+        if " " in name:
+            msg = "No spaces allowed in the workspace name!"
+            raise ValueError(msg)
 
 
 @dataclass
@@ -83,6 +131,7 @@ class WorkspaceChild(TogglClass):
     __tablename__ = "workspace_child"
 
     workspace: int = field(default=0)
+    """The id of the workspace that the model belongs to."""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -117,7 +166,6 @@ class TogglProject(WorkspaceChild):
             all colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
-
     """
 
     __tablename__ = "project"
@@ -154,12 +202,12 @@ class TogglTracker(WorkspaceChild):
         start: Start time of the tracker. Defaults to time created if nothing
             is passed.
         duration: Duration of the tracker
-        stop: Stop time of the tracker
-        project: ID of the project
-        tags: List of tags
+        stop: Stop time of the tracker.
+        project: Id of the project the tracker is assigned to.
+        tags: List of tags.
 
     Methods:
-        active(bool): Whether the tracker is running.
+        running: Whether the tracker is running.
     """
 
     __tablename__ = "tracker"

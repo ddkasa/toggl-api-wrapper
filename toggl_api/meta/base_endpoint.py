@@ -1,7 +1,7 @@
 """Metaclass for requesting and modiftying data from the Toggl API.
 
 Classes:
-    TogglRequest: Base class with basic functionality for all API requests.
+    TogglEndpoint: Base class with basic functionality for all API requests.
 """
 
 from __future__ import annotations
@@ -11,10 +11,11 @@ import logging
 import random
 import time
 from abc import ABC, abstractmethod
+from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
-from httpx import codes
+from httpx import HTTPStatusError, codes
 
 from toggl_api.models import TogglClass
 
@@ -28,10 +29,6 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 class TogglEndpoint(ABC):
     """Base class with basic functionality for all API requests."""
-
-    OK_RESPONSE: Final[int] = codes.OK
-    NOT_FOUND: Final[int] = codes.NOT_FOUND
-    SERVER_ERROR: Final[int] = codes.INTERNAL_SERVER_ERROR
 
     BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -170,7 +167,7 @@ class TogglEndpoint(ABC):
         """Method for verifying that the Toggl API is up."""
         try:
             result = httpx.get("https://api.track.toggl.com/api/v9/status").json()
-        except httpx.HTTPStatusError:
+        except (HTTPStatusError, JSONDecodeError):
             log.critical("Failed to get a response from the Toggl API!")
             log.exception("%s")
             return False

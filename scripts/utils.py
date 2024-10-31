@@ -11,10 +11,12 @@ from toggl_api.client import ClientEndpoint
 from toggl_api.config import generate_authentication
 from toggl_api.meta import JSONCache
 from toggl_api.meta.cache import TogglCache
+from toggl_api.organization import OrganizationEndpoint
 from toggl_api.project import ProjectEndpoint
 from toggl_api.tag import TagEndpoint
 from toggl_api.tracker import TrackerEndpoint
 from toggl_api.user import UserEndpoint
+from toggl_api.workspace import WorkspaceEndpoint
 
 
 def _path_cleanup(cache_path: Path) -> None:
@@ -67,6 +69,18 @@ def _tag_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1)
         time.sleep(delay)
 
 
+def _org_cleanup(cache: TogglCache, config: BasicAuth, delay: int = 1) -> None:
+    endpoint = OrganizationEndpoint(config, cache)
+    orgs = endpoint.collect(refresh=True)
+    for org in orgs:
+        if org.name == "Do-Not-Delete":
+            continue
+        log.info("Deleting org: %s", org)
+        with contextlib.suppress(HTTPError):
+            endpoint.delete(org)
+        time.sleep(delay)
+
+
 def cleanup():
     path = Path(__file__).parent / "cache"
     wid = int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
@@ -77,4 +91,6 @@ def cleanup():
     _tracker_cleanup(cache, wid, config)
     _client_cleanup(cache, wid, config)
     _tag_cleanup(cache, wid, config)
+    _org_cleanup(cache, config)
+
     _path_cleanup(path)

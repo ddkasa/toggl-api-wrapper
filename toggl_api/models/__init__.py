@@ -4,6 +4,7 @@ from typing import Any
 from .models import (
     TogglClass,
     TogglClient,
+    TogglOrganization,
     TogglProject,
     TogglTag,
     TogglTracker,
@@ -31,6 +32,7 @@ def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
 __all__ = (
     "TogglClass",
     "TogglClient",
+    "TogglOrganization",
     "TogglProject",
     "TogglTag",
     "TogglTracker",
