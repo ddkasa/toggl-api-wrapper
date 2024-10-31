@@ -89,7 +89,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         config = _get_togglrc(config_path)
     except FileNotFoundError as err:
         warnings.warn(
-            "DEPRECATED: AuthenticationError will be switched for a FileNotFoundError.",
+            "DEPRECATED: 'AuthenticationError' will be switched for 'FileNotFoundError'.",
             DeprecationWarning,
             stacklevel=3,
         )
@@ -121,6 +121,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
     return BasicAuth(email, password)
 
 
+# NOTE: For .togglrc compatibility.
 def retrieve_workspace_id(default: Optional[int] = None) -> int:
     """Helper function that collect the default workspace from the environment.
 
