@@ -65,6 +65,11 @@ def organization_id() -> int:
     return int(os.getenv("TOGGL_ORGANIZATION_ID", "0"))
 
 
+@pytest.fixture(scope="session")
+def user_id() -> int:
+    return int(os.getenv("TOGGL_USER_ID", "0"))
+
+
 @pytest.fixture
 def workspace_object(organization_id, config_setup, get_json_cache):
     return WorkspaceEndpoint(organization_id, config_setup, get_json_cache)
