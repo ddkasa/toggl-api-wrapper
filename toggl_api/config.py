@@ -17,9 +17,9 @@ class AuthenticationError(ValueError):
 def generate_authentication() -> BasicAuth:
     """Gathers credentials from environment variables.
 
-    If using an API token as authentication: `TOGGL_API_TOKEN`.
+    If using an API token as authentication: **TOGGL_API_TOKEN**.
 
-    If using email as authentication: `TOGGL_API_TOKEN` & `TOGGL_PASSWORD`.
+    If using email as authentication: **TOGGL_API_TOKEN** & **TOGGL_PASSWORD**.
 
     Examples:
         >>> generate_authentication()

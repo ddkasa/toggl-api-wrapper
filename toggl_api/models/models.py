@@ -78,6 +78,7 @@ class TogglOrganization(TogglClass):
 
     @staticmethod
     def validate_name(name: str, *, max_len: int = 140) -> None:
+        """Checks if a organization name is valid for the API."""
         if not name:
             msg = "The organization name need at least have one letter!"
             raise ValueError(msg)
@@ -111,6 +112,7 @@ class TogglWorkspace(TogglClass):
 
     @staticmethod
     def validate_name(name: str, *, max_len: int = 140) -> None:
+        """Checks if a workspace name is valid for the API."""
         if not name:
             msg = "The workspace name need at least have one character!"
             raise ValueError(msg)
@@ -129,6 +131,7 @@ class WorkspaceChild(TogglClass):
     __tablename__ = "workspace_child"
 
     workspace: int = field(default=0)
+    """The id of the workspace that the model belongs to."""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -163,7 +166,6 @@ class TogglProject(WorkspaceChild):
             all colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
-
     """
 
     __tablename__ = "project"
@@ -200,12 +202,12 @@ class TogglTracker(WorkspaceChild):
         start: Start time of the tracker. Defaults to time created if nothing
             is passed.
         duration: Duration of the tracker
-        stop: Stop time of the tracker
-        project: ID of the project
-        tags: List of tags
+        stop: Stop time of the tracker.
+        project: Id of the project the tracker is assigned to.
+        tags: List of tags.
 
     Methods:
-        active(bool): Whether the tracker is running.
+        running: Whether the tracker is running.
     """
 
     __tablename__ = "tracker"
