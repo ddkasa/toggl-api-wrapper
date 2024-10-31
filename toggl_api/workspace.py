@@ -278,6 +278,17 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
         """Lists workspaces for given user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-workspaces)
+
+        Args:
+            since: Optional argument to filter any workspace after the timestamp.
+            refresh: Whether to use cache or not.
+
+        Raises:
+            ValueError: If the since argument is after the current time.
+
+        Returns:
+            list: A list of workspaces or empty if there are None assocciated
+                with the user.
         """
 
         if since is not None:
@@ -310,8 +321,10 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-workspace-time-entry-constraints)
 
+        Toggl premium feature.
+
         Examples:
-            >>> .get_workspace_constraints(24214214)
+            >>> workspace_endpoint.get_workspace_constraints(24214214)
             {
                 "description_present": True,
                 "project_present": False,
@@ -319,6 +332,12 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
                 "task_present": False,
                 "time_entry_constraints_enabled": True,
             }
+
+        Args:
+            workspace_id: Id of the workspace to retrieve constraints from.
+
+        Returns:
+            dict: A dictionary of booleans containing the settings.
         """
 
         if isinstance(workspace_id, TogglWorkspace):
@@ -334,6 +353,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
         """Returns workspace admins list, members count and groups count.
 
         [Official Documentation](https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/statistics)
+
+        Args:
+            workspace_id: Id of the workspace to fetch the statistics from.
+
+        Returns:
+            dict: A dictionary containing relevant statistics.
+                Refer to WorkspaceStatistics typed dict for reference.
         """
 
         if isinstance(workspace_id, TogglWorkspace):
