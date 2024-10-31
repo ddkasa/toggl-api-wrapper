@@ -9,6 +9,8 @@ from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict
 
+from httpx import HTTPStatusError, codes
+
 from toggl_api.meta.body import BaseBody
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.meta.enums import RequestMethod
@@ -215,6 +217,18 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
         """Get the current workspace based on the workspace_id class attribute.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-single-workspace)
+
+        Args:
+            workspace: Workspace id or to get. Optional is DEPRECATED argument
+                type and will become required in the future.
+            refresh: Whether to use cache or not.
+
+        Raises:
+            HTTPStatusError: If anything that's not a '2xx' or '404' status_code is returned.
+
+        Returns:
+            TogglWorkspace | None: Model of workspace if found else none.
+
         """
 
         if workspace is None:
@@ -230,7 +244,15 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
         if not refresh:
             return self.cache.find_entry({"id": workspace})  # type: ignore[return-value]
 
-        return self.request(f"workspaces/{workspace}", refresh=refresh)
+        try:
+            response = self.request(f"workspaces/{workspace}", refresh=refresh)
+        except HTTPStatusError as err:
+            log.exception("%s")
+            if err.response.status_code == codes.NOT_FOUND:
+                return None
+            raise
+
+        return response
 
     def add(self, body: WorkspaceBody) -> TogglWorkspace:
         """Create a new workspace.
