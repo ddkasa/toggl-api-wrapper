@@ -46,6 +46,7 @@ def test_cache_int_arg():
         "project",
         "tag",
         "tracker",
+        "organization",
     ],
 )
 def test_schema(table, setup_schema):
