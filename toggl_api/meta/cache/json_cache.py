@@ -272,7 +272,17 @@ class JSONCache(TogglCache):
         search = self.session.data
         existing: defaultdict[str, set[Any]] = defaultdict(set)
 
-        return [model for model in search if self._query_helper(model, query, existing, min_ts)]
+        return [
+            model
+            for model in search
+            if self._query_helper(
+                model,
+                query,
+                existing,
+                min_ts,
+                distinct=distinct,
+            )
+        ]
 
     def _query_helper(
         self,
@@ -280,26 +290,40 @@ class JSONCache(TogglCache):
         queries: tuple[TogglQuery, ...],
         existing: dict[str, set[Any]],
         min_ts: Optional[datetime],
+        *,
+        distinct: bool,
     ) -> bool:
         if self.expire_after and min_ts and model.timestamp and min_ts >= model.timestamp:
             return False
 
         for query in queries:
-            if model[query.key] in existing[query.key] or not self._match_query(model, query):
+            if (
+                distinct and not isinstance(query.value, list) and model[query.key] in existing[query.key]
+            ) or not self._match_query(model, query):
                 return False
 
-        for query in queries:
-            existing[query.key].add(model[query.key])
+        if distinct:
+            for query in queries:
+                existing[query.key].add(model[query.key])
 
         return True
 
     @staticmethod
+    def _match_equal(model: TogglClass, query: TogglQuery):
+        if isinstance(query.value, Sequence) and not isinstance(query.value, str):
+            value = model[query.key]
+
+            if isinstance(value, list):
+                return any(v == comp for comp in query.value for v in value)
+
+            return any(value == comp for comp in query.value)
+
+        return model[query.key] == query.value
+
+    @staticmethod
     def _match_query(model: TogglClass, query: TogglQuery) -> bool:
         if query.comparison == Comparison.EQUAL:
-            if isinstance(query.value, Sequence) and not isinstance(query.value, str):
-                value = model[query.key]
-                return any(value == comp for comp in query.value)
-            return model[query.key] == query.value
+            return JSONCache._match_equal(model, query)
         if query.comparison == Comparison.LESS_THEN:
             return model[query.key] < query.value
         if query.comparison == Comparison.LESS_THEN_OR_EQUAL:

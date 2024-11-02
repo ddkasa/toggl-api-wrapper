@@ -1,5 +1,6 @@
 import json
 import random
+import sys
 import time
 from copy import deepcopy
 from dataclasses import asdict
@@ -12,7 +13,7 @@ from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.meta.cache.json_cache import JSONSession
-from toggl_api.models.models import TogglTracker
+from toggl_api.models.models import TogglTag, TogglTracker
 from toggl_api.user import UserEndpoint
 
 
@@ -174,6 +175,44 @@ def test_query(model_data, tracker_object, faker):
     assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
     assert tracker_object.query(TogglQuery("name", names[0]))[0].name == names[0]
     assert len(tracker_object.query(TogglQuery("name", names[:5]))) == 5  # noqa: PLR2004
+
+
+@pytest.mark.unit
+def test_query_distinct(model_data, tracker_object, faker):
+    t = model_data.pop("tracker")
+    t.id = 1
+
+    d = asdict(t)
+    for i in range(1, 13):
+        d["id"] += i
+        d["timestamp"] = datetime.now(timezone.utc)
+        tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
+
+    tracker_object.cache.commit()
+    assert len(tracker_object.load_cache()) == 12  # noqa: PLR2004
+    assert len(tracker_object.query(TogglQuery("name", t["name"]), distinct=True)) == 1
+
+
+@pytest.mark.unit
+def test_query_tag(model_data, tracker_object, faker, number):
+    names = [faker.name() for _ in range(12)]
+    t = model_data.pop("tracker")
+    t.id = 1
+
+    d = asdict(t)
+    tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
+    tag = TogglTag(number.randint(50, sys.maxsize), faker.name())
+
+    for i in range(1, 3):
+        d["id"] += i
+        d["name"] = names[i - 1]
+        d["timestamp"] = datetime.now(timezone.utc)
+        d["tags"] = [tag]
+        tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
+
+    tracker_object.cache.commit()
+    assert len(tracker_object.load_cache()) == 3  # noqa: PLR2004
+    assert len(tracker_object.query(TogglQuery("tags", [tag]))) == 2  # noqa: PLR2004
 
 
 @pytest.mark.unit
