@@ -16,7 +16,12 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 @dataclass
 class TrackerBody(BaseBody):
-    """JSON body dataclass for PUT, POST & PATCH requests."""
+    """JSON body dataclass for PUT, POST & PATCH requests.
+
+    Examples:
+        >>> TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
+        TrackerBody(description='What a wonderful tracker description!', project_id=2123132)
+    """
 
     description: Optional[str] = field(default=None)
     duration: Optional[int | timedelta] = field(default=None)
@@ -89,6 +94,16 @@ class TrackerEndpoint(TogglCachedEndpoint):
     See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/time_entries)
+
+    Examples:
+        >>> tracker_endpoint = TrackerEndpoint(324525, BasicAuth(...), JSONCache(Path("cache")))
+
+        >>> body = TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
+        >>> tracker = tracker_endpoint.add(body)
+        TogglTracker(id=58687689, name="What a wonderful tracker description!", project=2123132, ...)
+
+        >>> tracker_endpoint.delete(tracker)
+        None
     """
 
     TRACKER_ALREADY_STOPPED: Final[int] = 409
@@ -99,6 +114,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
         This endpoint always hit the external API in order to keep trackers consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#put-timeentries)
+
+        Examples:
+            >>> body = TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
+            >>> tracker_endpoint.edit(58687684, body)
+            TogglTracker(id=58687684, name="What a wonderful tracker description!", project=2123132, ...)
 
         Args:
             tracker: Target tracker model or id to edit.
@@ -131,6 +151,10 @@ class TrackerEndpoint(TogglCachedEndpoint):
         This endpoint always hit the external API in order to keep trackers consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#delete-timeentries)
+
+        Examples:
+            >>> tracker_endpoint.delete(58687684)
+            None
 
         Args:
             tracker: Tracker object with ID to delete.
@@ -165,8 +189,15 @@ class TrackerEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#patch-stop-timeentry)
 
+        Examples:
+            >>> tracker_endpoint.stop(58687684)
+            TogglTracker(id=58687684, name="What a wonderful tracker description!", ...)
+
         Args:
-            tracker: Tracker object with IP to stop.
+            tracker: Tracker id to stop. An integer or model.
+
+        Raises:
+            HTTPStatusError: For anything thats not 'ok' or a '409' status code.
 
         Returns:
             TogglTracker | None: If the tracker was stopped or if the tracker
@@ -192,6 +223,11 @@ class TrackerEndpoint(TogglCachedEndpoint):
         This endpoint always hit the external API in order to keep trackers consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#post-timeentries)
+
+        Examples:
+            >>> body = TrackerBody(description="Tracker description!", project_id=2123132)
+            >>> tracker_endpoint.edit(body)
+            TogglTracker(id=78895400, name="Tracker description!", project=2123132, ...)
 
         Args:
             body: Body of the request. Description must be set. If start date
