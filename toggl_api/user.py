@@ -145,7 +145,7 @@ class UserEndpoint(TogglCachedEndpoint):
         elif start_date and end_date:
             params += f"?start_date={format_iso(start_date)}&end_date={format_iso(end_date)}"
 
-        response = self.request(params)
+        response = self.request(params, refresh=refresh)
 
         return response if isinstance(response, list) else []
 

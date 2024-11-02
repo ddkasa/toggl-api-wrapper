@@ -5,6 +5,7 @@ import httpx
 import pytest
 
 from toggl_api import TogglTracker
+from toggl_api.user import UserEndpoint
 
 
 @pytest.mark.order("first")
@@ -96,7 +97,11 @@ def test_tracker_get_error(user_object, httpx_mock):
 
 
 @pytest.mark.integration
-def test_tracker_collection(user_object, add_tracker):
+def test_tracker_collection(user_object: UserEndpoint, add_tracker):
+    # NOTE: Make sure tracker object is missing from cache for the refresh.
+    user_object.cache.delete_entries(add_tracker)
+    user_object.cache.commit()
+
     collection = user_object.collect(refresh=True)
     assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
 
