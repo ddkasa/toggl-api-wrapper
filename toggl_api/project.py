@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass, field
-from datetime import date, datetime
-from typing import Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 from httpx import HTTPStatusError, codes
 
@@ -9,6 +10,9 @@ from toggl_api.utility import format_iso
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
+
+if TYPE_CHECKING:
+    from datetime import date, datetime
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
