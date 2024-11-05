@@ -193,8 +193,7 @@ def test_query_distinct(model_data, tracker_object, faker):
     assert len(tracker_object.query(TogglQuery("name", t["name"]), distinct=True)) == 1
 
 
-@pytest.mark.unit
-def test_query_tag(model_data, tracker_object, faker, number):
+def _create_tag_data(faker, model_data, tracker_object, number):
     names = [faker.name() for _ in range(12)]
     t = model_data.pop("tracker")
     t.id = 1
@@ -210,9 +209,25 @@ def test_query_tag(model_data, tracker_object, faker, number):
         d["tags"] = [tag]
         tracker_object.save_cache(TogglTracker.from_kwargs(**d), RequestMethod.GET)
 
+    return tag
+
+
+@pytest.mark.unit
+def test_query_tag(model_data, tracker_object, faker, number):
+    tag = _create_tag_data(faker, model_data, tracker_object, number)
+
     tracker_object.cache.commit()
     assert len(tracker_object.load_cache()) == 3  # noqa: PLR2004
     assert len(tracker_object.query(TogglQuery("tags", [tag]))) == 2  # noqa: PLR2004
+
+
+@pytest.mark.unit
+def test_query_tag_distict(model_data, tracker_object, faker, number):
+    tag = _create_tag_data(faker, model_data, tracker_object, number)
+
+    tracker_object.cache.commit()
+    assert len(tracker_object.load_cache()) == 3  # noqa: PLR2004
+    assert len(tracker_object.query(TogglQuery("tags", [tag]), distinct=True)) == 2  # noqa: PLR2004
 
 
 @pytest.mark.unit
@@ -223,7 +238,9 @@ def test_query_parent(tmp_path):
         cache.query()
 
 
+# FIX:: Flaky test that will fail occassionaly on windows testing.
 @pytest.mark.unit
+@pytest.mark.flaky(rerun_except="AssertionError", reruns=3)
 def test_cache_sync(
     tmpdir,
     get_test_data,
