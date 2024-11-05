@@ -32,13 +32,27 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-# REFACTOR: Possibly turn this into a mixin to avoid duplication and more flexibility.
 class TogglCachedEndpoint(TogglEndpoint):
     """Abstract cached endpoint for requesting toggl API data to disk.
 
-    Attributes:
-        _cache: Cache object for caching toggl API data to disk. Builtin cache
+    See parent endpoint for more details.
+
+    Params:
+        cache: Cache object for caching toggl API data to disk. Builtin cache
             types are JSONCache and SqliteCache.
+
+    Attributes:
+        cache: Cache object the endpoint will use for storing models. Assigns
+            itself as the parent automatically.
+
+    Methods:
+        request: Overriden method that implements the cache into the request chain.
+        load_cache: Method for loading cache into memory.
+        save_cache: Method for saving cache to disk. Ignored if expiry is set
+            to 0 seconds.
+        query: Wrapper method for accessing querying capabilities within the
+            assigned cache.
+
     """
 
     __slots__ = ("_cache",)
@@ -115,6 +129,7 @@ class TogglCachedEndpoint(TogglEndpoint):
         return response
 
     def load_cache(self) -> Iterable[TogglClass]:
+        """Direct loading method for retrieving all models from cache."""
         return self.cache.load_cache()
 
     def save_cache(
@@ -122,11 +137,21 @@ class TogglCachedEndpoint(TogglEndpoint):
         response: list[TogglClass] | TogglClass,
         method: RequestMethod,
     ) -> None:
+        """Direct saving method for retrieving all models from cache."""
         if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
             return None
         return self.cache.save_cache(response, method)
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]:
+        """Query wrapper for the cache method.
+
+        Args:
+            query: An arbitary amount of queries to match the models to.
+            distinct: A boolean that remove duplicate values if present.
+
+        Returns:
+            iterable: An iterable object depending on the cache used.
+        """
         return self.cache.query(*query, distinct=distinct)
 
     @property

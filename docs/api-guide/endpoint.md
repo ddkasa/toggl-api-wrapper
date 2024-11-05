@@ -23,4 +23,5 @@
             - load_cache
             - save_cache
             - cache
+            - query
 
