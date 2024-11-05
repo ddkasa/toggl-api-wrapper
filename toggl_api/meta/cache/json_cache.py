@@ -41,16 +41,13 @@ class JSONSession:
     Similar to a SQL session as its meant to have the same/similar interface.
 
     This dataclass doesn't require interaction from the library user and will
-    be created the json cache object.
+    be created in the json cache object.
 
     Examples:
         >>> cache = JSONSession(max_length=5000)
 
-    Methods:
-        save: Saves the data to a JSON file. Setting current timestamp and
-            version.
-        load: Loads the data from disk and stores it in the data attribute.
-            Invalidates any entries older than expire argument.
+    Params:
+        max_length: Max length of the data to be stored.
 
     Attributes:
         max_length: Max length of the data to be stored.
@@ -59,6 +56,13 @@ class JSONSession:
         modified: Timestamp of when the cache was last modified in nanoseconds.
             Used for checking if another cache object has updated it recently.
 
+    Methods:
+        save: Saves the data to a JSON file. Setting current timestamp and
+            version.
+        load: Loads the data from disk and stores it in the data attribute.
+            Invalidates any entries older than expire argument.
+        refresh: Utility method that checks if cache has been updated.
+        process_data: Processes models according to set attributes.
     """
 
     max_length: int = field(default=10_000)
@@ -135,7 +139,7 @@ class JSONCache(TogglCache):
 
         >>> cache = JSONCache(Path("cache"), timedelta(weeks=2))
 
-    Args:
+    Params:
         path: Path to the cache file
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
@@ -143,6 +147,12 @@ class JSONCache(TogglCache):
         parent: Parent endpoint that will use the cache. Assigned automatically
             when supplied to a cached endpoint.
         max_length: Max length list of the data to be stored permanently.
+
+    Attributes:
+        expire_after: Time after which the cache should be refreshed.
+
+        session(JSONSession): Store the current json data in memory while
+            handling the cache.
 
     Methods:
         commit: Wrapper for JSONSession.save() that saves the current json data
@@ -152,10 +162,6 @@ class JSONCache(TogglCache):
             change before saving.
         load_cache: Loads the data from the cache and returns the data to the
             caller discarding expired entries.
-
-    Attributes:
-        session(JSONSession): Store the current json data in memory while
-            handling the cache.
     """
 
     __slots__ = ("session",)
@@ -246,7 +252,7 @@ class JSONCache(TogglCache):
     def query(self, *query: TogglQuery, distinct: bool = False) -> list[TogglClass]:
         """Query method for filtering Toggl objects from cache.
 
-        Filters cached toggl objects by set of supplied queries.
+        Filters cached Toggl objects by set of supplied queries.
 
         Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
         enumeration.
@@ -260,7 +266,7 @@ class JSONCache(TogglCache):
             ValueError: If parent has not been set.
 
         Returns:
-            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
+            list[TogglClass]: A query object with parameters filtered.
         """
         if self.parent is None:
             msg = "Cannot load cache without parent!"

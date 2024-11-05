@@ -32,5 +32,9 @@
 # JSON
 
 ::: toggl_api.meta.cache.json_cache.JSONSession
+    options:
+        show_source: true
 
 ::: toggl_api.JSONCache
+    options:
+        show_source: true
