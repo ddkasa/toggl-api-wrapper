@@ -31,9 +31,11 @@ if TYPE_CHECKING:
 
 @requires("sqlalchemy")
 class SqliteCache(TogglCache):
-    """Class for caching data to a Sqlite database.
+    """Class for caching data to a SQLite database.
 
-    Args:
+    Disconnects database on deletion or exit.
+
+    Params:
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
@@ -41,6 +43,7 @@ class SqliteCache(TogglCache):
             automatically when supplied to a cached endpoint.
 
     Attributes:
+        expire_after: Time after which the cache should be refreshed.
         database: Sqlalchemy database engine.
         metadata: Sqlalchemy metadata.
         session: Sqlalchemy session.
@@ -48,6 +51,7 @@ class SqliteCache(TogglCache):
     Methods:
         load_cache: Loads the data from disk and stores it in the data
             attribute. Invalidates any entries older than expire argument.
+        query: Querying method that uses SQL to query cached objects.
     """
 
     __slots__ = (
@@ -146,7 +150,7 @@ class SqliteCache(TogglCache):
 
         Args:
             query: Any positional argument that is used becomes query argument.
-            distinct: Whether to keep the same values around.
+            distinct: Whether to keep equivalent values around.
 
         Raises:
             ValueError: If parent has not been set.

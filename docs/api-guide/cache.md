@@ -26,6 +26,8 @@
 > Make sure to install sqlalchemy if using SqliteCache with `pip install toggl-api-wrapper[sqlite]`
 
 ::: toggl_api.meta.cache.sqlite_cache.SqliteCache
+    options:
+        show_source: true
 
 ---
 
