@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2024-11-05
+
+### 🐛 Bug Fixes
+
+- *(cache)* Json query hashable type error
+- *(cache)* Check for all sequences
+
+### 📚 Documentation
+
+- *(endpoint)* Improve cached endpoint docstrings
+- *(cache)* Improve base cache docstring
+- *(cache)* Improve json cache docstrings
+- *(cache)* Improve sqlite cache docstrings
+
+### 🧪 Testing
+
+- *(cache)* Test for distinct flag and unhashable types
+
 ## [1.3.1] - 2024-11-02
 
 ### 🐛 Bug Fixes
