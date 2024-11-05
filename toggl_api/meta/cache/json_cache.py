@@ -316,7 +316,7 @@ class JSONCache(TogglCache):
         if isinstance(query.value, Sequence) and not isinstance(query.value, str):
             value = model[query.key]
 
-            if isinstance(value, list):
+            if isinstance(value, Sequence) and not isinstance(value, str):
                 return any(v == comp for comp in query.value for v in value)
 
             return any(value == comp for comp in query.value)
