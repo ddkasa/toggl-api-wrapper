@@ -67,6 +67,21 @@ class TogglCache(ABC):
     Integrates fully with TogglCachedEndpoint to create a seemless depending on
     the users choice of cache.
 
+    Params:
+        path: Location where the cache will be saved.
+        expire_after: After how much time should the cache expire.
+            Set to None if no expire_date or to **0** seconds for no caching
+            at all. If using an integer it will be assumed as seconds.
+            If set to None its ignored.
+        parent: Endpoint which the cache belongs to. Doesn't need to be set
+            through parameters as it will be auto assigned.
+
+    Attributes:
+        cache_path: Path to the cache file. Will generate the folder if it
+            does not exist.
+        expire_after: Time after which the cache should be refreshed.
+        parent: Parent TogglCachedEndpoint
+
     Methods:
         commit: Commits the cache to disk, database or other form.
             Method for finalising the cache. Abstract.
@@ -80,14 +95,6 @@ class TogglCache(ABC):
         parent_exist: Validates if the parent has been set. The parent will be
             generally set by the endpoint when assigned. Abstract.
         query: Queries the cache for various varibles. Abstract.
-
-    Attributes:
-        cache_path: Path to the cache file. Will generate the folder if it
-            does not exist.
-        expire_after: Time after which the cache should be refreshed.
-            If using an integer it will be assumed as seconds.
-            If set to None its ignored.
-        parent: Parent TogglCachedEndpoint
     """
 
     __slots__ = ("_cache_path", "_expire_after", "_parent")
