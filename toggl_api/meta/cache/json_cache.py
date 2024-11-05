@@ -5,7 +5,7 @@ import json
 import logging
 import time
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Optional
@@ -253,7 +253,8 @@ class JSONCache(TogglCache):
 
         Args:
             query: Any positional argument that is used becomes query argument.
-            distinct: Whether to keep the same values around.
+            distinct: Whether to keep the same values around. This doesn't work
+                with unhashable fields such as lists.
 
         Raises:
             ValueError: If parent has not been set.
@@ -304,7 +305,9 @@ class JSONCache(TogglCache):
 
         if distinct:
             for query in queries:
-                existing[query.key].add(model[query.key])
+                value = model[query.key]
+                if isinstance(value, Hashable):
+                    existing[query.key].add(value)
 
         return True
 
