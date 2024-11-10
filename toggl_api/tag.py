@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional
 
 from httpx import HTTPStatusError, codes
 
@@ -37,16 +38,24 @@ class TagEndpoint(TogglCachedEndpoint):
             refresh=True,
         )
 
-    def edit(self, tag: TogglTag) -> TogglTag:
+    def edit(self, tag: TogglTag | int, name: Optional[str] = None) -> TogglTag:
         """Sets the name of the tag based on the tag object.
 
         This endpoint always hit the external API in order to keep tags consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#put-update-tag)
         """
+
+        if isinstance(tag, TogglTag) and name is None:
+            name = tag.name
+
+        if not name:
+            msg = "The tag name needs to be at least one character long."
+            raise ValueError(msg)
+
         return self.request(
-            f"/{tag.id}",
-            body={"name": tag.name},
+            f"/{tag.id if isinstance(tag, TogglTag) else tag}",
+            body={"name": name},
             method=RequestMethod.PUT,
             refresh=True,
         )
