@@ -100,7 +100,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         "yellow": "#c7af14",
         "dark-green": "#566614",
         "red": "#d92b2b",
-        "gray": "#d80435",
+        "gray": "#525266",
     }
     """Basic colors available for projects in order."""
 
