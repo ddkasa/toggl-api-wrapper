@@ -15,7 +15,18 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class TagEndpoint(TogglCachedEndpoint):
     """Specific endpoints for retrieving and modifying tags.
 
+    Tags don't have single model get endpoint. Use parent class query method
+    if searching for a single tag.
+
     [Official Documentation](https://engineering.toggl.com/docs/api/tags)
+
+    Examples:
+        >>> tag_endpoint = TagEndpoint(21341214, BasicAuth(...), JSONCache(Path("cache")))
+        >>> tag_endpoint.add("Eucalyptus")
+        TogglTag(213123132, "Eucalyptus")
+
+        >>> tag_endpoint.query(TogglQuery("name", "Eucalyptus"))
+        [TogglTag(213123132, "Eucalyptus")]
     """
 
     def collect(self, *, refresh: bool = False) -> list[TogglTag]:
