@@ -12,7 +12,7 @@ from .models import TogglTag
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class TagEndpoint(TogglCachedEndpoint):
+class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     """Specific endpoints for retrieving and modifying tags.
 
     Tags don't have single model get endpoint. Use parent class query method

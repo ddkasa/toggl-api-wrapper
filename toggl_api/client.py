@@ -49,7 +49,7 @@ class ClientBody(BaseBody):
         return body
 
 
-class ClientEndpoint(TogglCachedEndpoint):
+class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
     """Specific endpoints for retrieving and modifying clients.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/clients)

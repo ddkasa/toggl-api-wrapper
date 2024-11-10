@@ -182,7 +182,7 @@ class WorkspaceStatistics(TypedDict):
     members_count: int
 
 
-class WorkspaceEndpoint(TogglCachedEndpoint):
+class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
     """Specific endpoints for retrieving workspaces.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)

@@ -80,7 +80,7 @@ class ProjectBody(BaseBody):
         return body
 
 
-class ProjectEndpoint(TogglCachedEndpoint):
+class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     """Specific endpoints for retrieving and modifying projects.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/projects)

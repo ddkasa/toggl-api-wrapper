@@ -88,7 +88,7 @@ class TrackerBody(BaseBody):
         return body
 
 
-class TrackerEndpoint(TogglCachedEndpoint):
+class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
     """Endpoint for modifying and creating trackers.
 
     See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
