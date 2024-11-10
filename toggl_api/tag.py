@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import warnings
 from typing import Optional
 
 from httpx import HTTPStatusError, codes
@@ -47,6 +48,10 @@ class TagEndpoint(TogglCachedEndpoint):
         """
 
         if isinstance(tag, TogglTag) and name is None:
+            warnings.warn(
+                "DEPRECATED: the 'name' argument will replace the internal usage of the 'Tag.name' attribute.",
+                stacklevel=2,
+            )
             name = tag.name
 
         if not name:
