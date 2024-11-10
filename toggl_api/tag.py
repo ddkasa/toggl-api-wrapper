@@ -45,6 +45,27 @@ class TagEndpoint(TogglCachedEndpoint):
         This endpoint always hit the external API in order to keep tags consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#put-update-tag)
+
+        Examples:
+            >>> tag = Tag(213123132, "Eucalyptus")
+            >>> tag_endpoint.edit(tag)
+            TogglTag(213123132, "Eucalyptus")
+
+            >>> tag_endpoint.edit(213123132, "Eucalyptus")
+            TogglTag(213123132, "Eucalyptus")
+
+        Args:
+            tag: TogglTag or integer as the id.
+                *Currently can accept the tag as the 'name' input as well.*
+            name: New name for the tag. Will become required in the next major
+                version.
+
+        Raises:
+            ValueError: If the name is not at the minimum length.
+            HTTPStatusError: If any issue happens with the Toggl API.
+
+        Returns:
+            TogglTag: The edited tag.
         """
 
         if isinstance(tag, TogglTag) and name is None:
