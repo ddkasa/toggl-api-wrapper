@@ -87,11 +87,17 @@ class TagEndpoint(TogglCachedEndpoint):
         )
 
     def delete(self, tag: TogglTag | int) -> None:
-        """Deletes a tag based on its ID.
+        """Deletes a tag based on its ID or model.
 
         This endpoint always hit the external API in order to keep tags consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#delete-delete-tag)
+
+        Args:
+            tag: The tag to delete. Either the id or model.
+
+        Raises:
+            HTTPStatusError: For anything thats not an '2xx' or '404' code.
         """
         tag_id = tag if isinstance(tag, int) else tag.id
         try:
