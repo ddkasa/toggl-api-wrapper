@@ -31,6 +31,16 @@ class TagEndpoint(TogglCachedEndpoint):
         This endpoint always hit the external API in order to keep tags consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#post-create-tag)
+
+        Args:
+            name: The name of the new tag.
+
+        Raises:
+            ValueError: IF the tag name is empty.
+            HTTPStatusError: If a tag with the same name exists.
+
+        Returns:
+            TogglTag: The newly created tag.
         """
 
         if not name:
