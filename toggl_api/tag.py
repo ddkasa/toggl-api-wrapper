@@ -32,6 +32,11 @@ class TagEndpoint(TogglCachedEndpoint):
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#post-create-tag)
         """
+
+        if not name:
+            msg = "The tag name needs to be at least one character long."
+            raise ValueError(msg)
+
         return self.request(
             "",
             body={"name": name},
