@@ -9,6 +9,7 @@ import httpx
 from httpx import BasicAuth, HTTPStatusError, codes
 
 from toggl_api import Comparison, TogglQuery
+from toggl_api._exceptions import DateTimeError
 
 from .meta import TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
@@ -114,7 +115,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             refresh: Whether to refresh the cache or not.
 
         Raises:
-            ValueError: If the dates are not in the correct ranges.
+            DateTimeError: If the dates are not in the correct ranges.
 
         Returns:
             list[TogglTracker]: List of TogglTracker objects that are within
@@ -124,10 +125,10 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         if start_date and end_date:
             if end_date < start_date:
                 msg = "end_date must be after the start_date!"
-                raise ValueError(msg)
+                raise DateTimeError(msg)
             if start_date > datetime.now(tz=timezone.utc):
                 msg = "start_date must not be earlier than the current date!"
-                raise ValueError(msg)
+                raise DateTimeError(msg)
 
         if not refresh:
             return self._collect_cache(since, before, start_date, end_date)
