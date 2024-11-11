@@ -146,8 +146,11 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             return None
         return self.cache.save_cache(response, method)
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[T]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
         """Query wrapper for the cache method.
+
+        If the original data structure is required use the query on the
+        *.cache* attribute instead.
 
         Args:
             query: An arbitary amount of queries to match the models to.
@@ -156,7 +159,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         Returns:
             Iterable: An iterable object depending on the cache used.
         """
-        return self.cache.query(*query, distinct=distinct)
+        return list(self.cache.query(*query, distinct=distinct))
 
     @property
     @abstractmethod

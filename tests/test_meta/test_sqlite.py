@@ -187,7 +187,7 @@ def test_query_sqlite(tracker_object_sqlite, model_data, faker):
     tracker_object_sqlite.cache.commit()
     assert tracker_object_sqlite.load_cache().count() == 11  # noqa: PLR2004
     assert tracker_object_sqlite.query(TogglQuery("name", tracker.name))[0] == tracker
-    assert tracker_object_sqlite.query(TogglQuery("name", list(picked_names))).count() == total_picks
+    assert tracker_object_sqlite.cache.query(TogglQuery("name", list(picked_names))).count() == total_picks
 
 
 @pytest.mark.unit
@@ -204,7 +204,7 @@ def test_query_sqlite_distinct(tracker_object_sqlite, model_data, faker):
         d["timestamp"] = datetime.now(timezone.utc)
         tracker_object_sqlite.save_cache(tracker.from_kwargs(**d), RequestMethod.GET)
 
-    assert tracker_object_sqlite.query(TogglQuery("name", name), distinct=True).count() == 1
+    assert tracker_object_sqlite.cache.query(TogglQuery("name", name), distinct=True).count() == 1
 
 
 @pytest.mark.unit
