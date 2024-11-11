@@ -7,13 +7,13 @@ from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 from toggl_api.meta.enums import RequestMethod
+from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
-    from toggl_api.models import TogglClass
 
 
 class Comparison(enum.Enum):
@@ -61,7 +61,10 @@ class TogglQuery(Generic[T]):
                 )
 
 
-class TogglCache(ABC):
+TC = TypeVar("TC", bound=TogglClass)
+
+
+class TogglCache(ABC, Generic[TC]):
     """Abstract class for caching toggl API data to disk.
 
     Integrates fully with TogglCachedEndpoint to create a seemless depending on
@@ -115,25 +118,25 @@ class TogglCache(ABC):
     def commit(self) -> None: ...
 
     @abstractmethod
-    def load_cache(self) -> Iterable[TogglClass]: ...
+    def load_cache(self) -> Iterable[TC]: ...
 
     @abstractmethod
-    def save_cache(self, entry: list[TogglClass] | TogglClass, method: RequestMethod) -> None: ...
+    def save_cache(self, entry: list[TC] | TC, method: RequestMethod) -> None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TogglClass | dict[str, Any]) -> TogglClass | None: ...
+    def find_entry(self, entry: TC | dict[str, Any]) -> TC | None: ...
 
     @abstractmethod
-    def add_entries(self, update: list[TogglClass]) -> None: ...
+    def add_entries(self, update: list[TC]) -> None: ...
 
     @abstractmethod
-    def update_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
+    def update_entries(self, update: list[TC] | TC) -> None: ...
 
     @abstractmethod
-    def delete_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
+    def delete_entries(self, update: list[TC] | TC) -> None: ...
 
     @abstractmethod
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]: ...
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
 
     @property
     @abstractmethod
@@ -149,11 +152,11 @@ class TogglCache(ABC):
         self._expire_after = value
 
     @property
-    def parent(self) -> TogglCachedEndpoint | None:
+    def parent(self) -> TogglCachedEndpoint[TC] | None:
         return self._parent
 
     @parent.setter
-    def parent(self, value: Optional[TogglCachedEndpoint]) -> None:
+    def parent(self, value: Optional[TogglCachedEndpoint[TC]]) -> None:
         self._parent = value
 
     def find_method(self, method: RequestMethod) -> Callable | None:

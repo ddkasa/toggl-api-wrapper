@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class OrganizationEndpoint(TogglCachedEndpoint):
+class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     """Endpoint to do with handling organization specific details.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)

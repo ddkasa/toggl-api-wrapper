@@ -17,7 +17,7 @@ from .utility import format_iso
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class UserEndpoint(TogglCachedEndpoint):
+class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
     """Endpoint for retrieving and fetching trackers with GET requests.
 
     See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.

@@ -12,7 +12,7 @@ import random
 import time
 from abc import ABC, abstractmethod
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 import httpx
 from httpx import HTTPStatusError, codes
@@ -27,7 +27,10 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class TogglEndpoint(ABC):
+T = TypeVar("T", bound=TogglClass)
+
+
+class TogglEndpoint(ABC, Generic[T]):
     """Base class with basic functionality for all API requests."""
 
     BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
@@ -146,21 +149,16 @@ class TogglEndpoint(ABC):
 
         return data
 
-    def process_models(
-        self,
-        data: list[dict[str, Any]],
-    ) -> list[TogglClass]:
+    def process_models(self, data: list[dict[str, Any]]) -> list[TogglClass]:
         return [self.model.from_kwargs(**mdl) for mdl in data]
 
     @property
     @abstractmethod
-    def endpoint(self) -> str:
-        pass
+    def endpoint(self) -> str: ...
 
     @property
     @abstractmethod
-    def model(self) -> type[TogglClass]:
-        return TogglClass
+    def model(self) -> type[T]: ...
 
     @staticmethod
     def api_status() -> bool:
