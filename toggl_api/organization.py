@@ -84,7 +84,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
                 No space characters allowed.
 
         Raises:
-            ValueError: If any of the names are invalid or the long length.
+            NamingError: If any of the names are invalid or the wrong length.
 
         Returns:
             TogglOrganization: The newly created organization.
@@ -110,7 +110,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             name: What name to change the org to.
 
         Raises:
-            ValueError: If the new name is invalid.
+            NamingError: If the new name is invalid.
 
         Returns:
             TogglOrganization: The newly edited organization.
