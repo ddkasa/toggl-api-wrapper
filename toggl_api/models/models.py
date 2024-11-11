@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
+from toggl_api._exceptions import NamingError
 from toggl_api.utility import get_workspace, parse_iso
 
 if TYPE_CHECKING:
@@ -81,10 +82,10 @@ class TogglOrganization(TogglClass):
         """Checks if a organization name is valid for the API."""
         if not name:
             msg = "The organization name need at least have one letter!"
-            raise ValueError(msg)
+            raise NamingError(msg)
         if max_len and len(name) > max_len:
             msg = f"Max organization name length is {max_len}!"
-            raise ValueError(msg)
+            raise NamingError(msg)
 
 
 @dataclass
@@ -99,7 +100,7 @@ class TogglWorkspace(TogglClass):
         super().__post_init__()
         try:
             TogglWorkspace.validate_name(self.name)
-        except ValueError as err:
+        except NamingError as err:
             if str(err) != "No spaces allowed in the workspace name!":
                 raise
             log.warning(err)
@@ -115,13 +116,13 @@ class TogglWorkspace(TogglClass):
         """Checks if a workspace name is valid for the API."""
         if not name:
             msg = "The workspace name need at least have one character!"
-            raise ValueError(msg)
+            raise NamingError(msg)
         if max_len and len(name) > max_len:
             msg = f"The max workspace name length is {max_len}!"
-            raise ValueError(msg)
+            raise NamingError(msg)
         if " " in name:
             msg = "No spaces allowed in the workspace name!"
-            raise ValueError(msg)
+            raise NamingError(msg)
 
 
 @dataclass
