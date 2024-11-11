@@ -6,6 +6,8 @@ from typing import Any, Literal, Optional, get_args
 
 from httpx import HTTPStatusError, codes
 
+from toggl_api._exceptions import NamingError
+
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
 
@@ -66,7 +68,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             body: New parameters for the client to be created.
 
         Raises:
-            ValueError: If no name was set as its required.
+            NamingError: If no name was set as its required.
 
         Returns:
             TogglClient: Newly created client with specified parameters.
@@ -74,7 +76,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
         if body.name is None:
             msg = "Name must be set in order to create a client!"
-            raise ValueError(msg)
+            raise NamingError(msg)
 
         return self.request(
             "",
