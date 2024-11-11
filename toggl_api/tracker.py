@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Final, Literal, Optional
@@ -244,7 +245,12 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         Returns:
             TogglTracker | None: The tracker that was created.
         """
-        if not isinstance(body.description, str) or not body.description:
+        if not isinstance(body.description, str):
+            warnings.warn(
+                "DEPRECATED: 'TypeError' is being swapped for a 'NamingError'.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             msg = "Description must be set in order to create a tracker!"
             raise TypeError(msg)
         if not body.description:
