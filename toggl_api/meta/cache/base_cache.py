@@ -111,6 +111,10 @@ class TogglCache(ABC, Generic[TC]):
         parent_exist: Validates if the parent has been set. The parent will be
             generally set by the endpoint when assigned. Abstract.
         query: Queries the cache for various varibles. Abstract.
+
+    Raises:
+        MissingParentError: If the parent is None and any cache method is being
+            accessed.
     """
 
     __slots__ = ("_cache_path", "_expire_after", "_parent")
@@ -165,7 +169,11 @@ class TogglCache(ABC, Generic[TC]):
         self._expire_after = value
 
     @property
-    def parent(self) -> TogglCachedEndpoint[TC] | None:
+    def parent(self) -> TogglCachedEndpoint[TC]:
+        if self._parent is None:
+            msg = "Cannot use cache without a parent set!"
+            raise MissingParentError(msg)
+
         return self._parent
 
     @parent.setter

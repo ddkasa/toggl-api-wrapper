@@ -10,7 +10,7 @@ import sqlalchemy
 from sqlalchemy.orm import Query, Session
 
 from toggl_api.meta import RequestMethod
-from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
+from toggl_api.meta.cache.base_cache import Comparison, MissingParentError, TogglQuery
 from toggl_api.meta.cache.sqlite_cache import SqliteCache
 from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.models._decorators import UTCDateTime  # noqa: PLC2701
@@ -101,7 +101,7 @@ def test_add_entries_sqlite_parent(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.add_entries(tracker)
     meta_object_sqlite.cache.parent = None
-    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+    with pytest.raises(MissingParentError):
         assert tracker in meta_object_sqlite.cache.load_cache()
 
 
@@ -135,7 +135,7 @@ def test_find_sqlite(meta_object_sqlite, model_data):
 @pytest.mark.unit
 def test_find_sqlite_parent(meta_object_sqlite):
     meta_object_sqlite.cache.parent = None
-    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+    with pytest.raises(MissingParentError):
         meta_object_sqlite.cache.find_entry({"id": 5})
 
 
@@ -210,7 +210,7 @@ def test_query_sqlite_distinct(tracker_object_sqlite, model_data, faker):
 @pytest.mark.unit
 def test_query_sqlite_parent(meta_object_sqlite):
     meta_object_sqlite.cache.parent = None
-    with pytest.raises(ValueError, match="Cannot load cache without parent set!"):
+    with pytest.raises(MissingParentError):
         meta_object_sqlite.cache.find_entry({"id": 5})
 
 

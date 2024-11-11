@@ -85,9 +85,6 @@ class SqliteCache(TogglCache[T]):
         func(entry)
 
     def load_cache(self) -> Query[T]:
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
         query = self.session.query(self.parent.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
@@ -125,10 +122,6 @@ class SqliteCache(TogglCache[T]):
         self.commit()
 
     def find_entry(self, query: T | dict[str, Any]) -> T | None:
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
-
         if isinstance(query, TogglClass):
             query = {"id": query.id}
 
@@ -150,15 +143,9 @@ class SqliteCache(TogglCache[T]):
             query: Any positional argument that is used becomes query argument.
             distinct: Whether to keep equivalent values around.
 
-        Raises:
-            ValueError: If parent has not been set.
-
         Returns:
             Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
         """
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
 
         search = self.session.query(self.parent.model)
         if isinstance(self.expire_after, timedelta):

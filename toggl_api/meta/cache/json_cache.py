@@ -141,6 +141,7 @@ class JSONCache(TogglCache, Generic[T]):
         >>> cache = JSONCache(Path("cache"), 3600)
 
         >>> cache = JSONCache(Path("cache"), timedelta(weeks=2))
+        >>> tracker_endpoint = TrackerEndpoint(231231, BasicAuth(...), cache)
 
     Params:
         path: Path to the cache file
@@ -153,6 +154,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
+
 
         session(JSONSession): Store the current json data in memory while
             handling the cache.
@@ -200,7 +202,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     def find_entry(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)
-        if not self.session.data or self.parent is None:
+        if not self.session.data:
             return None
         for item in self.session.data:
             if item is not None and item["id"] == entry["id"] and isinstance(item, self.parent.model):
@@ -253,15 +255,9 @@ class JSONCache(TogglCache, Generic[T]):
             distinct: Whether to keep the same values around. This doesn't work
                 with unhashable fields such as lists.
 
-        Raises:
-            ValueError: If parent has not been set.
-
         Returns:
             list[TogglClass]: A query object with parameters filtered.
         """
-        if self.parent is None:
-            msg = "Cannot load cache without parent!"
-            raise ValueError(msg)
 
         log.debug("Querying cache with %s parameters.", len(query), extra={"query": query})
 
@@ -342,7 +338,7 @@ class JSONCache(TogglCache, Generic[T]):
         return self._cache_path / f"cache_{self.parent.model.__tablename__}.json"
 
     @property
-    def parent(self) -> TogglCachedEndpoint[T] | None:
+    def parent(self) -> TogglCachedEndpoint[T]:
         return super().parent
 
     @parent.setter

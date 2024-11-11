@@ -173,5 +173,5 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     @cache.setter
     def cache(self, value: TogglCache) -> None:
         self._cache = value
-        if self.cache.parent is not self:
+        if self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self
