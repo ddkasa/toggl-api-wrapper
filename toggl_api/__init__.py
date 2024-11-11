@@ -1,3 +1,4 @@
+from ._exceptions import DateTimeError, NamingError
 from .client import ClientBody, ClientEndpoint
 from .config import generate_authentication
 from .meta import JSONCache
@@ -17,6 +18,8 @@ __typed__ = True
 
 
 __all__ = (  # noqa: RUF022
+    "DateTimeError",
+    "NamingError",
     "ClientBody",
     "ClientEndpoint",
     "Comparison",
