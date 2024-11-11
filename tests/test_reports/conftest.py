@@ -24,6 +24,7 @@ def add_multiple_trackers(tracker_object, faker, create_project):
 
     yield trackers
     for tracker in trackers:
+        time.sleep(1)
         tracker_object.delete(tracker)
 
 
