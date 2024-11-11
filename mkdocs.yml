@@ -133,6 +133,7 @@ plugins:
             show_source: false
             show_signature_annotations: true
             show_symbol_type_heading: true
+            show_symbol_type_toc: true
   - callouts
   - panzoom:
       full_screen: true
