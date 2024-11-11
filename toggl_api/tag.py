@@ -6,6 +6,7 @@ from typing import Optional
 
 from httpx import HTTPStatusError, codes
 
+from ._exceptions import NamingError
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
 
@@ -47,7 +48,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             name: The name of the new tag.
 
         Raises:
-            ValueError: IF the tag name is empty.
+            NamingError: IF the tag name is empty.
             HTTPStatusError: If a tag with the same name exists.
 
         Returns:
@@ -56,7 +57,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         if not name:
             msg = "The tag name needs to be at least one character long."
-            raise ValueError(msg)
+            raise NamingError(msg)
 
         return self.request(
             "",
@@ -87,7 +88,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
                 version.
 
         Raises:
-            ValueError: If the name is not at the minimum length.
+            NamingError: If the name is not at the minimum length.
             HTTPStatusError: If any issue happens with the Toggl API.
 
         Returns:
@@ -103,7 +104,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         if not name:
             msg = "The tag name needs to be at least one character long."
-            raise ValueError(msg)
+            raise NamingError(msg)
 
         return self.request(
             f"/{tag.id if isinstance(tag, TogglTag) else tag}",
