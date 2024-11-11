@@ -14,7 +14,9 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, TypeVar
+
+from toggl_api.models import TogglClass
 
 from .base_endpoint import TogglEndpoint
 from .enums import RequestMethod
@@ -25,14 +27,17 @@ if TYPE_CHECKING:
     import httpx
 
     from toggl_api.meta.cache.base_cache import TogglQuery
-    from toggl_api.modules.models import TogglClass
 
     from .cache import TogglCache
+
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class TogglCachedEndpoint(TogglEndpoint):
+T = TypeVar("T", bound=TogglClass)
+
+
+class TogglCachedEndpoint(TogglEndpoint[T]):
     """Abstract cached endpoint for requesting toggl API data to disk.
 
     See parent endpoint for more details.
@@ -52,7 +57,6 @@ class TogglCachedEndpoint(TogglEndpoint):
             to 0 seconds.
         query: Wrapper method for accessing querying capabilities within the
             assigned cache.
-
     """
 
     __slots__ = ("_cache",)
@@ -61,10 +65,10 @@ class TogglCachedEndpoint(TogglEndpoint):
         self,
         workspace_id: int,
         auth: httpx.BasicAuth,
-        cache: TogglCache,
+        cache: TogglCache[T],
         *,
         timeout: int = 20,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(
             workspace_id=workspace_id,
@@ -128,13 +132,13 @@ class TogglCachedEndpoint(TogglEndpoint):
 
         return response
 
-    def load_cache(self) -> Iterable[TogglClass]:
+    def load_cache(self) -> Iterable[T]:
         """Direct loading method for retrieving all models from cache."""
         return self.cache.load_cache()
 
     def save_cache(
         self,
-        response: list[TogglClass] | TogglClass,
+        response: list[T] | T,
         method: RequestMethod,
     ) -> None:
         """Direct saving method for retrieving all models from cache."""
@@ -142,17 +146,20 @@ class TogglCachedEndpoint(TogglEndpoint):
             return None
         return self.cache.save_cache(response, method)
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
         """Query wrapper for the cache method.
+
+        If the original data structure is required use the query on the
+        *.cache* attribute instead.
 
         Args:
             query: An arbitary amount of queries to match the models to.
             distinct: A boolean that remove duplicate values if present.
 
         Returns:
-            iterable: An iterable object depending on the cache used.
+            Iterable: An iterable object depending on the cache used.
         """
-        return self.cache.query(*query, distinct=distinct)
+        return list(self.cache.query(*query, distinct=distinct))
 
     @property
     @abstractmethod
@@ -160,11 +167,11 @@ class TogglCachedEndpoint(TogglEndpoint):
         pass
 
     @property
-    def cache(self) -> TogglCache:
+    def cache(self) -> TogglCache[T]:
         return self._cache
 
     @cache.setter
     def cache(self, value: TogglCache) -> None:
         self._cache = value
-        if self.cache.parent is not self:
+        if self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self

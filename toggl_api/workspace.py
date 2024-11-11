@@ -15,6 +15,7 @@ from toggl_api.meta.body import BaseBody
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
 from toggl_api.meta.enums import RequestMethod
 
+from ._exceptions import DateTimeError, NamingError
 from .meta import TogglCache, TogglCachedEndpoint
 from .models import TogglWorkspace
 
@@ -138,7 +139,7 @@ class WorkspaceBody(BaseBody):
         if self.name:
             try:
                 TogglWorkspace.validate_name(self.name)
-            except ValueError as err:
+            except NamingError as err:
                 if str(err) != "No spaces allowed in the workspace name!":
                     raise
                 log.warning(err)
@@ -182,7 +183,7 @@ class WorkspaceStatistics(TypedDict):
     members_count: int
 
 
-class WorkspaceEndpoint(TogglCachedEndpoint):
+class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
     """Specific endpoints for retrieving workspaces.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)
@@ -277,18 +278,15 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
     def _collect_cache(self, since: int | None) -> list[TogglWorkspace]:
         if isinstance(since, int):
             ts = datetime.fromtimestamp(since, timezone.utc)
-            cache = self.query(TogglQuery("timestamp", ts, Comparison.GREATER_THEN))
-        else:
-            cache = self.load_cache()
-
-        return list(cache)
+            return list(self.query(TogglQuery("timestamp", ts, Comparison.GREATER_THEN)))
+        return list(self.load_cache())
 
     def _validate_collect_since(self, since: datetime | int) -> int:
         since = since if isinstance(since, int) else int(time.mktime(since.timetuple()))
         now = int(time.mktime(datetime.now(tz=timezone.utc).timetuple()))
         if since > now:
             msg = "The 'since' argument needs to be before the current time!"
-            raise ValueError(msg)
+            raise DateTimeError(msg)
         return since
 
     def collect(
@@ -306,7 +304,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint):
             refresh: Whether to use cache or not.
 
         Raises:
-            ValueError: If the since argument is after the current time.
+            DateTimeError: If the since argument is after the current time.
 
         Returns:
             list: A list of workspaces or empty if there are None assocciated

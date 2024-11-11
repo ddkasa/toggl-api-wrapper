@@ -1,19 +1,32 @@
 from __future__ import annotations
 
 import enum
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 from toggl_api.meta.enums import RequestMethod
+from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
-    from toggl_api.models import TogglClass
+
+
+class MissingParentError(AttributeError, ValueError):
+    """Raised when a cache object doesn't have a parent and is being called."""
+
+    def __init__(self, *args: object, name: str | None = None, obj: object = ...) -> None:
+        super().__init__(*args, name=name, obj=obj)
+        warnings.warn(
+            "DEPRECATED: 'ValueError' parent class will be removed in the future!",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
 
 class Comparison(enum.Enum):
@@ -61,11 +74,14 @@ class TogglQuery(Generic[T]):
                 )
 
 
-class TogglCache(ABC):
-    """Abstract class for caching toggl API data to disk.
+TC = TypeVar("TC", bound=TogglClass)
 
-    Integrates fully with TogglCachedEndpoint to create a seemless depending on
-    the users choice of cache.
+
+class TogglCache(ABC, Generic[TC]):
+    """Abstract class for caching Toggl API data to disk.
+
+    Integrates as the backend for the [TogglCachedEndpoint][toggl_api.meta.TogglCachedEndpoint]
+    in order to store requested models locally.
 
     Params:
         path: Location where the cache will be saved.
@@ -95,6 +111,10 @@ class TogglCache(ABC):
         parent_exist: Validates if the parent has been set. The parent will be
             generally set by the endpoint when assigned. Abstract.
         query: Queries the cache for various varibles. Abstract.
+
+    Raises:
+        MissingParentError: If the parent is None and any cache method is being
+            accessed.
     """
 
     __slots__ = ("_cache_path", "_expire_after", "_parent")
@@ -115,25 +135,25 @@ class TogglCache(ABC):
     def commit(self) -> None: ...
 
     @abstractmethod
-    def load_cache(self) -> Iterable[TogglClass]: ...
+    def load_cache(self) -> Iterable[TC]: ...
 
     @abstractmethod
-    def save_cache(self, entry: list[TogglClass] | TogglClass, method: RequestMethod) -> None: ...
+    def save_cache(self, entry: list[TC] | TC, method: RequestMethod) -> None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TogglClass | dict[str, Any]) -> TogglClass | None: ...
+    def find_entry(self, entry: TC | dict[str, Any]) -> TC | None: ...
 
     @abstractmethod
-    def add_entries(self, update: list[TogglClass]) -> None: ...
+    def add_entries(self, update: list[TC]) -> None: ...
 
     @abstractmethod
-    def update_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
+    def update_entries(self, update: list[TC] | TC) -> None: ...
 
     @abstractmethod
-    def delete_entries(self, update: list[TogglClass] | TogglClass) -> None: ...
+    def delete_entries(self, update: list[TC] | TC) -> None: ...
 
     @abstractmethod
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TogglClass]: ...
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
 
     @property
     @abstractmethod
@@ -149,11 +169,15 @@ class TogglCache(ABC):
         self._expire_after = value
 
     @property
-    def parent(self) -> TogglCachedEndpoint | None:
+    def parent(self) -> TogglCachedEndpoint[TC]:
+        if self._parent is None:
+            msg = "Cannot use cache without a parent set!"
+            raise MissingParentError(msg)
+
         return self._parent
 
     @parent.setter
-    def parent(self, value: Optional[TogglCachedEndpoint]) -> None:
+    def parent(self, value: Optional[TogglCachedEndpoint[TC]]) -> None:
         self._parent = value
 
     def find_method(self, method: RequestMethod) -> Callable | None:

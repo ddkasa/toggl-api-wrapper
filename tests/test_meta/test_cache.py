@@ -8,10 +8,11 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+from sqlalchemy.util.langhelpers import MissingOr
 
 from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
-from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
+from toggl_api.meta.cache.base_cache import Comparison, MissingParentError, TogglQuery
 from toggl_api.meta.cache.json_cache import JSONSession
 from toggl_api.models.models import TogglTag, TogglTracker
 from toggl_api.user import UserEndpoint
@@ -87,7 +88,7 @@ def test_cache_path(meta_object):
 
 @pytest.mark.unit
 def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
-    assert get_sqlite_cache.parent is None
+    assert get_sqlite_cache._parent is None  # noqa: SLF001
     endpoint = EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
 
@@ -138,7 +139,8 @@ def test_encoder_json(model_data, tmp_path):
 
 
 @pytest.mark.unit
-def test_max_length(model_data, get_json_cache):
+def test_max_length(model_data, get_json_cache, tracker_object):
+    tracker_object.cache = get_json_cache
     get_json_cache.session.data = []
     assert get_json_cache.session.max_length == 10000  # noqa: PLR2004
     get_json_cache.session.max_length = 10
@@ -234,11 +236,11 @@ def test_query_tag_distict(model_data, tracker_object, faker, number):
 def test_query_parent(tmp_path):
     cache = JSONCache(Path(tmp_path))
 
-    with pytest.raises(ValueError, match="Cannot load cache without parent!"):
+    with pytest.raises(MissingParentError):
         cache.query()
 
 
-# FIX:: Flaky test that will fail occassionaly on windows testing.
+# FIX:: Flaky test that will fail occasionally on windows testing.
 @pytest.mark.unit
 @pytest.mark.flaky(rerun_except="AssertionError", reruns=3)
 def test_cache_sync(

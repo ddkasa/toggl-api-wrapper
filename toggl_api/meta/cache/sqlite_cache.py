@@ -5,7 +5,7 @@ from __future__ import annotations
 import atexit
 import warnings
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, TypeVar
 
 try:
     import sqlalchemy as db
@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 import contextlib
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
@@ -23,14 +23,16 @@ from toggl_api.utility import requires
 from .base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from pathlib import Path
 
     from toggl_api.meta import RequestMethod, TogglCachedEndpoint
 
 
+T = TypeVar("T", bound=TogglClass)
+
+
 @requires("sqlalchemy")
-class SqliteCache(TogglCache):
+class SqliteCache(TogglCache[T]):
     """Class for caching data to a SQLite database.
 
     Disconnects database on deletion or exit.
@@ -64,7 +66,7 @@ class SqliteCache(TogglCache):
         self,
         path: Path,
         expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint] = None,
+        parent: Optional[TogglCachedEndpoint[T]] = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = db.create_engine(f"sqlite:///{self.cache_path}")
@@ -76,28 +78,21 @@ class SqliteCache(TogglCache):
     def commit(self) -> None:
         self.session.commit()
 
-    def save_cache(
-        self,
-        entry: list[TogglClass] | TogglClass,
-        method: RequestMethod,
-    ) -> None:
+    def save_cache(self, entry: list[T] | T, method: RequestMethod) -> None:
         func = self.find_method(method)
         if func is None:
             return
         func(entry)
 
-    def load_cache(self) -> Query[TogglClass]:
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
+    def load_cache(self) -> Query[T]:
         query = self.session.query(self.parent.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
             query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
         return query
 
-    def add_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
-        if isinstance(entry, TogglClass):
+    def add_entries(self, entry: Iterable[T] | T) -> None:
+        if not isinstance(entry, Iterable):
             entry = (entry,)
 
         for item in entry:
@@ -107,16 +102,16 @@ class SqliteCache(TogglCache):
             self.session.add(item)
         self.commit()
 
-    def update_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
-        if isinstance(entry, TogglClass):
+    def update_entries(self, entry: Iterable[T] | T) -> None:
+        if not isinstance(entry, Iterable):
             entry = (entry,)
 
         for item in entry:
             self.session.merge(item)
         self.commit()
 
-    def delete_entries(self, entry: Iterable[TogglClass] | TogglClass) -> None:
-        if isinstance(entry, TogglClass):
+    def delete_entries(self, entry: Iterable[T] | T) -> None:
+        if not isinstance(entry, Iterable):
             entry = (entry,)
 
         for item in entry:
@@ -126,11 +121,7 @@ class SqliteCache(TogglCache):
                 ).filter_by(id=item.id).delete()
         self.commit()
 
-    def find_entry(self, query: TogglClass | dict[str, Any]) -> TogglClass | None:
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
-
+    def find_entry(self, query: T | dict[str, Any]) -> T | None:
         if isinstance(query, TogglClass):
             query = {"id": query.id}
 
@@ -140,7 +131,7 @@ class SqliteCache(TogglCache):
             search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
         return search.filter_by(**query).first()
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Query[TogglClass]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> Query[T]:
         """Query method for filtering Toggl objects from cache.
 
         Filters cached toggl objects by set of supplied queries.
@@ -152,15 +143,9 @@ class SqliteCache(TogglCache):
             query: Any positional argument that is used becomes query argument.
             distinct: Whether to keep equivalent values around.
 
-        Raises:
-            ValueError: If parent has not been set.
-
         Returns:
             Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
         """
-        if self.parent is None:
-            msg = "Cannot load cache without parent set!"
-            raise ValueError(msg)
 
         search = self.session.query(self.parent.model)
         if isinstance(self.expire_after, timedelta):
@@ -175,13 +160,13 @@ class SqliteCache(TogglCache):
                 search = search.distinct(*data).group_by(*data)  # type: ignore[arg-type]
         return search
 
-    def _query_helper(self, query: list[TogglQuery], query_obj: Query[TogglClass]) -> Query[TogglClass]:
+    def _query_helper(self, query: list[TogglQuery], query_obj: Query[T]) -> Query[T]:
         if query:
             query_obj = self._match_query(query.pop(0), query_obj)
             return self._query_helper(query, query_obj)
         return query_obj
 
-    def _match_query(self, query: TogglQuery, query_obj: Query[TogglClass]) -> Query[TogglClass]:
+    def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
         value = getattr(self.parent.model, query.key)  # type: ignore[union-attr]
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(query.value, str):

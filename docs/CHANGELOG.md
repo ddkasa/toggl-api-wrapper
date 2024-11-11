@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2024-11-11
+
+### 🚀 Features
+
+- *(exceptions)* Custom exceptions for commonly raised value errors
+- *(cache)* Custom missing parent error
+
+### 🐛 Bug Fixes
+
+- *(project)* Wrong hex code for gray color
+- *(utils)* Remove unnecessary import
+
+### 🚜 Refactor
+
+- *(tag)* Edit endpoint method accepts seperate name argument
+- *(tag)* Validate minimum name length
+- *(endpoint)* Use generics with base endpoint
+- *(cache)* User generic type with cache
+- *(endpoint)* Assign generics to all endpoints
+- *(endpoint)* Cache query method always returns list
+- *(typing)* Generics implementation
+- *(workspace)* Use custom exceptions for raised errors
+- *(user)* Use custom exceptions for raised errors
+- *(user)* Use custom exceptions for raised errors
+- *(tag)* Use custom exceptions for raised errors
+- *(project)* Use custom exceptions for raised errors
+- *(client)* Use custom exceptions for raised errors
+- *(models)* Use naming error instead of value error
+- *(cache)* Implement new error subclass
+
+### 🕸 Deprecations
+
+- *(tag)* Remove the internal usage of a modified name in a tag
+- *(trackers)* Change exception type in add endpoint method
+
+### 📚 Documentation
+
+- *(tag)* Update edit endpoint docstring
+- *(tag)* Improve delete endpoint docstring
+- *(tag)* Improve add endpoint method docstring
+- *(tag)* Improve endpoint class docstring
+- *(organization)* Use custom exceptions for raised errors docstring
+- *(exceptions)* Document new exception classes
+- *(mkdocs)* Enable symbols in table of contents
+- *(config)* Reconfigure headings
+
+### 🧪 Testing
+
+- *(tag)* Validate tag name length
+- *(conftest)* Rate limit trackers teardown
+- *(utility)* Make sure version is updated
+
 ## [1.3.2] - 2024-11-05
 
 ### 🐛 Bug Fixes

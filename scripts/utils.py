@@ -16,7 +16,6 @@ from toggl_api.project import ProjectEndpoint
 from toggl_api.tag import TagEndpoint
 from toggl_api.tracker import TrackerEndpoint
 from toggl_api.user import UserEndpoint
-from toggl_api.workspace import WorkspaceEndpoint
 
 
 def _path_cleanup(cache_path: Path) -> None:

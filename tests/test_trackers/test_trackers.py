@@ -5,7 +5,7 @@ from datetime import timedelta
 import pytest
 from httpx import HTTPStatusError
 
-from toggl_api import TogglTag, TogglTracker, TrackerBody
+from toggl_api import NamingError, TogglTag, TogglTracker, TrackerBody
 
 
 @pytest.mark.unit
@@ -55,7 +55,7 @@ def test_tracker_creation_description(tracker_object):
         tracker_object.add(body)
 
     body.description = ""
-    with pytest.raises(TypeError):
+    with pytest.raises(NamingError):
         tracker_object.add(body)
 
 

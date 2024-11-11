@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class OrganizationEndpoint(TogglCachedEndpoint):
+class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     """Endpoint to do with handling organization specific details.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
@@ -84,7 +84,7 @@ class OrganizationEndpoint(TogglCachedEndpoint):
                 No space characters allowed.
 
         Raises:
-            ValueError: If any of the names are invalid or the long length.
+            NamingError: If any of the names are invalid or the wrong length.
 
         Returns:
             TogglOrganization: The newly created organization.
@@ -110,7 +110,7 @@ class OrganizationEndpoint(TogglCachedEndpoint):
             name: What name to change the org to.
 
         Raises:
-            ValueError: If the new name is invalid.
+            NamingError: If the new name is invalid.
 
         Returns:
             TogglOrganization: The newly edited organization.

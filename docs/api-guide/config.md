@@ -1,4 +1,4 @@
-# Authentication
+## Authentication
 
 ::: toggl_api.config.AuthenticationError
 
@@ -9,9 +9,7 @@
 > [!NOTE]  
 > The [UserEndpoint](/toggl-api-wrapper/api-guide/tracker.html#toggl_api.modules.user.UserEndpoint) has a [verify_authentication](/toggl-api-wrapper/api-guide/tracker.html#toggl_api.modules.user.UserEndpoint.check_authentication) method for verifying authentication with the Toggl API.
 
----
-
-# Default Workspace
+## Default Workspace
 
 ::: toggl_api.config.retrieve_workspace_id
 

@@ -3,7 +3,7 @@ import sys
 import pytest
 from httpx import HTTPStatusError
 
-from toggl_api import TogglTag
+from toggl_api import NamingError, TogglTag
 
 
 @pytest.fixture
@@ -28,12 +28,26 @@ def test_tag_creation(tag_object, get_workspace_id, faker):
     assert tag.name == name
 
 
+@pytest.mark.unit
+def test_tag_creation_name(tag_object, get_workspace_id, faker):
+    name = ""
+    with pytest.raises(NamingError):
+        assert tag_object.add(name)
+
+
 @pytest.mark.integration
 def test_tag_update(tag_object, get_workspace_id, add_tag, monkeypatch, faker):
     monkeypatch.setattr(add_tag, "name", faker.name())
     tag = tag_object.edit(add_tag)
     assert isinstance(tag, TogglTag)
     assert tag.name == add_tag.name
+
+
+@pytest.mark.unit
+def test_tag_edit_name(tag_object, get_workspace_id, faker, number):
+    name = ""
+    with pytest.raises(NamingError):
+        assert tag_object.edit(number.randint(50, 50000), name)
 
 
 @pytest.mark.integration

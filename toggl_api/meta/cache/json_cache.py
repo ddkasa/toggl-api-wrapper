@@ -8,7 +8,7 @@ from collections import defaultdict
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 from toggl_api.models import (
     TogglClass,
@@ -34,8 +34,11 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.cache")
 
 
+T = TypeVar("T", bound=TogglClass)
+
+
 @dataclass
-class JSONSession:
+class JSONSession(Generic[T]):
     """Data structure for storing JSON in memory.
 
     Similar to a SQL session as its meant to have the same/similar interface.
@@ -67,7 +70,7 @@ class JSONSession:
 
     max_length: int = field(default=10_000)
     version: str = field(init=False, default=version)
-    data: list[TogglClass] = field(default_factory=list)
+    data: list[T] = field(default_factory=list)
     modified: int = field(init=False, default=0)
 
     def refresh(self, path: Path) -> bool:
@@ -92,14 +95,14 @@ class JSONSession:
 
         self.modified = path.stat().st_mtime_ns
 
-    def _diff(self, comp: list[TogglClass], mtime: int) -> list[TogglClass]:
+    def _diff(self, comp: list[T], mtime: int) -> list[T]:
         old_models = {m.id: m for m in self.data}
         new_models = {m.id: m for m in comp}
 
         model_ids: set[int] = set(old_models)
         model_ids.update(new_models)
 
-        new_data: list[TogglClass] = []
+        new_data: list[T] = []
         for mid in model_ids:
             old = old_models.get(mid)
             new = new_models.get(mid)
@@ -124,12 +127,12 @@ class JSONSession:
             self.version = version
             self.modified = time.time_ns()
 
-    def process_data(self, data: list[TogglClass]) -> list[TogglClass]:
+    def process_data(self, data: list[T]) -> list[T]:
         data.sort(key=lambda x: x.timestamp or datetime.now(timezone.utc))
         return data[: self.max_length]
 
 
-class JSONCache(TogglCache):
+class JSONCache(TogglCache, Generic[T]):
     """Class for caching Toggl data to disk in JSON format.
 
     Examples:
@@ -138,6 +141,7 @@ class JSONCache(TogglCache):
         >>> cache = JSONCache(Path("cache"), 3600)
 
         >>> cache = JSONCache(Path("cache"), timedelta(weeks=2))
+        >>> tracker_endpoint = TrackerEndpoint(231231, BasicAuth(...), cache)
 
     Params:
         path: Path to the cache file
@@ -150,6 +154,7 @@ class JSONCache(TogglCache):
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
+
 
         session(JSONSession): Store the current json data in memory while
             handling the cache.
@@ -170,49 +175,41 @@ class JSONCache(TogglCache):
         self,
         path: Path,
         expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint] = None,
+        parent: Optional[TogglCachedEndpoint[T]] = None,
         *,
         max_length: int = 10_000,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.session = JSONSession(max_length=max_length)
+        self.session: JSONSession[T] = JSONSession(max_length=max_length)
 
     def commit(self) -> None:
         log.debug("Saving cache to disk!")
         self.session.commit(self.cache_path)
 
-    def save_cache(
-        self,
-        update: Iterable[TogglClass] | TogglClass,
-        method: RequestMethod,
-    ) -> None:
+    def save_cache(self, update: Iterable[T] | T, method: RequestMethod) -> None:
         self.session.refresh(self.cache_path)
         func = self.find_method(method)
         if func is not None:
             func(update)
         self.commit()
 
-    def load_cache(self) -> list[TogglClass]:
+    def load_cache(self) -> list[T]:
         self.session.load(self.cache_path)
         if self.expire_after is None:
             return self.session.data
         min_ts = datetime.now(timezone.utc) - self.expire_after
         return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
 
-    def find_entry(
-        self,
-        entry: TogglClass | dict[str, int],
-        **kwargs,
-    ) -> TogglClass | None:
+    def find_entry(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)
-        if not self.session.data or self.parent is None:
+        if not self.session.data:
             return None
         for item in self.session.data:
             if item is not None and item["id"] == entry["id"] and isinstance(item, self.parent.model):
                 return item
         return None
 
-    def add_entry(self, item: TogglClass) -> None:
+    def add_entry(self, item: T) -> None:
         find_entry = self.find_entry(item)
         if find_entry is None:
             return self.session.data.append(item)
@@ -221,29 +218,25 @@ class JSONCache(TogglCache):
         self.session.data[index] = item
         return None
 
-    def add_entries(self, update: list[TogglClass] | TogglClass, **kwargs) -> None:
-        if isinstance(update, TogglClass):
+    def add_entries(self, update: list[T] | T, **kwargs: Any) -> None:
+        if not isinstance(update, list):
             return self.add_entry(update)
         for item in update:
             self.add_entry(item)
         return None
 
-    def update_entries(self, update: list[TogglClass] | TogglClass, **kwargs) -> None:
+    def update_entries(self, update: list[T] | T, **kwargs: Any) -> None:
         self.add_entries(update)
 
-    def delete_entry(self, entry: TogglClass) -> None:
+    def delete_entry(self, entry: T) -> None:
         find_entry = self.find_entry(entry)
         if not find_entry:
             return
         index = self.session.data.index(find_entry)
         self.session.data.pop(index)
 
-    def delete_entries(
-        self,
-        update: list[TogglClass] | TogglClass,
-        **kwargs,
-    ) -> None:
-        if isinstance(update, TogglClass):
+    def delete_entries(self, update: list[T] | T, **kwargs: Any) -> None:
+        if not isinstance(update, list):
             return self.delete_entry(update)
         for entry in update:
             self.delete_entry(entry)
@@ -262,15 +255,9 @@ class JSONCache(TogglCache):
             distinct: Whether to keep the same values around. This doesn't work
                 with unhashable fields such as lists.
 
-        Raises:
-            ValueError: If parent has not been set.
-
         Returns:
             list[TogglClass]: A query object with parameters filtered.
         """
-        if self.parent is None:
-            msg = "Cannot load cache without parent!"
-            raise ValueError(msg)
 
         log.debug("Querying cache with %s parameters.", len(query), extra={"query": query})
 
@@ -293,7 +280,7 @@ class JSONCache(TogglCache):
 
     def _query_helper(
         self,
-        model: TogglClass,
+        model: T,
         queries: tuple[TogglQuery, ...],
         existing: dict[str, set[Any]],
         min_ts: Optional[datetime],
@@ -318,7 +305,7 @@ class JSONCache(TogglCache):
         return True
 
     @staticmethod
-    def _match_equal(model: TogglClass, query: TogglQuery):
+    def _match_equal(model: T, query: TogglQuery) -> bool:
         if isinstance(query.value, Sequence) and not isinstance(query.value, str):
             value = model[query.key]
 
@@ -330,7 +317,7 @@ class JSONCache(TogglCache):
         return model[query.key] == query.value
 
     @staticmethod
-    def _match_query(model: TogglClass, query: TogglQuery) -> bool:
+    def _match_query(model: T, query: TogglQuery) -> bool:
         if query.comparison == Comparison.EQUAL:
             return JSONCache._match_equal(model, query)
         if query.comparison == Comparison.LESS_THEN:
@@ -351,11 +338,11 @@ class JSONCache(TogglCache):
         return self._cache_path / f"cache_{self.parent.model.__tablename__}.json"
 
     @property
-    def parent(self) -> TogglCachedEndpoint | None:
+    def parent(self) -> TogglCachedEndpoint[T]:
         return super().parent
 
     @parent.setter
-    def parent(self, parent: Optional[TogglCachedEndpoint]) -> None:
+    def parent(self, parent: Optional[TogglCachedEndpoint[T]]) -> None:
         self._parent = parent
         if parent is not None:
             self.session.load(self.cache_path)

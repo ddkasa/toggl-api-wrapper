@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Final, Optional
 
 from httpx import HTTPStatusError, codes
 
+from toggl_api._exceptions import NamingError
 from toggl_api.utility import format_iso
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
@@ -80,7 +81,7 @@ class ProjectBody(BaseBody):
         return body
 
 
-class ProjectEndpoint(TogglCachedEndpoint):
+class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     """Specific endpoints for retrieving and modifying projects.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/projects)
@@ -100,7 +101,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         "yellow": "#c7af14",
         "dark-green": "#566614",
         "red": "#d92b2b",
-        "gray": "#d80435",
+        "gray": "#525266",
     }
     """Basic colors available for projects in order."""
 
@@ -192,7 +193,7 @@ class ProjectEndpoint(TogglCachedEndpoint):
         """
         if body.name is None:
             msg = "Name must be set in order to create a project!"
-            raise ValueError(msg)
+            raise NamingError(msg)
 
         return self.request(
             "",
