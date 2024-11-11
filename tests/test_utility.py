@@ -1,8 +1,19 @@
 from datetime import date, datetime, timezone
+from pathlib import Path
 
 import pytest
+import tomli
 
+from toggl_api import __version__
 from toggl_api.utility import format_iso, get_workspace, parse_iso, requires
+
+
+@pytest.mark.unit
+def test_version():
+    with (Path.cwd() / "pyproject.toml").open("rb") as pyproject:
+        pyversion = tomli.load(pyproject)["tool"]["poetry"]["version"]
+
+    assert __version__ == pyversion
 
 
 @pytest.mark.unit

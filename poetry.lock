@@ -1892,4 +1892,4 @@ sqlite = ["sqlalchemy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "65c8ec8c100437b9241b3d8c15184c8c9a7446b0a822df93ce841bda80bd7f50"
+content-hash = "3042787ec6ed0c9f95210c35a5523bfbf0e115aad36d13bf376be60d34fc75c4"
