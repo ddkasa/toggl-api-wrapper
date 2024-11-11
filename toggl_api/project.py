@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Final, Optional
 
 from httpx import HTTPStatusError, codes
 
+from toggl_api._exceptions import NamingError
 from toggl_api.utility import format_iso
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
@@ -192,7 +193,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         """
         if body.name is None:
             msg = "Name must be set in order to create a project!"
-            raise ValueError(msg)
+            raise NamingError(msg)
 
         return self.request(
             "",
