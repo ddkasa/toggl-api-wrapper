@@ -78,10 +78,10 @@ TC = TypeVar("TC", bound=TogglClass)
 
 
 class TogglCache(ABC, Generic[TC]):
-    """Abstract class for caching toggl API data to disk.
+    """Abstract class for caching Toggl API data to disk.
 
-    Integrates fully with TogglCachedEndpoint to create a seemless depending on
-    the users choice of cache.
+    Integrates as the backend for the [TogglCachedEndpoint][toggl_api.meta.TogglCachedEndpoint]
+    in order to store requested models locally.
 
     Params:
         path: Location where the cache will be saved.

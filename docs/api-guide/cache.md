@@ -4,6 +4,8 @@
 {% include "static/mermaid/cache.mmd" %}
 ```
 
+::: toggl_api.MissingParentError
+
 ::: toggl_api.meta.cache.TogglCache
 
 ---
