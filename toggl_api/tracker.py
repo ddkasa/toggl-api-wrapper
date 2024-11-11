@@ -7,6 +7,7 @@ from typing import Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError, codes
 
+from toggl_api._exceptions import NamingError
 from toggl_api.meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from toggl_api.models import TogglTracker
 from toggl_api.utility import format_iso
@@ -20,7 +21,7 @@ class TrackerBody(BaseBody):
 
     Examples:
         >>> TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
-        TrackerBody(description='What a wonderful tracker description!', project_id=2123132)
+        TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
     """
 
     description: Optional[str] = field(default=None)
@@ -159,6 +160,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         Args:
             tracker: Tracker object with ID to delete.
 
+        Raises:
+            HTTPStatusError: If anything thats not a '404' or 'ok' code is returned.
+
         Returns:
             None: If the tracker was deleted or not found at all.
         """
@@ -235,7 +239,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 to -1 for a running tracker.
 
         Raises:
-            ValueError: Description must be set in order to create a new tracker.
+            NamingError: Description must be set in order to create a new tracker.
 
         Returns:
             TogglTracker | None: The tracker that was created.
@@ -243,6 +247,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         if not isinstance(body.description, str) or not body.description:
             msg = "Description must be set in order to create a tracker!"
             raise TypeError(msg)
+        if not body.description:
+            msg = "Description must be set in order to create a tracker!"
+            raise NamingError(msg)
 
         if body.start is None and body.start_date is None:
             body.start = datetime.now(tz=timezone.utc)
