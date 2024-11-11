@@ -3,6 +3,7 @@ from .client import ClientBody, ClientEndpoint
 from .config import generate_authentication
 from .meta import JSONCache
 from .meta.cache import Comparison, TogglQuery
+from .meta.cache.base_cache import MissingParentError
 from .models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 from .organization import OrganizationEndpoint
 from .project import ProjectBody, ProjectEndpoint
@@ -42,4 +43,5 @@ __all__ = (  # noqa: RUF022
     "generate_authentication",
     "TogglOrganization",
     "OrganizationEndpoint",
+    "MissingParentError",
 )

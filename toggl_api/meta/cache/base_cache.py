@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -14,6 +15,18 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
+
+
+class MissingParentError(AttributeError, ValueError):
+    """Raised when a cache object doesn't have a parent and is being called."""
+
+    def __init__(self, *args: object, name: str | None = None, obj: object = ...) -> None:
+        super().__init__(*args, name=name, obj=obj)
+        warnings.warn(
+            "DEPRECATED: 'ValueError' parent class will be removed in the future!",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
 
 class Comparison(enum.Enum):
