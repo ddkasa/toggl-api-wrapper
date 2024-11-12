@@ -97,13 +97,13 @@ jobs:
           poetry_install_options: "--without=dev,docs"
 
   release:
-    needs: test
+    needs: build
     permissions:
       contents: write
     uses: ./.github/workflows/release.yaml
 
   documentation:
-    needs: test
+    needs: build
     permissions:
       contents: write
     uses: ./.github/workflows/documentation.yaml
