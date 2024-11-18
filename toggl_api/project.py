@@ -205,7 +205,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     @classmethod
     def get_color(cls, color: str) -> str:
         """Get a color by name. Defaults to gray."""
-        return cls.BASIC_COLORS.get(color, "#d80435")
+        return cls.BASIC_COLORS.get(color, "#525266")
 
     @classmethod
     def get_color_id(cls, color: str) -> int:
