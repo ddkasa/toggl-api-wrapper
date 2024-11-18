@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional, get_args
+from typing import TYPE_CHECKING, Any, Literal, Optional, get_args
 
 from httpx import HTTPStatusError, codes
 
@@ -10,6 +10,12 @@ from toggl_api._exceptions import NamingError
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from .meta import TogglCache
+    from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -55,7 +61,22 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
     """Specific endpoints for retrieving and modifying clients.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/clients)
+
+    Params:
+        workspace_id: The workspace the clients belong to.
     """
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglClient],
+        *,
+        timeout: int = 20,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def add(self, body: ClientBody) -> TogglClient | None:
         """Create a Client based on parameters set in the provided body.
