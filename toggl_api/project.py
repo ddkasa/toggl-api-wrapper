@@ -15,6 +15,12 @@ from .models import TogglProject
 if TYPE_CHECKING:
     from datetime import date, datetime
 
+    from httpx import BasicAuth
+
+    from toggl_api.meta import TogglCache
+
+    from .models import TogglWorkspace
+
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
@@ -85,6 +91,9 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     """Specific endpoints for retrieving and modifying projects.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/projects)
+
+    Params:
+        workspace_id: The workspace the projects belong to.
     """
 
     BASIC_COLORS: Final[dict[str, str]] = {
@@ -104,6 +113,18 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         "gray": "#525266",
     }
     """Basic colors available for projects in order."""
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglProject],
+        *,
+        timeout: int = 20,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def collect(self, *, refresh: bool = False) -> list[TogglProject]:
         """Returns all cached or remote projects.
