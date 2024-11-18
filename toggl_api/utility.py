@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import functools
 import importlib.util
-from collections.abc import Callable
+import warnings
 from datetime import date, datetime, timezone
-from typing import ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -22,7 +27,27 @@ def requires(module: str) -> Callable[[Callable[P, R]], Callable[P, R]]:
     return requires_dec
 
 
-def get_workspace(data: dict) -> int:
+def _re_kwarg(kwarg_map: dict[str, str]) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def _re_kwarg_dec(fn: Callable[P, R]) -> Callable[P, R]:
+        @functools.wraps(fn)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            for key, value in kwargs.items():
+                if key in kwarg_map:
+                    new_key = kwarg_map[key]
+                    warnings.warn(
+                        f"DEPRECATED: '{key}' argument has been renamed to '{new_key}'!",
+                        DeprecationWarning,
+                        stacklevel=3,
+                    )
+                    kwargs[kwarg_map[key]] = value
+            return fn(*args, **kwargs)
+
+        return wrapper
+
+    return _re_kwarg_dec
+
+
+def get_workspace(data: dict[str, Any]) -> int:
     workspace = data.get("workspace_id")
     if isinstance(workspace, int):
         return workspace
