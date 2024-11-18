@@ -10,6 +10,7 @@ import atexit
 import logging
 import random
 import time
+import warnings
 from abc import ABC, abstractmethod
 from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
@@ -40,12 +41,19 @@ class TogglEndpoint(ABC, Generic[T]):
 
     def __init__(
         self,
-        workspace_id: int,
+        workspace_id: int | None,
         auth: httpx.BasicAuth,
         *,
         timeout: int = 20,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
+        if workspace_id:
+            warnings.warn(
+                "DEPRECATED: 'workspace_id' is being removed from the base Toggl endpoint!",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
         self.workspace_id = workspace_id
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
