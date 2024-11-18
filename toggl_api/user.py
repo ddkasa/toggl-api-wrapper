@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 import warnings
 from datetime import date, datetime, timezone
-from typing import Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
-from httpx import BasicAuth, HTTPStatusError, codes
+from httpx import HTTPStatusError, codes
 
 from toggl_api import Comparison, TogglQuery
 from toggl_api._exceptions import DateTimeError
@@ -14,6 +14,13 @@ from toggl_api._exceptions import DateTimeError
 from .meta import TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
 from .utility import format_iso
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from toggl_api.models.models import TogglWorkspace
+
+    from .meta import TogglCache
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -24,9 +31,24 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
     See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/me)
+
+    Params:
+        workspace_id: The workspace the Toggl trackers belong to.
     """
 
     TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglTracker],
+        *,
+        timeout: int = 20,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def current(self, *, refresh: bool = True) -> TogglTracker | None:
         """Get current running tracker. Returns None if no tracker is running.
@@ -229,7 +251,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 of the provided authentication utilities.
 
         Raises:
-            HTTPStatusError: If anything that an error that is not a FORBIDDEN code.
+            HTTPStatusError: If anything that is an error that is not a FORBIDDEN code.
 
         Returns:
             bool: True if successfully verified authentication else False.
