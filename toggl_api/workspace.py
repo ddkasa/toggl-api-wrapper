@@ -22,6 +22,8 @@ from .models import TogglWorkspace
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
+    from .models import TogglOrganization
+
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -195,7 +197,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
 
     def __init__(
         self,
-        organization_id: int,
+        organization_id: int | TogglOrganization,
         auth: BasicAuth,
         cache: TogglCache,
         *,
@@ -207,7 +209,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             DeprecationWarning,
             stacklevel=3,
         )
-        super().__init__(organization_id, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(
+            organization_id if isinstance(organization_id, int) else organization_id.id,
+            auth,
+            cache,
+            timeout=timeout,
+            **kwargs,
+        )
 
     def get(
         self,
