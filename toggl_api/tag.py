@@ -2,13 +2,20 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from httpx import HTTPStatusError, codes
 
 from ._exceptions import NamingError
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from toggl_api.meta import TogglCache
+
+    from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -28,7 +35,22 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         >>> tag_endpoint.query(TogglQuery("name", "Eucalyptus"))
         [TogglTag(213123132, "Eucalyptus")]
+
+    Params:
+        workspace_id: The workspace the tags belong to.
     """
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglTag],
+        *,
+        timeout: int = 20,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def collect(self, *, refresh: bool = False) -> list[TogglTag]:
         """Gather all tags.
