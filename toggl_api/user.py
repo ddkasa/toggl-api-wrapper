@@ -50,6 +50,15 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
+    def _current_refresh(self, tracker: TogglTracker | None) -> None:
+        if tracker is None:
+            for t in self.cache.query(TogglQuery("stop", None)):
+                try:
+                    self.get(t, refresh=True)
+                except HTTPStatusError:
+                    log.exception("%s")
+                    return
+
     def current(self, *, refresh: bool = True) -> TogglTracker | None:
         """Get current running tracker. Returns None if no tracker is running.
 
@@ -65,8 +74,10 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         except HTTPStatusError as err:
             if err.response.status_code == self.TRACKER_NOT_RUNNING:
                 log.warning("No tracker is currently running!")
-                return None
+                response = None
             raise
+
+        self._current_refresh(response)
 
         return response if isinstance(response, TogglTracker) else None
 
