@@ -4,14 +4,21 @@ import logging
 import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import Any, Final, Literal, Optional
+from typing import TYPE_CHECKING, Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
-from toggl_api.meta import BaseBody, RequestMethod, TogglCachedEndpoint
+from toggl_api.meta import BaseBody, RequestMethod, TogglCache, TogglCachedEndpoint
 from toggl_api.models import TogglTracker
 from toggl_api.utility import format_iso
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from toggl_api import TogglWorkspace
+    from toggl_api.meta import TogglCache
+
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -106,9 +113,24 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
 
         >>> tracker_endpoint.delete(tracker)
         None
+
+    Params:
+        workspace_id: The workspace the Toggl trackers belong to.
     """
 
     TRACKER_ALREADY_STOPPED: Final[int] = 409
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglTracker],
+        *,
+        timeout: int = 20,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
         """Edit an existing tracker based on the supplied parameters within the body.
