@@ -63,6 +63,26 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         """Get current running tracker. Returns None if no tracker is running.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-current-time-entry)
+
+        Examples:
+            >>> user_endpoint.current()
+            None
+
+            >>> user_endpoint.current(refresh=True)
+            TogglTracker(...)
+
+        Args:
+            refresh: Whether to check the remote API for running trackers.
+                If 'refresh' is True it will check if there are any other running
+                trackers and update if the 'stop' attribute is None.
+
+        Raises:
+            HTTPStatusError: If the request is not a success or any error that's
+                not a '405' status code.
+
+        Returns:
+            TogglTracker | None: A model from cache or the API. None if nothing
+                is running.
         """
 
         if not refresh:
