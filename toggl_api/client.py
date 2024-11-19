@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, get_args
 from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
+from toggl_api.meta.cache.base_cache import TogglQuery
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
@@ -191,6 +192,15 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         self.cache.delete_entries(client)
         self.cache.commit()
 
+    def _collect_cache(self, body: ClientBody | None) -> list[TogglClient]:
+        if body and body.status is not None:
+            log.warning("Client body 'status' parameter is not implemented with cache!")
+
+        if body and body.name:
+            return list(self.query(TogglQuery("name", body.name)))
+
+        return list(self.load_cache())
+
     def collect(
         self,
         body: Optional[ClientBody] = None,
@@ -202,12 +212,16 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)
 
         Args:
-            body: Status and name to target. Ignores notes.
+            body: Status and name to target. Ignores notes. Ignores status if
+                using cache.
             refresh: Whether to refresh cache.
 
         Returns:
             list[TogglClient]: A list of clients. Empty if not found.
         """
+        if not refresh:
+            return self._collect_cache(body)
+
         url = ""
         if body and body.status:
             url += f"?{body.status}"
