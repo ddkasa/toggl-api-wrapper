@@ -25,9 +25,6 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     """Specific endpoints for retrieving and modifying tags.
 
-    Tags don't have single model get endpoint. Use parent class query method
-    if searching for a single tag.
-
     [Official Documentation](https://engineering.toggl.com/docs/api/tags)
 
     Examples:
@@ -55,6 +52,22 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
+        """Get endpoint convenience method for querying single tags from cache.
+
+        This endpoint doesn't exist on the API so it locally queries for tags
+        instead.
+
+        Examples:
+            >>> toggl_endpoint.get(213123132)
+            TogglTag(213123132, "Eucalyptus")
+
+        Args:
+            tag: Which tag to retrieve. Can be an existing model or its id.
+            refresh: Whether to collect all tags from the API first.
+
+        Returns:
+            TogglTag | None: A tag model if it was found otherwise None.
+        """
         if self.cache is None:
             return None
 
