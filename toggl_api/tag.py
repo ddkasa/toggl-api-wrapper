@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from httpx import HTTPStatusError, codes
 
+from toggl_api.meta.cache.base_cache import TogglQuery
+
 from ._exceptions import NamingError
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
@@ -51,6 +53,25 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     ) -> None:
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+
+    def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
+        if self.cache is None:
+            return None
+
+        if refresh:
+            try:
+                self.collect(refresh=True)
+            except HTTPStatusError:
+                log.exception("%s")
+
+        if isinstance(tag, TogglTag):
+            tag = tag.id
+
+        query = self.query(TogglQuery("id", tag))
+        if query:
+            return query[0]
+
+        return None
 
     def collect(self, *, refresh: bool = False) -> list[TogglTag]:
         """Gather all tags.
