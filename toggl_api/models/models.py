@@ -216,6 +216,7 @@ class TogglProject(WorkspaceChild):
         )
 
     def get_status(self) -> TogglProject.Status:
+        """Derive the project status from instance attributes."""
         if not self.active:
             return TogglProject.Status.ARCHIVED
         now = datetime.now(timezone.utc)
@@ -276,6 +277,7 @@ class TogglTracker(WorkspaceChild):
             self.stop = parse_iso(self.stop)  # type: ignore[assignment]
 
     def running(self) -> bool:
+        """Is this tracker running?"""
         return self.stop is None
 
     @classmethod

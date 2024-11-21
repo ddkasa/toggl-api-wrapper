@@ -1,4 +1,4 @@
-# Abstract Classes
+## Abstract Classes
 
 ::: toggl_api.models.TogglClass
     options:
@@ -10,7 +10,7 @@
 
 ---
 
-# Main Models
+## Main Models
 
 ::: toggl_api.TogglOrganization
     options:
@@ -31,10 +31,15 @@
 ::: toggl_api.TogglProject
     options:
         show_source: true
+        members:
+            - Status
+            - get_status
 
 ::: toggl_api.TogglTracker
     options:
         show_source: true
+        members:
+            - running
 
 ::: toggl_api.TogglTag
     options:
