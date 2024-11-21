@@ -135,7 +135,8 @@ class ProjectBody(BaseBody):
                 "is_private": self.is_private,
             },
         )
-
+        if self.name:
+            body["name"] = self.name
         if self.client_id:
             body["client_id"] = self.client_id
         elif self.client_name:
@@ -145,13 +146,16 @@ class ProjectBody(BaseBody):
             color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
             body["color"] = color
 
-        if self.start_date:
+        if self.start_date and self.verify_endpoint_parameter("start_date", endpoint):
             body["start_date"] = format_iso(self.start_date)
-            if self.end_date and self.end_date > self.start_date:
+        if self.end_date and self.verify_endpoint_parameter("end_date", endpoint):
+            if self.start_date and self.end_date < self.start_date:
+                log.warning("End date is before the start date. Ignoring end date...")
+            else:
                 body["end_date"] = format_iso(self.end_date)
 
-        if self.name:
-            body["name"] = self.name
+        if endpoint == "collect":
+            self._format_collect(body)
 
         return body
 
