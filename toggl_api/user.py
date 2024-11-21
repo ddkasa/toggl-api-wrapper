@@ -13,7 +13,7 @@ from toggl_api._exceptions import DateTimeError
 
 from .meta import TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
-from .utility import format_iso
+from .utility import format_iso, get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
@@ -189,8 +189,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         params = "/time_entries"
         if since or before:
             if since:
-                format_since = int(since.timestamp()) if isinstance(since, datetime) else since
-                params += f"?since={format_since}"
+                params += f"?since={get_timestamp(since)}"
 
             if before:
                 params += "&" if since else "?"
