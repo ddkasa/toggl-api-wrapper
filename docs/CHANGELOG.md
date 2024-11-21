@@ -1,3 +1,8 @@
+---
+hide:
+  - navigation
+---
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -16,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🚜 Refactor
 
-- *(tag)* Edit endpoint method accepts seperate name argument
+- *(tag)* Edit endpoint method accepts separate name argument
 - *(tag)* Validate minimum name length
 - *(endpoint)* Use generics with base endpoint
 - *(cache)* User generic type with cache
