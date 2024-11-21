@@ -163,15 +163,14 @@ class TogglProject(WorkspaceChild):
     """Data structure for Toggl projects.
 
     Attributes:
-        color: Color of the project. Defaults to blue. Refer to
-            [ProjectEndpoint][toggl_api.ProjectEndpoint] for
-            all colors.
+        color: Color of the project. Defaults to blue. Refer to this endpoint
+            [attribute][toggl_api.ProjectEndpoint.BASIC_COLORS] for basic colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
         start_date: When the project is supposed to start. Will default to
             the original date.
         stop_date: When the projects is supposed to end. None if there is none
-            deadline.
+            deadline. Optional.
     """
 
     class Status(enum.Enum):
@@ -183,7 +182,7 @@ class TogglProject(WorkspaceChild):
 
     __tablename__ = "project"
 
-    color: str = field(default="0b83d9")
+    color: str = field(default="#0b83d9")
     client: Optional[int] = field(default=None)
     active: bool = field(default=True)
 
