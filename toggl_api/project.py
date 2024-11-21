@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Final, Literal, Optional
 from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
+from toggl_api.meta.cache import Comparison, TogglQuery
 from toggl_api.utility import format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
@@ -203,6 +204,31 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def collect(self, *, refresh: bool = False) -> list[TogglProject]:
+    @staticmethod
+    def status_to_query(status: TogglProject.Status) -> list[TogglQuery]:
+        """Creates a list of queries depending on the desired project status.
+
+        Args:
+            status: What is the status you are querying for?
+
+        Raises:
+
+
+
+        """
+        if status == TogglProject.Status.ARCHIVED:
+            return [TogglQuery("active", value=False)]
+
+        now = datetime.now(timezone.utc)
+        if status == TogglProject.Status.UPCOMING:
+            return [TogglQuery("start_date", now, Comparison.LESS_THEN)]
+
+        if status == TogglProject.Status.ENDED:
+            return [TogglQuery("end_date", now, Comparison.GREATER_THEN)]
+
+        msg = f"{status} status is not supported by local cache queries!"
+        raise NotImplementedError(msg)
+
         """Returns all cached or remote projects.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceprojects)
