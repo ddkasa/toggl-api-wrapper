@@ -57,6 +57,8 @@ class ProjectBody(BaseBody):
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
+    """Color of the project. Refer to [BASIC_COLORS][toggl_api.ProjectEndpoint.BASIC_COLORS]
+    for accepted colors for non-premium users."""
 
     start_date: Optional[date] = field(
         default=None,
@@ -167,8 +169,21 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     [Official Documentation](https://engineering.toggl.com/docs/api/projects)
 
+    Examples:
+        >>> from toggl_api.utility import get_authentication, retrieve_workspace_id
+        >>> from toggl_api import JSONCache
+        >>> project_endpoint = ProjectEndpoint(retrieve_workspace_id(), get_authentication(), JSONCache(...))
+        >>> project_endpoint.get(213141424)
+        TogglProject(213141424, "Amaryllis", ...)
+
+        >>> project_endpoint.delete(213141424)
+        None
+
     Params:
         workspace_id: The workspace the projects belong to.
+        auth: Basic authentication with an api token or username/password combo.
+        cache: Cache to push the projects to.
+        timeout: How long it takes for the client to timeout a request in seconds.
 
     Attributes:
         BASIC_COLORS: Default colors that are available for non-premium users.
@@ -212,9 +227,11 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             status: What is the status you are querying for?
 
         Raises:
+            NotImplementedError: Active & Deleted Statuses are currently not
+                supported for localy querying.
 
-
-
+        Returns:
+            list[TogglQuery]: A list of query parameters for the desired status.
         """
         if status == TogglProject.Status.ARCHIVED:
             return [TogglQuery("active", value=False)]
@@ -271,8 +288,8 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
         Raises:
             HTTPStatusError: If any response that is not '200' code is returned.
-            NotImplementedError: If the 'deleted' status is used with a 'False'
-                refresh flag.
+            NotImplementedError: Deleted or Active status are used with a 'False'
+                refresh argument.
 
         Returns:
             list[TogglProject]: A list of projects or an empty list if None are
@@ -301,15 +318,29 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         )
 
     def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
-        """Request a projects based on its id.
+        """Request a project based on its id.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceproject)
+
+        Examples:
+            >>> project_endpoint.get(213141424)
+            TogglProject(213141424, "Amaryllis", ...)
+
+        Args:
+            project_id: TogglProject to retrieve. Either a model with the correct id or integer.
+            refresh: Whether to check cache or not.
+
+        Raises:
+            HTTPStatusError: If any status code that is not '200' or a '404' is returned.
+
+        Returns:
+            TogglProject | None: A project or None if nothing was found.
         """
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
         if not refresh:
-            return self.cache.find_entry({"id": project_id})  # type: ignore[return-value]
+            return self.cache.find_entry({"id": project_id})
 
         try:
             response = self.request(
@@ -327,9 +358,19 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     def delete(self, project: TogglProject | int) -> None:
         """Deletes a project based on its id.
 
-        This endpoint always hit the external API in order to keep projects consistent.
+        This endpoint always hits the external API in order to keep projects consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#delete-workspaceproject)
+
+        Examples:
+            >>> project_endpoint.delete(213141424)
+            None
+
+        Args:
+            project: TogglProject to delete. Either an existing model or the integer id.
+
+        Raises:
+            HTTPStatusError: For anything that's not a '200' or '404' status code.
         """
 
         project_id = project if isinstance(project, int) else project.id
@@ -362,9 +403,25 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         This endpoint always hit the external API in order to keep projects consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#put-workspaceproject)
+
+        Examples:
+            >>> body = ProjectBody(name="Amaryllis")
+            >>> project_endpoint.add(213141424, body)
+            TogglProject(213141424, "Amaryllis", client=87695895, ...)
+
+        Args:
+            project: The existing project to edit. Either the model or the integer id.
+            body: The body with the edited attributes.
+
+        Raises:
+            HTTPStatusError: For anything that's not a 'ok' status code.
+
+        Returns:
+            TogglProject: The project model with the provided modifications.
         """
         if isinstance(project, TogglProject):
             project = project.id
+
         return self.request(
             f"/{project}",
             method=RequestMethod.PUT,
@@ -378,6 +435,20 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         This endpoint always hit the external API in order to keep projects consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#post-workspaceprojects)
+
+        Examples:
+            >>> body = ProjectBody(name="Zinnia", client_id=87695895)
+            >>> project_endpoint.add(body)
+            TogglProject(213141424, "Zinnia", client=87695895, ...)
+
+        Args:
+            body: The body with the new attributes of the project.
+
+        Raises:
+            HTTPStatusError: For anything that's not a 'ok' status code.
+
+        Returns:
+            TogglProject: The newly created project.
         """
         if body.name is None:
             msg = "Name must be set in order to create a project!"
@@ -397,7 +468,17 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     @classmethod
     def get_color_id(cls, color: str) -> int:
-        """Get a color id by name."""
+        """Get a color id by name.
+
+        Args:
+            color: Name of the desired color.
+
+        Raises:
+            IndexError: If the color name is not a standard color.
+
+        Returns:
+            int: Index of the provided color cname.
+        """
         colors = list(cls.BASIC_COLORS.values())
         return colors.index(color)
 

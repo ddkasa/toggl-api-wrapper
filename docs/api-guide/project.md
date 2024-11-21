@@ -1,5 +1,6 @@
 ::: toggl_api.ProjectBody
-
+    options:
+        show_source: true
 
 ::: toggl_api.ProjectEndpoint
     options:
