@@ -7,7 +7,7 @@ import time
 from collections import defaultdict
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
 
 from toggl_api.models import (
@@ -350,7 +350,7 @@ class JSONCache(TogglCache, Generic[T]):
 
 class CustomEncoder(json.encoder.JSONEncoder):
     def default(self, obj: Any) -> Any:
-        if isinstance(obj, datetime):
+        if isinstance(obj, date):
             return obj.isoformat()
         if isinstance(obj, timedelta):
             return timedelta.total_seconds(obj)
