@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError, codes
 
@@ -13,7 +13,7 @@ from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
 
 if TYPE_CHECKING:
-    from datetime import date, datetime
+    from datetime import date
 
     from httpx import BasicAuth
 
@@ -31,22 +31,79 @@ class ProjectBody(BaseBody):
     name: Optional[str] = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
 
-    active: bool = field(default=True)
-    """Whether the project is archived or active."""
-    is_private: Optional[bool] = field(default=True)
+    active: bool | Literal["both"] = field(default="both")
+    """Whether the project is archived or active.
+    The literal 'both' is used for querying."""
+    is_private: Optional[bool] = field(
+        default=True,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
     """Whether the project is private or not. Defaults to True."""
 
-    client_id: Optional[int] = field(default=None)
-    client_name: Optional[str] = field(default=None)
+    client_id: Optional[int] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
+    client_name: Optional[str] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
     """Client name if client_id is not set. Defaults to None. If client_id is
     set the client_name will be ignored."""
 
-    color: Optional[str] = field(default=None)
+    color: Optional[str] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
 
-    start_date: Optional[datetime | date] = field(default=None)
-    end_date: Optional[datetime | date] = field(default=None)
+    start_date: Optional[date] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
+    """Date to set the start of a project. If not set or start date is after
+    the end date the end date will be ignored."""
+
+    end_date: Optional[date] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("edit", "add"))},
+    )
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
+
+    since: Optional[date | int] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("collect",))},
+    )
+    """Timestamp for querying for projects with the 'collect' endpoint.
+    Retrieve projects created/modified/deleted since this date using UNIX timestamp.
+    *If using local cache deleted projects are not present.*
+    """
+
+    user_ids: list[int] = field(
+        default_factory=list,
+        metadata={"endpoints": frozenset(("collect",))},
+    )
+    """Query for specific projects with assocciated users. API only."""
+
+    client_ids: list[int] = field(
+        default_factory=list,
+        metadata={"endpoints": frozenset(("collect",))},
+    )
+    """Query for specific projects with assocciated clients."""
+
+    group_ids: list[int] = field(
+        default_factory=list,
+        metadata={"endpoints": frozenset(("collect",))},
+    )
+    """Query for specific projects with assocciated groups. API only"""
+
+    statuses: list[TogglProject.Status] = field(
+        default_factory=list,
+        metadata={"endpoints": frozenset(("collect",))},
+    )
+    """Query for specific statuses when using the collect endpoint.
+    Deleted status only works with the remote API.
+    """
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
