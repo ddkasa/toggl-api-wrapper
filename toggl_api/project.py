@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Final, Literal, Optional
 
 from httpx import HTTPStatusError, codes
@@ -203,7 +204,6 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
-    def collect(self, *, refresh: bool = False) -> list[TogglProject]:
     @staticmethod
     def status_to_query(status: TogglProject.Status) -> list[TogglQuery]:
         """Creates a list of queries depending on the desired project status.
@@ -229,11 +229,76 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         msg = f"{status} status is not supported by local cache queries!"
         raise NotImplementedError(msg)
 
+    def _collect_cache(self, body: ProjectBody | None) -> list[TogglProject]:
+        if body:
+            queries: list[TogglQuery] = []
+            if isinstance(body.active, bool):
+                queries.append(TogglQuery("active", body.active, Comparison.EQUAL))
+            if body.since:
+                queries.append(TogglQuery("timestamp", body.since, Comparison.GREATER_THEN_OR_EQUAL))
+            if body.client_ids:
+                queries.append(TogglQuery("client", body.client_ids))
+            if body.statuses:
+                for status in body.statuses:
+                    queries += self.status_to_query(status)
+
+            return list(self.query(*queries))
+
+        return list(self.load_cache())
+
+    def collect(
+        self,
+        body: Optional[ProjectBody] = None,
+        *,
+        refresh: bool = False,
+        sort_pinned: bool = False,
+        only_me: bool = False,
+        only_templates: bool = False,
+    ) -> list[TogglProject]:
         """Returns all cached or remote projects.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceprojects)
+
+        Args:
+            body: Optional body for adding query parameters for filtering projects.
+            refresh: Whether to fetch from the remote API if true else using
+                the local cache.
+            sort_pinned: Whether to put pinned projects ontop of the results.
+                Only works with the remote API at the moment.
+            only_me: Only retrieve projects that are assigned to the current
+                user assocciated with the authentication. API specific.
+            only_templates: Retrieve template projects. API specific.
+
+        Raises:
+            HTTPStatusError: If any response that is not '200' code is returned.
+            NotImplementedError: If the 'deleted' status is used with a 'False'
+                refresh flag.
+
+        Returns:
+            list[TogglProject]: A list of projects or an empty list if None are
+                found.
         """
-        return self.request("", refresh=refresh)
+
+        if not refresh:
+            return self._collect_cache(body)
+
+        return self.request(
+            "",
+            body=body.format(
+                "collect",
+                workspace_id=self.workspace_id,
+                sort_pinned=sort_pinned,
+                only_me=only_me,
+                only_templates=only_templates,
+            )
+            if body
+            else {
+                "sort_pinned": sort_pinned,
+                "only_me": only_me,
+                "only_templates": only_templates,
+            },
+            refresh=refresh,
+        )
 
     def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
         """Request a projects based on its id.
