@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -172,6 +173,13 @@ class TogglProject(WorkspaceChild):
         stop_date: When the projects is supposed to end. None if there is none
             deadline.
     """
+
+    class Status(enum.Enum):
+        UPCOMING = enum.auto()
+        ACTIVE = enum.auto()
+        ENDED = enum.auto()
+        ARCHIVED = enum.auto()
+        DELETED = enum.auto()
 
     __tablename__ = "project"
 
