@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import importlib.util
+import time
 import warnings
 from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
@@ -59,6 +60,12 @@ def get_workspace(data: dict[str, Any]) -> int:
         return workspace
     msg = "Workspace not found!"
     raise KeyError(msg)
+
+
+def get_timestamp(ts: date | datetime | int) -> int:
+    if isinstance(ts, int):
+        return ts
+    return int(time.mktime(ts.timetuple()))
 
 
 # NOTE: Date utilities for python 3.10 compatibility.
