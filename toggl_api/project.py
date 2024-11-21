@@ -167,6 +167,9 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     Params:
         workspace_id: The workspace the projects belong to.
+
+    Attributes:
+        BASIC_COLORS: Default colors that are available for non-premium users.
     """
 
     BASIC_COLORS: Final[dict[str, str]] = {
@@ -185,7 +188,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         "red": "#d92b2b",
         "gray": "#525266",
     }
-    """Basic colors available for projects in order."""
+    """Basic colors available for projects in order of the API index."""
 
     def __init__(
         self,
