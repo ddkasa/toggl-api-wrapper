@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Final, Literal, Optional
 from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
-from toggl_api.utility import format_iso
+from toggl_api.utility import format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
@@ -104,6 +104,18 @@ class ProjectBody(BaseBody):
     """Query for specific statuses when using the collect endpoint.
     Deleted status only works with the remote API.
     """
+
+    def _format_collect(self, body: dict[str, Any]) -> None:
+        if self.since:
+            body["since"] = get_timestamp(self.since)
+        if self.user_ids:
+            body["user_ids"] = self.user_ids
+        if self.client_ids:
+            body["client_ids"] = self.client_ids
+        if self.group_ids:
+            body["group_ids"] = self.group_ids
+        if self.statuses:
+            body["statuses"] = [s.name.lower() for s in self.statuses]
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
