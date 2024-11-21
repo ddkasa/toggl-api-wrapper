@@ -356,7 +356,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         self.cache.delete_entries(project)
         self.cache.commit()
 
-    def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject | None:
+    def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject:
         """Edit a project based on its id with the parameters provided in the body.
 
         This endpoint always hit the external API in order to keep projects consistent.
@@ -372,7 +372,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             refresh=True,
         )
 
-    def add(self, body: ProjectBody) -> TogglProject | None:
+    def add(self, body: ProjectBody) -> TogglProject:
         """Create a new project based on the parameters provided in the body.
 
         This endpoint always hit the external API in order to keep projects consistent.
