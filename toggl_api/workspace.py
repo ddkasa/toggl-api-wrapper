@@ -18,7 +18,7 @@ from toggl_api.meta.enums import RequestMethod
 from ._exceptions import DateTimeError, NamingError
 from .meta import TogglCache, TogglCachedEndpoint
 from .models import TogglWorkspace
-from .utility import _re_kwarg
+from .utility import _re_kwarg, get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
@@ -288,7 +288,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         return list(self.load_cache())
 
     def _validate_collect_since(self, since: datetime | int) -> int:
-        since = since if isinstance(since, int) else int(time.mktime(since.timetuple()))
+        since = get_timestamp(since)
         now = int(time.mktime(datetime.now(tz=timezone.utc).timetuple()))
         if since > now:
             msg = "The 'since' argument needs to be before the current time!"
