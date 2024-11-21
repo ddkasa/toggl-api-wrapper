@@ -215,6 +215,16 @@ class TogglProject(WorkspaceChild):
             end_date=kwargs.get("end_date"),
         )
 
+    def get_status(self) -> TogglProject.Status:
+        if not self.active:
+            return TogglProject.Status.ARCHIVED
+        now = datetime.now(timezone.utc)
+        if now < self.start_date:
+            return TogglProject.Status.UPCOMING
+        if self.end_date and now >= self.end_date:
+            return TogglProject.Status.ENDED
+        return TogglProject.Status.ACTIVE
+
 
 @dataclass
 class TogglTracker(WorkspaceChild):
