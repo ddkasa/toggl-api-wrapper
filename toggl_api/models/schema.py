@@ -81,6 +81,8 @@ def register_tables(engine: Engine) -> MetaData:
         db.Column("color", db.String(6)),
         db.Column("client", db.Integer, db.ForeignKey("client.id")),
         db.Column("active", db.Boolean),
+        db.Column("start_date", UTCDateTime),
+        db.Column("stop_date", UTCDateTime),
     )
     _map_imperatively(TogglProject, project)
 

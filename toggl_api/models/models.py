@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -167,6 +167,10 @@ class TogglProject(WorkspaceChild):
             all colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
+        start_date: When the project is supposed to start. Will default to
+            the original date.
+        stop_date: When the projects is supposed to end. None if there is none
+            deadline.
     """
 
     __tablename__ = "project"
@@ -175,10 +179,19 @@ class TogglProject(WorkspaceChild):
     client: Optional[int] = field(default=None)
     active: bool = field(default=True)
 
+    start_date: date = field(default_factory=lambda: datetime.now(tz=timezone.utc).date())
+    end_date: Optional[date] = field(default=None)
+
     def __post_init__(self) -> None:
         super().__post_init__()
         if isinstance(self.client, TogglClient):
             self.client = self.client.id
+
+        if isinstance(self.start_date, str):
+            self.start_date = parse_iso(self.start_date).date()
+
+        if isinstance(self.end_date, str):
+            self.stop_date = parse_iso(self.end_date).date()
 
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglProject:
@@ -187,9 +200,11 @@ class TogglProject(WorkspaceChild):
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
             color=kwargs["color"],
-            client=kwargs.get("client_id", kwargs.get("client")),
+            client=kwargs.get("client_id") or kwargs.get("client"),
             active=kwargs["active"],
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
+            start_date=kwargs.get("start_date") or datetime.now(tz=timezone.utc).date(),
+            end_date=kwargs.get("end_date"),
         )
 
 
