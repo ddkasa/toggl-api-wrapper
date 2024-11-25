@@ -141,7 +141,13 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
-    def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
+    def edit(
+        self,
+        tracker: TogglTracker | int,
+        body: TrackerBody,
+        *,
+        meta: bool = False,
+    ) -> TogglTracker:
         """Edit an existing tracker based on the supplied parameters within the body.
 
         This endpoint always hit the external API in order to keep trackers consistent.
@@ -156,6 +162,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         Args:
             tracker: Target tracker model or id to edit.
             body: Updated content to add.
+            meta: Should the response contain data for meta entities.
 
         Returns:
             TogglTracker | None: A new model if successful else None.
@@ -166,17 +173,13 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
 
-        data = self.request(
+        return self.request(
             f"/{tracker}",
             method=RequestMethod.PUT,
-            body=body.format("edit", workspace_id=self.workspace_id),
+            body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
             refresh=True,
         )
-        if not isinstance(data, self.model):
-            log.error("Failed to edit tracker with the id %s!", tracker, extra={"body": body})
-            return None
 
-        return data
 
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
