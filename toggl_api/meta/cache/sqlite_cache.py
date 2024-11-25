@@ -18,7 +18,7 @@ from collections.abc import Iterable, Sequence
 
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
-from toggl_api.utility import requires
+from toggl_api.utility import _requires
 
 from .base_cache import Comparison, TogglCache, TogglQuery
 
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound=TogglClass)
 
 
-@requires("sqlalchemy")
+@_requires("sqlalchemy")
 class SqliteCache(TogglCache[T]):
     """Class for caching data to a SQLite database.
 

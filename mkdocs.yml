@@ -73,8 +73,8 @@ nav:
       - Client: api-guide/client.md
       - Tags: api-guide/tag.md
       - Reports: api-guide/reports.md
+  - Changelog: CHANGELOG.md
   - About:
-      - Changelog: CHANGELOG.md
       - Contributing: CONTRIBUTING.md
       - License: LICENSE.md
 

@@ -1,6 +1,6 @@
 import sys
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import HTTPStatusError
@@ -91,11 +91,11 @@ def test_tracker_stop(tracker_object, add_tracker, user_object):
 @pytest.mark.unit
 def test_tracker_stop_mock(tracker_object, httpx_mock, number):
     httpx_mock.add_response(status_code=tracker_object.TRACKER_ALREADY_STOPPED, method="PATCH")
-    assert tracker_object.stop(tracker=number) is None
+    assert tracker_object.stop(tracker=number.randint(10, sys.maxsize)) is None
 
     httpx_mock.add_response(status_code=401, method="PATCH")
     with pytest.raises(HTTPStatusError):
-        assert tracker_object.stop(tracker=number)
+        assert tracker_object.stop(tracker=number.randint(19, sys.maxsize))
 
 
 @pytest.mark.integration
@@ -130,3 +130,16 @@ def test_tracker_deletion_id(tracker_object, user_object, add_tracker):
 def test_tracker_deletion_mock(tracker_object, number, httpx_mock, error):
     httpx_mock.add_response(status_code=error)
     assert tracker_object.delete(number.randint(100, sys.maxsize)) is None
+
+
+@pytest.mark.integration
+def test_tracker_bulk_edit(tracker_object, add_multiple_trackers, faker):
+    tracker_object.retries = 0
+    body = TrackerBody(
+        faker.name(),
+        tags=[faker.name()],
+        start=datetime.now(tz=timezone.utc),
+        tag_action="add",
+    )
+    edit = tracker_object.bulk_edit(*add_multiple_trackers, body=body)
+    assert all(t.id in edit.successes for t in add_multiple_trackers)

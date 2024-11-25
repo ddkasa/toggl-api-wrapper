@@ -1,4 +1,6 @@
 ::: toggl_api.meta.enums.RequestMethod
+    options:
+        show_source: true
 
 ***
 

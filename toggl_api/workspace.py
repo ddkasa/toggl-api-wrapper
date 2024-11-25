@@ -18,9 +18,12 @@ from toggl_api.meta.enums import RequestMethod
 from ._exceptions import DateTimeError, NamingError
 from .meta import TogglCache, TogglCachedEndpoint
 from .models import TogglWorkspace
+from .utility import _re_kwarg, get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
+
+    from .models import TogglOrganization
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -188,26 +191,38 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)
 
-    Args:
+    Params:
         organization_id: Workspace endpoint takes an organization id instead of
             a workspace id.
+        auth: Authentication for the client.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    @_re_kwarg({"workspace_id": "organization_id"})
     def __init__(
         self,
-        organization_id: int,
+        organization_id: int | TogglOrganization,
         auth: BasicAuth,
-        cache: TogglCache,
+        cache: TogglCache[TogglWorkspace],
         *,
-        timeout: int = 20,
-        **kwargs,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
-        warnings.warn(
-            "DEPRECATED: The 'workspace_id' is becoming a required 'organization_id' in the 'WorkspaceEndpoint'!",
-            DeprecationWarning,
-            stacklevel=3,
+        super().__init__(
+            0,
+            auth,
+            cache,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
         )
-        super().__init__(organization_id, auth, cache, timeout=timeout, **kwargs)
+        self.organization_id = organization_id if isinstance(organization_id, int) else organization_id.id
 
     def get(
         self,
@@ -249,7 +264,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             response = self.request(f"workspaces/{workspace}", refresh=refresh)
         except HTTPStatusError as err:
             log.exception("%s")
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 return None
             raise
 
@@ -282,7 +297,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         return list(self.load_cache())
 
     def _validate_collect_since(self, since: datetime | int) -> int:
-        since = since if isinstance(since, int) else int(time.mktime(since.timetuple()))
+        since = get_timestamp(since)
         now = int(time.mktime(datetime.now(tz=timezone.utc).timetuple()))
         if since > now:
             msg = "The 'since' argument needs to be before the current time!"
@@ -394,11 +409,3 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
     @property
     def endpoint(self) -> str:
         return ""
-
-    @property
-    def organization_id(self) -> int:
-        return self.workspace_id
-
-    @organization_id.setter
-    def organization_id(self, value: int) -> None:
-        self.workspace_id = value

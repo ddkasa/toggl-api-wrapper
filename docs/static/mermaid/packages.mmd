@@ -1,6 +1,8 @@
 classDiagram
   class toggl_api {
   }
+  class _exceptions {
+  }
   class client {
   }
   class config {
@@ -51,18 +53,23 @@ classDiagram
   }
   class workspace {
   }
+  toggl_api --> _exceptions
   toggl_api --> client
   toggl_api --> config
   toggl_api --> meta
   toggl_api --> cache
+  toggl_api --> base_cache
   toggl_api --> models
+  toggl_api --> organization
   toggl_api --> project
   toggl_api --> tag
   toggl_api --> tracker
   toggl_api --> user
   toggl_api --> version
   toggl_api --> workspace
+  client --> _exceptions
   client --> meta
+  client --> base_cache
   client --> models
   meta --> base_endpoint
   meta --> body
@@ -74,6 +81,7 @@ classDiagram
   cache --> base_cache
   cache --> json_cache
   base_cache --> enums
+  base_cache --> models
   json_cache --> base_cache
   json_cache --> models
   json_cache --> utility
@@ -84,7 +92,9 @@ classDiagram
   sqlite_cache --> utility
   cached_endpoint --> base_endpoint
   cached_endpoint --> enums
+  cached_endpoint --> models
   models --> models
+  models --> _exceptions
   models --> utility
   schema --> _decorators
   schema --> models
@@ -92,7 +102,9 @@ classDiagram
   organization --> meta
   organization --> meta
   organization --> models
+  project --> _exceptions
   project --> meta
+  project --> cache
   project --> models
   project --> utility
   reports --> reports
@@ -100,25 +112,34 @@ classDiagram
   reports --> enums
   reports --> models
   reports --> utility
+  tag --> _exceptions
   tag --> meta
+  tag --> base_cache
   tag --> models
+  tracker --> _exceptions
   tracker --> meta
   tracker --> models
   tracker --> utility
   user --> toggl_api
+  user --> _exceptions
   user --> meta
   user --> models
   user --> utility
+  workspace --> _exceptions
   workspace --> meta
   workspace --> body
   workspace --> base_cache
   workspace --> enums
   workspace --> models
+  workspace --> utility
   base_cache ..> meta
-  base_cache ..> models
   json_cache ..> meta
   json_cache ..> cached_endpoint
   sqlite_cache ..> meta
   cached_endpoint ..> cache
   cached_endpoint ..> base_cache
   organization ..> base_cache
+  project ..> meta
+  tag ..> meta
+  tracker ..> toggl_api
+  user ..> models

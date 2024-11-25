@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import enum
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -21,10 +22,10 @@ log = logging.getLogger("toggl-api-wrapper.model")
 class TogglClass(ABC):
     """Base class for all Toggl dataclasses.
 
-    Attributes:
-        id: Toggl API / Database ID (Primary Key) of the Toggl object.
-        name: Name or description of the Toggl object.
-        timestamp: Timestamp of when the Toggl object was last modified.
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl project.
+        name: Name or description of the Toggl project.
+        timestamp: Local timestamp of when the Toggl project was last modified.
     """
 
     __tablename__ = "base"
@@ -49,11 +50,12 @@ class TogglClass(ABC):
 
     @classmethod
     @abstractmethod
-    def from_kwargs(cls, **kwargs) -> TogglClass:
+    def from_kwargs(cls, **kwargs: Any) -> TogglClass:
+        """Converts an arbitrary amount of kwargs to a model."""
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
         )
 
     def __getitem__(self, item: str) -> Any:
@@ -65,7 +67,13 @@ class TogglClass(ABC):
 
 @dataclass
 class TogglOrganization(TogglClass):
-    """Data structure for Toggl organizations."""
+    """Data structure for Toggl organizations.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl organization.
+        name: Name or description of the Toggl organization.
+        timestamp: Local timestamp of when the Toggl organization was last modified.
+    """
 
     ___tablename__ = "organization"
 
@@ -74,7 +82,8 @@ class TogglOrganization(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglOrganization:
+    def from_kwargs(cls, **kwargs: Any) -> TogglOrganization:
+        """Converts an arbitrary amount of kwargs to an organization."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
     @staticmethod
@@ -90,7 +99,14 @@ class TogglOrganization(TogglClass):
 
 @dataclass
 class TogglWorkspace(TogglClass):
-    """Data structure for Toggl workspaces."""
+    """Data structure for Toggl workspaces.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl object.
+        name: Name or description of the Toggl workspace.
+        timestamp: Local timestamp of when the Toggl workspace was last modified.
+        organization: Organization id the workspace belongs to.
+    """
 
     ___tablename__ = "workspace"
 
@@ -108,7 +124,8 @@ class TogglWorkspace(TogglClass):
             log.warning("Updated to new name: %s!", self.name)
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglWorkspace:
+    def from_kwargs(cls, **kwargs: Any) -> TogglWorkspace:
+        """Converts an arbitrary amount of kwargs to a workspace."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
     @staticmethod
@@ -127,7 +144,14 @@ class TogglWorkspace(TogglClass):
 
 @dataclass
 class WorkspaceChild(TogglClass):
-    """Base class for all Toggl workspace objects."""
+    """Base class for all Toggl workspace objects.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl object.
+        name: Name or description of the Toggl object.
+        timestamp: Local timestamp of when the Toggl object was last modified.
+        workspace: The workspace id the toggl object belongs to.
+    """
 
     __tablename__ = "workspace_child"
 
@@ -138,23 +162,35 @@ class WorkspaceChild(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> WorkspaceChild:
+    def from_kwargs(cls, **kwargs: Any) -> WorkspaceChild:
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
         )
 
 
 @dataclass
 class TogglClient(WorkspaceChild):
-    """Data structure for Toggl clients."""
+    """Data structure for Toggl clients.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl client.
+        name: Name or description of the Toggl client.
+        timestamp: Local timestamp of when the Toggl client was last modified.
+        workspace: The workspace id the Toggl client belongs to.
+    """
 
     __tablename__ = "client"
 
     def __post_init__(self) -> None:
         super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs: Any) -> TogglClient:
+        """Converts an arbitrary amount of kwargs to a client."""
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
 
 @dataclass
@@ -162,44 +198,87 @@ class TogglProject(WorkspaceChild):
     """Data structure for Toggl projects.
 
     Attributes:
-        color: Color of the project. Defaults to blue. Refer to
-            [ProjectEndpoint][toggl_api.ProjectEndpoint] for
-            all colors.
+        STATUS: An enumeration with all project statuses supported by the API.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl project.
+        name: Name or description of the Toggl project.
+        timestamp: Local timestamp of when the Toggl project was last modified.
+        workspace: The workspace id the project belongs to.
+        color: Color of the project. Defaults to blue. Refer to this endpoint
+            [attribute][toggl_api.ProjectEndpoint.BASIC_COLORS] for basic colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
+        start_date: When the project is supposed to start. Will default to
+            the original date.
+        end_date: When the projects is supposed to end. None if there is no
+            deadline. Optional.
     """
+
+    class Status(enum.Enum):
+        UPCOMING = enum.auto()
+        ACTIVE = enum.auto()
+        ENDED = enum.auto()
+        ARCHIVED = enum.auto()
+        DELETED = enum.auto()
 
     __tablename__ = "project"
 
-    color: str = field(default="0b83d9")
+    color: str = field(default="#0b83d9")
     client: Optional[int] = field(default=None)
     active: bool = field(default=True)
+
+    start_date: date = field(default_factory=lambda: datetime.now(tz=timezone.utc).date())
+    end_date: Optional[date] = field(default=None)
 
     def __post_init__(self) -> None:
         super().__post_init__()
         if isinstance(self.client, TogglClient):
             self.client = self.client.id
 
+        if isinstance(self.start_date, str):
+            self.start_date = parse_iso(self.start_date).date()
+
+        if isinstance(self.end_date, str):
+            self.stop_date = parse_iso(self.end_date).date()
+
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglProject:
+    def from_kwargs(cls, **kwargs: Any) -> TogglProject:
+        """Converts an arbitrary amount of kwargs to a project."""
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
             color=kwargs["color"],
-            client=kwargs.get("client_id", kwargs.get("client")),
+            client=kwargs.get("client_id") or kwargs.get("client"),
             active=kwargs["active"],
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
+            start_date=kwargs.get("start_date") or datetime.now(tz=timezone.utc).date(),
+            end_date=kwargs.get("end_date"),
         )
+
+    def get_status(self) -> TogglProject.Status:
+        """Derive the project status from instance attributes."""
+        if not self.active:
+            return TogglProject.Status.ARCHIVED
+        now = datetime.now(timezone.utc)
+        if now < self.start_date:
+            return TogglProject.Status.UPCOMING
+        if self.end_date and now >= self.end_date:
+            return TogglProject.Status.ENDED
+        return TogglProject.Status.ACTIVE
 
 
 @dataclass
 class TogglTracker(WorkspaceChild):
     """Data structure for trackers.
 
-    Attributes:
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl tracker.
         name: Description of the tracker. Refers to tracker **description**
-            inside the Toggl API. Inherited.
+            inside the Toggl API.
+        timestamp: Local timestamp of when the Toggl tracker was last modified.
+        workspace: The workspace id the tracker belongs to.
         start: Start time of the tracker. Defaults to time created if nothing
             is passed.
         duration: Duration of the tracker
@@ -243,10 +322,12 @@ class TogglTracker(WorkspaceChild):
             self.stop = parse_iso(self.stop)  # type: ignore[assignment]
 
     def running(self) -> bool:
+        """Is this tracker running?"""
         return self.stop is None
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglTracker:
+    def from_kwargs(cls, **kwargs: Any) -> TogglTracker:
+        """Converts an arbitrary amount of kwargs to a tracker."""
         start = kwargs.get("start")
         if start is None:
             start = datetime.now(tz=timezone.utc)
@@ -265,7 +346,7 @@ class TogglTracker(WorkspaceChild):
         )
 
     @staticmethod
-    def get_tags(**kwargs: dict) -> list[TogglTag]:
+    def get_tags(**kwargs: Any) -> list[TogglTag]:
         tag_id = kwargs.get("tag_ids")
         tag = kwargs.get("tags")
         tags = []
@@ -284,7 +365,14 @@ class TogglTracker(WorkspaceChild):
 
 @dataclass
 class TogglTag(WorkspaceChild):
-    """Data structure for Toggl tags."""
+    """Data structure for Toggl tags.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl tag.
+            name:Name or description of the Toggl tag.
+        timestamp: Local timestamp of when the Toggl tag was last modified.
+        workspace: The workspace id the tag belongs to.
+    """
 
     __tablename__ = "tag"
 
@@ -292,5 +380,6 @@ class TogglTag(WorkspaceChild):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglTag:
+    def from_kwargs(cls, **kwargs: Any) -> TogglTag:
+        """Converts an arbitrary amount of kwargs to a tag."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]

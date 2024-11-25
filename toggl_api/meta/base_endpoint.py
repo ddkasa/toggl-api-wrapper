@@ -10,9 +10,10 @@ import atexit
 import logging
 import random
 import time
+import warnings
 from abc import ABC, abstractmethod
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Optional, TypeVar
 
 import httpx
 from httpx import HTTPStatusError, codes
@@ -31,22 +32,48 @@ T = TypeVar("T", bound=TogglClass)
 
 
 class TogglEndpoint(ABC, Generic[T]):
-    """Base class with basic functionality for all API requests."""
+    """Base class with basic functionality for all API requests.
 
-    BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
+    Attributes:
+        BASE_ENDPOINT: Base URL of the Toggl API.
+        HEADERS: Default headers that the API requires for most endpoints.
+
+    Params:
+        workspace_id: DEPRECATED and moved to child classes.
+        auth: Authentication for the client.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
+    """
+
+    BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
-    __slots__ = ("__client", "workspace_id")
+    __slots__ = ("__client", "re_raise", "retries", "workspace_id")
 
     def __init__(
         self,
-        workspace_id: int,
+        workspace_id: int | None,
         auth: httpx.BasicAuth,
         *,
-        timeout: int = 20,
-        **kwargs,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
+        if workspace_id:
+            warnings.warn(
+                "DEPRECATED: 'workspace_id' is being removed from the base Toggl endpoint!",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
         self.workspace_id = workspace_id
+        self.re_raise = re_raise
+        self.retries = max(0, retries)
+
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
         self.__client = httpx.Client(
@@ -66,15 +93,15 @@ class TogglEndpoint(ABC, Generic[T]):
         }
         return match_dict.get(method, self.__client.get)
 
-    def request(  # noqa: PLR0913
+    def request(
         self,
         parameters: str,
         headers: Optional[dict] = None,
-        body: Optional[dict] = None,
+        body: Optional[dict | list] = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
-        retries: int = 3,
+        retries: int | None = None,
     ) -> Any:
         """Main request method which handles putting together the final API
         request.
@@ -84,7 +111,7 @@ class TogglEndpoint(ABC, Generic[T]):
                 Will concate with the endpoint property.
             headers (dict, optional): Custom request headers. Defaults to
                 class property if set to None.
-            body (dict, optional): Request body JSON data for specifying info.
+            body (dict | list, optional): Request body JSON data for specifying info.
                 Defaults to None. Only used with none-GET or DELETE requests.
             method (RequestMethod): Request method to select. Defaults to GET.
             raw (bool): Whether to use the raw data. Defaults to False.
@@ -93,6 +120,8 @@ class TogglEndpoint(ABC, Generic[T]):
         Returns:
             Any: Response data or None if request does not return any data.
         """
+        if retries is None:
+            retries = self.retries
 
         url = self.endpoint + parameters
         headers = headers or self.HEADERS
@@ -103,11 +132,10 @@ class TogglEndpoint(ABC, Generic[T]):
             response = self.method(method)(url, headers=headers)
 
         if codes.is_error(response.status_code):
-            # TODO: Toggl API return code lookup.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
 
-            if codes.is_server_error(response.status_code) and retries:
+            if not self.re_raise and codes.is_server_error(response.status_code) and retries:
                 delay = random.randint(1, 5)
                 retries -= 1
                 log.error(
@@ -149,8 +177,8 @@ class TogglEndpoint(ABC, Generic[T]):
 
         return data
 
-    def process_models(self, data: list[dict[str, Any]]) -> list[TogglClass]:
-        return [self.model.from_kwargs(**mdl) for mdl in data]
+    def process_models(self, data: list[dict[str, Any]]) -> list[T]:
+        return [self.model.from_kwargs(**mdl) for mdl in data]  # type: ignore[misc]
 
     @property
     @abstractmethod

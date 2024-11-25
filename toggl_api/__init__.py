@@ -8,7 +8,7 @@ from .models import TogglClient, TogglOrganization, TogglProject, TogglTag, Togg
 from .organization import OrganizationEndpoint
 from .project import ProjectBody, ProjectEndpoint
 from .tag import TagEndpoint
-from .tracker import TrackerBody, TrackerEndpoint
+from .tracker import BulkEditParameter, Edits, TrackerBody, TrackerEndpoint
 from .user import UserEndpoint
 from .version import version
 from .workspace import WorkspaceBody, WorkspaceEndpoint
@@ -19,6 +19,8 @@ __typed__ = True
 
 
 __all__ = (  # noqa: RUF022
+    "BulkEditParameter",
+    "Edits",
     "DateTimeError",
     "NamingError",
     "ClientBody",

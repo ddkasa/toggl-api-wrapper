@@ -250,7 +250,7 @@ class ReportBody(BaseBody):
     )
     """It will force the detailed report to return as much information as possible, as it does for the export."""
 
-    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:  # noqa: C901, PLR0912
+    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:  # noqa: PLR0912
         body.update(
             {
                 "client_ids": self.client_ids,

@@ -1,8 +1,10 @@
-# Abstract Classes
+## Abstract Classes
 
 ::: toggl_api.models.TogglClass
     options:
         show_source: true
+        members: 
+            - from_kwargs
 
 ::: toggl_api.models.WorkspaceChild
     options:
@@ -10,32 +12,45 @@
 
 ---
 
-# Main Models
+## Main Models
 
 ::: toggl_api.TogglOrganization
     options:
         show_source: true
         members:
             - validate_name
+            - from_kwargs
 
 ::: toggl_api.TogglWorkspace
     options:
         show_source: true
         members:
             - validate_name
+            - from_kwargs
 
 ::: toggl_api.TogglClient
     options:
         show_source: true
+        members:
+          - from_kwargs
 
 ::: toggl_api.TogglProject
     options:
         show_source: true
+        members:
+            - Status
+            - get_status
+            - from_kwargs
 
 ::: toggl_api.TogglTracker
     options:
         show_source: true
+        members:
+            - running
+            - from_kwargs
 
 ::: toggl_api.TogglTag
     options:
         show_source: true
+        members:
+            - from_kwargs

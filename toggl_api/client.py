@@ -2,14 +2,21 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional, get_args
+from typing import TYPE_CHECKING, Any, Literal, Optional, get_args
 
 from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
+from toggl_api.meta.cache.base_cache import TogglQuery
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglClient
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from .meta import TogglCache
+    from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -55,7 +62,38 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
     """Specific endpoints for retrieving and modifying clients.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/clients)
+
+    Params:
+        workspace_id: The workspace the clients belong to.
+        auth: Authentication for the client.
+        cache: Cache object where the clients will stored and handled.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglClient],
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(
+            0,
+            auth,
+            cache,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def add(self, body: ClientBody) -> TogglClient | None:
         """Create a Client based on parameters set in the provided body.
@@ -110,7 +148,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Client with id %s does not exist!", client_id)
                 return None
             raise
@@ -155,7 +193,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         try:
             self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Client with id %s was either already deleted or did not exist in the first place!",
@@ -170,6 +208,15 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         self.cache.delete_entries(client)
         self.cache.commit()
 
+    def _collect_cache(self, body: ClientBody | None) -> list[TogglClient]:
+        if body and body.status is not None:
+            log.warning("Client body 'status' parameter is not implemented with cache!")
+
+        if body and body.name:
+            return list(self.query(TogglQuery("name", body.name)))
+
+        return list(self.load_cache())
+
     def collect(
         self,
         body: Optional[ClientBody] = None,
@@ -181,12 +228,16 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)
 
         Args:
-            body: Status and name to target. Ignores notes.
+            body: Status and name to target. Ignores notes. Ignores status if
+                using cache.
             refresh: Whether to refresh cache.
 
         Returns:
             list[TogglClient]: A list of clients. Empty if not found.
         """
+        if not refresh:
+            return self._collect_cache(body)
+
         url = ""
         if body and body.status:
             url += f"?{body.status}"

@@ -2,22 +2,28 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from httpx import HTTPStatusError, codes
+
+from toggl_api.meta.cache.base_cache import TogglQuery
 
 from ._exceptions import NamingError
 from .meta import RequestMethod, TogglCachedEndpoint
 from .models import TogglTag
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from toggl_api.meta import TogglCache
+
+    from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     """Specific endpoints for retrieving and modifying tags.
-
-    Tags don't have single model get endpoint. Use parent class query method
-    if searching for a single tag.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/tags)
 
@@ -28,7 +34,75 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         >>> tag_endpoint.query(TogglQuery("name", "Eucalyptus"))
         [TogglTag(213123132, "Eucalyptus")]
+
+    Params:
+        workspace_id: The workspace the tags belong to.
+        auth: Authentication for the client.
+        cache: Cache object where tags are stored.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only
     """
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglTag],
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(
+            0,
+            auth,
+            cache,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+
+    def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
+        """Get endpoint convenience method for querying single tags from cache.
+
+        This endpoint doesn't exist on the API so it locally queries for tags
+        instead.
+
+        Examples:
+            >>> toggl_endpoint.get(213123132)
+            TogglTag(213123132, "Eucalyptus")
+
+        Args:
+            tag: Which tag to retrieve. Can be an existing model or its id.
+            refresh: Whether to collect all tags from the API first.
+
+        Returns:
+            TogglTag | None: A tag model if it was found otherwise None.
+        """
+        if self.cache is None:
+            return None
+
+        if refresh:
+            try:
+                self.collect(refresh=True)
+            except HTTPStatusError:
+                if self.re_raise:
+                    raise
+                log.exception("%s")
+
+        if isinstance(tag, TogglTag):
+            tag = tag.id
+
+        query = self.query(TogglQuery("id", tag))
+        if query:
+            return query[0]
+
+        return None
 
     def collect(self, *, refresh: bool = False) -> list[TogglTag]:
         """Gather all tags.
@@ -134,7 +208,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Tag with id %s was either already deleted or did not exist in the first place!",

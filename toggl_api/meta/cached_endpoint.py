@@ -24,7 +24,7 @@ from .enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    import httpx
+    from httpx import BasicAuth
 
     from toggl_api.meta.cache.base_cache import TogglQuery
 
@@ -43,8 +43,15 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     See parent endpoint for more details.
 
     Params:
+        auth: Authentication for the client.
         cache: Cache object for caching toggl API data to disk. Builtin cache
             types are JSONCache and SqliteCache.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
 
     Attributes:
         cache: Cache object the endpoint will use for storing models. Assigns
@@ -64,25 +71,27 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     def __init__(
         self,
         workspace_id: int,
-        auth: httpx.BasicAuth,
+        auth: BasicAuth,
         cache: TogglCache[T],
         *,
-        timeout: int = 20,
-        **kwargs: Any,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
         super().__init__(
             workspace_id=workspace_id,
             auth=auth,
             timeout=timeout,
-            **kwargs,
+            re_raise=re_raise,
+            retries=retries,
         )
         self.cache = cache
 
-    def request(  # type: ignore[override]  # noqa: PLR0913
+    def request(  # type: ignore[override]
         self,
         parameters: str,
         headers: Optional[dict] = None,
-        body: Optional[dict] = None,
+        body: Optional[dict | list] = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,

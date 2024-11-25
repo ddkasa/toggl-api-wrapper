@@ -3,17 +3,24 @@ from __future__ import annotations
 import logging
 import warnings
 from datetime import date, datetime, timezone
-from typing import Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import httpx
-from httpx import BasicAuth, HTTPStatusError, codes
+from httpx import HTTPStatusError, codes
 
 from toggl_api import Comparison, TogglQuery
 from toggl_api._exceptions import DateTimeError
 
 from .meta import TogglCachedEndpoint, TogglEndpoint
 from .models import TogglTracker
-from .utility import format_iso
+from .utility import format_iso, get_timestamp
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from toggl_api.models.models import TogglWorkspace
+
+    from .meta import TogglCache
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -24,14 +31,67 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
     See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/me)
+
+    Params:
+        workspace_id: The workspace the Toggl trackers belong to.
+        auth: Authentication for the client.
+        cache: Cache object where trackers are stored.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
     TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED
+
+    def __init__(
+        self,
+        workspace_id: int | TogglWorkspace,
+        auth: BasicAuth,
+        cache: TogglCache[TogglTracker],
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+
+    def _current_refresh(self, tracker: TogglTracker | None) -> None:
+        if tracker is None:
+            for t in self.cache.query(TogglQuery("stop", None)):
+                try:
+                    self.get(t, refresh=True)
+                except HTTPStatusError:
+                    log.exception("%s")
+                    return
 
     def current(self, *, refresh: bool = True) -> TogglTracker | None:
         """Get current running tracker. Returns None if no tracker is running.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-current-time-entry)
+
+        Examples:
+            >>> user_endpoint.current()
+            None
+
+            >>> user_endpoint.current(refresh=True)
+            TogglTracker(...)
+
+        Args:
+            refresh: Whether to check the remote API for running trackers.
+                If 'refresh' is True it will check if there are any other running
+                trackers and update if the 'stop' attribute is None.
+
+        Raises:
+            HTTPStatusError: If the request is not a success or any error that's
+                not a '405' status code.
+
+        Returns:
+            TogglTracker | None: A model from cache or the API. None if nothing
+                is running.
         """
 
         if not refresh:
@@ -41,10 +101,13 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         try:
             response = self.request("/time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
-            if err.response.status_code == self.TRACKER_NOT_RUNNING:
+            if not self.re_raise and err.response.status_code == self.TRACKER_NOT_RUNNING:
                 log.warning("No tracker is currently running!")
-                return None
-            raise
+                response = None
+            else:
+                raise
+
+        self._current_refresh(response)
 
         return response if isinstance(response, TogglTracker) else None
 
@@ -136,8 +199,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         params = "/time_entries"
         if since or before:
             if since:
-                format_since = int(since.timestamp()) if isinstance(since, datetime) else since
-                params += f"?since={format_since}"
+                params += f"?since={get_timestamp(since)}"
 
             if before:
                 params += "&" if since else "?"
@@ -179,7 +241,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise
@@ -229,7 +291,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 of the provided authentication utilities.
 
         Raises:
-            HTTPStatusError: If anything that an error that is not a FORBIDDEN code.
+            HTTPStatusError: If anything that is an error that is not a FORBIDDEN code.
 
         Returns:
             bool: True if successfully verified authentication else False.
