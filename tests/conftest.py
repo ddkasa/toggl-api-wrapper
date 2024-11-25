@@ -242,3 +242,22 @@ def create_project(
     project_body,
 ):
     return project_object.add(project_body)
+
+
+@pytest.fixture
+def add_multiple_trackers(tracker_object, faker, create_project):
+    trackers = []
+    for i in range(5, 10):
+        time.sleep(1)
+        body = TrackerBody(
+            description=faker.name(),
+            project_id=create_project.id,
+            start=datetime.now(tz=timezone.utc).replace(hour=i),
+            stop=datetime.now(tz=timezone.utc).replace(hour=i + 1),
+        )
+        trackers.append(tracker_object.add(body=body))
+
+    yield trackers
+    for tracker in trackers:
+        time.sleep(1)
+        tracker_object.delete(tracker)
