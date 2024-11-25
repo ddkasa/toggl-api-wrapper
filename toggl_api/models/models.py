@@ -50,7 +50,8 @@ class TogglClass(ABC):
 
     @classmethod
     @abstractmethod
-    def from_kwargs(cls, **kwargs) -> TogglClass:
+    def from_kwargs(cls, **kwargs: Any) -> TogglClass:
+        """Converts an arbitrary amount of kwargs to a model."""
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -81,7 +82,8 @@ class TogglOrganization(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglOrganization:
+    def from_kwargs(cls, **kwargs: Any) -> TogglOrganization:
+        """Converts an arbitrary amount of kwargs to an organization."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
     @staticmethod
@@ -122,7 +124,8 @@ class TogglWorkspace(TogglClass):
             log.warning("Updated to new name: %s!", self.name)
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglWorkspace:
+    def from_kwargs(cls, **kwargs: Any) -> TogglWorkspace:
+        """Converts an arbitrary amount of kwargs to a workspace."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
     @staticmethod
@@ -159,7 +162,7 @@ class WorkspaceChild(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> WorkspaceChild:
+    def from_kwargs(cls, **kwargs: Any) -> WorkspaceChild:
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -183,6 +186,11 @@ class TogglClient(WorkspaceChild):
 
     def __post_init__(self) -> None:
         super().__post_init__()
+
+    @classmethod
+    def from_kwargs(cls, **kwargs: Any) -> TogglClient:
+        """Converts an arbitrary amount of kwargs to a client."""
+        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
 
 
 @dataclass
@@ -235,7 +243,8 @@ class TogglProject(WorkspaceChild):
             self.stop_date = parse_iso(self.end_date).date()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglProject:
+    def from_kwargs(cls, **kwargs: Any) -> TogglProject:
+        """Converts an arbitrary amount of kwargs to a project."""
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -317,7 +326,8 @@ class TogglTracker(WorkspaceChild):
         return self.stop is None
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglTracker:
+    def from_kwargs(cls, **kwargs: Any) -> TogglTracker:
+        """Converts an arbitrary amount of kwargs to a tracker."""
         start = kwargs.get("start")
         if start is None:
             start = datetime.now(tz=timezone.utc)
@@ -336,7 +346,7 @@ class TogglTracker(WorkspaceChild):
         )
 
     @staticmethod
-    def get_tags(**kwargs: dict) -> list[TogglTag]:
+    def get_tags(**kwargs: Any) -> list[TogglTag]:
         tag_id = kwargs.get("tag_ids")
         tag = kwargs.get("tags")
         tags = []
@@ -370,5 +380,6 @@ class TogglTag(WorkspaceChild):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> TogglTag:
+    def from_kwargs(cls, **kwargs: Any) -> TogglTag:
+        """Converts an arbitrary amount of kwargs to a tag."""
         return super().from_kwargs(**kwargs)  # type: ignore[return-value]
