@@ -9,21 +9,25 @@ from toggl_api.project import ProjectBody, ProjectEndpoint
 from toggl_api.utility import format_iso
 
 
-@pytest.mark.unit
-def test_project_model(get_workspace_id, faker):
-    data = {
-        "id": 1100,
+@pytest.fixture
+def project_sample(faker, number, get_workspace_id):
+    return {
+        "id": number.randint(100, sys.maxsize),
         "name": faker.name(),
         "workspace": get_workspace_id,
-        "color": "#000000",
+        "color": ProjectEndpoint.get_color(""),
         "active": True,
     }
-    project = TogglProject.from_kwargs(**data)
+
+
+@pytest.mark.unit
+def test_project_model(get_workspace_id, faker, project_sample):
+    project = TogglProject.from_kwargs(**project_sample)
     assert isinstance(project, TogglProject)
-    assert project.id == data["id"]
-    assert project.name == data["name"]
-    assert project.color == data["color"]
-    assert project.workspace == data["workspace"]
+    assert project.id == project_sample["id"]
+    assert project.name == project_sample["name"]
+    assert project.color == project_sample["color"]
+    assert project.workspace == project_sample["workspace"]
 
 
 @pytest.mark.unit
