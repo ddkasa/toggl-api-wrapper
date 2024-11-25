@@ -54,7 +54,7 @@ class TogglClass(ABC):
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
         )
 
     def __getitem__(self, item: str) -> Any:
@@ -144,7 +144,7 @@ class WorkspaceChild(TogglClass):
             id=kwargs["id"],
             name=kwargs["name"],
             workspace=get_workspace(kwargs),
-            timestamp=kwargs.get("timestamp", datetime.now(tz=timezone.utc)),
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
         )
 
 
