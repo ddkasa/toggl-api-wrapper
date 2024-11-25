@@ -90,7 +90,7 @@ class TogglEndpoint(ABC, Generic[T]):
         }
         return match_dict.get(method, self.__client.get)
 
-    def request(  # noqa: PLR0913
+    def request(
         self,
         parameters: str,
         headers: Optional[dict] = None,
