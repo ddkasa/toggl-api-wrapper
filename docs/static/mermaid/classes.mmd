@@ -5,6 +5,11 @@ classDiagram
     format(endpoint: str)* dict[str, Any]
     verify_endpoint_parameter(parameter: str, endpoint: str) bool
   }
+  class BulkEditParameter {
+    op : Literal['add', 'remove', 'replace']
+    path : str
+    value : Any
+  }
   class ClientBody {
     name : Optional[str]
     notes : Optional[str]
@@ -14,6 +19,7 @@ classDiagram
   class ClientEndpoint {
     endpoint
     model
+    workspace_id
     add(body: ClientBody) TogglClient | None
     collect(body: Optional[ClientBody]) list[TogglClient]
     delete(client: TogglClient | int) None
@@ -30,36 +36,46 @@ classDiagram
   class CustomEncoder {
     default(obj: Any) Any
   }
+  class DateTimeError {
+  }
   class DetailedReportEndpoint {
     endpoint
     export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: Optional[PaginationOptions]) PaginatedResult[bytes]
     search_time_entries(body: ReportBody, pagination: Optional[PaginationOptions]) PaginatedResult[list]
     totals_report(body: ReportBody) dict[str, int]
   }
+  class Edits {
+    failures : list[int]
+    successes : list[int]
+  }
   class JSONCache {
     cache_path
     parent
-    session
-    add_entries(update: list[TogglClass] | TogglClass) None
-    add_entry(item: TogglClass) None
+    session : JSONSession[T]
+    add_entries(update: list[T] | T) None
+    add_entry(item: T) None
     commit() None
-    delete_entries(update: list[TogglClass] | TogglClass) None
-    delete_entry(entry: TogglClass) None
-    find_entry(entry: TogglClass | dict[str, int]) TogglClass | None
-    load_cache() list[TogglClass]
+    delete_entries(update: list[T] | T) None
+    delete_entry(entry: T) None
+    find_entry(entry: T | dict[str, int]) T | None
+    load_cache() list[T]
     query() list[TogglClass]
-    save_cache(update: Iterable[TogglClass] | TogglClass, method: RequestMethod) None
-    update_entries(update: list[TogglClass] | TogglClass) None
+    save_cache(update: Iterable[T] | T, method: RequestMethod) None
+    update_entries(update: list[T] | T) None
   }
   class JSONSession {
-    data : list[TogglClass]
+    data : list[T]
     max_length : int
     modified : int
     version : str
     commit(path: Path) None
     load(path: Path) None
-    process_data(data: list[TogglClass]) list[TogglClass]
+    process_data(data: list[T]) list[T]
     refresh(path: Path) bool
+  }
+  class MissingParentError {
+  }
+  class NamingError {
   }
   class OrganizationEndpoint {
     endpoint
@@ -82,27 +98,34 @@ classDiagram
     page_size : int
   }
   class ProjectBody {
-    active : bool
+    active : bool | Literal['both']
     client_id : Optional[int]
+    client_ids : list[int]
     client_name : Optional[str]
     color : Optional[str]
-    end_date : Optional[datetime | date]
+    end_date : Optional[date]
+    group_ids : list[int]
     is_private : Optional[bool]
     name : Optional[str]
-    start_date : Optional[datetime | date]
+    since : Optional[date | int]
+    start_date : Optional[date]
+    statuses : list[TogglProject.Status]
+    user_ids : list[int]
     format(endpoint: str) dict[str, Any]
   }
   class ProjectEndpoint {
     BASIC_COLORS : Final[dict[str, str]]
     endpoint
     model
-    add(body: ProjectBody) TogglProject | None
-    collect() list[TogglProject]
+    workspace_id
+    add(body: ProjectBody) TogglProject
+    collect(body: Optional[ProjectBody]) list[TogglProject]
     delete(project: TogglProject | int) None
-    edit(project: TogglProject | int, body: ProjectBody) TogglProject | None
+    edit(project: TogglProject | int, body: ProjectBody) TogglProject
     get(project_id: int | TogglProject) TogglProject | None
-    get_color(color: str) str
+    get_color(name: str) str
     get_color_id(color: str) int
+    status_to_query(status: TogglProject.Status) list[TogglQuery]
   }
   class ReportBody {
     client_ids : list[int | None]
@@ -142,14 +165,17 @@ classDiagram
     database
     metadata
     session
-    add_entries(entry: Iterable[TogglClass] | TogglClass) None
+    add_entries(entry: Iterable[T] | T) None
     commit() None
-    delete_entries(entry: Iterable[TogglClass] | TogglClass) None
-    find_entry(query: TogglClass | dict[str, Any]) TogglClass | None
-    load_cache() Query[TogglClass]
-    query() Query[TogglClass]
-    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod) None
-    update_entries(entry: Iterable[TogglClass] | TogglClass) None
+    delete_entries(entry: Iterable[T] | T) None
+    find_entry(query: T | dict[str, Any]) T | None
+    load_cache() Query[T]
+    query() Query[T]
+    save_cache(entry: list[T] | T, method: RequestMethod) None
+    update_entries(entry: Iterable[T] | T) None
+  }
+  class Status {
+    name
   }
   class SummaryReportEndpoint {
     endpoint
@@ -163,32 +189,34 @@ classDiagram
   class TagEndpoint {
     endpoint
     model
+    workspace_id
     add(name: str) TogglTag
     collect() list[TogglTag]
     delete(tag: TogglTag | int) None
-    edit(tag: TogglTag) TogglTag
+    edit(tag: TogglTag | int, name: Optional[str]) TogglTag
+    get(tag: TogglTag | int) TogglTag | None
   }
   class TogglCache {
     cache_path
     expire_after
     parent
-    add_entries(update: list[TogglClass])* None
+    add_entries(update: list[TC])* None
     commit()* None
-    delete_entries(update: list[TogglClass] | TogglClass)* None
-    find_entry(entry: TogglClass | dict[str, Any])* TogglClass | None
+    delete_entries(update: list[TC] | TC)* None
+    find_entry(entry: TC | dict[str, Any])* TC | None
     find_method(method: RequestMethod) Callable | None
-    load_cache()* Iterable[TogglClass]
-    query()* Iterable[TogglClass]
-    save_cache(entry: list[TogglClass] | TogglClass, method: RequestMethod)* None
-    update_entries(update: list[TogglClass] | TogglClass)* None
+    load_cache()* Iterable[TC]
+    query()* Iterable[TC]
+    save_cache(entry: list[TC] | TC, method: RequestMethod)* None
+    update_entries(update: list[TC] | TC)* None
   }
   class TogglCachedEndpoint {
     cache
     endpoint
-    load_cache() Iterable[TogglClass]
-    query() Iterable[TogglClass]
-    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Any
-    save_cache(response: list[TogglClass] | TogglClass, method: RequestMethod) None
+    load_cache() Iterable[T]
+    query() list[T]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict | list], method: RequestMethod) Any
+    save_cache(response: list[T] | T, method: RequestMethod) None
   }
   class TogglClass {
     id : int
@@ -199,15 +227,17 @@ classDiagram
   class TogglClient {
   }
   class TogglEndpoint {
-    BASE_ENDPOINT : str
+    BASE_ENDPOINT : ClassVar[str]
     HEADERS : Final[dict]
     endpoint
     model
-    workspace_id : int
+    re_raise : bool
+    retries
+    workspace_id : int | None
     api_status() bool
     method(method: RequestMethod) Callable
-    process_models(data: list[dict[str, Any]]) list[TogglClass]
-    request(parameters: str, headers: Optional[dict], body: Optional[dict], method: RequestMethod) Any
+    process_models(data: list[dict[str, Any]]) list[T]
+    request(parameters: str, headers: Optional[dict], body: Optional[dict | list], method: RequestMethod) Any
   }
   class TogglOrganization {
     from_kwargs() TogglOrganization
@@ -217,7 +247,11 @@ classDiagram
     active : bool
     client : Optional[int]
     color : str
+    end_date : Optional[date]
+    start_date : date
+    stop_date : date
     from_kwargs() TogglProject
+    get_status() TogglProject.Status
   }
   class TogglQuery {
     comparison
@@ -261,9 +295,11 @@ classDiagram
     TRACKER_ALREADY_STOPPED : Final[int]
     endpoint
     model
+    workspace_id
     add(body: TrackerBody) TogglTracker | None
+    bulk_edit() Edits
     delete(tracker: TogglTracker | int) None
-    edit(tracker: TogglTracker | int, body: TrackerBody) TogglTracker | None
+    edit(tracker: TogglTracker | int, body: TrackerBody) TogglTracker
     stop(tracker: TogglTracker | int) TogglTracker | None
   }
   class UTCDateTime {
@@ -280,6 +316,7 @@ classDiagram
     TRACKER_NOT_RUNNING : Final[int]
     endpoint
     model
+    workspace_id
     check_authentication() bool
     collect(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
     current() TogglTracker | None
@@ -316,7 +353,7 @@ classDiagram
     endpoint
     model
     organization_id
-    add(organization_id: int, body: WorkspaceBody) TogglWorkspace
+    add(body: WorkspaceBody) TogglWorkspace
     collect(since: Optional[datetime | int]) list[TogglWorkspace]
     edit(workspace_id: TogglWorkspace | int, body: WorkspaceBody) TogglWorkspace
     get(workspace: Optional[TogglWorkspace | int]) TogglWorkspace | None
@@ -355,5 +392,4 @@ classDiagram
   WorkspaceBody --|> BaseBody
   WorkspaceEndpoint --|> TogglCachedEndpoint
   Comparison --* TogglQuery : comparison
-  JSONSession --* JSONCache : session
   TogglCache --o TogglCachedEndpoint : _cache
