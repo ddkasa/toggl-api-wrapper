@@ -9,7 +9,7 @@ from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
 from toggl_api.meta.cache import Comparison, TogglQuery
-from toggl_api.utility import format_iso, get_timestamp
+from toggl_api.utility import _re_kwarg, format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
@@ -465,9 +465,10 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         )
 
     @classmethod
-    def get_color(cls, color: str) -> str:
+    @_re_kwarg({"color": "name"})
+    def get_color(cls, name: str) -> str:
         """Get a color by name. Defaults to gray."""
-        return cls.BASIC_COLORS.get(color, "#525266")
+        return cls.BASIC_COLORS.get(name, "#525266")
 
     @classmethod
     def get_color_id(cls, color: str) -> int:
