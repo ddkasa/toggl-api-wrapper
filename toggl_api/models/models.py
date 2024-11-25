@@ -22,10 +22,10 @@ log = logging.getLogger("toggl-api-wrapper.model")
 class TogglClass(ABC):
     """Base class for all Toggl dataclasses.
 
-    Attributes:
-        id: Toggl API / Database ID (Primary Key) of the Toggl object.
-        name: Name or description of the Toggl object.
-        timestamp: Timestamp of when the Toggl object was last modified.
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl project.
+        name: Name or description of the Toggl project.
+        timestamp: Local timestamp of when the Toggl project was last modified.
     """
 
     __tablename__ = "base"
@@ -66,7 +66,13 @@ class TogglClass(ABC):
 
 @dataclass
 class TogglOrganization(TogglClass):
-    """Data structure for Toggl organizations."""
+    """Data structure for Toggl organizations.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl organization.
+        name: Name or description of the Toggl organization.
+        timestamp: Local timestamp of when the Toggl organization was last modified.
+    """
 
     ___tablename__ = "organization"
 
@@ -91,7 +97,14 @@ class TogglOrganization(TogglClass):
 
 @dataclass
 class TogglWorkspace(TogglClass):
-    """Data structure for Toggl workspaces."""
+    """Data structure for Toggl workspaces.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl object.
+        name: Name or description of the Toggl workspace.
+        timestamp: Local timestamp of when the Toggl workspace was last modified.
+        organization: Organization id the workspace belongs to.
+    """
 
     ___tablename__ = "workspace"
 
@@ -128,7 +141,14 @@ class TogglWorkspace(TogglClass):
 
 @dataclass
 class WorkspaceChild(TogglClass):
-    """Base class for all Toggl workspace objects."""
+    """Base class for all Toggl workspace objects.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl object.
+        name: Name or description of the Toggl object.
+        timestamp: Local timestamp of when the Toggl object was last modified.
+        workspace: The workspace id the toggl object belongs to.
+    """
 
     __tablename__ = "workspace_child"
 
@@ -150,7 +170,14 @@ class WorkspaceChild(TogglClass):
 
 @dataclass
 class TogglClient(WorkspaceChild):
-    """Data structure for Toggl clients."""
+    """Data structure for Toggl clients.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl client.
+        name: Name or description of the Toggl client.
+        timestamp: Local timestamp of when the Toggl client was last modified.
+        workspace: The workspace id the Toggl client belongs to.
+    """
 
     __tablename__ = "client"
 
@@ -163,13 +190,20 @@ class TogglProject(WorkspaceChild):
     """Data structure for Toggl projects.
 
     Attributes:
+        STATUS: An enumeration with all project statuses supported by the API.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl project.
+        name: Name or description of the Toggl project.
+        timestamp: Local timestamp of when the Toggl project was last modified.
+        workspace: The workspace id the project belongs to.
         color: Color of the project. Defaults to blue. Refer to this endpoint
             [attribute][toggl_api.ProjectEndpoint.BASIC_COLORS] for basic colors.
         client: ID of the client the project belongs to. Defaults to None.
         active: Whether the project is archived or not. Defaults to True.
         start_date: When the project is supposed to start. Will default to
             the original date.
-        stop_date: When the projects is supposed to end. None if there is none
+        end_date: When the projects is supposed to end. None if there is no
             deadline. Optional.
     """
 
@@ -230,9 +264,12 @@ class TogglProject(WorkspaceChild):
 class TogglTracker(WorkspaceChild):
     """Data structure for trackers.
 
-    Attributes:
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl tracker.
         name: Description of the tracker. Refers to tracker **description**
-            inside the Toggl API. Inherited.
+            inside the Toggl API.
+        timestamp: Local timestamp of when the Toggl tracker was last modified.
+        workspace: The workspace id the tracker belongs to.
         start: Start time of the tracker. Defaults to time created if nothing
             is passed.
         duration: Duration of the tracker
@@ -318,7 +355,14 @@ class TogglTracker(WorkspaceChild):
 
 @dataclass
 class TogglTag(WorkspaceChild):
-    """Data structure for Toggl tags."""
+    """Data structure for Toggl tags.
+
+    Params:
+        id: Toggl API / Database ID (Primary Key) of the Toggl tag.
+            name:Name or description of the Toggl tag.
+        timestamp: Local timestamp of when the Toggl tag was last modified.
+        workspace: The workspace id the tag belongs to.
+    """
 
     __tablename__ = "tag"
 
