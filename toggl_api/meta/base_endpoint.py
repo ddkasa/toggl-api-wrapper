@@ -13,7 +13,7 @@ import time
 import warnings
 from abc import ABC, abstractmethod
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Optional, TypeVar
 
 import httpx
 from httpx import HTTPStatusError, codes
@@ -34,10 +34,10 @@ T = TypeVar("T", bound=TogglClass)
 class TogglEndpoint(ABC, Generic[T]):
     """Base class with basic functionality for all API requests."""
 
-    BASE_ENDPOINT: str = "https://api.track.toggl.com/api/v9/"
+    BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
-    __slots__ = ("__client", "workspace_id")
+    __slots__ = ("__client", "re_raise", "workspace_id")
 
     def __init__(
         self,
@@ -45,7 +45,7 @@ class TogglEndpoint(ABC, Generic[T]):
         auth: httpx.BasicAuth,
         *,
         timeout: int = 10,
-        **kwargs: Any,
+        re_raise: bool = False,
     ) -> None:
         if workspace_id:
             warnings.warn(
@@ -55,6 +55,7 @@ class TogglEndpoint(ABC, Generic[T]):
             )
 
         self.workspace_id = workspace_id
+        self.re_raise = re_raise
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
         self.__client = httpx.Client(
@@ -115,7 +116,7 @@ class TogglEndpoint(ABC, Generic[T]):
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
 
-            if codes.is_server_error(response.status_code) and retries:
+            if not self.re_raise and codes.is_server_error(response.status_code) and retries:
                 delay = random.randint(1, 5)
                 retries -= 1
                 log.error(
@@ -157,8 +158,8 @@ class TogglEndpoint(ABC, Generic[T]):
 
         return data
 
-    def process_models(self, data: list[dict[str, Any]]) -> list[TogglClass]:
-        return [self.model.from_kwargs(**mdl) for mdl in data]
+    def process_models(self, data: list[dict[str, Any]]) -> list[T]:
+        return [self.model.from_kwargs(**mdl) for mdl in data]  # type: ignore[misc]
 
     @property
     @abstractmethod

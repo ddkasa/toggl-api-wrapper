@@ -201,17 +201,17 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         self,
         organization_id: int | TogglOrganization,
         auth: BasicAuth,
-        cache: TogglCache,
+        cache: TogglCache[TogglWorkspace],
         *,
         timeout: int = 10,
-        **kwargs,
+        re_raise: bool = False,
     ) -> None:
         super().__init__(
             0,
             auth,
             cache,
             timeout=timeout,
-            **kwargs,
+            re_raise=re_raise,
         )
         self.organization_id = organization_id if isinstance(organization_id, int) else organization_id.id
 
@@ -255,7 +255,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             response = self.request(f"workspaces/{workspace}", refresh=refresh)
         except HTTPStatusError as err:
             log.exception("%s")
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 return None
             raise
 

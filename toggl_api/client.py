@@ -74,9 +74,9 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         cache: TogglCache[TogglClient],
         *,
         timeout: int = 10,
-        **kwargs: Any,
+        re_raise: bool = False,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def add(self, body: ClientBody) -> TogglClient | None:
@@ -132,7 +132,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Client with id %s does not exist!", client_id)
                 return None
             raise
@@ -177,7 +177,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         try:
             self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Client with id %s was either already deleted or did not exist in the first place!",

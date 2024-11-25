@@ -25,8 +25,15 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
     """
 
-    def __init__(self, auth: BasicAuth, cache: TogglCache, *, timeout: int = 10, **kwargs) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+    def __init__(
+        self,
+        auth: BasicAuth,
+        cache: TogglCache[TogglOrganization],
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+    ) -> None:
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
 
     def get(
         self,
@@ -60,7 +67,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         try:
             response = self.request(f"organizations/{organization}", refresh=refresh)
         except HTTPStatusError as err:
-            if err.response.status_code in {codes.NOT_FOUND, codes.FORBIDDEN}:
+            if not self.re_raise and err.response.status_code in {codes.NOT_FOUND, codes.FORBIDDEN}:
                 log.warning(err)
                 return None
             raise
@@ -171,7 +178,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.exception("%s")
             log.warning(

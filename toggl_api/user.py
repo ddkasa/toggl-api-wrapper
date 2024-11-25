@@ -44,10 +44,10 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         auth: BasicAuth,
         cache: TogglCache[TogglTracker],
         *,
-        **kwargs: Any,
         timeout: int = 10,
+        re_raise: bool = False,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def _current_refresh(self, tracker: TogglTracker | None) -> None:
@@ -92,10 +92,11 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         try:
             response = self.request("/time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
-            if err.response.status_code == self.TRACKER_NOT_RUNNING:
+            if not self.re_raise and err.response.status_code == self.TRACKER_NOT_RUNNING:
                 log.warning("No tracker is currently running!")
                 response = None
-            raise
+            else:
+                raise
 
         self._current_refresh(response)
 
@@ -231,7 +232,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise

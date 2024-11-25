@@ -127,9 +127,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         cache: TogglCache[TogglTracker],
         *,
         timeout: int = 10,
-        **kwargs: Any,
+        re_raise: bool = False,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def edit(self, tracker: TogglTracker | int, body: TrackerBody) -> TogglTracker | None:
@@ -193,7 +193,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         try:
             self.request(f"/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Tracker with id %s was either already deleted or did not exist in the first place!",
@@ -239,7 +239,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != self.TRACKER_ALREADY_STOPPED:
+            if self.re_raise or err.response.status_code != self.TRACKER_ALREADY_STOPPED:
                 raise
             log.warning("Tracker with id %s was already stopped!", tracker)
         return None

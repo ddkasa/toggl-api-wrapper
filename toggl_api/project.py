@@ -183,7 +183,10 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         workspace_id: The workspace the projects belong to.
         auth: Basic authentication with an api token or username/password combo.
         cache: Cache to push the projects to.
-        timeout: How long it takes for the client to timeout a request in seconds.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise HTTPStatusError errors and not handle them
+            internally. Keyword Only.
 
     Attributes:
         BASIC_COLORS: Default colors that are available for non-premium users.
@@ -214,9 +217,9 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         cache: TogglCache[TogglProject],
         *,
         timeout: int = 10,
-        **kwargs: Any,
+        re_raise: bool = False,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @staticmethod
@@ -348,7 +351,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if err.response.status_code == codes.NOT_FOUND:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Project with id %s was not found!", project_id)
                 return None
             raise
@@ -381,7 +384,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Project with id %s was either already deleted or did not exist in the first place!",

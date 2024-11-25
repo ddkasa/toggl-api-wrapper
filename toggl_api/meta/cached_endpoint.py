@@ -24,7 +24,7 @@ from .enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    import httpx
+    from httpx import BasicAuth
 
     from toggl_api.meta.cache.base_cache import TogglQuery
 
@@ -64,17 +64,17 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     def __init__(
         self,
         workspace_id: int,
-        auth: httpx.BasicAuth,
+        auth: BasicAuth,
         cache: TogglCache[T],
         *,
-        **kwargs: Any,
         timeout: int = 10,
+        re_raise: bool = False,
     ) -> None:
         super().__init__(
             workspace_id=workspace_id,
             auth=auth,
             timeout=timeout,
-            **kwargs,
+            re_raise=re_raise,
         )
         self.cache = cache
 

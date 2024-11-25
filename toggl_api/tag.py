@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from httpx import HTTPStatusError, codes
 
@@ -46,9 +46,9 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         cache: TogglCache[TogglTag],
         *,
         timeout: int = 10,
-        **kwargs: Any,
+        re_raise: bool = False,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, **kwargs)
+        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
@@ -75,6 +75,8 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             try:
                 self.collect(refresh=True)
             except HTTPStatusError:
+                if self.re_raise:
+                    raise
                 log.exception("%s")
 
         if isinstance(tag, TogglTag):
@@ -190,7 +192,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
                 refresh=True,
             )
         except HTTPStatusError as err:
-            if err.response.status_code != codes.NOT_FOUND:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
             log.warning(
                 "Tag with id %s was either already deleted or did not exist in the first place!",
