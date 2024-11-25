@@ -175,6 +175,7 @@ ignore = [
     "PLR6301", # Class Method Suggestion
     "S311",    # Unsafe pseudo-random generator
     "PLR0913", # Too many arguments.
+    "C901",    # Complex functions
 ]
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
