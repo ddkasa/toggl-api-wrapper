@@ -36,16 +36,40 @@ def test_project_body(project_body, get_workspace_id):
 
 
 @pytest.mark.unit
+def test_project_body_collect_params(get_workspace_id):
+    body = ProjectBody(
+        since=datetime.now(timezone.utc),
+        user_ids=[12, 21312312],
+        client_ids=[21321321],
+        group_ids=[213123123],
+        statuses=[TogglProject.Status.ACTIVE],
+    )
+    formatted = body.format("collect", workspace_id=get_workspace_id)
+    assert formatted["workspace_id"] == get_workspace_id
+    assert isinstance(formatted["since"], int)
+    assert isinstance(formatted["user_ids"], list)
+    assert isinstance(formatted["client_ids"], list)
+    assert isinstance(formatted["group_ids"], list)
+    assert "active" in formatted["statuses"]
+
+    formatted = body.format("add", workspace_id=get_workspace_id)
+    assert formatted.get("client_ids") is None
+
+
+@pytest.mark.unit
 def test_project_body_dates(project_body, get_workspace_id, monkeypatch):
     monkeypatch.setattr(project_body, "start_date", datetime.now(tz=timezone.utc))
     monkeypatch.setattr(project_body, "end_date", datetime.now(tz=timezone.utc) - timedelta(hours=1))
-    formatted = project_body.format("endpoint", workspace_id=get_workspace_id)
+    formatted = project_body.format("edit", workspace_id=get_workspace_id)
     assert formatted["start_date"] == format_iso(project_body.start_date)
     assert formatted.get("end_date") is None
     monkeypatch.setattr(project_body, "end_date", datetime.now(tz=timezone.utc) + timedelta(hours=1))
-    formatted = project_body.format("endpoint", workspace_id=get_workspace_id)
+    formatted = project_body.format("add", workspace_id=get_workspace_id)
     assert formatted["start_date"] == format_iso(project_body.start_date)
     assert formatted["end_date"] == format_iso(project_body.end_date)
+
+    monkeypatch.setattr(project_body, "start_date", None)
+    assert isinstance(project_body.format("edit")["end_date"], str)
 
 
 @pytest.mark.unit
