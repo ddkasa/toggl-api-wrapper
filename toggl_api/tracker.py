@@ -95,6 +95,20 @@ class TrackerBody(BaseBody):
         metadata={"endpoints": ("add", "edit")},
     )
 
+    def __post_init__(self) -> None:
+        if self.start_date is not None:
+            warnings.warn(
+                'DEPRECATED: "start_date" will be removed. Use "start" parameter instead!',
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            if self.start is None:
+                self.start = datetime(
+                    self.start_date.year,
+                    self.start_date.month,
+                    self.start_date.day,
+                    tzinfo=timezone.utc,
+                )
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -129,8 +143,6 @@ class TrackerBody(BaseBody):
 
         if self.start:
             body["start"] = format_iso(self.start)
-        elif self.start_date:
-            body["start_date"] = format_iso(self.start_date)
 
         if self.stop:
             body["stop"] = format_iso(self.stop)

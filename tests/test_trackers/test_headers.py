@@ -12,19 +12,11 @@ def test_format_body(get_workspace_id):
 
 
 @pytest.mark.unit
-def test_start_date(get_workspace_id):
+def test_start_time(get_workspace_id):
     d = datetime.now(tz=timezone.utc)
     body = TrackerBody(get_workspace_id, start=d)
     b_format = body.format(get_workspace_id)
     assert isinstance(b_format["start"], str)
-    assert b_format.get("start_date") is None
-    body.start_date = d.date()
-    b_format = body.format(get_workspace_id)
-    assert b_format.get("start_date") is None
-    body.start = None
-    b_format = body.format(get_workspace_id)
-    assert b_format.get("start") is None
-    assert isinstance(b_format["start_date"], str)
 
 
 @pytest.mark.unit
