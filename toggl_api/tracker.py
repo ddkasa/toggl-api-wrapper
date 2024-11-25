@@ -43,21 +43,58 @@ class TrackerBody(BaseBody):
         TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
     """
 
-    description: Optional[str] = field(default=None)
-    duration: Optional[int | timedelta] = field(default=None)
+    description: Optional[str] = field(
+        default=None,
+        metadata={"endpoints": frozenset(("add", "edit", "bulk_edit"))},
+    )
+    """Description of the a tracker. Refers to the name of a model within the wrapper."""
+    duration: Optional[int | timedelta] = field(
+        default=None,
+        metadata={"endpoints": ("add", "edit")},
+    )
     """Duration set in a timedelta or in seconds if using an integer."""
-    project_id: Optional[int] = field(default=None)
-    start: Optional[datetime] = field(default=None)
+    project_id: Optional[int] = field(
+        default=None,
+        metadata={"endpoints": ("add", "edit")},
+    )
+    """Project the tracker belongs. If the value == -1 its marked for removal."""
+    start: Optional[datetime] = field(
+        default=None,
+        metadata={"endpoints": ("add", "edit", "bulk_edit")},
+    )
+    """Start time of the tracker. If using `bulk_edit` endpoint the date is only used."""
     start_date: Optional[date] = field(default=None)
-    """Start date in YYYY-MM-DD format. If start is present start_date is ignored."""
-    stop: Optional[datetime] = field(default=None)
-    tag_action: Optional[Literal["add", "remove"]] = field(default=None)
+    stop: Optional[datetime] = field(
+        default=None,
+        metadata={"endpoints": ("add", "edit", "bulk_edit")},
+    )
+    """Stop time of a tracker. If using `bulk_edit` endpoint the date is only used."""
+    tag_action: Optional[Literal["add", "remove"]] = field(
+        default=None,
+        metadata={"endpoints": ("add", "edit", "bulk_edit")},
+    )
     """Options are *add* or *remove*. Will default to *add* when editing a
     tracker. Otherwise ignored."""
-    tag_ids: list[int] = field(default_factory=list)
-    tags: list[str] = field(default_factory=list)
-    shared_with_user_ids: list[int] = field(default_factory=list)
-    created_with: str = field(default="toggl-api-wrapper")
+    tag_ids: list[int] = field(
+        default_factory=list,
+        metadata={"endpoints": ("add", "edit")},
+    )
+    """Tag integer ids in a list. Tag action decides what to do with them."""
+    tags: list[str] = field(
+        default_factory=list,
+        metadata={"endpoints": ("add", "edit", "bulk_edit")},
+    )
+    """Names of tags to assocciate a tracker with. Tag action decides what to do with them."""
+    shared_with_user_ids: list[int] = field(
+        default_factory=list,
+        metadata={"endpoints": ("add", "edit")},
+    )
+    """Which user to share the tracker with."""
+    created_with: str = field(
+        default="toggl-api-wrapper",
+        metadata={"endpoints": ("add", "edit")},
+    )
+
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -85,7 +122,9 @@ class TrackerBody(BaseBody):
         elif not self.stop and self.start:
             body["duration"] = -1
 
-        if self.project_id:
+        if self.project_id == -1:
+            body["project_id"] = None
+        elif self.project_id is not None:
             body["project_id"] = self.project_id
 
         if self.start:
