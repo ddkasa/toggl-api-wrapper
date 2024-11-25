@@ -202,3 +202,27 @@ def test_delete_project_raise(httpx_mock, project_object, number):
 def test_get_color_id():
     for i, key in enumerate(ProjectEndpoint.BASIC_COLORS.values()):
         assert i == ProjectEndpoint.get_color_id(key)
+
+
+@pytest.mark.unit
+def test_collect_project_cache(project_object, httpx_mock, project_sample):
+    project_sample["start_date"] = datetime.now(tz=timezone.utc).isoformat()
+    httpx_mock.add_response(json=project_sample)
+    model = project_object.get(project_sample["id"], refresh=True)
+    body = ProjectBody(
+        since=datetime.now(tz=timezone.utc).date(),
+    )
+    assert model in project_object.collect(body)
+    assert model in project_object.collect()
+
+
+@pytest.mark.integration
+def test_collect_project(project_object, create_project, user_id):
+    body = ProjectBody(
+        active="both",
+        statuses=[TogglProject.Status.ACTIVE],
+        since=datetime.now(tz=timezone.utc),
+        user_ids=[user_id],
+    )
+
+    assert project_object.collect(body, refresh=True)
