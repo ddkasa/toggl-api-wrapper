@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -109,6 +110,35 @@ class TrackerBody(BaseBody):
                     self.start_date.day,
                     tzinfo=timezone.utc,
                 )
+
+    def _format_bulk_edit(self) -> list[BulkEditParameter]:
+        params: list[BulkEditParameter] = []
+
+        if self.description:
+            params.append(
+                {
+                    "op": "replace",
+                    "path": "/description",
+                    "value": self.description,
+                },
+            )
+
+        if self.tags and self.tag_action:
+            params += [{"op": self.tag_action, "path": "/tags", "value": self.tags}]
+
+        if self.start:
+            start = self.start.date() if isinstance(self.start, datetime) else self.start
+            params.append({"op": "replace", "path": "/start", "value": format_iso(start)})
+
+            if self.stop and self.start > self.stop:
+                log.warning("Start is after the stop time! Ignoring 'stop' parameter!")
+                self.stop = None
+
+        if self.stop:
+            stop = self.stop.date() if isinstance(self.stop, datetime) else self.stop
+            params.append({"op": "replace", "path": "/stop", "value": format_iso(stop)})
+
+        return params
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -242,6 +272,67 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             refresh=True,
         )
 
+    def _bulk_edit(
+        self,
+        trackers: list[int],
+        body: list[BulkEditParameter],
+    ) -> dict[str, list[int]]:
+        url = "/" + ",".join([str(t) for t in trackers])
+
+        return self.request(
+            url,
+            body=body,
+            refresh=True,
+            method=RequestMethod.PATCH,
+            raw=True,
+        ).json()
+
+    def bulk_edit(
+        self,
+        *trackers: int | TogglTracker,
+        body: TrackerBody,
+    ) -> Edits:
+        """Bulk edit multiple trackers at the same time.
+
+        Patch will be executed partially when there are errors with some records.
+        No transaction, no rollback.
+
+        There is a limit of editing 100 trackers at the same time, so the
+        method will make multiple calls if the count exceeds that limit.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries/#patch-bulk-editing-time-entries)
+
+        Examples:
+            >>> body = TrackerBody(description="All these trackers belong to me!")
+            >>> tracker_endpoint.bulk_edit(1235151, 214124, body)
+            [
+            TogglTracker(1235151, "All these trackers belong to me!"),
+            TogglTracker(214124, "All these trackers belong to me!"),
+            ]
+
+        Args:
+            trackers: All trackers that need to be edited.
+            body: The parameters that need to be edited.
+
+        Raises:
+            HTTPStatusError: For anything thats not a *ok* status_code.
+
+        Returns:
+            Edited: Successeful or failed ids editing the trackers.
+        """
+        tracker_ids = [t if isinstance(t, int) else t.id for t in trackers]
+        requests = math.ceil(len(tracker_ids) / 100)
+        success: list[int]
+        failure: list[int]
+        success, failure = [], []
+
+        fmt_body = body._format_bulk_edit()  # noqa: SLF001
+        for i in range(requests):
+            edit = self._bulk_edit(tracker_ids[100 * i : 100 + (100 * i)], fmt_body)
+            success.extend(edit["success"])
+            failure.extend(edit["failure"])
+
+        return Edits(success, failure)
 
     def delete(self, tracker: TogglTracker | int) -> None:
         """Delete a tracker from Toggl.
