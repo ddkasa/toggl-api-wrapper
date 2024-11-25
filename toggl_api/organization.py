@@ -42,8 +42,16 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         *,
         timeout: int = 10,
         re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise)
+        super().__init__(
+            0,
+            auth,
+            cache,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
 
     def get(
         self,

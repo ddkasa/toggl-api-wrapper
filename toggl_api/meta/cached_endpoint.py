@@ -76,12 +76,14 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         *,
         timeout: int = 10,
         re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
         super().__init__(
             workspace_id=workspace_id,
             auth=auth,
             timeout=timeout,
             re_raise=re_raise,
+            retries=retries,
         )
         self.cache = cache
 

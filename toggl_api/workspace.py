@@ -212,6 +212,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         *,
         timeout: int = 10,
         re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
         super().__init__(
             0,
@@ -219,6 +220,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             cache,
             timeout=timeout,
             re_raise=re_raise,
+            retries=retries,
         )
         self.organization_id = organization_id if isinstance(organization_id, int) else organization_id.id
 

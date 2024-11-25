@@ -52,7 +52,7 @@ class TogglEndpoint(ABC, Generic[T]):
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
 
-    __slots__ = ("__client", "re_raise", "workspace_id")
+    __slots__ = ("__client", "re_raise", "retries", "workspace_id")
 
     def __init__(
         self,
@@ -61,6 +61,7 @@ class TogglEndpoint(ABC, Generic[T]):
         *,
         timeout: int = 10,
         re_raise: bool = False,
+        retries: int = 3,
     ) -> None:
         if workspace_id:
             warnings.warn(
@@ -71,6 +72,8 @@ class TogglEndpoint(ABC, Generic[T]):
 
         self.workspace_id = workspace_id
         self.re_raise = re_raise
+        self.retries = max(0, retries)
+
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
         self.__client = httpx.Client(
@@ -98,7 +101,7 @@ class TogglEndpoint(ABC, Generic[T]):
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
-        retries: int = 3,
+        retries: int | None = None,
     ) -> Any:
         """Main request method which handles putting together the final API
         request.
@@ -117,6 +120,8 @@ class TogglEndpoint(ABC, Generic[T]):
         Returns:
             Any: Response data or None if request does not return any data.
         """
+        if retries is None:
+            retries = self.retries
 
         url = self.endpoint + parameters
         headers = headers or self.HEADERS
