@@ -4,7 +4,7 @@ import logging
 import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Literal, Optional
+from typing import TYPE_CHECKING, Any, Final, Literal, Optional, TypedDict
 
 from httpx import HTTPStatusError, codes
 
@@ -23,6 +23,10 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
+class BulkEditParameter(TypedDict):
+    op: Literal["add", "remove", "replace"]
+    path: str
+    value: Any
 @dataclass
 class TrackerBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests.
