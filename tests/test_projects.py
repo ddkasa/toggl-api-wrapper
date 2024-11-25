@@ -36,6 +36,35 @@ def test_project_body(project_body, get_workspace_id):
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        (TogglProject.Status.ARCHIVED, {"active"}),
+        (TogglProject.Status.UPCOMING, {"start_date"}),
+        (TogglProject.Status.ENDED, {"end_date"}),
+        pytest.param(
+            TogglProject.Status.ACTIVE,
+            {"active", "start_date", "end_date"},
+            marks=pytest.mark.xfail(
+                reason="Active project querying is currently not supported!",
+                raises=NotImplementedError,
+            ),
+        ),
+        pytest.param(
+            TogglProject.Status.DELETED,
+            set(),
+            marks=pytest.mark.xfail(
+                reason="Deleted project querying is currently not supported!",
+                raises=NotImplementedError,
+            ),
+        ),
+    ],
+)
+def test_project_status_query(status, expected):
+    assert all(q.key in expected for q in ProjectEndpoint.status_to_query(status))
+
+
+@pytest.mark.unit
 def test_project_body_collect_params(get_workspace_id):
     body = ProjectBody(
         since=datetime.now(timezone.utc),
