@@ -7,6 +7,91 @@ hide:
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2024-11-25
+
+### 🚀 Features
+
+- *(workspace)* Organization id accepts a model
+- *(utility)* Deprecation helper method
+- *(tags)* Single get endpoint convenience method
+- *(models)* Add start and end date to project model
+- *(utility)* Get_timestamp helper function
+- *(models)* Project status enum
+- *(models)* Project get_status method
+- *(projects)* Status to query helper method
+- *(endpoints)* Implement re_raise parameter
+- *(endpoints)* Implement retries parameter
+- *(trackers)* Bulk edit item typed dict
+- *(trackers)* Edit named tuple data structure
+- *(trackers)* Bulk edit patch endpoint method
+
+### 🐛 Bug Fixes
+
+- *(projects)* Default color for using old gray hex code
+- *(models)* Missing pound sign on project default color
+- *(projects)* Edit & add method return type had none
+
+### 🚜 Refactor
+
+- *(workspace)* Deprecate workspace_id argument correctly
+- *(user)* Add workspace_id param to endpoint + model type
+- *(tracker)* Add workspace_id param to endpoint + model type
+- *(projects)* Add workspace_id param to endpoint + model type
+- *(clients)* Add workspace_id param to endpoint + model type
+- *(tags)* Add workspace_id param to endpoint + model type
+- *(user)* Current endpoint will try refresh if no tracker is running
+- *(clients)* Properly implement collect endpoint cache queries
+- *(cache)* Json serializer formating date objects
+- *(user)* Collect method uses get_timestamp helper
+- *(workspace)* Collect method uses get_timestamp helper
+- *(projects)* Add collect endpoint method body attributes
+- *(projects)* Collect method endpoint format method helper
+- *(projects)* Implement new body attributes into format method
+- *(projects)* Update project collect method to include querying cache
+- *(models)* Prevent unnecessary datetime call
+- *(endpoints)* Change default timeout parameter
+- *(utility)* [**breaking**] Turn requires into a private function
+- *(tracker)* Improve edit endpoint method
+- *(endpoints)* Request method accepts lists as a body
+- *(trackers)* Update body parameters
+
+### 🕸 Deprecations
+
+- *(meta)* Base endpoint workspace_id argument removal
+- *(projects)* Get color argument name
+- *(trackers)* Body start_date parameter
+
+### 📚 Documentation
+
+- *(user)* Update current endpoint docstring
+- *(tags)* Update get method docstring
+- *(models)* Helper method docstrngs
+- *(projects)* Update basic color docstrings
+- *(projects)* Add and update all endpoint + body docstrings
+- *(cache)* Remove docstring newlines
+- *(endpoints)* Improve all endpoint parameter documentation
+- *(trackers)* Add new functionality
+- *(mermaid)* Update package diagrams
+- *(models)* Improve docstring parameters
+- *(models)* Document from_kwargs classmethod
+
+### ⚙️ Miscellaneous Tasks
+
+- *(actions)* Change release & documentation workflow dependency
+- *(ruff)* Ignore PLR0913 code
+- *(ruff)* Ignore C901 code
+- *(merge)* V1.5.0-release
+
+### 🧪 Testing
+
+- *(projects)* Validate new body params
+- *(projects)* Validate status_to_query method
+- *(projects)* Sample data fixture
+- *(projects)* Check collect method endpoint parameters
+- *(user)* Validate re_raise works with current tracker
+- *(trackers)* Validate bulk edit endpoint
+- *(utils)* Improve version testing
+
 ## [1.4.0] - 2024-11-11
 
 ### 🚀 Features
@@ -21,7 +106,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🚜 Refactor
 
-- *(tag)* Edit endpoint method accepts separate name argument
+- *(tag)* Edit endpoint method accepts seperate name argument
 - *(tag)* Validate minimum name length
 - *(endpoint)* Use generics with base endpoint
 - *(cache)* User generic type with cache
