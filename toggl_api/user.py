@@ -34,6 +34,14 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
 
     Params:
         workspace_id: The workspace the Toggl trackers belong to.
+        auth: Authentication for the client.
+        cache: Cache object where trackers are stored.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
     TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED

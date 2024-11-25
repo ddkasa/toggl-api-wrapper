@@ -185,8 +185,10 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         cache: Cache to push the projects to.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
-        re_raise: Whether to raise HTTPStatusError errors and not handle them
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
             internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
 
     Attributes:
         BASIC_COLORS: Default colors that are available for non-premium users.
@@ -231,7 +233,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
         Raises:
             NotImplementedError: Active & Deleted Statuses are currently not
-                supported for localy querying.
+                supported for local querying.
 
         Returns:
             list[TogglQuery]: A list of query parameters for the desired status.

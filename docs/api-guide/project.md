@@ -14,3 +14,4 @@
             - add
             - get_color
             - get_color_id
+            - status_to_query

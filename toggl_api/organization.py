@@ -23,6 +23,16 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     """Endpoint to do with handling organization specific details.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
+
+    Params:
+        auth: Authentication for the client.
+        cache: Cache object where trackers are stored.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
     def __init__(

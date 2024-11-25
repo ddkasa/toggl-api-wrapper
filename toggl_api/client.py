@@ -65,6 +65,14 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
     Params:
         workspace_id: The workspace the clients belong to.
+        auth: Authentication for the client.
+        cache: Cache object where the clients will stored and handled.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
     def __init__(

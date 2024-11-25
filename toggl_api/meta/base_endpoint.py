@@ -32,7 +32,22 @@ T = TypeVar("T", bound=TogglClass)
 
 
 class TogglEndpoint(ABC, Generic[T]):
-    """Base class with basic functionality for all API requests."""
+    """Base class with basic functionality for all API requests.
+
+    Attributes:
+        BASE_ENDPOINT: Base URL of the Toggl API.
+        HEADERS: Default headers that the API requires for most endpoints.
+
+    Params:
+        workspace_id: DEPRECATED and moved to child classes.
+        auth: Authentication for the client.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
+    """
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
@@ -112,7 +127,6 @@ class TogglEndpoint(ABC, Generic[T]):
             response = self.method(method)(url, headers=headers)
 
         if codes.is_error(response.status_code):
-            # TODO: Toggl API return code lookup.
             msg = "Request failed with status code %s: %s"
             log.error(msg, response.status_code, response.text)
 

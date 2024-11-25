@@ -191,9 +191,16 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)
 
-    Args:
+    Params:
         organization_id: Workspace endpoint takes an organization id instead of
             a workspace id.
+        auth: Authentication for the client.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
     """
 
     @_re_kwarg({"workspace_id": "organization_id"})

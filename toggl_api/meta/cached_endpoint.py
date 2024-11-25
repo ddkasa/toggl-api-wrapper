@@ -43,8 +43,15 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     See parent endpoint for more details.
 
     Params:
+        auth: Authentication for the client.
         cache: Cache object for caching toggl API data to disk. Builtin cache
             types are JSONCache and SqliteCache.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise all HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
 
     Attributes:
         cache: Cache object the endpoint will use for storing models. Assigns
