@@ -97,7 +97,7 @@ class TogglEndpoint(ABC, Generic[T]):
         self,
         parameters: str,
         headers: Optional[dict] = None,
-        body: Optional[dict] = None,
+        body: Optional[dict | list] = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
@@ -111,7 +111,7 @@ class TogglEndpoint(ABC, Generic[T]):
                 Will concate with the endpoint property.
             headers (dict, optional): Custom request headers. Defaults to
                 class property if set to None.
-            body (dict, optional): Request body JSON data for specifying info.
+            body (dict | list, optional): Request body JSON data for specifying info.
                 Defaults to None. Only used with none-GET or DELETE requests.
             method (RequestMethod): Request method to select. Defaults to GET.
             raw (bool): Whether to use the raw data. Defaults to False.

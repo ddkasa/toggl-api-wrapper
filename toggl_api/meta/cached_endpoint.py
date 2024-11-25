@@ -91,7 +91,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         self,
         parameters: str,
         headers: Optional[dict] = None,
-        body: Optional[dict] = None,
+        body: Optional[dict | list] = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
