@@ -44,8 +44,8 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         auth: BasicAuth,
         cache: TogglCache[TogglTracker],
         *,
-        timeout: int = 20,
         **kwargs: Any,
+        timeout: int = 10,
     ) -> None:
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id

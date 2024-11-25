@@ -44,7 +44,7 @@ class TogglEndpoint(ABC, Generic[T]):
         workspace_id: int | None,
         auth: httpx.BasicAuth,
         *,
-        timeout: int = 20,
+        timeout: int = 10,
         **kwargs: Any,
     ) -> None:
         if workspace_id:

@@ -67,8 +67,8 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         auth: httpx.BasicAuth,
         cache: TogglCache[T],
         *,
-        timeout: int = 20,
         **kwargs: Any,
+        timeout: int = 10,
     ) -> None:
         super().__init__(
             workspace_id=workspace_id,

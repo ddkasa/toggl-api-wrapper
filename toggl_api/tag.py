@@ -45,7 +45,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         auth: BasicAuth,
         cache: TogglCache[TogglTag],
         *,
-        timeout: int = 20,
+        timeout: int = 10,
         **kwargs: Any,
     ) -> None:
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)

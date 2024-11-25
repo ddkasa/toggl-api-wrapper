@@ -25,7 +25,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
     """
 
-    def __init__(self, auth: BasicAuth, cache: TogglCache, *, timeout: int = 20, **kwargs) -> None:
+    def __init__(self, auth: BasicAuth, cache: TogglCache, *, timeout: int = 10, **kwargs) -> None:
         super().__init__(0, auth, cache, timeout=timeout, **kwargs)
 
     def get(

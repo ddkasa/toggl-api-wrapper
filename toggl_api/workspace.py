@@ -203,7 +203,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         auth: BasicAuth,
         cache: TogglCache,
         *,
-        timeout: int = 20,
+        timeout: int = 10,
         **kwargs,
     ) -> None:
         super().__init__(
