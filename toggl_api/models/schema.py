@@ -12,7 +12,7 @@ with contextlib.suppress(ImportError):
     from sqlalchemy.sql import func
 
 
-from toggl_api.utility import requires
+from toggl_api.utility import _requires
 
 from .models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
 
-@requires("sqlalchemy")
+@_requires("sqlalchemy")
 def register_tables(engine: Engine) -> MetaData:
     metadata = db.MetaData()
 
@@ -128,7 +128,7 @@ def register_tables(engine: Engine) -> MetaData:
     return metadata
 
 
-@requires("sqlalchemy")
+@_requires("sqlalchemy")
 def _map_imperatively(
     cls: type,
     table: Table,

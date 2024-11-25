@@ -14,7 +14,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def requires(module: str) -> Callable[[Callable[P, R]], Callable[P, R]]:
+def _requires(module: str) -> Callable[[Callable[P, R]], Callable[P, R]]:
     def requires_dec(fn: Callable[P, R]) -> Callable[P, R]:
         @functools.wraps(fn)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:

@@ -5,7 +5,7 @@ import pytest
 import tomli
 
 from toggl_api import __version__
-from toggl_api.utility import format_iso, get_workspace, parse_iso, requires
+from toggl_api.utility import _requires, format_iso, get_workspace, parse_iso  # noqa: PLC2701
 
 
 @pytest.mark.unit
@@ -71,7 +71,7 @@ def test_get_workspace(data, result):
     ],
 )
 def test_requires_decorator(module, monkeypatch):
-    @requires(module)
+    @_requires(module)
     def test(a):
         return a
 
