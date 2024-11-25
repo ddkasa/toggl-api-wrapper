@@ -154,8 +154,6 @@ class JSONCache(TogglCache, Generic[T]):
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
-
-
         session(JSONSession): Store the current json data in memory while
             handling the cache.
 
