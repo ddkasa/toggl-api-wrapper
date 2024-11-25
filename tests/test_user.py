@@ -74,6 +74,14 @@ def test_current_tracker_not_running(status_code, user_object, httpx_mock):
     assert user_object.current(refresh=True) is None
 
 
+@pytest.mark.unit
+def test_current_tracker_re_raise(user_object, httpx_mock, monkeypatch):
+    httpx_mock.add_response(status_code=405)
+    monkeypatch.setattr(user_object, "re_raise", True)
+    with pytest.raises(httpx.HTTPStatusError):
+        assert user_object.current(refresh=True) is None
+
+
 @pytest.mark.integration
 def test_tracker_get(user_object, add_tracker):
     t = user_object.get(add_tracker.id)
