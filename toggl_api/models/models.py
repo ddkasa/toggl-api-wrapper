@@ -126,7 +126,12 @@ class TogglWorkspace(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs: Any) -> TogglWorkspace:
         """Converts an arbitrary amount of kwargs to a workspace."""
-        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+        return cls(
+            id=kwargs["id"],
+            name=kwargs["name"],
+            timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
+            organization=kwargs.get("organization", 0),
+        )
 
     @staticmethod
     def validate_name(name: str, *, max_len: int = 140) -> None:
