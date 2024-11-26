@@ -256,8 +256,11 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             body: Updated content to add.
             meta: Should the response contain data for meta entities.
 
+        Raises:
+            HTTPStatusError: For anything thats not a *ok* status code.
+
         Returns:
-            TogglTracker | None: A new model if successful else None.
+            A new model if successful else None.
         """
         if (body.tag_ids or body.tags) and not body.tag_action:
             body.tag_action = "add"
@@ -305,20 +308,17 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         Examples:
             >>> body = TrackerBody(description="All these trackers belong to me!")
             >>> tracker_endpoint.bulk_edit(1235151, 214124, body)
-            [
-            TogglTracker(1235151, "All these trackers belong to me!"),
-            TogglTracker(214124, "All these trackers belong to me!"),
-            ]
+            Edits(successes=[1235151, 214124], failures=[])
 
         Args:
             trackers: All trackers that need to be edited.
             body: The parameters that need to be edited.
 
         Raises:
-            HTTPStatusError: For anything thats not a *ok* status_code.
+            HTTPStatusError: For anything thats not a *ok* status code.
 
         Returns:
-            Edited: Successeful or failed ids editing the trackers.
+            Successeful or failed ids editing the trackers.
         """
         tracker_ids = [t if isinstance(t, int) else t.id for t in trackers]
         requests = math.ceil(len(tracker_ids) / 100)
@@ -352,7 +352,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             HTTPStatusError: If anything thats not a '404' or 'ok' code is returned.
 
         Returns:
-            None: If the tracker was deleted or not found at all.
+            If the tracker was deleted or not found at all.
         """
         tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
@@ -392,8 +392,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             HTTPStatusError: For anything thats not 'ok' or a '409' status code.
 
         Returns:
-            TogglTracker | None: If the tracker was stopped or if the tracker
-                wasn't running it will return None.
+           If the tracker was stopped or if the tracker wasn't running it will return None.
         """
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
@@ -409,7 +408,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             log.warning("Tracker with id %s was already stopped!", tracker)
         return None
 
-    def add(self, body: TrackerBody) -> TogglTracker | None:
+    def add(self, body: TrackerBody) -> TogglTracker:
         """Add a new tracker.
 
         This endpoint always hit the external API in order to keep trackers consistent.
@@ -427,10 +426,11 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 to -1 for a running tracker.
 
         Raises:
+            HTTPStatusError: For anything that wasn't an *ok* status code.
             NamingError: Description must be set in order to create a new tracker.
 
         Returns:
-            TogglTracker | None: The tracker that was created.
+            The tracker that was created.
         """
         if not isinstance(body.description, str):
             warnings.warn(

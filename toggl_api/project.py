@@ -244,7 +244,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 supported for local querying.
 
         Returns:
-            list[TogglQuery]: A list of query parameters for the desired status.
+            A list of query parameters for the desired status.
         """
         if status == TogglProject.Status.ARCHIVED:
             return [TogglQuery("active", value=False)]
@@ -305,8 +305,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 refresh argument.
 
         Returns:
-            list[TogglProject]: A list of projects or an empty list if None are
-                found.
+            A list of projects or an empty list if None are found.
         """
 
         if not refresh:
@@ -347,7 +346,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             HTTPStatusError: If any status code that is not '200' or a '404' is returned.
 
         Returns:
-            TogglProject | None: A project or None if nothing was found.
+            A project model or None if nothing was found.
         """
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
@@ -430,7 +429,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             HTTPStatusError: For anything that's not a 'ok' status code.
 
         Returns:
-            TogglProject: The project model with the provided modifications.
+            The project model with the provided modifications.
         """
         if isinstance(project, TogglProject):
             project = project.id
@@ -461,7 +460,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             HTTPStatusError: For anything that's not a 'ok' status code.
 
         Returns:
-            TogglProject: The newly created project.
+            The newly created project.
         """
         if body.name is None:
             msg = "Name must be set in order to create a project!"
@@ -491,7 +490,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             IndexError: If the color name is not a standard color.
 
         Returns:
-            int: Index of the provided color cname.
+            Index of the provided color name.
         """
         colors = list(cls.BASIC_COLORS.values())
         return colors.index(color)

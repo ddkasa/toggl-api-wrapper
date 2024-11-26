@@ -353,7 +353,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             end_date: The date to gather project summary data to.
 
         Returns:
-            list: A list of dictionary with the summary data.
+            A list of dictionary with the summary data.
         """
 
         return self.request(
@@ -379,7 +379,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             end_date: The date to gather project summaries data to.
 
         Returns:
-            list: A list of dictionary with the summary data.
+            A list of dictionary with the summary data.
         """
 
         return self.request(
@@ -400,7 +400,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             body: Body parameters to filter time entries by.
 
         Returns:
-            list: A list of dictionaries with the filtered tracker data.
+            A list of dictionaries with the filtered tracker data.
         """
         return self.request(
             "summary/time_entries",
@@ -422,7 +422,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             body: Body parameters to filter time entries by.
 
         Returns:
-            list: A list of dictionaries with the filtered tracker data.
+            A list of dictionaries with the filtered tracker data.
         """
         warnings.warn(
             "Deprecated: Use 'search_time_entries' instead.",
@@ -451,7 +451,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             ValueError: If extension is not pdf or csv.
 
         Returns:
-            object: A format ready to be saved as a file or used for further processing.
+            A format ready to be saved as a file or used for further processing.
         """
         _validate_extension(extension)
 
@@ -488,7 +488,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             ValueError: If extension is not pdf or csv.
 
         Returns:
-            object: A format ready to be saved as a file or used for further processing.
+            A format ready to be saved as a file or used for further processing.
         """
         warnings.warn(
             "Deprecated: Use 'export_report' instead.",
@@ -545,7 +545,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             hide_amounts: Whether amounts should be hidden.
 
         Returns:
-            PaginatedResult: data with pagination information if required.
+            Data with pagination information if required.
         """
 
         pagination = pagination or PaginationOptions()
@@ -586,9 +586,10 @@ class DetailedReportEndpoint(ReportEndpoint):
 
         Raises:
             ValueError: If extension is not pdf or csv.
+            HTTPStatusError: If the request is not a success.
 
         Returns:
-            bytes: Report ready to be saved or further processed in python.
+            Report ready to be saved or further processed in python.
         """
         _validate_extension(extension)
 
@@ -625,7 +626,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             with_graph: Whether Graph information should be loaded.
 
         Returns:
-            dict: With the totals relevant to the provided filters.
+            With the totals relevant to the provided filters.
         """
         return self.request(
             "/totals",
@@ -658,7 +659,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             body: JSON body for filtering time entries.
 
         Returns:
-            list: A List of time entries filted by the formatted body.
+            A List of time entries filted by the formatted body.
         """
         return self.request(
             "",
@@ -682,7 +683,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             ValueError: If extension is not pdf or csv.
 
         Returns:
-            bytes: Report ready to be saved or further processed in python.
+            Report ready to be saved or further processed in python.
         """
         _validate_extension(extension)
         return self.request(

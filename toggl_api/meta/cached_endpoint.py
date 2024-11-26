@@ -108,9 +108,12 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             refresh: Whether to refresh the cache or not. Defaults to False.
             raw (bool): Whether to use the raw data. Defaults to False.
 
+        Raises:
+            HTTPStatusError: If the request is not a success.
+
         Returns:
-            TogglClass | Iterable[TogglClass] | None: Toggl API response data
-                processed into TogglClass objects.
+            Toggl API response data processed into TogglClass objects or not
+                depending on arguments.
         """
 
         data = self.load_cache() if self.model is not None else None
@@ -166,7 +169,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             distinct: A boolean that remove duplicate values if present.
 
         Returns:
-            Iterable: An iterable object depending on the cache used.
+            A list objects depending on the endpoint.
         """
         return list(self.cache.query(*query, distinct=distinct))
 

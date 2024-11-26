@@ -187,9 +187,13 @@ class WorkspaceStatistics(TypedDict):
 
 
 class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
-    """Specific endpoints for retrieving workspaces.
+    """Specific endpoints for retrieving and modifying workspaces.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/workspaces)
+
+    Examples:
+        >>> org_id = 123213324
+        >>> workspace_endpoint = WorkspaceEndpoint(org_id, BasicAuth(...), SqliteCache(...))
 
     Params:
         organization_id: Workspace endpoint takes an organization id instead of
@@ -235,7 +239,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-single-workspace)
 
         Args:
-            workspace: Workspace id or to get. Optional is DEPRECATED argument
+            workspace: Workspace id or to get. Optional is DEPRECATED.
                 type and will become required in the future.
             refresh: Whether to use cache or not.
 
@@ -243,8 +247,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             HTTPStatusError: If anything that's not a '2xx' or '404' status_code is returned.
 
         Returns:
-            TogglWorkspace | None: Model of workspace if found else none.
-
+            Model of workspace if found else none.
         """
 
         if workspace is None:
@@ -281,7 +284,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             body: All settings for the workspace to be attached to as a body.
 
         Returns:
-            TogglWorkspace: A newly created workspace with the supplied params.
+            A newly created workspace with the supplied params.
         """
         return self.request(
             f"organizations/{self.organization_id}/workspaces",
@@ -322,8 +325,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             DateTimeError: If the since argument is after the current time.
 
         Returns:
-            list: A list of workspaces or empty if there are None assocciated
-                with the user.
+            A list of workspaces or empty if there are None assocciated with the user.
         """
 
         if since is not None:
@@ -340,6 +342,12 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         """Update a specific workspace.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#put-update-workspace)
+
+        Raises:
+            HTTPStatusError: For anything thats not an *ok* status code.
+
+        Returns:
+            A workspace model with the supplied edits.
         """
         if isinstance(workspace_id, TogglWorkspace):
             workspace_id = workspace_id.id
@@ -372,7 +380,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id: Id of the workspace to retrieve constraints from.
 
         Returns:
-            dict: A dictionary of booleans containing the settings.
+            A dictionary of booleans containing the settings.
         """
 
         if isinstance(workspace_id, TogglWorkspace):
@@ -393,7 +401,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id: Id of the workspace to fetch the statistics from.
 
         Returns:
-            dict: A dictionary containing relevant statistics.
+            A dictionary containing relevant statistics.
                 Refer to WorkspaceStatistics typed dict for reference.
         """
 

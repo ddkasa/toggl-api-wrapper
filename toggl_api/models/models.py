@@ -23,7 +23,7 @@ class TogglClass(ABC):
     """Base class for all Toggl dataclasses.
 
     Params:
-        id: Toggl API / Database ID (Primary Key) of the Toggl project.
+        id: Toggl API / Database ID (Primary Key) of the Toggl model.
         name: Name or description of the Toggl project.
         timestamp: Local timestamp of when the Toggl project was last modified.
     """
@@ -71,7 +71,7 @@ class TogglOrganization(TogglClass):
 
     Params:
         id: Toggl API / Database ID (Primary Key) of the Toggl organization.
-        name: Name or description of the Toggl organization.
+        name: Name of the Toggl organization. Max 140 characters and min 1 character.
         timestamp: Local timestamp of when the Toggl organization was last modified.
     """
 
@@ -102,8 +102,8 @@ class TogglWorkspace(TogglClass):
     """Data structure for Toggl workspaces.
 
     Params:
-        id: Toggl API / Database ID (Primary Key) of the Toggl object.
-        name: Name or description of the Toggl workspace.
+        id: Toggl API / Database ID (Primary Key) of the Toggl workspace.
+        name: Name of the workspace.
         timestamp: Local timestamp of when the Toggl workspace was last modified.
         organization: Organization id the workspace belongs to.
     """
@@ -148,9 +148,9 @@ class WorkspaceChild(TogglClass):
 
     Params:
         id: Toggl API / Database ID (Primary Key) of the Toggl object.
-        name: Name or description of the Toggl object.
+        name: Name of the object.
         timestamp: Local timestamp of when the Toggl object was last modified.
-        workspace: The workspace id the toggl object belongs to.
+        workspace: The workspace id the Toggl object belongs to.
     """
 
     __tablename__ = "workspace_child"
@@ -177,7 +177,7 @@ class TogglClient(WorkspaceChild):
 
     Params:
         id: Toggl API / Database ID (Primary Key) of the Toggl client.
-        name: Name or description of the Toggl client.
+        name: Name of the client.
         timestamp: Local timestamp of when the Toggl client was last modified.
         workspace: The workspace id the Toggl client belongs to.
     """
@@ -198,11 +198,11 @@ class TogglProject(WorkspaceChild):
     """Data structure for Toggl projects.
 
     Attributes:
-        STATUS: An enumeration with all project statuses supported by the API.
+        Status: An enumeration with all project statuses supported by the API.
 
     Params:
         id: Toggl API / Database ID (Primary Key) of the Toggl project.
-        name: Name or description of the Toggl project.
+        name: Name of the project.
         timestamp: Local timestamp of when the Toggl project was last modified.
         workspace: The workspace id the project belongs to.
         color: Color of the project. Defaults to blue. Refer to this endpoint
@@ -369,7 +369,7 @@ class TogglTag(WorkspaceChild):
 
     Params:
         id: Toggl API / Database ID (Primary Key) of the Toggl tag.
-            name:Name or description of the Toggl tag.
+        name: Name of the tag.
         timestamp: Local timestamp of when the Toggl tag was last modified.
         workspace: The workspace id the tag belongs to.
     """
