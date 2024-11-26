@@ -132,9 +132,9 @@ class SqliteCache(TogglCache[T]):
         return search.filter_by(**query).first()
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Query[T]:
-        """Query method for filtering Toggl objects from cache.
+        """Query method for filtering models from cache.
 
-        Filters cached toggl objects by set of supplied queries.
+        Filters cached model by set of supplied queries.
 
         Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
         enumeration.
@@ -144,7 +144,7 @@ class SqliteCache(TogglCache[T]):
             distinct: Whether to keep equivalent values around.
 
         Returns:
-            Query[TogglClass]: A SQLAlchemy query object with parameters filtered.
+            A SQLAlchemy query object with parameters filtered.
         """
 
         search = self.session.query(self.parent.model)
