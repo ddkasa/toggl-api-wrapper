@@ -117,8 +117,11 @@ class TogglEndpoint(ABC, Generic[T]):
             raw (bool): Whether to use the raw data. Defaults to False.
             retries (int): For recursive calls if the server fails multiple times.
 
+        Raises:
+            HTTPStatusError: If the request is not a success.
+
         Returns:
-            Any: Response data or None if request does not return any data.
+            Response data or None if request does not return any data.
         """
         if retries is None:
             retries = self.retries

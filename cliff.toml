@@ -8,6 +8,11 @@
 [changelog]
 # template for the changelog header
 header = """
+---
+hide:
+  - navigation
+---
+
 # Changelog\n
 All notable changes to this project will be documented in this file.\n
 """

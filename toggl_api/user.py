@@ -90,13 +90,12 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 not a '405' status code.
 
         Returns:
-            TogglTracker | None: A model from cache or the API. None if nothing
-                is running.
+            A model from cache or the API. None if nothing is running.
         """
 
         if not refresh:
             query = list(self.cache.query(TogglQuery("stop", None)))
-            return query[0] if query else None  # type: ignore[return-value]
+            return query[0] if query else None
 
         try:
             response = self.request("/time_entries/current", refresh=refresh)
@@ -179,10 +178,11 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
 
         Raises:
             DateTimeError: If the dates are not in the correct ranges.
+            HTTPStatusError: If the request is not a successful status code.
 
         Returns:
-            list[TogglTracker]: List of TogglTracker objects that are within
-                specified parameters. Empty if none is matched.
+           List of TogglTracker objects that are within specified parameters.
+                Empty if none is matched.
         """
 
         if start_date and end_date:
@@ -226,14 +226,18 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             tracker_id: ID of the tracker to get.
             refresh: Whether to refresh the cache or not.
 
+        Raises:
+            HTTPStatusError: If anything thats not a *ok* or *404* status code
+                is returned.
+
         Returns:
-            TogglTracker | None: TogglTracker object or None if not found.
+            TogglTracker object or None if not found.
         """
         if isinstance(tracker_id, TogglTracker):
             tracker_id = tracker_id.id
 
         if not refresh:
-            return self.cache.find_entry({"id": tracker_id})  # type: ignore[return-value]
+            return self.cache.find_entry({"id": tracker_id})
 
         try:
             response = self.request(
@@ -294,8 +298,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             HTTPStatusError: If anything that is an error that is not a FORBIDDEN code.
 
         Returns:
-            bool: True if successfully verified authentication else False.
-
+            True if successfully verified authentication else False.
         """
         try:
             httpx.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()
@@ -313,6 +316,12 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         """Returns details for the current user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-me)
+
+        Raises:
+            HTTPStatusError: If the request is not a successful status code.
+
+        Returns:
+            User details in a raw dictionary.
         """
         return TogglEndpoint.request(self, "", raw=True).json()
 

@@ -24,6 +24,9 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
     [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
 
+    Examples:
+        >>> org_endpoint = OrganizationEndpoint(BasicAuth(...), SqliteCache(...))
+
     Params:
         auth: Authentication for the client.
         cache: Cache object where trackers are stored.
@@ -72,8 +75,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             HTTPStatusError: If any error except a '404' was received.
 
         Returns:
-            TogglOrganization | None: Organization object that was retrieve or
-                None if not found.
+            Organization object that was retrieve or None if not found.
         """
 
         if isinstance(organization, TogglOrganization):
@@ -110,9 +112,10 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         Raises:
             NamingError: If any of the names are invalid or the wrong length.
+            HTTPStatusError: If the request is not a success.
 
         Returns:
-            TogglOrganization: The newly created organization.
+            The newly created organization.
         """
 
         TogglOrganization.validate_name(name)
@@ -136,9 +139,10 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         Raises:
             NamingError: If the new name is invalid.
+            HTTPStatusError: If the request is not a success.
 
         Returns:
-            TogglOrganization: The newly edited organization.
+            The newly edited organization.
         """
 
         TogglOrganization.validate_name(name)
@@ -167,8 +171,11 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Args:
             refresh: Whether to use cache or not.
 
+        Raises:
+            HTTPStatusError: If the request is not a success.
+
         Returns:
-            list: A list of organization objects or empty if none found.
+            A list of organization objects or empty if none found.
         """
         return self.request("me/organizations", refresh=refresh)
 

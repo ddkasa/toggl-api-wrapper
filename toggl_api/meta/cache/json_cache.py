@@ -240,7 +240,7 @@ class JSONCache(TogglCache, Generic[T]):
             self.delete_entry(entry)
         return None
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> list[TogglClass]:
+    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
         """Query method for filtering Toggl objects from cache.
 
         Filters cached Toggl objects by set of supplied queries.
@@ -254,7 +254,7 @@ class JSONCache(TogglCache, Generic[T]):
                 with unhashable fields such as lists.
 
         Returns:
-            list[TogglClass]: A query object with parameters filtered.
+            A list of models with the query parameters that matched.
         """
 
         log.debug("Querying cache with %s parameters.", len(query), extra={"query": query})

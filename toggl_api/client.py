@@ -63,6 +63,12 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
     [Official Documentation](https://engineering.toggl.com/docs/api/clients)
 
+    Examples:
+        >>> wid = 123213324
+        >>> client_endpoint = ClientEndpoint(wid, BasicAuth(...), SqliteCache(...))
+        >>> client_endpoint.get(214125562)
+        TogglClient(214125562, "Simplicidentata", workspace=123213324)
+
     Params:
         workspace_id: The workspace the clients belong to.
         auth: Authentication for the client.
@@ -109,7 +115,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             NamingError: If no name was set as its required.
 
         Returns:
-            TogglClient: Newly created client with specified parameters.
+            Newly created client with specified parameters.
         """
 
         if body.name is None:
@@ -134,7 +140,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 is not found in cache. Defaults to False.
 
         Returns:
-            TogglClient | None: If the client was found.
+            A TogglClient if the client was found else None.
         """
         if isinstance(client_id, TogglClient):
             client_id = client_id.id
@@ -167,7 +173,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             body: New parameters to use. Ignore client status.
 
         Returns:
-            TogglClient | None: Newly edited client or None if not found.
+            Newly edited client or None if not found.
         """
         if body.status:
             log.warning("Client status not supported by edit endpoint")
@@ -188,6 +194,10 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         This endpoint always hit the external API in order to keep clients consistent.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)
+
+        Raises:
+            HTTPStatusError: If anything thats not an *ok* or *404* status code
+                is returned.
         """
         client_id = client if isinstance(client, int) else client.id
         try:
@@ -228,12 +238,11 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)
 
         Args:
-            body: Status and name to target. Ignores notes. Ignores status if
-                using cache.
+            body: Status and name to target. Ignores notes. Ignores status if using cache.
             refresh: Whether to refresh cache.
 
         Returns:
-            list[TogglClient]: A list of clients. Empty if not found.
+            A list of clients. Empty if not found.
         """
         if not refresh:
             return self._collect_cache(body)

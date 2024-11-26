@@ -82,7 +82,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             refresh: Whether to collect all tags from the API first.
 
         Returns:
-            TogglTag | None: A tag model if it was found otherwise None.
+            A tag model if it was found otherwise None.
         """
         if self.cache is None:
             return None
@@ -108,6 +108,12 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         """Gather all tags.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/tags#get-tags)
+
+        Raises:
+            HTTPStatusError: If any issue happens with the Toggl API.
+
+        Returns:
+            A list of tags collected from the API or local cache.
         """
         return self.request("", refresh=refresh)
 
@@ -123,10 +129,11 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         Raises:
             NamingError: IF the tag name is empty.
-            HTTPStatusError: If a tag with the same name exists.
+            HTTPStatusError: If a tag with the same name exists or any other
+                none *ok* status code is returned.
 
         Returns:
-            TogglTag: The newly created tag.
+            The newly created tag.
         """
 
         if not name:
@@ -166,7 +173,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             HTTPStatusError: If any issue happens with the Toggl API.
 
         Returns:
-            TogglTag: The edited tag.
+            The edited tag.
         """
 
         if isinstance(tag, TogglTag) and name is None:

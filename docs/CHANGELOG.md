@@ -1,11 +1,22 @@
 ---
 hide:
-  - navigation
+- navigation
 ---
 
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [1.5.1] - 2024-11-26
+
+### 🐛 Bug Fixes
+
+- *(models)* From_kwargs not incorporating organization id
+
+### 📚 Documentation
+
+- *(endpoints)* Correct and improve docstrings
+- *(cache, config)* Remove unnecessary type on return value in docstrings
 
 ## [1.5.0] - 2024-11-25
 

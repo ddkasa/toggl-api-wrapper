@@ -29,7 +29,7 @@ def generate_authentication() -> BasicAuth:
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
-        BasicAuth: BasicAuth object that is used with httpx client.
+        BasicAuth object that is used with Httpx client.
     """
     api_token = os.getenv("TOGGL_API_TOKEN")
     if api_token is None:
@@ -83,7 +83,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
-        BasicAuth: BasicAuth object that is used with httpx client.
+        BasicAuth object that is used with httpx client.
     """
     try:
         config = _get_togglrc(config_path)
@@ -138,7 +138,7 @@ def retrieve_workspace_id(default: Optional[int] = None) -> int:
             variable or the workspace set is not an integer.
 
     Returns:
-        int: The id of the workspace.
+        The id of the workspace.
     """
 
     workspace = os.environ.get("TOGGL_WORKSPACE_ID", default)
@@ -165,7 +165,7 @@ def retrieve_togglrc_workspace_id(config_path: Optional[Path] = None) -> int:
         ValueError: If the workspace value is not an integer.
 
     Returns:
-        int: The id of the workspace.
+        The id of the workspace.
     """
 
     config = _get_togglrc(config_path)
