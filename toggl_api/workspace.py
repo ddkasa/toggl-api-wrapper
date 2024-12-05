@@ -261,7 +261,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace = workspace.id
 
         if not refresh:
-            return self.cache.find_entry({"id": workspace})  # type: ignore[return-value]
+            return self.cache.find_entry({"id": workspace})
 
         try:
             response = self.request(f"workspaces/{workspace}", refresh=refresh)

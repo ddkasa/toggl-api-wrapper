@@ -146,7 +146,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             client_id = client_id.id
 
         if not refresh:
-            return self.cache.find_entry({"id": client_id})  # type: ignore[return-value]
+            return self.cache.find_entry({"id": client_id})
 
         try:
             response = self.request(
