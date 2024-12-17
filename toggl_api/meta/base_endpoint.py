@@ -138,6 +138,22 @@ class TogglEndpoint(ABC, Generic[T]):
 
         return response.raise_for_status()
 
+    def _process_response(self, response: Response, *, raw: bool) -> T | list[T] | Response | None:
+        try:
+            data = response if raw else response.json()
+        except ValueError:
+            return None
+
+        if self.MODEL is None or raw:
+            return data
+
+        if isinstance(data, list):
+            data = self.process_models(data)
+        elif isinstance(data, dict):
+            data = self.MODEL.from_kwargs(**data)
+
+        return data  # type: ignore[return-value]
+
     def _build_request(
         self,
         parameters: str,
