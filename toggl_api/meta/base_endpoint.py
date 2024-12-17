@@ -101,6 +101,43 @@ class TogglEndpoint(ABC, Generic[T]):
         }
         return match_dict.get(method, self.client.get)
 
+    def _request_handle_error(
+        self,
+        response: Response,
+        body: dict | list | None,
+        headers: dict | None,
+        method: RequestMethod,
+        parameters: str,
+        *,
+        raw: bool,
+        retries: int,
+    ) -> T | list[T] | Response | None:
+        msg = "Request failed with status code %s: %s"
+        log.error(msg, response.status_code, response.text)
+
+        if not self.re_raise and codes.is_server_error(response.status_code) and retries:
+            delay = random.randint(1, 5)
+            retries -= 1
+            log.error(
+                ("Status code %s is a server error. Retrying request in %s seconds. There are %s retries left."),
+                response.status_code,
+                delay,
+                retries,
+            )
+            # NOTE: According to https://engineering.toggl.com/docs/#generic-responses
+            time.sleep(delay)
+            return TogglEndpoint.request(
+                self,
+                parameters,
+                headers,
+                body,
+                method,
+                raw=raw,
+                retries=retries,
+            )
+
+        return response.raise_for_status()
+
     def _build_request(
         self,
         parameters: str,
