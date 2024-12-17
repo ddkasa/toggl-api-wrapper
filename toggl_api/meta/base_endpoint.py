@@ -37,6 +37,7 @@ class TogglEndpoint(ABC, Generic[T]):
     Attributes:
         BASE_ENDPOINT: Base URL of the Toggl API.
         HEADERS: Default headers that the API requires for most endpoints.
+        client: Httpx client that is used for making requests to the API.
 
     Params:
         workspace_id: DEPRECATED and moved to child classes.
@@ -53,7 +54,7 @@ class TogglEndpoint(ABC, Generic[T]):
     HEADERS: Final[dict] = {"content-type": "application/json"}
     MODEL: type[T] | None = None
 
-    __slots__ = ("__client", "re_raise", "retries", "workspace_id")
+    __slots__ = ("client", "re_raise", "retries", "workspace_id")
 
     def __init__(
         self,
@@ -77,12 +78,12 @@ class TogglEndpoint(ABC, Generic[T]):
 
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
-        self.__client = httpx.Client(
+        self.client = Client(
             base_url=self.BASE_ENDPOINT,
             timeout=timeout,
             auth=auth,
         )
-        atexit.register(self.__client.close)
+        atexit.register(self.client.close)
 
     def method(self, method: RequestMethod) -> Callable:
         warnings.warn(
@@ -91,13 +92,13 @@ class TogglEndpoint(ABC, Generic[T]):
             stacklevel=2,
         )
         match_dict: dict[RequestMethod, Callable] = {
-            RequestMethod.GET: self.__client.get,
-            RequestMethod.POST: self.__client.post,
-            RequestMethod.PUT: self.__client.put,
-            RequestMethod.DELETE: self.__client.delete,
-            RequestMethod.PATCH: self.__client.patch,
+            RequestMethod.GET: self.client.get,
+            RequestMethod.POST: self.client.post,
+            RequestMethod.PUT: self.client.put,
+            RequestMethod.DELETE: self.client.delete,
+            RequestMethod.PATCH: self.client.patch,
         }
-        return match_dict.get(method, self.__client.get)
+        return match_dict.get(method, self.client.get)
 
     def request(
         self,
