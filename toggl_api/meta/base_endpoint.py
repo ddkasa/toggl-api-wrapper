@@ -186,8 +186,10 @@ class TogglEndpoint(ABC, Generic[T]):
 
         return data
 
-    def process_models(self, data: list[dict[str, Any]]) -> list[T]:
-        return [self.model.from_kwargs(**mdl) for mdl in data]  # type: ignore[misc]
+    @classmethod
+    def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
+        assert cls.MODEL is not None
+        return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
 
     @property
     def model(self) -> type[T] | None:
