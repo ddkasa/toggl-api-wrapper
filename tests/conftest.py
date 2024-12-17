@@ -131,13 +131,11 @@ class ModelTest(TogglClass):
 
 
 class EndPointTest(TogglCachedEndpoint):
+    MODEL = TogglTracker
+
     @property
     def endpoint(self) -> str:
         return ""
-
-    @property
-    def model(self) -> type[TogglTracker]:
-        return TogglTracker
 
 
 @pytest.fixture

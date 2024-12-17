@@ -51,6 +51,7 @@ class TogglEndpoint(ABC, Generic[T]):
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[dict] = {"content-type": "application/json"}
+    MODEL: type[T] | None = None
 
     __slots__ = ("__client", "re_raise", "retries", "workspace_id")
 
@@ -189,12 +190,13 @@ class TogglEndpoint(ABC, Generic[T]):
         return [self.model.from_kwargs(**mdl) for mdl in data]  # type: ignore[misc]
 
     @property
-    @abstractmethod
-    def endpoint(self) -> str: ...
-
-    @property
-    @abstractmethod
-    def model(self) -> type[T]: ...
+    def model(self) -> type[T] | None:
+        warnings.warn(
+            "DEPRECATED: Use 'Endpoint.MODEL' ClassVar instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.MODEL
 
     @staticmethod
     def api_status() -> bool:
