@@ -16,7 +16,7 @@ from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Optional, TypeVar
 
 import httpx
-from httpx import HTTPStatusError, codes
+from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
 
 from toggl_api.models import TogglClass
 
@@ -60,7 +60,7 @@ class TogglEndpoint(ABC, Generic[T]):
     def __init__(
         self,
         workspace_id: int | None,
-        auth: httpx.BasicAuth,
+        auth: BasicAuth,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -100,6 +100,24 @@ class TogglEndpoint(ABC, Generic[T]):
             RequestMethod.PATCH: self.client.patch,
         }
         return match_dict.get(method, self.client.get)
+
+    def _build_request(
+        self,
+        parameters: str,
+        headers: dict | None,
+        body: dict | list | None,
+        method: RequestMethod,
+    ) -> Request:
+        url = self.BASE_ENDPOINT + self.endpoint + parameters
+        headers = headers or self.HEADERS
+
+        requires_body = method not in {RequestMethod.DELETE, RequestMethod.GET}
+        return self.client.build_request(
+            method.name.lower(),
+            url,
+            headers=headers,
+            json=body if requires_body else None,
+        )
 
     def request(
         self,
