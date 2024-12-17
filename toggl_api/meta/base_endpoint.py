@@ -11,7 +11,7 @@ import logging
 import random
 import time
 import warnings
-from abc import ABC, abstractmethod
+from abc import ABC
 from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Optional, TypeVar
 
@@ -51,6 +51,7 @@ class TogglEndpoint(ABC, Generic[T]):
     """
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
+    ENDPOINT: ClassVar[str]
     HEADERS: Final[dict] = {"content-type": "application/json"}
     MODEL: type[T] | None = None
 
@@ -200,6 +201,15 @@ class TogglEndpoint(ABC, Generic[T]):
             stacklevel=2,
         )
         return self.MODEL
+
+    @property
+    def endpoint(self) -> str:
+        warnings.warn(
+            "DEPRECATED: Use 'Endpoint.BASE_ENDPOINT' ClassVar instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.BASE_ENDPOINT
 
     @staticmethod
     def api_status() -> bool:
