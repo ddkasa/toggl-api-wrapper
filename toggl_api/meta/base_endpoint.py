@@ -84,6 +84,11 @@ class TogglEndpoint(ABC, Generic[T]):
         atexit.register(self.__client.close)
 
     def method(self, method: RequestMethod) -> Callable:
+        warnings.warn(
+            "DEPRECATED: Use `httpx.Client.build_request` instead!",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         match_dict: dict[RequestMethod, Callable] = {
             RequestMethod.GET: self.__client.get,
             RequestMethod.POST: self.__client.post,
