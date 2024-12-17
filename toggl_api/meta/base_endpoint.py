@@ -13,7 +13,7 @@ import time
 import warnings
 from abc import ABC
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, TypeVar
 
 import httpx
 from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
@@ -175,13 +175,13 @@ class TogglEndpoint(ABC, Generic[T]):
     def request(
         self,
         parameters: str,
-        headers: Optional[dict] = None,
-        body: Optional[dict | list] = None,
+        headers: dict | None = None,
+        body: dict | list | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
         retries: int | None = None,
-    ) -> Any:
+    ) -> T | list[T] | Response | None:
         """Main request method which handles putting together the final API
         request.
 
@@ -205,59 +205,21 @@ class TogglEndpoint(ABC, Generic[T]):
         if retries is None:
             retries = self.retries
 
-        url = self.endpoint + parameters
-        headers = headers or self.HEADERS
-
-        if body and method not in {RequestMethod.DELETE, RequestMethod.GET}:
-            response = self.method(method)(url, headers=headers, json=body)
-        else:
-            response = self.method(method)(url, headers=headers)
+        request = self._build_request(parameters, headers, body, method)
+        response = self.client.send(request)
 
         if codes.is_error(response.status_code):
-            msg = "Request failed with status code %s: %s"
-            log.error(msg, response.status_code, response.text)
+            return self._request_handle_error(
+                response,
+                body,
+                headers,
+                method,
+                parameters,
+                raw=raw,
+                retries=retries,
+            )
 
-            if not self.re_raise and codes.is_server_error(response.status_code) and retries:
-                delay = random.randint(1, 5)
-                retries -= 1
-                log.error(
-                    (
-                        "Status code %s is a server error. "
-                        "Retrying request in %s seconds. "
-                        "There are %s retries left."
-                    ),
-                    response.status_code,
-                    delay,
-                    retries,
-                )
-                # NOTE: According to https://engineering.toggl.com/docs/#generic-responses
-                time.sleep(delay)
-                return TogglEndpoint.request(
-                    self,
-                    parameters,
-                    headers,
-                    body,
-                    method,
-                    raw=raw,
-                    retries=retries,
-                )
-
-            response.raise_for_status()
-
-        try:
-            data = response if raw else response.json()
-        except ValueError:
-            return None
-
-        if self.model is None:
-            return data
-
-        if isinstance(data, list):
-            data = self.process_models(data)
-        elif isinstance(data, dict):
-            data = self.model.from_kwargs(**data)
-
-        return data
+        return self._process_response(response, raw=raw)
 
     @classmethod
     def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
