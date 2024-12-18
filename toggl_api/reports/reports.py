@@ -3,7 +3,7 @@
 import warnings
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Generic, Literal, Optional, TypeVar
+from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, cast
 
 from httpx import Response
 
@@ -324,11 +324,7 @@ class ReportBody(BaseBody):
 class ReportEndpoint(TogglEndpoint):
     """Abstract baseclass for the reports endpoint that overrides BASE_ENDPOINT."""
 
-    BASE_ENDPOINT = "https://api.track.toggl.com/reports/api/v3/"
-
-    @property
-    def model(self) -> None:  # type: ignore[override]
-        return
+    BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/reports/api/v3/"
 
 
 class SummaryReportEndpoint(ReportEndpoint):
@@ -342,7 +338,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         project: TogglProject | int,
         start_date: date | str,
         end_date: date | str,
-    ) -> list[dict[str, int]]:
+    ) -> dict[str, int]:
         """Returns a specific projects summary within the parameters provided.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-load-project-summary)
@@ -356,13 +352,16 @@ class SummaryReportEndpoint(ReportEndpoint):
             A list of dictionary with the summary data.
         """
 
-        return self.request(
-            f"projects/{project.id if isinstance(project, TogglProject) else project}/summary",
-            method=RequestMethod.POST,
-            body={
-                "start_date": format_iso(start_date),
-                "end_date": format_iso(end_date),
-            },
+        return cast(
+            dict[str, int],
+            self.request(
+                f"projects/{project.id if isinstance(project, TogglProject) else project}/summary",
+                method=RequestMethod.POST,
+                body={
+                    "start_date": format_iso(start_date),
+                    "end_date": format_iso(end_date),
+                },
+            ),
         )
 
     def project_summaries(
@@ -382,13 +381,16 @@ class SummaryReportEndpoint(ReportEndpoint):
             A list of dictionary with the summary data.
         """
 
-        return self.request(
-            "projects/summary",
-            method=RequestMethod.POST,
-            body={
-                "start_date": format_iso(start_date),
-                "end_date": format_iso(end_date),
-            },
+        return cast(
+            list[dict[str, int]],
+            self.request(
+                "projects/summary",
+                method=RequestMethod.POST,
+                body={
+                    "start_date": format_iso(start_date),
+                    "end_date": format_iso(end_date),
+                },
+            ),
         )
 
     def search_time_entries(self, body: ReportBody) -> list[dict[str, int]]:
@@ -402,12 +404,15 @@ class SummaryReportEndpoint(ReportEndpoint):
         Returns:
             A list of dictionaries with the filtered tracker data.
         """
-        return self.request(
-            "summary/time_entries",
-            method=RequestMethod.POST,
-            body=body.format(
-                "summary_time_entries",
-                workspace_id=self.workspace_id,
+        return cast(
+            list[dict[str, int]],
+            self.request(
+                "summary/time_entries",
+                method=RequestMethod.POST,
+                body=body.format(
+                    "summary_time_entries",
+                    workspace_id=self.workspace_id,
+                ),
             ),
         )
 
@@ -455,15 +460,18 @@ class SummaryReportEndpoint(ReportEndpoint):
         """
         _validate_extension(extension)
 
-        return self.request(
-            f"summary/time_entries.{extension}",
-            method=RequestMethod.POST,
-            body=body.format(
-                f"summary_report_{extension}",
-                workspace_id=self.workspace_id,
-                collapse=collapse,
+        return cast(
+            Response,
+            self.request(
+                f"summary/time_entries.{extension}",
+                method=RequestMethod.POST,
+                body=body.format(
+                    f"summary_report_{extension}",
+                    workspace_id=self.workspace_id,
+                    collapse=collapse,
+                ),
+                raw=True,
             ),
-            raw=True,
         ).content
 
     def export_summary(
@@ -499,7 +507,7 @@ class SummaryReportEndpoint(ReportEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/"
+        return f"workspace/{self.workspace_id}/"
 
 
 class DetailedReportEndpoint(ReportEndpoint):
@@ -550,18 +558,21 @@ class DetailedReportEndpoint(ReportEndpoint):
 
         pagination = pagination or PaginationOptions()
 
-        request: Response = self.request(
-            "",
-            body=self._paginate_body(
-                body.format(
-                    "detail_search_time",
-                    workspace_id=self.workspace_id,
-                    hide_amounts=hide_amounts,
+        request: Response = cast(
+            Response,
+            self.request(
+                "",
+                body=self._paginate_body(
+                    body.format(
+                        "detail_search_time",
+                        workspace_id=self.workspace_id,
+                        hide_amounts=hide_amounts,
+                    ),
+                    pagination,
                 ),
-                pagination,
+                method=RequestMethod.POST,
+                raw=True,
             ),
-            method=RequestMethod.POST,
-            raw=True,
         )
 
         return self._paginate(request)
@@ -594,18 +605,21 @@ class DetailedReportEndpoint(ReportEndpoint):
         _validate_extension(extension)
 
         pagination = pagination or PaginationOptions()
-        request = self.request(
-            f".{extension}",
-            body=self._paginate_body(
-                body.format(
-                    f"detail_report_{extension}",
-                    workspace_id=self.workspace_id,
-                    hide_amounts=hide_amounts,
+        request = cast(
+            Response,
+            self.request(
+                f".{extension}",
+                body=self._paginate_body(
+                    body.format(
+                        f"detail_report_{extension}",
+                        workspace_id=self.workspace_id,
+                        hide_amounts=hide_amounts,
+                    ),
+                    pagination,
                 ),
-                pagination,
+                method=RequestMethod.POST,
+                raw=True,
             ),
-            method=RequestMethod.POST,
-            raw=True,
         )
         return self._paginate(request, raw=True)
 
@@ -628,20 +642,23 @@ class DetailedReportEndpoint(ReportEndpoint):
         Returns:
             With the totals relevant to the provided filters.
         """
-        return self.request(
-            "/totals",
-            body=body.format(
-                "detail_totals",
-                workspace_id=self.workspace_id,
-                granularity=granularity,
-                with_graph=with_graph,
+        return cast(
+            dict[str, int],
+            self.request(
+                "/totals",
+                body=body.format(
+                    "detail_totals",
+                    workspace_id=self.workspace_id,
+                    granularity=granularity,
+                    with_graph=with_graph,
+                ),
+                method=RequestMethod.POST,
             ),
-            method=RequestMethod.POST,
         )
 
     @property
     def endpoint(self) -> str:
-        return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/search/time_entries"
+        return f"workspace/{self.workspace_id}/search/time_entries"
 
 
 class WeeklyReportEndpoint(ReportEndpoint):
@@ -661,13 +678,16 @@ class WeeklyReportEndpoint(ReportEndpoint):
         Returns:
             A List of time entries filted by the formatted body.
         """
-        return self.request(
-            "",
-            body=body.format(
-                "weekly_time_entries",
-                workspace_id=self.workspace_id,
+        return cast(
+            list[dict[str, Any]],
+            self.request(
+                "",
+                body=body.format(
+                    "weekly_time_entries",
+                    workspace_id=self.workspace_id,
+                ),
+                method=RequestMethod.POST,
             ),
-            method=RequestMethod.POST,
         )
 
     def export_report(self, body: ReportBody, extension: REPORT_FORMATS) -> bytes:
@@ -686,16 +706,19 @@ class WeeklyReportEndpoint(ReportEndpoint):
             Report ready to be saved or further processed in python.
         """
         _validate_extension(extension)
-        return self.request(
-            f".{extension}",
-            body=body.format(
-                f"weekly_report_{extension}",
-                workspace_id=self.workspace_id,
+        return cast(
+            Response,
+            self.request(
+                f".{extension}",
+                body=body.format(
+                    f"weekly_report_{extension}",
+                    workspace_id=self.workspace_id,
+                ),
+                method=RequestMethod.POST,
+                raw=True,
             ),
-            method=RequestMethod.POST,
-            raw=True,
         ).content
 
     @property
     def endpoint(self) -> str:
-        return self.BASE_ENDPOINT + f"workspace/{self.workspace_id}/weekly/time_entries"
+        return f"workspace/{self.workspace_id}/weekly/time_entries"
