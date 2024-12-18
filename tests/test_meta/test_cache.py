@@ -104,7 +104,7 @@ def test_cache_functionality_json(meta_object, model_data):
     model_data = model_data["tracker"]
     if meta_object.cache.cache_path.exists():
         meta_object.cache.cache_path.unlink()
-    meta_object.cache.save_cache(model_data, RequestMethod.GET)
+    meta_object.cache.save(model_data, RequestMethod.GET)
     assert model_data in meta_object.load_cache()
     meta_object.cache.cache_path.unlink()
 
@@ -153,7 +153,7 @@ def test_max_length(model_data, get_json_cache, tracker_object):
 
     get_json_cache.commit()
 
-    assert len(get_json_cache.load_cache()) == 10  # noqa: PLR2004
+    assert len(get_json_cache.load()) == 10  # noqa: PLR2004
 
 
 @pytest.mark.unit
@@ -253,11 +253,11 @@ def test_cache_sync(
     path = Path(tmpdir)
     cache2 = JSONCache(path)
     endpoint = UserEndpoint(get_workspace_id, config_setup, cache2)
-    assert len(cache2.load_cache()) == 0
+    assert len(cache2.load()) == 0
 
     cache1 = JSONCache(path)
     user_object = UserEndpoint(get_workspace_id, config_setup, cache1)
-    assert len(user_object.cache.load_cache()) == 0
+    assert len(user_object.cache.load()) == 0
 
     tracker = get_test_data[1]
     tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
