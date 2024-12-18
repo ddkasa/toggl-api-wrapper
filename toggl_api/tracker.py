@@ -35,7 +35,7 @@ class Edits(NamedTuple):
     failures: list[int]
 
 
-@dataclass
+@dataclass(frozen=True)
 class TrackerBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests.
 

@@ -52,7 +52,7 @@ def _validate_extension(extension: REPORT_FORMATS) -> None:
         raise ValueError(msg)
 
 
-@dataclass
+@dataclass(frozen=True)
 class ReportBody(BaseBody):
     """Body for summary endpoint which turns into a JSON body."""
 

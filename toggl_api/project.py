@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProjectBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 

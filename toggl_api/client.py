@@ -24,7 +24,7 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 CLIENT_STATUS = Literal["active", "archived", "both"]
 
 
-@dataclass
+@dataclass(frozen=True)
 class ClientBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
