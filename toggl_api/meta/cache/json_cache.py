@@ -203,7 +203,7 @@ class JSONCache(TogglCache, Generic[T]):
         if not self.session.data:
             return None
         for item in self.session.data:
-            if item is not None and item["id"] == entry["id"] and isinstance(item, self.parent.model):
+            if item is not None and item["id"] == entry["id"] and isinstance(item, self.model):
                 return item
         return None
 
@@ -333,7 +333,7 @@ class JSONCache(TogglCache, Generic[T]):
     def cache_path(self) -> Path:
         if self.parent is None:
             return self._cache_path / "cache.json"
-        return self._cache_path / f"cache_{self.parent.model.__tablename__}.json"
+        return self._cache_path / f"cache_{self.model.__tablename__}.json"
 
     @property
     def parent(self) -> TogglCachedEndpoint[T]:
