@@ -87,7 +87,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglClient],
+        cache: TogglCache[TogglClient] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -150,8 +150,8 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         if isinstance(client_id, TogglClient):
             client_id = client_id.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": client_id})
+        if self.cache and not refresh:
+            return self.cache.find({"id": client_id})
 
         try:
             response = self.request(
@@ -218,13 +218,15 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 "Client with id %s was either already deleted or did not exist in the first place!",
                 client_id,
             )
+        if self.cache is None:
+            return
         if isinstance(client, int):
-            clt = self.cache.find_entry({"id": client})
+            clt = self.cache.find({"id": client})
             if not isinstance(clt, TogglClient):
                 return
             client = clt
 
-        self.cache.delete_entries(client)
+        self.cache.delete(client)
         self.cache.commit()
 
     def _collect_cache(self, body: ClientBody | None) -> list[TogglClient]:
