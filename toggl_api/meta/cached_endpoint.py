@@ -155,6 +155,10 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     ) -> None:
         """Direct saving method for retrieving all models from cache."""
         if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
+            log.debug(
+                "Cache is set to immediately expire!",
+                extra={"expiry": self.cache.expire_after},
+            )
             return None
         return self.cache.save_cache(response, method)
 
