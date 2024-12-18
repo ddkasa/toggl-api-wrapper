@@ -107,7 +107,8 @@ def test_tracker_get_error(user_object, httpx_mock):
 @pytest.mark.integration
 def test_tracker_collection(user_object: UserEndpoint, add_tracker):
     # NOTE: Make sure tracker object is missing from cache for the refresh.
-    user_object.cache.delete_entries(add_tracker)
+    assert user_object.cache is not None
+    user_object.cache.delete(add_tracker)
     user_object.cache.commit()
 
     collection = user_object.collect(refresh=True)
