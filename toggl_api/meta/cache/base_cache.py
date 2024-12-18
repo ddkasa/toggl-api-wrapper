@@ -5,7 +5,7 @@ import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar, cast
 
 from toggl_api.meta.enums import RequestMethod
 from toggl_api.models import TogglClass
@@ -155,6 +155,15 @@ class TogglCache(ABC, Generic[TC]):
     @abstractmethod
     def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
 
+    def find_method(self, method: RequestMethod) -> Callable | None:
+        match_func: Final[dict[RequestMethod, Callable]] = {
+            RequestMethod.GET: self.add_entries,
+            RequestMethod.POST: self.update_entries,
+            RequestMethod.PATCH: self.update_entries,
+            RequestMethod.PUT: self.add_entries,
+        }
+        return match_func.get(method)
+
     @property
     @abstractmethod
     def cache_path(self) -> Path:
@@ -171,7 +180,7 @@ class TogglCache(ABC, Generic[TC]):
     @property
     def parent(self) -> TogglCachedEndpoint[TC]:
         if self._parent is None:
-            msg = "Cannot use cache without a parent set!"
+            msg = "Can not use cache without a parent set!"
             raise MissingParentError(msg)
 
         return self._parent
@@ -180,11 +189,6 @@ class TogglCache(ABC, Generic[TC]):
     def parent(self, value: Optional[TogglCachedEndpoint[TC]]) -> None:
         self._parent = value
 
-    def find_method(self, method: RequestMethod) -> Callable | None:
-        match_func: Final[dict[RequestMethod, Callable]] = {
-            RequestMethod.GET: self.add_entries,
-            RequestMethod.POST: self.update_entries,
-            RequestMethod.PATCH: self.update_entries,
-            RequestMethod.PUT: self.add_entries,
-        }
-        return match_func.get(method)
+    @property
+    def model(self) -> type[TC]:
+        return cast(type[TC], self.parent.MODEL)
