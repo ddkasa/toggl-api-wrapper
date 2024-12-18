@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 import contextlib
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
@@ -25,7 +25,7 @@ from .base_cache import Comparison, TogglCache, TogglQuery
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from toggl_api.meta import RequestMethod, TogglCachedEndpoint
+    from toggl_api.meta import TogglCachedEndpoint
 
 
 T = TypeVar("T", bound=TogglClass)
@@ -78,50 +78,35 @@ class SqliteCache(TogglCache[T]):
     def commit(self) -> None:
         self.session.commit()
 
-    def save_cache(self, entry: list[T] | T, method: RequestMethod) -> None:
-        func = self.find_method(method)
-        if func is None:
-            return
-        func(entry)
-
-    def load_cache(self) -> Query[T]:
+    def load(self) -> Query[T]:
         query = self.session.query(self.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
             query.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
         return query
 
-    def add_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
-            if self.find_entry(item):
-                self.update_entries(item)
+    def add(self, *entries: T) -> None:
+        for item in entries:
+            if self.find(item):
+                self.update(item)
                 continue
             self.session.add(item)
         self.commit()
 
-    def update_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
+    def update(self, *entries: T) -> None:
+        for item in entries:
             self.session.merge(item)
         self.commit()
 
-    def delete_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
-            if self.find_entry(item):
+    def delete(self, *entries: T) -> None:
+        for entry in entries:
+            if self.find(entry):
                 self.session.query(
                     self.model,
-                ).filter_by(id=item.id).delete()
+                ).filter_by(id=entry.id).delete()
         self.commit()
 
-    def find_entry(self, query: T | dict[str, Any]) -> T | None:
+    def find(self, query: T | dict[str, Any]) -> T | None:
         if isinstance(query, TogglClass):
             query = {"id": query.id}
 
