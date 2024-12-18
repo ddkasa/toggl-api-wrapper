@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Final, Literal, Optional
+from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from httpx import HTTPStatusError, codes
 
@@ -313,22 +313,25 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if not refresh:
             return self._collect_cache(body)
 
-        return self.request(
-            "",
-            body=body.format(
-                "collect",
-                workspace_id=self.workspace_id,
-                sort_pinned=sort_pinned,
-                only_me=only_me,
-                only_templates=only_templates,
-            )
-            if body
-            else {
-                "sort_pinned": sort_pinned,
-                "only_me": only_me,
-                "only_templates": only_templates,
-            },
-            refresh=refresh,
+        return cast(
+            list[TogglProject],
+            self.request(
+                "",
+                body=body.format(
+                    "collect",
+                    workspace_id=self.workspace_id,
+                    sort_pinned=sort_pinned,
+                    only_me=only_me,
+                    only_templates=only_templates,
+                )
+                if body
+                else {
+                    "sort_pinned": sort_pinned,
+                    "only_me": only_me,
+                    "only_templates": only_templates,
+                },
+                refresh=refresh,
+            ),
         )
 
     def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
@@ -367,7 +370,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 return None
             raise
 
-        return response or None
+        return cast(TogglProject, response) or None
 
     def delete(self, project: TogglProject | int) -> None:
         """Deletes a project based on its id.
@@ -436,11 +439,14 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if isinstance(project, TogglProject):
             project = project.id
 
-        return self.request(
-            f"/{project}",
-            method=RequestMethod.PUT,
-            body=body.format("edit", workspace_id=self.workspace_id),
-            refresh=True,
+        return cast(
+            TogglProject,
+            self.request(
+                f"/{project}",
+                method=RequestMethod.PUT,
+                body=body.format("edit", workspace_id=self.workspace_id),
+                refresh=True,
+            ),
         )
 
     def add(self, body: ProjectBody) -> TogglProject:
@@ -468,11 +474,14 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             msg = "Name must be set in order to create a project!"
             raise NamingError(msg)
 
-        return self.request(
-            "",
-            method=RequestMethod.POST,
-            body=body.format("add", workspace_id=self.workspace_id),
-            refresh=True,
+        return cast(
+            TogglProject,
+            self.request(
+                "",
+                method=RequestMethod.POST,
+                body=body.format("add", workspace_id=self.workspace_id),
+                refresh=True,
+            ),
         )
 
     @classmethod

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal, Optional, get_args
+from typing import TYPE_CHECKING, Any, Literal, cast, get_args
 
 from httpx import HTTPStatusError, codes
 
@@ -124,11 +124,14 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             msg = "Name must be set in order to create a client!"
             raise NamingError(msg)
 
-        return self.request(
-            "",
-            body=body.format("add", wid=self.workspace_id),
-            method=RequestMethod.POST,
-            refresh=True,
+        return cast(
+            TogglClient,
+            self.request(
+                "",
+                body=body.format("add", wid=self.workspace_id),
+                method=RequestMethod.POST,
+                refresh=True,
+            ),
         )
 
     def get(self, client_id: int | TogglClient, *, refresh: bool = False) -> TogglClient | None:
@@ -161,7 +164,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 return None
             raise
 
-        return response or None
+        return cast(TogglClient, response) or None
 
     def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient | None:
         """Edit a client with the supplied parameters from the body.
@@ -184,11 +187,14 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         if isinstance(client, TogglClient):
             client = client.id
 
-        return self.request(
-            f"/{client}",
-            body=body.format("edit", wid=self.workspace_id),
-            method=RequestMethod.PUT,
-            refresh=True,
+        return cast(
+            TogglClient,
+            self.request(
+                f"/{client}",
+                body=body.format("edit", wid=self.workspace_id),
+                method=RequestMethod.PUT,
+                refresh=True,
+            ),
         )
 
     def delete(self, client: TogglClient | int) -> None:
