@@ -51,7 +51,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglTracker],
+        cache: TogglCache[TogglTracker] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -61,7 +61,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def _current_refresh(self, tracker: TogglTracker | None) -> None:
-        if tracker is None:
+        if self.cache and tracker is None:
             for t in self.cache.query(TogglQuery("stop", None)):
                 try:
                     self.get(t, refresh=True)
@@ -94,7 +94,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             A model from cache or the API. None if nothing is running.
         """
 
-        if not refresh:
+        if self.cache and not refresh:
             query = list(self.cache.query(TogglQuery("stop", None)))
             return query[0] if query else None
 
@@ -237,8 +237,8 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         if isinstance(tracker_id, TogglTracker):
             tracker_id = tracker_id.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": tracker_id})
+        if self.cache and not refresh:
+            return self.cache.find({"id": tracker_id})
 
         try:
             response = self.request(
