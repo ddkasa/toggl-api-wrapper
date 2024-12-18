@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 with contextlib.suppress(ImportError):
     import sqlalchemy as db
@@ -132,7 +132,7 @@ def register_tables(engine: Engine) -> MetaData:
 def _map_imperatively(
     cls: type,
     table: Table,
-    properties: Optional[dict] = None,
+    properties: dict | None = None,
 ) -> None:
     mapper_registry = registry()
     properties = properties or {}

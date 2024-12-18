@@ -5,7 +5,7 @@ from __future__ import annotations
 import atexit
 import warnings
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 try:
     import sqlalchemy as db
@@ -65,8 +65,8 @@ class SqliteCache(TogglCache[T]):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint[T]] = None,
+        expire_after: timedelta | int | None = None,
+        parent: TogglCachedEndpoint[T] | None = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = db.create_engine(f"sqlite:///{self.cache_path}")
@@ -85,10 +85,10 @@ class SqliteCache(TogglCache[T]):
         func(entry)
 
     def load_cache(self) -> Query[T]:
-        query = self.session.query(self.parent.model)
+        query = self.session.query(self.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
-            query.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
+            query.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
         return query
 
     def add_entries(self, entry: Iterable[T] | T) -> None:
@@ -117,7 +117,7 @@ class SqliteCache(TogglCache[T]):
         for item in entry:
             if self.find_entry(item):
                 self.session.query(
-                    self.parent.model,  # type: ignore[union-attr]
+                    self.model,
                 ).filter_by(id=item.id).delete()
         self.commit()
 
@@ -125,10 +125,10 @@ class SqliteCache(TogglCache[T]):
         if isinstance(query, TogglClass):
             query = {"id": query.id}
 
-        search = self.session.query(self.parent.model)
+        search = self.session.query(self.model)
         if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
+            search = search.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
         return search.filter_by(**query).first()
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Query[T]:
@@ -147,10 +147,10 @@ class SqliteCache(TogglCache[T]):
             A SQLAlchemy query object with parameters filtered.
         """
 
-        search = self.session.query(self.parent.model)
+        search = self.session.query(self.model)
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self.expire_after
-            search = search.filter(self.parent.model.timestamp > min_ts)  # type: ignore[arg-type]
+            search = search.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
 
         search = self._query_helper(list(query), search)
         if distinct:

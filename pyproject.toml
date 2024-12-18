@@ -168,8 +168,8 @@ ignore = [
     "S101",    # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
     "SIM102",  # Sometimes it's better to nest
-    "UP007",   # Useless `typing` imports
     "N802",
+    "TC006",
     "PLW2901",
     "UP017",   # Python 3.10 backwards compatibility
     "PLR6301", # Class Method Suggestion

@@ -6,14 +6,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from toggl_api._exceptions import NamingError
 from toggl_api.utility import get_workspace, parse_iso
-
-if TYPE_CHECKING:
-    from typing import Optional
-
 
 log = logging.getLogger("toggl-api-wrapper.model")
 
@@ -230,11 +226,11 @@ class TogglProject(WorkspaceChild):
     __tablename__ = "project"
 
     color: str = field(default="#0b83d9")
-    client: Optional[int] = field(default=None)
+    client: int | None = field(default=None)
     active: bool = field(default=True)
 
     start_date: date = field(default_factory=lambda: datetime.now(tz=timezone.utc).date())
-    end_date: Optional[date] = field(default=None)
+    end_date: date | None = field(default=None)
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -303,9 +299,9 @@ class TogglTracker(WorkspaceChild):
             tz=timezone.utc,
         ),
     )
-    duration: Optional[timedelta] = field(default=None)
-    stop: Optional[datetime | str] = field(default=None)
-    project: Optional[int] = field(default=None)
+    duration: timedelta | None = field(default=None)
+    stop: datetime | str | None = field(default=None)
+    project: int | None = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
     def __post_init__(self) -> None:

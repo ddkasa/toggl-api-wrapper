@@ -56,11 +56,11 @@ def test_endpoint(meta_object):
 
 @pytest.mark.unit
 def test_process_models(meta_object, get_test_data, meta_object_sqlite):
-    models = [meta_object.model.from_kwargs(**i) for i in get_test_data]
+    models = [meta_object.MODEL.from_kwargs(**i) for i in get_test_data]
     assert meta_object.process_models(get_test_data) == models
-    assert all(isinstance(model, meta_object.model) for model in models)
+    assert all(isinstance(model, meta_object.MODEL) for model in models)
     assert meta_object_sqlite.process_models(get_test_data) == models
-    assert all(isinstance(model, meta_object_sqlite.model) for model in models)
+    assert all(isinstance(model, meta_object_sqlite.MODEL) for model in models)
 
 
 @dataclass()

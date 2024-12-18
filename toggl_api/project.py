@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Final, Literal, Optional
+from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from httpx import HTTPStatusError, codes
 
@@ -30,51 +30,51 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class ProjectBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    name: Optional[str] = field(default=None)
+    name: str | None = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
 
     active: bool | Literal["both"] = field(default="both")
     """Whether the project is archived or active.
     The literal 'both' is used for querying."""
-    is_private: Optional[bool] = field(
+    is_private: bool | None = field(
         default=True,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Whether the project is private or not. Defaults to True."""
 
-    client_id: Optional[int] = field(
+    client_id: int | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
-    client_name: Optional[str] = field(
+    client_name: str | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Client name if client_id is not set. Defaults to None. If client_id is
     set the client_name will be ignored."""
 
-    color: Optional[str] = field(
+    color: str | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Color of the project. Refer to [BASIC_COLORS][toggl_api.ProjectEndpoint.BASIC_COLORS]
     for accepted colors for non-premium users."""
 
-    start_date: Optional[date] = field(
+    start_date: date | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Date to set the start of a project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    end_date: Optional[date] = field(
+    end_date: date | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    since: Optional[date | int] = field(
+    since: date | int | None = field(
         default=None,
         metadata={"endpoints": frozenset(("collect",))},
     )
@@ -194,6 +194,8 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         BASIC_COLORS: Default colors that are available for non-premium users.
     """
 
+    MODEL = TogglProject
+
     BASIC_COLORS: Final[dict[str, str]] = {
         "blue": "#0b83d9",
         "violet": "#9e5bd9",
@@ -278,7 +280,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     def collect(
         self,
-        body: Optional[ProjectBody] = None,
+        body: ProjectBody | None = None,
         *,
         refresh: bool = False,
         sort_pinned: bool = False,
@@ -311,22 +313,25 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if not refresh:
             return self._collect_cache(body)
 
-        return self.request(
-            "",
-            body=body.format(
-                "collect",
-                workspace_id=self.workspace_id,
-                sort_pinned=sort_pinned,
-                only_me=only_me,
-                only_templates=only_templates,
-            )
-            if body
-            else {
-                "sort_pinned": sort_pinned,
-                "only_me": only_me,
-                "only_templates": only_templates,
-            },
-            refresh=refresh,
+        return cast(
+            list[TogglProject],
+            self.request(
+                "",
+                body=body.format(
+                    "collect",
+                    workspace_id=self.workspace_id,
+                    sort_pinned=sort_pinned,
+                    only_me=only_me,
+                    only_templates=only_templates,
+                )
+                if body
+                else {
+                    "sort_pinned": sort_pinned,
+                    "only_me": only_me,
+                    "only_templates": only_templates,
+                },
+                refresh=refresh,
+            ),
         )
 
     def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
@@ -365,7 +370,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 return None
             raise
 
-        return response or None
+        return cast(TogglProject, response) or None
 
     def delete(self, project: TogglProject | int) -> None:
         """Deletes a project based on its id.
@@ -434,11 +439,14 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if isinstance(project, TogglProject):
             project = project.id
 
-        return self.request(
-            f"/{project}",
-            method=RequestMethod.PUT,
-            body=body.format("edit", workspace_id=self.workspace_id),
-            refresh=True,
+        return cast(
+            TogglProject,
+            self.request(
+                f"/{project}",
+                method=RequestMethod.PUT,
+                body=body.format("edit", workspace_id=self.workspace_id),
+                refresh=True,
+            ),
         )
 
     def add(self, body: ProjectBody) -> TogglProject:
@@ -466,11 +474,14 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             msg = "Name must be set in order to create a project!"
             raise NamingError(msg)
 
-        return self.request(
-            "",
-            method=RequestMethod.POST,
-            body=body.format("add", workspace_id=self.workspace_id),
-            refresh=True,
+        return cast(
+            TogglProject,
+            self.request(
+                "",
+                method=RequestMethod.POST,
+                body=body.format("add", workspace_id=self.workspace_id),
+                refresh=True,
+            ),
         )
 
     @classmethod
@@ -498,7 +509,3 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/projects"
-
-    @property
-    def model(self) -> type[TogglProject]:
-        return TogglProject

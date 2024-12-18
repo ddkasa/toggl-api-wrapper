@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from httpx import HTTPStatusError, codes
 
@@ -37,6 +37,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         retries: Max retries to attempt if the server returns a *5xx* status_code.
             Has no effect if re_raise is `True`. Keyword Only.
     """
+
+    MODEL = TogglOrganization
 
     def __init__(
         self,
@@ -92,7 +94,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
                 return None
             raise
 
-        return response
+        return cast(TogglOrganization, response)
 
     def add(self, name: str, workspace_name: str = "Default-Workspace") -> TogglOrganization:
         """Creates a new organization with a single workspace and assigns
@@ -121,11 +123,14 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         TogglOrganization.validate_name(name)
         TogglWorkspace.validate_name(workspace_name)
 
-        return self.request(
-            "organizations",
-            body={"name": name, "workspace_name": workspace_name},
-            method=RequestMethod.POST,
-            refresh=True,
+        return cast(
+            TogglOrganization,
+            self.request(
+                "organizations",
+                body={"name": name, "workspace_name": workspace_name},
+                method=RequestMethod.POST,
+                refresh=True,
+            ),
         )
 
     def edit(self, organization: TogglOrganization | int, name: str) -> TogglOrganization:
@@ -177,7 +182,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Returns:
             A list of organization objects or empty if none found.
         """
-        return self.request("me/organizations", refresh=refresh)
+        return cast(list[TogglOrganization], self.request("me/organizations", refresh=refresh))
 
     def delete(self, organization: TogglOrganization | int) -> None:
         """Leaves organization, effectively delete user account in org and
@@ -219,10 +224,6 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         self.cache.delete_entries(organization)
         self.cache.commit()
-
-    @property
-    def model(self) -> type[TogglOrganization]:
-        return TogglOrganization
 
     @property
     def endpoint(self) -> str:

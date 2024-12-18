@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from toggl_api.models import TogglClass
 
@@ -24,7 +24,7 @@ from .enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from httpx import BasicAuth
+    from httpx import BasicAuth, Response
 
     from toggl_api.meta.cache.base_cache import TogglQuery
 
@@ -90,13 +90,13 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     def request(  # type: ignore[override]
         self,
         parameters: str,
-        headers: Optional[dict] = None,
-        body: Optional[dict | list] = None,
+        headers: dict[str, Any] | None = None,
+        body: dict | list | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
         raw: bool = False,
-    ) -> Any:
+    ) -> T | list[T] | Response | None:
         """Overridden request method with builtin cache.
 
         Args:
@@ -116,7 +116,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
                 depending on arguments.
         """
 
-        data = self.load_cache() if self.model is not None else None
+        data = self.load_cache() if self.MODEL is not None else None
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -124,7 +124,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
                 parameters,
                 extra={"body": body, "headers": headers, "method": method},
             )
-            return data
+            return cast(list[T], data)
 
         response = super().request(
             parameters,
@@ -139,7 +139,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         if response is None or method == RequestMethod.DELETE:
             return None
 
-        if self.model is not None:
+        if self.MODEL is not None:
             self.save_cache(response, method)  # type: ignore[arg-type]
 
         return response
@@ -155,6 +155,10 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     ) -> None:
         """Direct saving method for retrieving all models from cache."""
         if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
+            log.debug(
+                "Cache is set to immediately expire!",
+                extra={"expiry": self.cache.expire_after},
+            )
             return None
         return self.cache.save_cache(response, method)
 

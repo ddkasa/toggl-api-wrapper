@@ -8,7 +8,7 @@ from collections import defaultdict
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
 
 from toggl_api.models import (
     TogglClass,
@@ -172,8 +172,8 @@ class JSONCache(TogglCache, Generic[T]):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint[T]] = None,
+        expire_after: timedelta | int | None = None,
+        parent: TogglCachedEndpoint[T] | None = None,
         *,
         max_length: int = 10_000,
     ) -> None:
@@ -203,7 +203,7 @@ class JSONCache(TogglCache, Generic[T]):
         if not self.session.data:
             return None
         for item in self.session.data:
-            if item is not None and item["id"] == entry["id"] and isinstance(item, self.parent.model):
+            if item is not None and item["id"] == entry["id"] and isinstance(item, self.model):
                 return item
         return None
 
@@ -281,7 +281,7 @@ class JSONCache(TogglCache, Generic[T]):
         model: T,
         queries: tuple[TogglQuery, ...],
         existing: dict[str, set[Any]],
-        min_ts: Optional[datetime],
+        min_ts: datetime | None,
         *,
         distinct: bool,
     ) -> bool:
@@ -333,20 +333,22 @@ class JSONCache(TogglCache, Generic[T]):
     def cache_path(self) -> Path:
         if self.parent is None:
             return self._cache_path / "cache.json"
-        return self._cache_path / f"cache_{self.parent.model.__tablename__}.json"
+        return self._cache_path / f"cache_{self.model.__tablename__}.json"
 
     @property
     def parent(self) -> TogglCachedEndpoint[T]:
         return super().parent
 
     @parent.setter
-    def parent(self, parent: Optional[TogglCachedEndpoint[T]]) -> None:
+    def parent(self, parent: TogglCachedEndpoint[T] | None) -> None:
         self._parent = parent
         if parent is not None:
             self.session.load(self.cache_path)
 
 
 class CustomEncoder(json.encoder.JSONEncoder):
+    """Encoder class for converting datclass & misc objects to JSON."""
+
     def default(self, obj: Any) -> Any:
         if isinstance(obj, date):
             return obj.isoformat()
@@ -358,6 +360,8 @@ class CustomEncoder(json.encoder.JSONEncoder):
 
 
 class CustomDecoder(json.decoder.JSONDecoder):
+    """Decoder class for converting JSON data to python objects."""
+
     MATCH_DICT: Final[dict[str, type[TogglClass]]] = {
         TogglClient.__tablename__: TogglClient,
         TogglProject.__tablename__: TogglProject,

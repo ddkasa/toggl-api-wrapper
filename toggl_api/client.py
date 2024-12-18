@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal, Optional, get_args
+from typing import TYPE_CHECKING, Any, Literal, cast, get_args
 
 from httpx import HTTPStatusError, codes
 
@@ -28,11 +28,11 @@ CLIENT_STATUS = Literal["active", "archived", "both"]
 class ClientBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    name: Optional[str] = field(default=None)
+    name: str | None = field(default=None)
     """Name of the client. Defaults to None. Will be required if its a POST request."""
-    status: Optional[CLIENT_STATUS] = field(default=None)
+    status: CLIENT_STATUS | None = field(default=None)
     """Status of the client. API defaults to active. Premium Feature."""
-    notes: Optional[str] = field(default=None)
+    notes: str | None = field(default=None)
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -81,6 +81,8 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    MODEL = TogglClient
+
     def __init__(
         self,
         workspace_id: int | TogglWorkspace,
@@ -122,11 +124,14 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             msg = "Name must be set in order to create a client!"
             raise NamingError(msg)
 
-        return self.request(
-            "",
-            body=body.format("add", wid=self.workspace_id),
-            method=RequestMethod.POST,
-            refresh=True,
+        return cast(
+            TogglClient,
+            self.request(
+                "",
+                body=body.format("add", wid=self.workspace_id),
+                method=RequestMethod.POST,
+                refresh=True,
+            ),
         )
 
     def get(self, client_id: int | TogglClient, *, refresh: bool = False) -> TogglClient | None:
@@ -146,7 +151,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             client_id = client_id.id
 
         if not refresh:
-            return self.cache.find_entry({"id": client_id})  # type: ignore[return-value]
+            return self.cache.find_entry({"id": client_id})
 
         try:
             response = self.request(
@@ -159,7 +164,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 return None
             raise
 
-        return response or None
+        return cast(TogglClient, response) or None
 
     def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient | None:
         """Edit a client with the supplied parameters from the body.
@@ -181,11 +186,15 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
         if isinstance(client, TogglClient):
             client = client.id
-        return self.request(
-            f"/{client}",
-            body=body.format("edit", wid=self.workspace_id),
-            method=RequestMethod.PUT,
-            refresh=True,
+
+        return cast(
+            TogglClient,
+            self.request(
+                f"/{client}",
+                body=body.format("edit", wid=self.workspace_id),
+                method=RequestMethod.PUT,
+                refresh=True,
+            ),
         )
 
     def delete(self, client: TogglClient | int) -> None:
@@ -229,7 +238,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
     def collect(
         self,
-        body: Optional[ClientBody] = None,
+        body: ClientBody | None = None,
         *,
         refresh: bool = False,
     ) -> list[TogglClient]:
@@ -263,7 +272,3 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/clients"
-
-    @property
-    def model(self) -> type[TogglClient]:
-        return TogglClient

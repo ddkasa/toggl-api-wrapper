@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, cast
 
 from httpx import HTTPStatusError, codes
 
@@ -46,6 +46,8 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         retries: Max retries to attempt if the server returns a *5xx* status_code.
             Has no effect if re_raise is `True`. Keyword Only
     """
+
+    MODEL = TogglTag
 
     def __init__(
         self,
@@ -115,7 +117,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             A list of tags collected from the API or local cache.
         """
-        return self.request("", refresh=refresh)
+        return cast(list[TogglTag], self.request("", refresh=refresh))
 
     def add(self, name: str) -> TogglTag:
         """Create a new tag.
@@ -140,14 +142,17 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
 
-        return self.request(
-            "",
-            body={"name": name},
-            method=RequestMethod.POST,
-            refresh=True,
+        return cast(
+            TogglTag,
+            self.request(
+                "",
+                body={"name": name},
+                method=RequestMethod.POST,
+                refresh=True,
+            ),
         )
 
-    def edit(self, tag: TogglTag | int, name: Optional[str] = None) -> TogglTag:
+    def edit(self, tag: TogglTag | int, name: str | None = None) -> TogglTag:
         """Sets the name of the tag based on the tag object.
 
         This endpoint always hit the external API in order to keep tags consistent.
@@ -187,11 +192,14 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
 
-        return self.request(
-            f"/{tag.id if isinstance(tag, TogglTag) else tag}",
-            body={"name": name},
-            method=RequestMethod.PUT,
-            refresh=True,
+        return cast(
+            TogglTag,
+            self.request(
+                f"/{tag.id if isinstance(tag, TogglTag) else tag}",
+                body={"name": name},
+                method=RequestMethod.PUT,
+                refresh=True,
+            ),
         )
 
     def delete(self, tag: TogglTag | int) -> None:
@@ -234,7 +242,3 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/tags"
-
-    @property
-    def model(self) -> type[TogglTag]:
-        return TogglTag
