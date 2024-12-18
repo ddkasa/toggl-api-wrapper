@@ -347,6 +347,8 @@ class JSONCache(TogglCache, Generic[T]):
 
 
 class CustomEncoder(json.encoder.JSONEncoder):
+    """Encoder class for converting datclass & misc objects to JSON."""
+
     def default(self, obj: Any) -> Any:
         if isinstance(obj, date):
             return obj.isoformat()
@@ -358,6 +360,8 @@ class CustomEncoder(json.encoder.JSONEncoder):
 
 
 class CustomDecoder(json.decoder.JSONDecoder):
+    """Decoder class for converting JSON data to python objects."""
+
     MATCH_DICT: Final[dict[str, type[TogglClass]]] = {
         TogglClient.__tablename__: TogglClient,
         TogglProject.__tablename__: TogglProject,
