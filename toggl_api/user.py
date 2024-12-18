@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 import warnings
 from datetime import date, datetime, timezone
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional, cast
 
 import httpx
-from httpx import HTTPStatusError, codes
+from httpx import HTTPStatusError, Response, codes
 
 from toggl_api import Comparison, TogglQuery
 from toggl_api._exceptions import DateTimeError
@@ -44,6 +44,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    MODEL = TogglTracker
     TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED
 
     def __init__(
@@ -323,12 +324,8 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         Returns:
             User details in a raw dictionary.
         """
-        return TogglEndpoint.request(self, "", raw=True).json()
+        return cast(Response, TogglEndpoint.request(self, "", raw=True)).json()
 
     @property
     def endpoint(self) -> str:
         return "me"
-
-    @property
-    def model(self) -> type[TogglTracker]:
-        return TogglTracker

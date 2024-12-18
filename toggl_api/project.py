@@ -194,6 +194,8 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         BASIC_COLORS: Default colors that are available for non-premium users.
     """
 
+    MODEL = TogglProject
+
     BASIC_COLORS: Final[dict[str, str]] = {
         "blue": "#0b83d9",
         "violet": "#9e5bd9",
@@ -498,7 +500,3 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/projects"
-
-    @property
-    def model(self) -> type[TogglProject]:
-        return TogglProject

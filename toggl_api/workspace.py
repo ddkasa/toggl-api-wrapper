@@ -7,9 +7,9 @@ import time
 import warnings
 from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import HTTPStatusError, Response, codes
 
 from toggl_api.meta.body import BaseBody
 from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
@@ -207,6 +207,8 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    MODEL = TogglWorkspace
+
     @_re_kwarg({"workspace_id": "organization_id"})
     def __init__(
         self,
@@ -386,10 +388,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         if isinstance(workspace_id, TogglWorkspace):
             workspace_id = workspace_id.id
 
-        return self.request(
-            f"workspaces/{workspace_id}/time_entry_constraints",
-            raw=True,
-            refresh=True,
+        return cast(
+            Response,
+            self.request(
+                f"workspaces/{workspace_id}/time_entry_constraints",
+                raw=True,
+                refresh=True,
+            ),
         ).json()
 
     def statistics(self, workspace_id: TogglWorkspace | int) -> WorkspaceStatistics:
@@ -408,11 +413,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         if isinstance(workspace_id, TogglWorkspace):
             workspace_id = workspace_id.id
 
-        return self.request(f"workspaces/{workspace_id}/statistics", refresh=True, raw=True).json()
-
-    @property
-    def model(self) -> type[TogglWorkspace]:
-        return TogglWorkspace
+        return cast(Response, self.request(f"workspaces/{workspace_id}/statistics", refresh=True, raw=True)).json()
 
     @property
     def endpoint(self) -> str:

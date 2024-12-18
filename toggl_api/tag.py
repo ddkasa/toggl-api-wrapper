@@ -47,6 +47,8 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             Has no effect if re_raise is `True`. Keyword Only
     """
 
+    MODEL = TogglTag
+
     def __init__(
         self,
         workspace_id: int | TogglWorkspace,
@@ -234,7 +236,3 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/tags"
-
-    @property
-    def model(self) -> type[TogglTag]:
-        return TogglTag

@@ -38,6 +38,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    MODEL = TogglOrganization
+
     def __init__(
         self,
         auth: BasicAuth,
@@ -219,10 +221,6 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         self.cache.delete_entries(organization)
         self.cache.commit()
-
-    @property
-    def model(self) -> type[TogglOrganization]:
-        return TogglOrganization
 
     @property
     def endpoint(self) -> str:

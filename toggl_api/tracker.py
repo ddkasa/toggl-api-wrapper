@@ -218,7 +218,8 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
-    TRACKER_ALREADY_STOPPED: Final[int] = 409
+    MODEL = TogglTracker
+    TRACKER_ALREADY_STOPPED: Final[int] = codes.CONFLICT
 
     def __init__(
         self,
@@ -466,7 +467,3 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/time_entries"
-
-    @property
-    def model(self) -> type[TogglTracker]:
-        return TogglTracker

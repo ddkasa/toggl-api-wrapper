@@ -81,6 +81,8 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
+    MODEL = TogglClient
+
     def __init__(
         self,
         workspace_id: int | TogglWorkspace,
@@ -181,6 +183,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
         if isinstance(client, TogglClient):
             client = client.id
+
         return self.request(
             f"/{client}",
             body=body.format("edit", wid=self.workspace_id),
@@ -263,7 +266,3 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
     @property
     def endpoint(self) -> str:
         return f"workspaces/{self.workspace_id}/clients"
-
-    @property
-    def model(self) -> type[TogglClient]:
-        return TogglClient
