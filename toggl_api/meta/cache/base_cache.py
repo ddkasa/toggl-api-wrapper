@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
@@ -11,7 +12,7 @@ from toggl_api.meta.enums import RequestMethod
 from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Sequence
+    from collections.abc import Callable, Iterable
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
@@ -135,32 +136,36 @@ class TogglCache(ABC, Generic[TC]):
     def commit(self) -> None: ...
 
     @abstractmethod
-    def load_cache(self) -> Iterable[TC]: ...
+    def load(self) -> Iterable[TC]: ...
+
+    def save(self, entry: list[TC] | TC, method: RequestMethod) -> None:
+        func = self.find_method(method)
+        if func is None:
+            return
+        func(*entry) if isinstance(entry, Sequence) else func(entry)
+        self.commit()
 
     @abstractmethod
-    def save_cache(self, entry: list[TC] | TC, method: RequestMethod) -> None: ...
+    def find(self, entry: TC | dict[str, Any]) -> TC | None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TC | dict[str, Any]) -> TC | None: ...
+    def add(self, *entries: TC) -> None: ...
 
     @abstractmethod
-    def add_entries(self, update: list[TC]) -> None: ...
+    def update(self, *entries: TC) -> None: ...
 
     @abstractmethod
-    def update_entries(self, update: list[TC] | TC) -> None: ...
-
-    @abstractmethod
-    def delete_entries(self, update: list[TC] | TC) -> None: ...
+    def delete(self, *entries: TC) -> None: ...
 
     @abstractmethod
     def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
 
     def find_method(self, method: RequestMethod) -> Callable | None:
         match_func: Final[dict[RequestMethod, Callable]] = {
-            RequestMethod.GET: self.add_entries,
-            RequestMethod.POST: self.update_entries,
-            RequestMethod.PATCH: self.update_entries,
-            RequestMethod.PUT: self.add_entries,
+            RequestMethod.GET: self.add,
+            RequestMethod.POST: self.update,
+            RequestMethod.PATCH: self.update,
+            RequestMethod.PUT: self.add,
         }
         return match_func.get(method)
 

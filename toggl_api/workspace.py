@@ -214,7 +214,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         self,
         organization_id: int | TogglOrganization,
         auth: BasicAuth,
-        cache: TogglCache[TogglWorkspace],
+        cache: TogglCache[TogglWorkspace] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -262,8 +262,8 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         elif isinstance(workspace, TogglWorkspace):
             workspace = workspace.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": workspace})
+        if self.cache and not refresh:
+            return self.cache.find({"id": workspace})
 
         try:
             response = self.request(f"workspaces/{workspace}", refresh=refresh)
@@ -336,7 +336,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         if since is not None:
             since = self._validate_collect_since(since)
 
-        if not refresh:
+        if self.cache and not refresh:
             return self._collect_cache(since)
 
         body = {"since": since} if since else None
