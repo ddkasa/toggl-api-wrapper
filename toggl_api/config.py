@@ -3,7 +3,6 @@ import os
 import warnings
 from configparser import ConfigParser, NoOptionError
 from pathlib import Path
-from typing import Optional
 
 from httpx import BasicAuth
 
@@ -46,7 +45,7 @@ def generate_authentication() -> BasicAuth:
     return BasicAuth(api_token, password)
 
 
-def _get_togglrc(config_path: Optional[Path] = None) -> ConfigParser:
+def _get_togglrc(config_path: Path | None = None) -> ConfigParser:
     if config_path is None:
         log.debug("Using default path for .togglrc configuration.")
         config_path = Path.home()
@@ -63,7 +62,7 @@ def _get_togglrc(config_path: Optional[Path] = None) -> ConfigParser:
 
 
 # NOTE: For .togglrc compatibility.
-def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
+def use_togglrc(config_path: Path | None = None) -> BasicAuth:
     """Gathers credentials from a .togglrc file.
 
     Mainly here for togglcli backwards compatibility.
@@ -122,7 +121,7 @@ def use_togglrc(config_path: Optional[Path] = None) -> BasicAuth:
 
 
 # NOTE: For .togglrc compatibility.
-def retrieve_workspace_id(default: Optional[int] = None) -> int:
+def retrieve_workspace_id(default: int | None = None) -> int:
     """Helper function that collect the default workspace from the environment.
 
     Examples:
@@ -149,7 +148,7 @@ def retrieve_workspace_id(default: Optional[int] = None) -> int:
     return int(workspace)
 
 
-def retrieve_togglrc_workspace_id(config_path: Optional[Path] = None) -> int:
+def retrieve_togglrc_workspace_id(config_path: Path | None = None) -> int:
     """Helper function that collects the default workspace id from a togglrc file.
 
     Examples:

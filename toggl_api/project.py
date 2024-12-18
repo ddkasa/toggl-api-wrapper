@@ -30,51 +30,51 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 class ProjectBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    name: Optional[str] = field(default=None)
+    name: str | None = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
 
     active: bool | Literal["both"] = field(default="both")
     """Whether the project is archived or active.
     The literal 'both' is used for querying."""
-    is_private: Optional[bool] = field(
+    is_private: bool | None = field(
         default=True,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Whether the project is private or not. Defaults to True."""
 
-    client_id: Optional[int] = field(
+    client_id: int | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
-    client_name: Optional[str] = field(
+    client_name: str | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Client name if client_id is not set. Defaults to None. If client_id is
     set the client_name will be ignored."""
 
-    color: Optional[str] = field(
+    color: str | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Color of the project. Refer to [BASIC_COLORS][toggl_api.ProjectEndpoint.BASIC_COLORS]
     for accepted colors for non-premium users."""
 
-    start_date: Optional[date] = field(
+    start_date: date | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Date to set the start of a project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    end_date: Optional[date] = field(
+    end_date: date | None = field(
         default=None,
         metadata={"endpoints": frozenset(("edit", "add"))},
     )
     """Date to set the end of the project. If not set or start date is after
     the end date the end date will be ignored."""
 
-    since: Optional[date | int] = field(
+    since: date | int | None = field(
         default=None,
         metadata={"endpoints": frozenset(("collect",))},
     )
@@ -280,7 +280,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     def collect(
         self,
-        body: Optional[ProjectBody] = None,
+        body: ProjectBody | None = None,
         *,
         refresh: bool = False,
         sort_pinned: bool = False,

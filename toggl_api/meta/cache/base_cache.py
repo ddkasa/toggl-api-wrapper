@@ -5,7 +5,7 @@ import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api.meta.enums import RequestMethod
 from toggl_api.models import TogglClass
@@ -122,8 +122,8 @@ class TogglCache(ABC, Generic[TC]):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint] = None,
+        expire_after: timedelta | int | None = None,
+        parent: TogglCachedEndpoint | None = None,
     ) -> None:
         path.mkdir(parents=True, exist_ok=True)
         self._cache_path = path
@@ -174,7 +174,7 @@ class TogglCache(ABC, Generic[TC]):
         return self._expire_after
 
     @expire_after.setter
-    def expire_after(self, value: Optional[timedelta] = None) -> None:
+    def expire_after(self, value: timedelta | None = None) -> None:
         self._expire_after = value
 
     @property
@@ -186,7 +186,7 @@ class TogglCache(ABC, Generic[TC]):
         return self._parent
 
     @parent.setter
-    def parent(self, value: Optional[TogglCachedEndpoint[TC]]) -> None:
+    def parent(self, value: TogglCachedEndpoint[TC] | None) -> None:
         self._parent = value
 
     @property

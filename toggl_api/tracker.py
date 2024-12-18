@@ -5,9 +5,9 @@ import math
 import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import HTTPStatusError, Response, codes
 
 from toggl_api._exceptions import NamingError
 from toggl_api.meta import BaseBody, RequestMethod, TogglCache, TogglCachedEndpoint
@@ -44,33 +44,33 @@ class TrackerBody(BaseBody):
         TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
     """
 
-    description: Optional[str] = field(
+    description: str | None = field(
         default=None,
         metadata={"endpoints": frozenset(("add", "edit", "bulk_edit"))},
     )
     """Description of the a tracker. Refers to the name of a model within the wrapper."""
-    duration: Optional[int | timedelta] = field(
+    duration: int | timedelta | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit")},
     )
     """Duration set in a timedelta or in seconds if using an integer."""
-    project_id: Optional[int] = field(
+    project_id: int | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit")},
     )
     """Project the tracker belongs. If the value == -1 its marked for removal."""
-    start: Optional[datetime] = field(
+    start: datetime | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit", "bulk_edit")},
     )
     """Start time of the tracker. If using `bulk_edit` endpoint the date is only used."""
-    start_date: Optional[date] = field(default=None)
-    stop: Optional[datetime] = field(
+    start_date: date | None = field(default=None)
+    stop: datetime | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit", "bulk_edit")},
     )
     """Stop time of a tracker. If using `bulk_edit` endpoint the date is only used."""
-    tag_action: Optional[Literal["add", "remove"]] = field(
+    tag_action: Literal["add", "remove"] | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit", "bulk_edit")},
     )
@@ -269,11 +269,14 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
 
-        return self.request(
-            f"/{tracker}",
-            method=RequestMethod.PUT,
-            body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
-            refresh=True,
+        return cast(
+            TogglTracker,
+            self.request(
+                f"/{tracker}",
+                method=RequestMethod.PUT,
+                body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
+                refresh=True,
+            ),
         )
 
     def _bulk_edit(
@@ -283,12 +286,15 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
     ) -> dict[str, list[int]]:
         url = "/" + ",".join([str(t) for t in trackers])
 
-        return self.request(
-            url,
-            body=body,
-            refresh=True,
-            method=RequestMethod.PATCH,
-            raw=True,
+        return cast(
+            Response,
+            self.request(
+                url,
+                body=body,
+                refresh=True,
+                method=RequestMethod.PATCH,
+                raw=True,
+            ),
         ).json()
 
     def bulk_edit(
@@ -398,10 +404,13 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         if isinstance(tracker, TogglTracker):
             tracker = tracker.id
         try:
-            return self.request(
-                f"/{tracker}/stop",
-                method=RequestMethod.PATCH,
-                refresh=True,
+            return cast(
+                TogglTracker,
+                self.request(
+                    f"/{tracker}/stop",
+                    method=RequestMethod.PATCH,
+                    refresh=True,
+                ),
             )
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != self.TRACKER_ALREADY_STOPPED:
@@ -457,11 +466,14 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
 
         body.tag_action = "add"
 
-        return self.request(
-            "",
-            method=RequestMethod.POST,
-            body=body.format("add", workspace_id=self.workspace_id),
-            refresh=True,
+        return cast(
+            TogglTracker,
+            self.request(
+                "",
+                method=RequestMethod.POST,
+                body=body.format("add", workspace_id=self.workspace_id),
+                refresh=True,
+            ),
         )
 
     @property

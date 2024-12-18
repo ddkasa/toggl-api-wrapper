@@ -3,7 +3,7 @@
 import warnings
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, cast
+from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
 
 from httpx import Response
 
@@ -23,8 +23,8 @@ class PaginationOptions:
     """Dataclass for paginate endpoints."""
 
     page_size: int = field(default=50)
-    next_id: Optional[int] = field(default=None)
-    next_row: Optional[int] = field(default=None)
+    next_id: int | None = field(default=None)
+    next_row: int | None = field(default=None)
 
 
 @dataclass
@@ -32,8 +32,8 @@ class PaginatedResult(Generic[T]):
     """Generic dataclass for paginated results."""
 
     result: T = field()
-    next_id: Optional[int] = field(default=None)
-    next_row: Optional[int] = field(default=None)
+    next_id: int | None = field(default=None)
+    next_row: int | None = field(default=None)
 
     def __post_init__(self) -> None:
         # NOTE: Header types are strings so post init converts to integer.
@@ -56,22 +56,22 @@ def _validate_extension(extension: REPORT_FORMATS) -> None:
 class ReportBody(BaseBody):
     """Body for summary endpoint which turns into a JSON body."""
 
-    start_date: Optional[date] = field(default=None)
+    start_date: date | None = field(default=None)
     """Start date, example time.DateOnly. Should be less than End date."""
 
-    end_date: Optional[date] = field(default=None)
+    end_date: date | None = field(default=None)
     """End date, example time. DateOnly. Should be greater than Start date."""
 
     client_ids: list[int | None] = field(default_factory=list)
     """Client IDs, optional, filtering attribute. To filter records with no clients, use [None]."""
 
-    description: Optional[str] = field(default=None)
+    description: str | None = field(default=None)
     """Description, optional, filtering attribute."""
 
     group_ids: list[int] = field(default_factory=list)
     """Group IDs, optional, filtering attribute."""
 
-    grouping: Optional[str] = field(
+    grouping: str | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(
@@ -114,25 +114,25 @@ class ReportBody(BaseBody):
     )
     """Whether time entry IDs should be included in the results, optional, default true. Not applicable for export."""
 
-    max_duration_seconds: Optional[int] = field(default=None)
+    max_duration_seconds: int | None = field(default=None)
     """Max duration seconds, optional, filtering attribute. Time Audit only,
     should be greater than min_duration_seconds."""
 
-    min_duration_seconds: Optional[int] = field(default=None)
+    min_duration_seconds: int | None = field(default=None)
     """Min duration seconds, optional, filtering attribute. Time Audit only,
     should be less than max_duration_seconds."""
 
     project_ids: list[int | None] = field(default_factory=list)
     """Project IDs, optional, filtering attribute. To filter records with no projects, use [None]."""
 
-    rounding: Optional[int] = field(default=None)
+    rounding: int | None = field(default=None)
     """Whether time should be rounded, optional, default from user preferences."""
 
-    rounding_minutes: Optional[Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240]] = field(default=None)
+    rounding_minutes: Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240] | None = field(default=None)
     """Rounding minutes value, optional, default from user preferences.
     Should be 0, 1, 5, 6, 10, 12, 15, 30, 60 or 240."""
 
-    sub_grouping: Optional[str] = field(
+    sub_grouping: str | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(
@@ -192,7 +192,7 @@ class ReportBody(BaseBody):
     )
     """Duration format, optional, default "classic". Can be "classic", "decimal" or "improved"."""
 
-    order_by: Optional[Literal["title", "duration"]] = field(
+    order_by: Literal["title", "duration"] | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(
@@ -208,7 +208,7 @@ class ReportBody(BaseBody):
     )
     """Order by option, optional, default title. Can be title or duration."""
 
-    order_dir: Optional[Literal["ASC", "DESC"]] = field(
+    order_dir: Literal["ASC", "DESC"] | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(
@@ -224,7 +224,7 @@ class ReportBody(BaseBody):
     )
     """Order direction, optional. Can be ASC or DESC."""
 
-    resolution: Optional[str] = field(
+    resolution: str | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(
@@ -539,7 +539,7 @@ class DetailedReportEndpoint(ReportEndpoint):
     def search_time_entries(
         self,
         body: ReportBody,
-        pagination: Optional[PaginationOptions] = None,
+        pagination: PaginationOptions | None = None,
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[list]:
@@ -581,7 +581,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         self,
         body: ReportBody,
         extension: REPORT_FORMATS,
-        pagination: Optional[PaginationOptions] = None,
+        pagination: PaginationOptions | None = None,
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[bytes]:

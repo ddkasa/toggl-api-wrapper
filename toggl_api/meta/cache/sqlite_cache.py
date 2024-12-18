@@ -5,7 +5,7 @@ from __future__ import annotations
 import atexit
 import warnings
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 try:
     import sqlalchemy as db
@@ -65,8 +65,8 @@ class SqliteCache(TogglCache[T]):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint[T]] = None,
+        expire_after: timedelta | int | None = None,
+        parent: TogglCachedEndpoint[T] | None = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = db.create_engine(f"sqlite:///{self.cache_path}")

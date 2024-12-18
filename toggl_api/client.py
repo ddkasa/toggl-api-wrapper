@@ -28,11 +28,11 @@ CLIENT_STATUS = Literal["active", "archived", "both"]
 class ClientBody(BaseBody):
     """JSON body dataclass for PUT, POST & PATCH requests."""
 
-    name: Optional[str] = field(default=None)
+    name: str | None = field(default=None)
     """Name of the client. Defaults to None. Will be required if its a POST request."""
-    status: Optional[CLIENT_STATUS] = field(default=None)
+    status: CLIENT_STATUS | None = field(default=None)
     """Status of the client. API defaults to active. Premium Feature."""
-    notes: Optional[str] = field(default=None)
+    notes: str | None = field(default=None)
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         """Formats the body for JSON requests.
@@ -238,7 +238,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
     def collect(
         self,
-        body: Optional[ClientBody] = None,
+        body: ClientBody | None = None,
         *,
         refresh: bool = False,
     ) -> list[TogglClient]:

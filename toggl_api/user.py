@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import warnings
 from datetime import date, datetime, timezone
-from typing import TYPE_CHECKING, Any, Final, Optional, cast
+from typing import TYPE_CHECKING, Any, Final, cast
 
 import httpx
 from httpx import HTTPStatusError, Response, codes
@@ -107,16 +107,16 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             else:
                 raise
 
-        self._current_refresh(response)
+        self._current_refresh(cast(TogglTracker | None, response))
 
         return response if isinstance(response, TogglTracker) else None
 
     def _collect_cache(
         self,
-        since: Optional[int | datetime] = None,
-        before: Optional[date] = None,
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
+        since: int | datetime | None = None,
+        before: date | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
     ) -> list[TogglTracker]:
         cache: list[TogglTracker] = []
         if since or before:
@@ -145,10 +145,10 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
 
     def collect(
         self,
-        since: Optional[int | datetime] = None,
-        before: Optional[date] = None,
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
+        since: int | datetime | None = None,
+        before: date | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
         *,
         refresh: bool = False,
     ) -> list[TogglTracker]:
@@ -251,7 +251,7 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 return None
             raise
 
-        return response
+        return cast(TogglTracker, response)
 
     def check_authentication(self) -> bool:
         """Check if user is correctly authenticated with the Toggl API.

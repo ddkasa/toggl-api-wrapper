@@ -8,7 +8,7 @@ from collections import defaultdict
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
 
 from toggl_api.models import (
     TogglClass,
@@ -172,8 +172,8 @@ class JSONCache(TogglCache, Generic[T]):
     def __init__(
         self,
         path: Path,
-        expire_after: Optional[timedelta | int] = None,
-        parent: Optional[TogglCachedEndpoint[T]] = None,
+        expire_after: timedelta | int | None = None,
+        parent: TogglCachedEndpoint[T] | None = None,
         *,
         max_length: int = 10_000,
     ) -> None:
@@ -281,7 +281,7 @@ class JSONCache(TogglCache, Generic[T]):
         model: T,
         queries: tuple[TogglQuery, ...],
         existing: dict[str, set[Any]],
-        min_ts: Optional[datetime],
+        min_ts: datetime | None,
         *,
         distinct: bool,
     ) -> bool:
@@ -340,7 +340,7 @@ class JSONCache(TogglCache, Generic[T]):
         return super().parent
 
     @parent.setter
-    def parent(self, parent: Optional[TogglCachedEndpoint[T]]) -> None:
+    def parent(self, parent: TogglCachedEndpoint[T] | None) -> None:
         self._parent = parent
         if parent is not None:
             self.session.load(self.cache_path)

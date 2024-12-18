@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Optional
 
 from sqlalchemy.types import DateTime, TypeDecorator
 
@@ -39,7 +38,7 @@ class UTCDateTime(TypeDecorator):
 
     def process_result_value(  # type: ignore[override]
         self,
-        value: Optional[datetime],
+        value: datetime | None,
         _,
     ) -> datetime | None:
         if value is not None:

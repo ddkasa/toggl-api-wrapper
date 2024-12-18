@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from datetime import timedelta
-from typing import TYPE_CHECKING, Optional, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from toggl_api.models import TogglClass
 
@@ -90,8 +90,8 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     def request(  # type: ignore[override]
         self,
         parameters: str,
-        headers: Optional[dict] = None,
-        body: Optional[dict | list] = None,
+        headers: dict[str, Any] | None = None,
+        body: dict | list | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
