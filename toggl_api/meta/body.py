@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 
@@ -15,6 +15,6 @@ class BaseBody(ABC):
         field = cls.__dataclass_fields__.get(parameter)
         if field is None:
             msg = "Validating a non-existant field!"
-            raise ValueError(msg)
+            raise KeyError(msg)
         endpoints = field.metadata.get("endpoints", frozenset())
         return not endpoints or endpoint in endpoints
