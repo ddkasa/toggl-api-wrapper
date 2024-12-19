@@ -444,14 +444,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         Returns:
             The tracker that was created.
         """
-        if not isinstance(body.description, str):
-            warnings.warn(
-                "DEPRECATED: 'TypeError' is being swapped for a 'NamingError'.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            msg = "Description must be set in order to create a tracker!"
-            raise TypeError(msg)
+
         if not body.description:
             msg = "Description must be set in order to create a tracker!"
             raise NamingError(msg)
