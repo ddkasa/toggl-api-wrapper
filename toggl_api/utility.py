@@ -3,7 +3,6 @@ from __future__ import annotations
 import functools
 import importlib.util
 import time
-import warnings
 from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 
