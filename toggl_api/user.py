@@ -141,5 +141,4 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         Returns:
             User details in a raw dictionary.
         """
-        return cast(Response, TogglEndpoint.request(self, "", raw=True)).json()
-
+        return cast(Response, self.request("me", raw=True)).json()
