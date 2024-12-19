@@ -1,6 +1,5 @@
 """Module for various report endpoints."""
 
-import warnings
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import date
@@ -435,26 +434,6 @@ class SummaryReportEndpoint(ReportEndpoint):
             ),
         )
 
-    def time_entries(self, body: ReportBody) -> list[dict[str, int]]:
-        """Returns a list of time entries within the parameters specified.
-
-        DEPRECATED: Use ['search_time_entries'][toggl_api.reports.SummaryReportEndpoint.search_time_entries] instead.
-
-        [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-search-time-entries)
-
-        Args:
-            body: Body parameters to filter time entries by.
-
-        Returns:
-            A list of dictionaries with the filtered tracker data.
-        """
-        warnings.warn(
-            "Deprecated: Use 'search_time_entries' instead.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
-        return self.search_time_entries(body)
-
     def export_report(
         self,
         body: ReportBody,
@@ -492,37 +471,6 @@ class SummaryReportEndpoint(ReportEndpoint):
                 raw=True,
             ),
         ).content
-
-    def export_summary(
-        self,
-        body: ReportBody,
-        extension: REPORT_FORMATS,
-        *,
-        collapse: bool = False,
-    ) -> bytes:
-        """Downloads summary report in the specified in the specified format: csv or pdf.
-
-        DEPRECATED: Use ['export_report'][toggl_api.reports.SummaryReportEndpoint.export_report] instead.
-
-        [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-export-summary-report)
-
-        Args:
-            body: Body parameters to filter the report by.
-            extension: What format to use for the report. CSV or PDF.
-            collapse: Whether collapse others. Inserted into body.
-
-        Raises:
-            ValueError: If extension is not pdf or csv.
-
-        Returns:
-            A format ready to be saved as a file or used for further processing.
-        """
-        warnings.warn(
-            "Deprecated: Use 'export_report' instead.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
-        return self.export_report(body, extension, collapse=collapse)
 
     @property
     def endpoint(self) -> str:
