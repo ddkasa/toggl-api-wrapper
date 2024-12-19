@@ -9,7 +9,7 @@ from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
 from toggl_api.meta.cache import Comparison, TogglQuery
-from toggl_api.utility import _re_kwarg, format_iso, get_timestamp
+from toggl_api.utility import format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
@@ -309,7 +309,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             list[TogglProject],
             self.request(
-                "",
+                self.endpoint,
                 body=body.format(
                     "collect",
                     workspace_id=self.workspace_id,
@@ -354,7 +354,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
         try:
             response = self.request(
-                f"/{project_id}",
+                f"{self.endpoint}/{project_id}",
                 refresh=refresh,
             )
         except HTTPStatusError as err:
@@ -386,7 +386,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         project_id = project if isinstance(project, int) else project.id
         try:
             self.request(
-                f"/{project_id}",
+                f"{self.endpoint}/{project_id}",
                 method=RequestMethod.DELETE,
                 refresh=True,
             )
@@ -436,7 +436,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             TogglProject,
             self.request(
-                f"/{project}",
+                f"{self.endpoint}/{project}",
                 method=RequestMethod.PUT,
                 body=body.format("edit", workspace_id=self.workspace_id),
                 refresh=True,
@@ -471,7 +471,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             TogglProject,
             self.request(
-                "",
+                self.endpoint,
                 method=RequestMethod.POST,
                 body=body.format("add", workspace_id=self.workspace_id),
                 refresh=True,
@@ -479,7 +479,6 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         )
 
     @classmethod
-    @_re_kwarg({"color": "name"})
     def get_color(cls, name: str) -> str:
         """Get a color by name. Defaults to gray."""
         return cls.BASIC_COLORS.get(name, "#525266")

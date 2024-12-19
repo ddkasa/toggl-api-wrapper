@@ -110,7 +110,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             A list of tags collected from the API or local cache.
         """
-        return cast(list[TogglTag], self.request("", refresh=refresh))
+        return cast(list[TogglTag], self.request(self.endpoint, refresh=refresh))
 
     def add(self, name: str) -> TogglTag:
         """Create a new tag.
@@ -138,7 +138,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         return cast(
             TogglTag,
             self.request(
-                "",
+                self.endpoint,
                 body={"name": name},
                 method=RequestMethod.POST,
                 refresh=True,
@@ -188,7 +188,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         return cast(
             TogglTag,
             self.request(
-                f"/{tag.id if isinstance(tag, TogglTag) else tag}",
+                f"{self.endpoint}/{tag.id if isinstance(tag, TogglTag) else tag}",
                 body={"name": name},
                 method=RequestMethod.PUT,
                 refresh=True,
@@ -211,7 +211,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         tag_id = tag if isinstance(tag, int) else tag.id
         try:
             self.request(
-                f"/{tag_id}",
+                f"{self.endpoint}/{tag_id}",
                 method=RequestMethod.DELETE,
                 refresh=True,
             )

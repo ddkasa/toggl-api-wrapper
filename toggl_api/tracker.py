@@ -468,7 +468,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         return cast(
             TogglTracker,
             self.request(
-                f"/{tracker}",
+                f"{self.endpoint}/{tracker}",
                 method=RequestMethod.PUT,
                 body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
                 refresh=True,
@@ -480,12 +480,10 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         trackers: list[int],
         body: list[BulkEditParameter],
     ) -> dict[str, list[int]]:
-        url = "/" + ",".join([str(t) for t in trackers])
-
         return cast(
             Response,
             self.request(
-                url,
+                f"{self.endpoint}/" + ",".join([str(t) for t in trackers]),
                 body=body,
                 refresh=True,
                 method=RequestMethod.PATCH,
@@ -559,7 +557,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         """
         tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
-            self.request(f"/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
+            self.request(f"{self.endpoint}/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -605,7 +603,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             return cast(
                 TogglTracker,
                 self.request(
-                    f"/{tracker}/stop",
+                    f"{self.endpoint}/{tracker}/stop",
                     method=RequestMethod.PATCH,
                     refresh=True,
                 ),
@@ -660,7 +658,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         return cast(
             TogglTracker,
             self.request(
-                "",
+                self.endpoint,
                 method=RequestMethod.POST,
                 body=body.format("add", workspace_id=self.workspace_id),
                 refresh=True,

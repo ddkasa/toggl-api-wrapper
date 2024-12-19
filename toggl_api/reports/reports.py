@@ -368,7 +368,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             dict[str, int],
             self.request(
-                f"projects/{project.id if isinstance(project, TogglProject) else project}/summary",
+                f"{self.endpoint}/projects/{project.id if isinstance(project, TogglProject) else project}/summary",
                 method=RequestMethod.POST,
                 body={
                     "start_date": format_iso(start_date),
@@ -397,7 +397,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, int]],
             self.request(
-                "projects/summary",
+                f"{self.endpoint}/projects/summary",
                 method=RequestMethod.POST,
                 body={
                     "start_date": format_iso(start_date),
@@ -420,7 +420,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, int]],
             self.request(
-                "summary/time_entries",
+                f"{self.endpoint}/summary/time_entries",
                 method=RequestMethod.POST,
                 body=body.format(
                     "summary_time_entries",
@@ -476,7 +476,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             Response,
             self.request(
-                f"summary/time_entries.{extension}",
+                f"{self.endpoint}/summary/time_entries.{extension}",
                 method=RequestMethod.POST,
                 body=body.format(
                     f"summary_report_{extension}",
@@ -520,7 +520,7 @@ class SummaryReportEndpoint(ReportEndpoint):
 
     @property
     def endpoint(self) -> str:
-        return f"workspace/{self.workspace_id}/"
+        return f"workspace/{self.workspace_id}"
 
 
 class DetailedReportEndpoint(ReportEndpoint):
@@ -574,7 +574,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         request: Response = cast(
             Response,
             self.request(
-                "",
+                self.endpoint,
                 body=self._paginate_body(
                     body.format(
                         "detail_search_time",
@@ -621,7 +621,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         request = cast(
             Response,
             self.request(
-                f".{extension}",
+                f"{self.endpoint}.{extension}",
                 body=self._paginate_body(
                     body.format(
                         f"detail_report_{extension}",
@@ -658,7 +658,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         return cast(
             dict[str, int],
             self.request(
-                "/totals",
+                f"{self.endpoint}/totals",
                 body=body.format(
                     "detail_totals",
                     workspace_id=self.workspace_id,
@@ -694,7 +694,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, Any]],
             self.request(
-                "",
+                self.endpoint,
                 body=body.format(
                     "weekly_time_entries",
                     workspace_id=self.workspace_id,
@@ -722,7 +722,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
         return cast(
             Response,
             self.request(
-                f".{extension}",
+                f"{self.endpoint}.{extension}",
                 body=body.format(
                     f"weekly_report_{extension}",
                     workspace_id=self.workspace_id,

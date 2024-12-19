@@ -120,7 +120,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         return cast(
             TogglClient,
             self.request(
-                "",
+                self.endpoint,
                 body=body.format("add", wid=self.workspace_id),
                 method=RequestMethod.POST,
                 refresh=True,
@@ -148,7 +148,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
         try:
             response = self.request(
-                f"/{client_id}",
+                f"{self.endpoint}/{client_id}",
                 refresh=refresh,
             )
         except HTTPStatusError as err:
@@ -183,7 +183,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         return cast(
             TogglClient,
             self.request(
-                f"/{client}",
+                f"{self.endpoint}/{client}",
                 body=body.format("edit", wid=self.workspace_id),
                 method=RequestMethod.PUT,
                 refresh=True,
@@ -203,7 +203,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         """
         client_id = client if isinstance(client, int) else client.id
         try:
-            self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
+            self.request(f"{self.endpoint}/{client_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -248,10 +248,10 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         Returns:
             A list of clients. Empty if not found.
         """
-        if not refresh:
+        if self.cache and not refresh:
             return self._collect_cache(body)
 
-        url = ""
+        url = self.endpoint
         if body and body.status:
             url += f"?{body.status}"
         if body and body.name:
