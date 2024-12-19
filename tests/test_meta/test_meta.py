@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
 
-import httpx
 import pytest
 
-from toggl_api.meta import BaseBody, RequestMethod
+from toggl_api.meta import BaseBody
 from toggl_api.meta.base_endpoint import TogglEndpoint
 from toggl_api.models import TogglTracker
 
@@ -28,30 +27,8 @@ def test_headers(meta_object):
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize(
-    ("method", "expected"),
-    [
-        (RequestMethod.GET, httpx.Client().get),
-        (RequestMethod.POST, httpx.Client().post),
-        (RequestMethod.PUT, httpx.Client().put),
-        (RequestMethod.DELETE, httpx.Client().delete),
-        (RequestMethod.PATCH, httpx.Client().patch),
-    ],
-)
-def test_get_method(meta_object, method, expected):
-    method = meta_object.method(method)
-    assert method.__name__ == expected.__name__
-    assert method.__class__ == expected.__class__
-
-
-@pytest.mark.unit
 def test_model_parameter(meta_object):
-    assert meta_object.model == TogglTracker
-
-
-@pytest.mark.unit
-def test_endpoint(meta_object):
-    assert isinstance(meta_object.endpoint, str)
+    assert meta_object.MODEL is TogglTracker
 
 
 @pytest.mark.unit
@@ -80,8 +57,8 @@ class BodyTest(BaseBody):
             "wdwad",
             False,
             marks=pytest.mark.xfail(
-                reason="Raises ValueError if parameter is not found.",
-                raises=ValueError,
+                reason="Raises KeyError if parameter is not found.",
+                raises=KeyError,
             ),
         ),
         ("parameter", "generic_endpoint_two", False),
@@ -89,4 +66,4 @@ class BodyTest(BaseBody):
 )
 @pytest.mark.unit
 def test_base_body(parameter, endpoint, expected):
-    assert BodyTest.-verify_endpoint_parameter(parameter, endpoint) is expected
+    assert BodyTest._verify_endpoint_parameter(parameter, endpoint) is expected  # noqa: SLF001

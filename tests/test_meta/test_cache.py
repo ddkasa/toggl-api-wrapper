@@ -8,14 +8,13 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
-from sqlalchemy.util.langhelpers import MissingOr
 
 from tests.conftest import EndPointTest
 from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
 from toggl_api.meta.cache.base_cache import Comparison, MissingParentError, TogglQuery
 from toggl_api.meta.cache.json_cache import JSONSession
 from toggl_api.models.models import TogglTag, TogglTracker
-from toggl_api.user import UserEndpoint
+from toggl_api.tracker import TrackerEndpoint
 
 
 @pytest.mark.unit
@@ -89,7 +88,7 @@ def test_cache_path(meta_object):
 @pytest.mark.unit
 def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
     assert get_sqlite_cache._parent is None  # noqa: SLF001
-    endpoint = EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
+    endpoint = EndPointTest(config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
 
 
@@ -252,18 +251,18 @@ def test_cache_sync(
 ):
     path = Path(tmpdir)
     cache2 = JSONCache(path)
-    endpoint = UserEndpoint(get_workspace_id, config_setup, cache2)
+    endpoint = TrackerEndpoint(get_workspace_id, config_setup, cache2)
     assert len(cache2.load()) == 0
 
     cache1 = JSONCache(path)
-    user_object = UserEndpoint(get_workspace_id, config_setup, cache1)
-    assert len(user_object.cache.load()) == 0
+    tracker_object = TrackerEndpoint(get_workspace_id, config_setup, cache1)
+    assert len(tracker_object.cache.load()) == 0
 
     tracker = get_test_data[1]
     tracker["tag_ids"] = [random.randint(1000, 100_000) for _ in range(2)]
     tracker_id = tracker["id"]
     httpx_mock.add_response(json=tracker)
-    tracker = user_object.get(tracker_id, refresh=True)
+    tracker = tracker_object.get(tracker_id, refresh=True)
     assert isinstance(tracker, TogglTracker)
 
     assert endpoint.get(tracker_id) == tracker

@@ -234,7 +234,7 @@ def user_object_sqlite(user_object, get_sqlite_cache):
 
 @pytest.mark.unit
 def test_tracker_cache(
-    user_object_sqlite,
+    tracker_object_sqlite,
     get_test_data,
     httpx_mock,
 ):
@@ -244,10 +244,10 @@ def test_tracker_cache(
     httpx_mock.add_response(
         json=tracker,
         status_code=200,
-        url=user_object_sqlite.BASE_ENDPOINT + user_object_sqlite.endpoint + f"/time_entries/{tracker_id}",
+        url=tracker_object_sqlite.BASE_ENDPOINT + f"me/time_entries/{tracker_id}",
     )
 
-    data = user_object_sqlite.get(tracker_id, refresh=True)
+    data = tracker_object_sqlite.get(tracker_id, refresh=True)
     assert TogglTracker.from_kwargs(**tracker) == data
 
 

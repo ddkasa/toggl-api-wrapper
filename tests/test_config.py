@@ -11,6 +11,7 @@ from toggl_api.config import (
     retrieve_workspace_id,
     use_togglrc,
 )
+from toggl_api.user import UserEndpoint
 
 
 @pytest.mark.unit
@@ -19,8 +20,8 @@ def test_generate_authentication(config_setup):
 
 
 @pytest.mark.integration
-def test_auth_integration(user_object):
-    assert user_object.check_authentication()
+def test_auth_integration(config_setup):
+    assert UserEndpoint.verify_authentication(config_setup)
 
 
 @pytest.mark.unit
