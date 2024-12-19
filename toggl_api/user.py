@@ -1,35 +1,27 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Final, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import httpx
 from httpx import HTTPStatusError, Response, codes
 
-from .meta import TogglCachedEndpoint, TogglEndpoint
-from .models import TogglTracker
+from .meta import TogglEndpoint
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from toggl_api.models.models import TogglWorkspace
-
-    from .meta import TogglCache
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
-    """Endpoint for retrieving and fetching trackers with GET requests.
-
-    See the [TrackerEndpoint][toggl_api.TrackerEndpoint] for modifying trackers.
+class UserEndpoint(TogglEndpoint):
+    """Endpoint for retrieving user data.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/me)
 
     Params:
-        workspace_id: The workspace the Toggl trackers belong to.
         auth: Authentication for the client.
-        cache: Cache object where trackers are stored.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -38,20 +30,15 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             Has no effect if re_raise is `True`. Keyword Only.
     """
 
-    MODEL = TogglTracker
-
     def __init__(
         self,
-        workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglTracker] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
 
     @staticmethod
     def verify_authentication(auth: BasicAuth) -> bool:
