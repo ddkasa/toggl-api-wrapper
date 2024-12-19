@@ -301,6 +301,3 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
         """
         return cast(Response, TogglEndpoint.request(self, "", raw=True)).json()
 
-    @property
-    def endpoint(self) -> str:
-        return "me"

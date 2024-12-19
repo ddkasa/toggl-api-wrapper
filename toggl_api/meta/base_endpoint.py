@@ -151,7 +151,7 @@ class TogglEndpoint(ABC, Generic[T]):
         body: dict | list | None,
         method: RequestMethod,
     ) -> Request:
-        url = self.BASE_ENDPOINT + self.endpoint + parameters
+        url = self.BASE_ENDPOINT + parameters
         headers = headers or self.HEADERS
 
         requires_body = method not in {RequestMethod.DELETE, RequestMethod.GET}
@@ -215,15 +215,6 @@ class TogglEndpoint(ABC, Generic[T]):
     def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
         assert cls.MODEL is not None
         return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
-
-    @property
-    def endpoint(self) -> str:
-        warnings.warn(
-            "DEPRECATED: Use 'Endpoint.BASE_ENDPOINT' ClassVar instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.BASE_ENDPOINT
 
     @staticmethod
     def api_status() -> bool:

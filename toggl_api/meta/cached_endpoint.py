@@ -12,7 +12,6 @@ Classes:
 from __future__ import annotations
 
 import logging
-from abc import abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
@@ -179,11 +178,6 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         if self.cache is None:
             raise NoCacheAssignedError
         return list(self.cache.query(*query, distinct=distinct))
-
-    @property
-    @abstractmethod
-    def endpoint(self) -> str:
-        pass
 
     @property
     def cache(self) -> TogglCache[T] | None:
