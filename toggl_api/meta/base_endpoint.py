@@ -10,10 +10,9 @@ import atexit
 import logging
 import random
 import time
-import warnings
 from abc import ABC
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, TypeVar
+from typing import Any, ClassVar, Final, Generic, TypeVar
 
 import httpx
 from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
@@ -21,9 +20,6 @@ from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
 from toggl_api.models import TogglClass
 
 from .enums import RequestMethod
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -75,21 +71,6 @@ class TogglEndpoint(ABC, Generic[T]):
             auth=auth,
         )
         atexit.register(self.client.close)
-
-    def method(self, method: RequestMethod) -> Callable:
-        warnings.warn(
-            "DEPRECATED: Use `httpx.Client.build_request` instead!",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        match_dict: dict[RequestMethod, Callable] = {
-            RequestMethod.GET: self.client.get,
-            RequestMethod.POST: self.client.post,
-            RequestMethod.PUT: self.client.put,
-            RequestMethod.DELETE: self.client.delete,
-            RequestMethod.PATCH: self.client.patch,
-        }
-        return match_dict.get(method, self.client.get)
 
     def _request_handle_error(
         self,
