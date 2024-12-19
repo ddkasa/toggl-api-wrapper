@@ -1,6 +1,7 @@
 """Module for various report endpoints."""
 
 import warnings
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
@@ -338,6 +339,11 @@ class ReportEndpoint(TogglEndpoint):
         super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
+    @abstractmethod
+    def search_time_entries(self, body: ReportBody, *args, **kwargs): ...
+
+    @abstractmethod
+    def export_report(self, body: ReportBody, *args, **kwargs): ...
 
 
 class SummaryReportEndpoint(ReportEndpoint):
