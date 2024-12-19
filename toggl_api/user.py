@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import warnings
 from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING, Any, Final, cast
 
@@ -252,30 +251,6 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
             raise
 
         return cast(TogglTracker, response)
-
-    def check_authentication(self) -> bool:
-        """Check if user is correctly authenticated with the Toggl API.
-
-        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
-        """
-        warnings.warn(
-            (
-                "DEPRECATED: 'check_authentication' is being removed. "
-                "Use the static method 'verify_authentication instead!"
-            ),
-            stacklevel=3,
-        )
-        try:
-            TogglEndpoint.request(self, "/logged")
-        except HTTPStatusError as err:
-            log.critical("Failed to verify authentication!")
-            log.exception("%s")
-            if err.response.status_code != codes.FORBIDDEN:
-                raise
-
-            return False
-
-        return True
 
     @staticmethod
     def verify_authentication(auth: BasicAuth) -> bool:
