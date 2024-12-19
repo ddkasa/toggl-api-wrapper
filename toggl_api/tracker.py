@@ -390,6 +390,46 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
 
         return response if isinstance(response, list) else []
 
+    def get(
+        self,
+        tracker_id: int | TogglTracker,
+        *,
+        refresh: bool = False,
+    ) -> TogglTracker | None:
+        """Get a single tracker by ID.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-a-time-entry-by-id)
+
+        Args:
+            tracker_id: ID of the tracker to get.
+            refresh: Whether to refresh the cache or not.
+
+        Raises:
+            HTTPStatusError: If anything thats not a *ok* or *404* status code
+                is returned.
+
+        Returns:
+            TogglTracker object or None if not found.
+        """
+        if isinstance(tracker_id, TogglTracker):
+            tracker_id = tracker_id.id
+
+        if self.cache and not refresh:
+            return self.cache.find({"id": tracker_id})
+
+        try:
+            response = self.request(
+                f"me/time_entries/{tracker_id}",
+                refresh=refresh,
+            )
+        except HTTPStatusError as err:
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
+                log.warning("Tracker with id %s does not exist!", tracker_id)
+                return None
+            raise
+
+        return cast(TogglTracker, response)
+
     def edit(
         self,
         tracker: TogglTracker | int,
