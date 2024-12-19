@@ -44,7 +44,6 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
     """
 
     MODEL = TogglTracker
-    TRACKER_NOT_RUNNING: Final[int] = codes.METHOD_NOT_ALLOWED
 
     def __init__(
         self,
@@ -58,57 +57,6 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
     ) -> None:
         super().__init__(0, auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
-
-    def _current_refresh(self, tracker: TogglTracker | None) -> None:
-        if self.cache and tracker is None:
-            for t in self.cache.query(TogglQuery("stop", None)):
-                try:
-                    self.get(t, refresh=True)
-                except HTTPStatusError:
-                    log.exception("%s")
-                    return
-
-    def current(self, *, refresh: bool = True) -> TogglTracker | None:
-        """Get current running tracker. Returns None if no tracker is running.
-
-        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-get-current-time-entry)
-
-        Examples:
-            >>> user_endpoint.current()
-            None
-
-            >>> user_endpoint.current(refresh=True)
-            TogglTracker(...)
-
-        Args:
-            refresh: Whether to check the remote API for running trackers.
-                If 'refresh' is True it will check if there are any other running
-                trackers and update if the 'stop' attribute is None.
-
-        Raises:
-            HTTPStatusError: If the request is not a success or any error that's
-                not a '405' status code.
-
-        Returns:
-            A model from cache or the API. None if nothing is running.
-        """
-
-        if self.cache and not refresh:
-            query = list(self.cache.query(TogglQuery("stop", None)))
-            return query[0] if query else None
-
-        try:
-            response = self.request("/time_entries/current", refresh=refresh)
-        except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == self.TRACKER_NOT_RUNNING:
-                log.warning("No tracker is currently running!")
-                response = None
-            else:
-                raise
-
-        self._current_refresh(cast(TogglTracker | None, response))
-
-        return response if isinstance(response, TogglTracker) else None
 
     def _collect_cache(
         self,
@@ -271,7 +219,8 @@ class UserEndpoint(TogglCachedEndpoint[TogglTracker]):
                 of the provided authentication utilities.
 
         Raises:
-            HTTPStatusError: If anything that is an error that is not a FORBIDDEN code.
+            HTTPStatusError: If anything that is error status code that is not
+                a FORBIDDEN code.
 
         Returns:
             True if successfully verified authentication else False.
