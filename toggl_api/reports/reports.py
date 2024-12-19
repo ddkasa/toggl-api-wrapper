@@ -5,11 +5,11 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
 
-from httpx import Response
+from httpx import BasicAuth, Response
 
 from toggl_api.meta import BaseBody, TogglEndpoint
 from toggl_api.meta.enums import RequestMethod
-from toggl_api.models.models import TogglProject
+from toggl_api.models.models import TogglProject, TogglWorkspace
 from toggl_api.utility import format_iso
 
 REPORT_FORMATS = Literal["pdf", "csv"]
@@ -325,6 +325,19 @@ class ReportEndpoint(TogglEndpoint):
     """Abstract baseclass for the reports endpoint that overrides BASE_ENDPOINT."""
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/reports/api/v3/"
+
+    def __init__(
+        self,
+        workspace_id: TogglWorkspace | int,
+        auth: BasicAuth,
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+
 
 
 class SummaryReportEndpoint(ReportEndpoint):

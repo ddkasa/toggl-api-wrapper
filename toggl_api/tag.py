@@ -59,14 +59,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            0,
-            auth,
-            cache,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:

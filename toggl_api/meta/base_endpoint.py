@@ -40,7 +40,6 @@ class TogglEndpoint(ABC, Generic[T]):
         client: Httpx client that is used for making requests to the API.
 
     Params:
-        workspace_id: DEPRECATED and moved to child classes.
         auth: Authentication for the client.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
@@ -59,21 +58,12 @@ class TogglEndpoint(ABC, Generic[T]):
 
     def __init__(
         self,
-        workspace_id: int | None,
         auth: BasicAuth,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        if workspace_id:
-            warnings.warn(
-                "DEPRECATED: 'workspace_id' is being removed from the base Toggl endpoint!",
-                DeprecationWarning,
-                stacklevel=3,
-            )
-
-        self.workspace_id = workspace_id
         self.re_raise = re_raise
         self.retries = max(0, retries)
 

@@ -50,7 +50,6 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         retries: int = 3,
     ) -> None:
         super().__init__(
-            0,
             auth,
             cache,
             timeout=timeout,

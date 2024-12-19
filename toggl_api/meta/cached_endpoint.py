@@ -74,7 +74,6 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
 
     def __init__(
         self,
-        workspace_id: int,
         auth: BasicAuth,
         cache: TogglCache[T] | None = None,
         *,
@@ -82,13 +81,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            workspace_id=workspace_id,
-            auth=auth,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth=auth, timeout=timeout, re_raise=re_raise, retries=retries)
         self.cache = cache
 
     def request(  # type: ignore[override]

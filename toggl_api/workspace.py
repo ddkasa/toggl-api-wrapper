@@ -221,7 +221,6 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         retries: int = 3,
     ) -> None:
         super().__init__(
-            0,
             auth,
             cache,
             timeout=timeout,
@@ -420,7 +419,3 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id = workspace_id.id
 
         return cast(Response, self.request(f"workspaces/{workspace_id}/statistics", refresh=True, raw=True)).json()
-
-    @property
-    def endpoint(self) -> str:
-        return ""
