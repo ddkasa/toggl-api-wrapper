@@ -225,7 +225,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglTracker],
+        cache: TogglCache[TogglTracker] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -371,14 +371,16 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 "Tracker with id %s was either already deleted or did not exist in the first place!",
                 tracker_id,
             )
+        if self.cache is None:
+            return
 
         if isinstance(tracker, int):
-            trk = self.cache.find_entry({"id": tracker})
+            trk = self.cache.find({"id": tracker})
             if not isinstance(trk, TogglTracker):
                 return
             tracker = trk
 
-        self.cache.delete_entries(tracker)
+        self.cache.delete(tracker)
         self.cache.commit()
 
     def stop(self, tracker: TogglTracker | int) -> TogglTracker | None:

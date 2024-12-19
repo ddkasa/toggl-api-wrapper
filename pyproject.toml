@@ -19,7 +19,11 @@ classifiers = [
     "Natural Language :: English",
     "Typing :: Typed",
 ]
-packages = [{ include = "toggl_api" }, { include = "toggl_api/py.typed" }]
+packages = [
+    { include = "toggl_api" },
+    { include = "toggl_api/py.typed" },
+    { include = "scripts" },
+]
 
 [tool.poetry.scripts]
 clean-toggl-account = "scripts.clean_account:main"

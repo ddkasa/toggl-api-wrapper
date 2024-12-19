@@ -150,9 +150,9 @@ class ProjectBody(BaseBody):
             color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
             body["color"] = color
 
-        if self.start_date and self.verify_endpoint_parameter("start_date", endpoint):
+        if self.start_date and self._verify_endpoint_parameter("start_date", endpoint):
             body["start_date"] = format_iso(self.start_date)
-        if self.end_date and self.verify_endpoint_parameter("end_date", endpoint):
+        if self.end_date and self._verify_endpoint_parameter("end_date", endpoint):
             if self.start_date and self.end_date < self.start_date:
                 log.warning("End date is before the start date. Ignoring end date...")
             else:
@@ -218,7 +218,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglProject],
+        cache: TogglCache[TogglProject] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -356,8 +356,8 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": project_id})
+        if self.cache and not refresh:
+            return self.cache.find({"id": project_id})
 
         try:
             response = self.request(
@@ -404,14 +404,15 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 "Project with id %s was either already deleted or did not exist in the first place!",
                 project_id,
             )
-
+        if self.cache is None:
+            return
         if isinstance(project, int):
-            proj = self.cache.find_entry({"id": project})
+            proj = self.cache.find({"id": project})
             if not isinstance(proj, TogglProject):
                 return
             project = proj
 
-        self.cache.delete_entries(project)
+        self.cache.delete(project)
         self.cache.commit()
 
     def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject:

@@ -53,7 +53,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglTag],
+        cache: TogglCache[TogglTag] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
@@ -230,13 +230,16 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
                 tag_id,
             )
 
+        if self.cache is None:
+            return
+
         if isinstance(tag, int):
-            tag_model = self.cache.find_entry({"id": tag})
+            tag_model = self.cache.find({"id": tag})
             if not isinstance(tag_model, TogglTag):
                 return
             tag = tag_model
 
-        self.cache.delete_entries(tag)
+        self.cache.delete(tag)
         self.cache.commit()
 
     @property
