@@ -217,15 +217,6 @@ class TogglEndpoint(ABC, Generic[T]):
         return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
 
     @property
-    def model(self) -> type[T] | None:
-        warnings.warn(
-            "DEPRECATED: Use 'Endpoint.MODEL' ClassVar instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.MODEL
-
-    @property
     def endpoint(self) -> str:
         warnings.warn(
             "DEPRECATED: Use 'Endpoint.BASE_ENDPOINT' ClassVar instead.",

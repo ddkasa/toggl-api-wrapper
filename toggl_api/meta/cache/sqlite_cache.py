@@ -152,7 +152,7 @@ class SqliteCache(TogglCache[T]):
         return query_obj
 
     def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
-        value = getattr(self.parent.model, query.key)  # type: ignore[union-attr]
+        value = getattr(self.model, query.key)  # type: ignore[union-attr]
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(query.value, str):
                 return query_obj.filter(value.in_(query.value))
