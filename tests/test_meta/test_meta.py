@@ -89,4 +89,4 @@ class BodyTest(BaseBody):
 )
 @pytest.mark.unit
 def test_base_body(parameter, endpoint, expected):
-    assert BodyTest.verify_endpoint_parameter(parameter, endpoint) is expected
+    assert BodyTest.-verify_endpoint_parameter(parameter, endpoint) is expected

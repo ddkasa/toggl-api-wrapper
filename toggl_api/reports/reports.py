@@ -270,13 +270,13 @@ class ReportBody(BaseBody):
         if self.end_date:
             body["end_date"] = format_iso(self.end_date)
 
-        if self.verify_endpoint_parameter("date_format", endpoint):
+        if self._verify_endpoint_parameter("date_format", endpoint):
             body["date_format"] = self.date_format
 
-        if self.verify_endpoint_parameter("duration_format", endpoint):
+        if self._verify_endpoint_parameter("duration_format", endpoint):
             body["duration_format"] = self.duration_format
 
-        if self.include_time_entry_ids and self.verify_endpoint_parameter("include_time_entry_ids", endpoint):
+        if self.include_time_entry_ids and self._verify_endpoint_parameter("include_time_entry_ids", endpoint):
             body["include_time_entry_ids"] = self.include_time_entry_ids
 
         if self.description is not None:
@@ -285,10 +285,10 @@ class ReportBody(BaseBody):
         if self.group_ids:
             body["group_ids"] = self.group_ids
 
-        if self.grouping and self.verify_endpoint_parameter("grouping", endpoint):
+        if self.grouping and self._verify_endpoint_parameter("grouping", endpoint):
             body["grouping"] = self.grouping
 
-        if self.grouped and self.verify_endpoint_parameter("grouped", endpoint):
+        if self.grouped and self._verify_endpoint_parameter("grouped", endpoint):
             body["grouped"] = self.grouped
 
         if isinstance(self.max_duration_seconds, int):
@@ -303,19 +303,19 @@ class ReportBody(BaseBody):
         if isinstance(self.rounding_minutes, int):
             body["rounding_minutes"] = self.rounding_minutes
 
-        if self.sub_grouping is not None and self.verify_endpoint_parameter("sub_grouping", endpoint):
+        if self.sub_grouping is not None and self._verify_endpoint_parameter("sub_grouping", endpoint):
             body["sub_grouping"] = self.sub_grouping
 
-        if self.order_by is not None and self.verify_endpoint_parameter("order_by", endpoint):
+        if self.order_by is not None and self._verify_endpoint_parameter("order_by", endpoint):
             body["order_by"] = self.order_by
 
-        if self.order_dir is not None and self.verify_endpoint_parameter("order_dir", endpoint):
+        if self.order_dir is not None and self._verify_endpoint_parameter("order_dir", endpoint):
             body["order_dir"] = self.order_dir
 
-        if self.resolution is not None and self.verify_endpoint_parameter("resolution", endpoint):
+        if self.resolution is not None and self._verify_endpoint_parameter("resolution", endpoint):
             body["resolution"] = self.resolution
 
-        if self.enrich_response and self.verify_endpoint_parameter("enrich_response", endpoint):
+        if self.enrich_response and self._verify_endpoint_parameter("enrich_response", endpoint):
             body["enrich_response"] = self.enrich_response
 
         return body

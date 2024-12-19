@@ -11,7 +11,7 @@ class BaseBody(Mapping):
         pass
 
     @classmethod
-    def verify_endpoint_parameter(cls, parameter: str, endpoint: str) -> bool:
+    def _verify_endpoint_parameter(cls, parameter: str, endpoint: str) -> bool:
         """Checks if a body parameter is valid for a specified endpoint."""
         field = cls.__dataclass_fields__.get(parameter)
         if field is None:

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-@dataclass(frozen=True)
+@dataclass
 class WorkspaceBody(BaseBody):
     name: str | None = field(default=None)
     """Name of the workspace. Check TogglWorkspace static method for validation."""
@@ -163,7 +163,7 @@ class WorkspaceBody(BaseBody):
         """
 
         for fld in fields(self):
-            if not self.verify_endpoint_parameter(fld.name, endpoint):
+            if not self._verify_endpoint_parameter(fld.name, endpoint):
                 continue
 
             value = getattr(self, fld.name)
