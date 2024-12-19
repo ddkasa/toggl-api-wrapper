@@ -9,11 +9,12 @@ from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, ca
 
 from httpx import HTTPStatusError, Response, codes
 
-from toggl_api import TogglQuery
-from toggl_api._exceptions import NamingError
+from toggl_api import Comparison, TogglQuery
+from toggl_api._exceptions import DateTimeError, NamingError
 from toggl_api.meta import BaseBody, RequestMethod, TogglCache, TogglCachedEndpoint
 from toggl_api.models import TogglTracker
-from toggl_api.utility import format_iso
+
+from .utility import format_iso, get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
@@ -286,6 +287,108 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         self._current_refresh(cast(TogglTracker | None, response))
 
         return response if isinstance(response, TogglTracker) else None
+
+    def _collect_cache(
+        self,
+        since: int | datetime | None = None,
+        before: date | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[TogglTracker]:
+        cache: list[TogglTracker] = []
+        if since or before:
+            queries: list[TogglQuery[date]] = []
+
+            if since:
+                since = datetime.fromtimestamp(since, tz=timezone.utc) if isinstance(since, int) else since
+                queries.append(TogglQuery("timestamp", since, Comparison.GREATER_THEN))
+
+            if before:
+                queries.append(TogglQuery("start", before, Comparison.LESS_THEN))
+
+            cache.extend(self.query(*queries))
+
+        elif start_date and end_date:
+            cache.extend(
+                self.query(
+                    TogglQuery("start", start_date, Comparison.GREATER_THEN_OR_EQUAL),
+                    TogglQuery("start", end_date, Comparison.LESS_THEN_OR_EQUAL),
+                ),
+            )
+        else:
+            cache.extend(self.load_cache())
+
+        return cache
+
+    def collect(
+        self,
+        since: int | datetime | None = None,
+        before: date | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        *,
+        refresh: bool = False,
+    ) -> list[TogglTracker]:
+        """Get a set of trackers depending on specified parameters.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/time_entries#get-timeentries)
+
+        Missing meta and include_sharing query flags not supported by wrapper at
+        the moment.
+
+        Examples:
+            >>> collect(since=17300032362, before=date(2024, 11, 27))
+
+            >>> collect(refresh=True)
+
+            >>> collect(start_date=date(2024, 11, 27), end_date=date(2024, 12, 27))
+
+        Args:
+            since: Get entries modified since this date using UNIX timestamp.
+                Includes deleted ones if refreshing.
+            before: Get entries with start time, before given date (YYYY-MM-DD)
+                or with time in RFC3339 format.
+            start_date: Get entries with start time, from start_date YYYY-MM-DD
+                or with time in RFC3339 format. To be used with end_date.
+            end_date: Get entries with start time, until end_date YYYY-MM-DD or
+                with time in RFC3339 format. To be used with start_date.
+            refresh: Whether to refresh the cache or not.
+
+        Raises:
+            DateTimeError: If the dates are not in the correct ranges.
+            HTTPStatusError: If the request is not a successful status code.
+
+        Returns:
+           List of TogglTracker objects that are within specified parameters.
+                Empty if none is matched.
+        """
+
+        if start_date and end_date:
+            if end_date < start_date:
+                msg = "end_date must be after the start_date!"
+                raise DateTimeError(msg)
+            if start_date > datetime.now(tz=timezone.utc):
+                msg = "start_date must not be earlier than the current date!"
+                raise DateTimeError(msg)
+
+        if not refresh:
+            return self._collect_cache(since, before, start_date, end_date)
+
+        params = "me/time_entries"
+        if since or before:
+            if since:
+                params += f"?since={get_timestamp(since)}"
+
+            if before:
+                params += "&" if since else "?"
+                params += f"before={format_iso(before)}"
+
+        elif start_date and end_date:
+            params += f"?start_date={format_iso(start_date)}&end_date={format_iso(end_date)}"
+
+        response = self.request(params, refresh=refresh)
+
+        return response if isinstance(response, list) else []
 
     def edit(
         self,
