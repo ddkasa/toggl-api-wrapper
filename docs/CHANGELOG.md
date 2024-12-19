@@ -7,6 +7,45 @@ hide:
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2024-12-19
+
+### 🚀 Features
+
+- *(endpoints)* Build request private helper method
+- *(cache)* Model helper property
+
+### 🚜 Refactor
+
+- *(endpoints)* Remove unnecessary ruff ignore flag
+- *(endpoints)* Convert process_models into clasmethod
+- *(endpoints)* Make client attribute public
+- *(endpoints)* Request handle error helper private method
+- *(endpoints)* Process_response private helper method
+- *(endpoints)* Improve request method readability
+- *(json-cache)* Uses new model property
+- *(sqlite-cache)* Uses new model property
+- *(reports)* Adjust report endpoint to base
+- *(endpoints)* Use MODEL classvar instead of property
+- *(cached_endpoint)* Adjust subclass to new structure
+- *(cached_endpoint)* Log info about cache expiration
+- Remove all optional types
+
+### 🕸 Deprecations
+
+- *(endpoints)* Deprecate 'method' helper method in favour of build_request
+- *(endpoints)* Deprecate model property in favour of class variable
+- *(endpoints)* Deprecate 'endpoint' property in favour of 'BASE_ENDPOINT' ClassVar
+
+### 📚 Documentation
+
+- *(json_cache)* Encoder & decoder docstrings
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ruff)* Ignore tc006 code
+- *(cliff)* Ignore merge commits
+- *(cliff)* Merge cliff.toml with pyproject
+
 ## [1.5.1] - 2024-11-26
 
 ### 🐛 Bug Fixes
@@ -91,7 +130,6 @@ All notable changes to this project will be documented in this file.
 - *(actions)* Change release & documentation workflow dependency
 - *(ruff)* Ignore PLR0913 code
 - *(ruff)* Ignore C901 code
-- *(merge)* V1.5.0-release
 
 ### 🧪 Testing
 
