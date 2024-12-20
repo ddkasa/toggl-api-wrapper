@@ -9,7 +9,7 @@ from httpx import HTTPStatusError, codes
 
 from toggl_api._exceptions import NamingError
 from toggl_api.meta.cache import Comparison, TogglQuery
-from toggl_api.utility import _re_kwarg, format_iso, get_timestamp
+from toggl_api.utility import format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject
@@ -150,9 +150,9 @@ class ProjectBody(BaseBody):
             color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
             body["color"] = color
 
-        if self.start_date and self.verify_endpoint_parameter("start_date", endpoint):
+        if self.start_date and self._verify_endpoint_parameter("start_date", endpoint):
             body["start_date"] = format_iso(self.start_date)
-        if self.end_date and self.verify_endpoint_parameter("end_date", endpoint):
+        if self.end_date and self._verify_endpoint_parameter("end_date", endpoint):
             if self.start_date and self.end_date < self.start_date:
                 log.warning("End date is before the start date. Ignoring end date...")
             else:
@@ -218,20 +218,13 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglProject],
+        cache: TogglCache[TogglProject] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            0,
-            auth,
-            cache,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @staticmethod
@@ -316,7 +309,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             list[TogglProject],
             self.request(
-                "",
+                self.endpoint,
                 body=body.format(
                     "collect",
                     workspace_id=self.workspace_id,
@@ -356,12 +349,12 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         if isinstance(project_id, TogglProject):
             project_id = project_id.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": project_id})
+        if self.cache and not refresh:
+            return self.cache.find({"id": project_id})
 
         try:
             response = self.request(
-                f"/{project_id}",
+                f"{self.endpoint}/{project_id}",
                 refresh=refresh,
             )
         except HTTPStatusError as err:
@@ -393,7 +386,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         project_id = project if isinstance(project, int) else project.id
         try:
             self.request(
-                f"/{project_id}",
+                f"{self.endpoint}/{project_id}",
                 method=RequestMethod.DELETE,
                 refresh=True,
             )
@@ -404,14 +397,15 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 "Project with id %s was either already deleted or did not exist in the first place!",
                 project_id,
             )
-
+        if self.cache is None:
+            return
         if isinstance(project, int):
-            proj = self.cache.find_entry({"id": project})
+            proj = self.cache.find({"id": project})
             if not isinstance(proj, TogglProject):
                 return
             project = proj
 
-        self.cache.delete_entries(project)
+        self.cache.delete(project)
         self.cache.commit()
 
     def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject:
@@ -442,7 +436,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             TogglProject,
             self.request(
-                f"/{project}",
+                f"{self.endpoint}/{project}",
                 method=RequestMethod.PUT,
                 body=body.format("edit", workspace_id=self.workspace_id),
                 refresh=True,
@@ -477,7 +471,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         return cast(
             TogglProject,
             self.request(
-                "",
+                self.endpoint,
                 method=RequestMethod.POST,
                 body=body.format("add", workspace_id=self.workspace_id),
                 refresh=True,
@@ -485,7 +479,6 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         )
 
     @classmethod
-    @_re_kwarg({"color": "name"})
     def get_color(cls, name: str) -> str:
         """Get a color by name. Defaults to gray."""
         return cls.BASIC_COLORS.get(name, "#525266")

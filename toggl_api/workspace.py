@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import time
-import warnings
 from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
@@ -18,7 +17,7 @@ from toggl_api.meta.enums import RequestMethod
 from ._exceptions import DateTimeError, NamingError
 from .meta import TogglCache, TogglCachedEndpoint
 from .models import TogglWorkspace
-from .utility import _re_kwarg, get_timestamp
+from .utility import get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
@@ -163,7 +162,7 @@ class WorkspaceBody(BaseBody):
         """
 
         for fld in fields(self):
-            if not self.verify_endpoint_parameter(fld.name, endpoint):
+            if not self._verify_endpoint_parameter(fld.name, endpoint):
                 continue
 
             value = getattr(self, fld.name)
@@ -209,19 +208,17 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
 
     MODEL = TogglWorkspace
 
-    @_re_kwarg({"workspace_id": "organization_id"})
     def __init__(
         self,
         organization_id: int | TogglOrganization,
         auth: BasicAuth,
-        cache: TogglCache[TogglWorkspace],
+        cache: TogglCache[TogglWorkspace] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
         super().__init__(
-            0,
             auth,
             cache,
             timeout=timeout,
@@ -232,17 +229,16 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
 
     def get(
         self,
-        workspace: TogglWorkspace | int | None = None,
+        workspace: TogglWorkspace | int,
         *,
         refresh: bool = False,
     ) -> TogglWorkspace | None:
-        """Get the current workspace based on the workspace_id class attribute.
+        """Get the current workspace based on an id or model.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-single-workspace)
 
         Args:
-            workspace: Workspace id or to get. Optional is DEPRECATED.
-                type and will become required in the future.
+            workspace: Workspace id or model.
             refresh: Whether to use cache or not.
 
         Raises:
@@ -252,18 +248,11 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             Model of workspace if found else none.
         """
 
-        if workspace is None:
-            warnings.warn(
-                "DEPRECATION: The 'workspace' argument will become required.",
-                DeprecationWarning,
-                stacklevel=3,
-            )
-            workspace = self.workspace_id
-        elif isinstance(workspace, TogglWorkspace):
+        if isinstance(workspace, TogglWorkspace):
             workspace = workspace.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": workspace})
+        if self.cache and not refresh:
+            return self.cache.find({"id": workspace})
 
         try:
             response = self.request(f"workspaces/{workspace}", refresh=refresh)
@@ -336,7 +325,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         if since is not None:
             since = self._validate_collect_since(since)
 
-        if not refresh:
+        if self.cache and not refresh:
             return self._collect_cache(since)
 
         body = {"since": since} if since else None
@@ -420,7 +409,3 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id = workspace_id.id
 
         return cast(Response, self.request(f"workspaces/{workspace_id}/statistics", refresh=True, raw=True)).json()
-
-    @property
-    def endpoint(self) -> str:
-        return ""

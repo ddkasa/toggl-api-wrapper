@@ -1,5 +1,5 @@
 import contextlib
-import logging as log
+import logging
 import os
 import time
 from datetime import timedelta
@@ -15,7 +15,8 @@ from toggl_api.organization import OrganizationEndpoint
 from toggl_api.project import ProjectEndpoint
 from toggl_api.tag import TagEndpoint
 from toggl_api.tracker import TrackerEndpoint
-from toggl_api.user import UserEndpoint
+
+log = logging.getLogger("toggl-api-wrapper.scripts")
 
 
 def _path_cleanup(cache_path: Path) -> None:
@@ -28,10 +29,8 @@ def _path_cleanup(cache_path: Path) -> None:
 
 
 def _tracker_cleanup(cache: TogglCache, wid: int, config: BasicAuth, delay: int = 1) -> None:
-    user_object = UserEndpoint(wid, config, cache)
-    trackers = user_object.collect(refresh=True)
     endpoint = TrackerEndpoint(wid, config, cache)
-    for tracker in trackers:
+    for tracker in endpoint.collect(refresh=True):
         log.info("Deleting tracker: %s", tracker)
         with contextlib.suppress(HTTPError):
             endpoint.delete(tracker)

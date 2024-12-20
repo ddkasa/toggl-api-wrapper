@@ -87,20 +87,13 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglClient],
+        cache: TogglCache[TogglClient] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            0,
-            auth,
-            cache,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def add(self, body: ClientBody) -> TogglClient | None:
@@ -127,7 +120,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         return cast(
             TogglClient,
             self.request(
-                "",
+                self.endpoint,
                 body=body.format("add", wid=self.workspace_id),
                 method=RequestMethod.POST,
                 refresh=True,
@@ -150,12 +143,12 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         if isinstance(client_id, TogglClient):
             client_id = client_id.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": client_id})
+        if self.cache and not refresh:
+            return self.cache.find({"id": client_id})
 
         try:
             response = self.request(
-                f"/{client_id}",
+                f"{self.endpoint}/{client_id}",
                 refresh=refresh,
             )
         except HTTPStatusError as err:
@@ -190,7 +183,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         return cast(
             TogglClient,
             self.request(
-                f"/{client}",
+                f"{self.endpoint}/{client}",
                 body=body.format("edit", wid=self.workspace_id),
                 method=RequestMethod.PUT,
                 refresh=True,
@@ -210,7 +203,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         """
         client_id = client if isinstance(client, int) else client.id
         try:
-            self.request(f"/{client_id}", method=RequestMethod.DELETE, refresh=True)
+            self.request(f"{self.endpoint}/{client_id}", method=RequestMethod.DELETE, refresh=True)
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -218,13 +211,15 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 "Client with id %s was either already deleted or did not exist in the first place!",
                 client_id,
             )
+        if self.cache is None:
+            return
         if isinstance(client, int):
-            clt = self.cache.find_entry({"id": client})
+            clt = self.cache.find({"id": client})
             if not isinstance(clt, TogglClient):
                 return
             client = clt
 
-        self.cache.delete_entries(client)
+        self.cache.delete(client)
         self.cache.commit()
 
     def _collect_cache(self, body: ClientBody | None) -> list[TogglClient]:
@@ -253,10 +248,10 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         Returns:
             A list of clients. Empty if not found.
         """
-        if not refresh:
+        if self.cache and not refresh:
             return self._collect_cache(body)
 
-        url = ""
+        url = self.endpoint
         if body and body.status:
             url += f"?{body.status}"
         if body and body.name:

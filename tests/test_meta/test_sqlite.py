@@ -90,53 +90,53 @@ def test_db_creation(meta_object_sqlite):
 
 
 @pytest.mark.unit
-def test_add_entries_sqlite(meta_object_sqlite, model_data):
+def test_add_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
-    meta_object_sqlite.cache.add_entries(tracker)
-    assert tracker in meta_object_sqlite.cache.load_cache()
+    meta_object_sqlite.cache.add(tracker)
+    assert tracker in meta_object_sqlite.cache.load()
 
 
 @pytest.mark.unit
-def test_add_entries_sqlite_parent(meta_object_sqlite, model_data):
+def test_add_sqlite_parent(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
-    meta_object_sqlite.cache.add_entries(tracker)
+    meta_object_sqlite.cache.add(tracker)
     meta_object_sqlite.cache.parent = None
     with pytest.raises(MissingParentError):
-        assert tracker in meta_object_sqlite.cache.load_cache()
+        assert tracker in meta_object_sqlite.cache.load()
 
 
 @pytest.mark.unit
-@pytest.mark.order(after="test_add_entries_sqlite")
+@pytest.mark.order(after="test_add_sqlite")
 def test_update_entries_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
-    meta_object_sqlite.cache.add_entries(tracker)
+    meta_object_sqlite.cache.add(tracker)
     tracker.name = "updated_test_tracker"
-    meta_object_sqlite.cache.update_entries(tracker)
+    meta_object_sqlite.cache.update(tracker)
 
-    assert tracker in meta_object_sqlite.cache.load_cache()
+    assert tracker in meta_object_sqlite.cache.load()
 
 
 @pytest.mark.unit
 @pytest.mark.order(after="test_update_entries_sqlite")
 def test_delete_entries_sqlite(meta_object_sqlite, model_data):
-    cache = meta_object_sqlite.cache.load_cache()
-    meta_object_sqlite.cache.delete_entries(cache)
-    assert not meta_object_sqlite.cache.load_cache().all()
+    cache = meta_object_sqlite.cache.load()
+    meta_object_sqlite.cache.delete(*cache)
+    assert not meta_object_sqlite.cache.load().all()
 
 
 @pytest.mark.unit
 def test_find_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     tracker.id += random.randint(50, 100_000)
-    meta_object_sqlite.cache.add_entries(tracker)
-    assert tracker == meta_object_sqlite.cache.find_entry(tracker)
+    meta_object_sqlite.cache.add(tracker)
+    assert tracker == meta_object_sqlite.cache.find(tracker)
 
 
 @pytest.mark.unit
 def test_find_sqlite_parent(meta_object_sqlite):
     meta_object_sqlite.cache.parent = None
     with pytest.raises(MissingParentError):
-        meta_object_sqlite.cache.find_entry({"id": 5})
+        meta_object_sqlite.cache.find({"id": 5})
 
 
 @pytest.mark.unit
@@ -211,7 +211,7 @@ def test_query_sqlite_distinct(tracker_object_sqlite, model_data, faker):
 def test_query_sqlite_parent(meta_object_sqlite):
     meta_object_sqlite.cache.parent = None
     with pytest.raises(MissingParentError):
-        meta_object_sqlite.cache.find_entry({"id": 5})
+        meta_object_sqlite.cache.find({"id": 5})
 
 
 @pytest.mark.unit
@@ -220,10 +220,10 @@ def test_expiration_sqlite(meta_object_sqlite, model_data):
     tracker = model_data["tracker"]
     meta_object_sqlite.cache.expire_after = delay
     assert meta_object_sqlite.cache.expire_after == delay
-    meta_object_sqlite.cache.add_entries(tracker)
+    meta_object_sqlite.cache.add(tracker)
     time.sleep(delay.total_seconds() + 2)
     tracker_data = {"id": tracker.id, "name": tracker.name}
-    assert meta_object_sqlite.cache.find_entry(tracker_data) is None
+    assert meta_object_sqlite.cache.find(tracker_data) is None
 
 
 @pytest.fixture
@@ -234,7 +234,7 @@ def user_object_sqlite(user_object, get_sqlite_cache):
 
 @pytest.mark.unit
 def test_tracker_cache(
-    user_object_sqlite,
+    tracker_object_sqlite,
     get_test_data,
     httpx_mock,
 ):
@@ -244,17 +244,17 @@ def test_tracker_cache(
     httpx_mock.add_response(
         json=tracker,
         status_code=200,
-        url=user_object_sqlite.BASE_ENDPOINT + user_object_sqlite.endpoint + f"/time_entries/{tracker_id}",
+        url=tracker_object_sqlite.BASE_ENDPOINT + f"me/time_entries/{tracker_id}",
     )
 
-    data = user_object_sqlite.get(tracker_id, refresh=True)
+    data = tracker_object_sqlite.get(tracker_id, refresh=True)
     assert TogglTracker.from_kwargs(**tracker) == data
 
 
 @pytest.mark.unit
 def test_sqlite_save(tmp_path, get_workspace_id):
     cache = SqliteCache(Path(tmp_path))
-    assert cache.save_cache(TogglTag(0, "awdad", None, get_workspace_id), object()) is None
+    assert cache.save(TogglTag(0, "awdad", None, get_workspace_id), object()) is None
 
 
 @pytest.mark.unit

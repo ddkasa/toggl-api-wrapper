@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
+from os import PathLike
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Sequence
@@ -144,7 +145,7 @@ class JSONCache(TogglCache, Generic[T]):
         >>> tracker_endpoint = TrackerEndpoint(231231, BasicAuth(...), cache)
 
     Params:
-        path: Path to the cache file
+        path: Path to the cache file.
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
@@ -160,10 +161,10 @@ class JSONCache(TogglCache, Generic[T]):
     Methods:
         commit: Wrapper for JSONSession.save() that saves the current json data
             to disk.
-        save_cache: Saves the given data to the cache. Takes a list of Toggl
+        save: Saves the given data to the cache. Takes a list of Toggl
             objects or a single Toggl object as an argument and process the
             change before saving.
-        load_cache: Loads the data from the cache and returns the data to the
+        load: Loads the data from the cache and returns the data to the
             caller discarding expired entries.
     """
 
@@ -171,7 +172,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,
@@ -184,21 +185,18 @@ class JSONCache(TogglCache, Generic[T]):
         log.debug("Saving cache to disk!")
         self.session.commit(self.cache_path)
 
-    def save_cache(self, update: Iterable[T] | T, method: RequestMethod) -> None:
+    def save(self, update: Iterable[T] | T, method: RequestMethod) -> None:
         self.session.refresh(self.cache_path)
-        func = self.find_method(method)
-        if func is not None:
-            func(update)
-        self.commit()
+        super().save(update, method)
 
-    def load_cache(self) -> list[T]:
+    def load(self) -> list[T]:
         self.session.load(self.cache_path)
         if self.expire_after is None:
             return self.session.data
         min_ts = datetime.now(timezone.utc) - self.expire_after
         return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
 
-    def find_entry(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
+    def find(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)
         if not self.session.data:
             return None
@@ -207,8 +205,8 @@ class JSONCache(TogglCache, Generic[T]):
                 return item
         return None
 
-    def add_entry(self, item: T) -> None:
-        find_entry = self.find_entry(item)
+    def _add_entry(self, item: T) -> None:
+        find_entry = self.find(item)
         if find_entry is None:
             return self.session.data.append(item)
         index = self.session.data.index(find_entry)
@@ -216,29 +214,23 @@ class JSONCache(TogglCache, Generic[T]):
         self.session.data[index] = item
         return None
 
-    def add_entries(self, update: list[T] | T, **kwargs: Any) -> None:
-        if not isinstance(update, list):
-            return self.add_entry(update)
-        for item in update:
-            self.add_entry(item)
-        return None
+    def add(self, *entries: T) -> None:
+        for entry in entries:
+            self._add_entry(entry)
 
-    def update_entries(self, update: list[T] | T, **kwargs: Any) -> None:
-        self.add_entries(update)
+    def update(self, *entries: T) -> None:
+        self.add(*entries)
 
-    def delete_entry(self, entry: T) -> None:
-        find_entry = self.find_entry(entry)
+    def _delete_entry(self, entry: T) -> None:
+        find_entry = self.find(entry)
         if not find_entry:
             return
         index = self.session.data.index(find_entry)
         self.session.data.pop(index)
 
-    def delete_entries(self, update: list[T] | T, **kwargs: Any) -> None:
-        if not isinstance(update, list):
-            return self.delete_entry(update)
-        for entry in update:
-            self.delete_entry(entry)
-        return None
+    def delete(self, *entries: T) -> None:
+        for entry in entries:
+            self._delete_entry(entry)
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
         """Query method for filtering Toggl objects from cache.

@@ -1,15 +1,15 @@
 """Module for various report endpoints."""
 
-import warnings
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
 
-from httpx import Response
+from httpx import BasicAuth, Response
 
 from toggl_api.meta import BaseBody, TogglEndpoint
 from toggl_api.meta.enums import RequestMethod
-from toggl_api.models.models import TogglProject
+from toggl_api.models.models import TogglProject, TogglWorkspace
 from toggl_api.utility import format_iso
 
 REPORT_FORMATS = Literal["pdf", "csv"]
@@ -46,10 +46,13 @@ class PaginatedResult(Generic[T]):
         return PaginationOptions(page_size, self.next_id, self.next_row)
 
 
+class InvalidExtensionError(ValueError):
+    """Extension argument needs to be 'pdf' or 'csv'."""
+
+
 def _validate_extension(extension: REPORT_FORMATS) -> None:
     if extension not in {"pdf", "csv"}:
-        msg = "Extension argument needs to be 'pdf' or 'csv'."
-        raise ValueError(msg)
+        raise InvalidExtensionError
 
 
 @dataclass
@@ -270,13 +273,13 @@ class ReportBody(BaseBody):
         if self.end_date:
             body["end_date"] = format_iso(self.end_date)
 
-        if self.verify_endpoint_parameter("date_format", endpoint):
+        if self._verify_endpoint_parameter("date_format", endpoint):
             body["date_format"] = self.date_format
 
-        if self.verify_endpoint_parameter("duration_format", endpoint):
+        if self._verify_endpoint_parameter("duration_format", endpoint):
             body["duration_format"] = self.duration_format
 
-        if self.include_time_entry_ids and self.verify_endpoint_parameter("include_time_entry_ids", endpoint):
+        if self.include_time_entry_ids and self._verify_endpoint_parameter("include_time_entry_ids", endpoint):
             body["include_time_entry_ids"] = self.include_time_entry_ids
 
         if self.description is not None:
@@ -285,10 +288,10 @@ class ReportBody(BaseBody):
         if self.group_ids:
             body["group_ids"] = self.group_ids
 
-        if self.grouping and self.verify_endpoint_parameter("grouping", endpoint):
+        if self.grouping and self._verify_endpoint_parameter("grouping", endpoint):
             body["grouping"] = self.grouping
 
-        if self.grouped and self.verify_endpoint_parameter("grouped", endpoint):
+        if self.grouped and self._verify_endpoint_parameter("grouped", endpoint):
             body["grouped"] = self.grouped
 
         if isinstance(self.max_duration_seconds, int):
@@ -303,19 +306,19 @@ class ReportBody(BaseBody):
         if isinstance(self.rounding_minutes, int):
             body["rounding_minutes"] = self.rounding_minutes
 
-        if self.sub_grouping is not None and self.verify_endpoint_parameter("sub_grouping", endpoint):
+        if self.sub_grouping is not None and self._verify_endpoint_parameter("sub_grouping", endpoint):
             body["sub_grouping"] = self.sub_grouping
 
-        if self.order_by is not None and self.verify_endpoint_parameter("order_by", endpoint):
+        if self.order_by is not None and self._verify_endpoint_parameter("order_by", endpoint):
             body["order_by"] = self.order_by
 
-        if self.order_dir is not None and self.verify_endpoint_parameter("order_dir", endpoint):
+        if self.order_dir is not None and self._verify_endpoint_parameter("order_dir", endpoint):
             body["order_dir"] = self.order_dir
 
-        if self.resolution is not None and self.verify_endpoint_parameter("resolution", endpoint):
+        if self.resolution is not None and self._verify_endpoint_parameter("resolution", endpoint):
             body["resolution"] = self.resolution
 
-        if self.enrich_response and self.verify_endpoint_parameter("enrich_response", endpoint):
+        if self.enrich_response and self._verify_endpoint_parameter("enrich_response", endpoint):
             body["enrich_response"] = self.enrich_response
 
         return body
@@ -325,6 +328,24 @@ class ReportEndpoint(TogglEndpoint):
     """Abstract baseclass for the reports endpoint that overrides BASE_ENDPOINT."""
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/reports/api/v3/"
+
+    def __init__(
+        self,
+        workspace_id: TogglWorkspace | int,
+        auth: BasicAuth,
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+
+    @abstractmethod
+    def search_time_entries(self, body: ReportBody, *args, **kwargs): ...
+
+    @abstractmethod
+    def export_report(self, body: ReportBody, *args, **kwargs): ...
 
 
 class SummaryReportEndpoint(ReportEndpoint):
@@ -355,7 +376,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             dict[str, int],
             self.request(
-                f"projects/{project.id if isinstance(project, TogglProject) else project}/summary",
+                f"{self.endpoint}/projects/{project.id if isinstance(project, TogglProject) else project}/summary",
                 method=RequestMethod.POST,
                 body={
                     "start_date": format_iso(start_date),
@@ -384,7 +405,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, int]],
             self.request(
-                "projects/summary",
+                f"{self.endpoint}/projects/summary",
                 method=RequestMethod.POST,
                 body={
                     "start_date": format_iso(start_date),
@@ -407,7 +428,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, int]],
             self.request(
-                "summary/time_entries",
+                f"{self.endpoint}/summary/time_entries",
                 method=RequestMethod.POST,
                 body=body.format(
                     "summary_time_entries",
@@ -415,26 +436,6 @@ class SummaryReportEndpoint(ReportEndpoint):
                 ),
             ),
         )
-
-    def time_entries(self, body: ReportBody) -> list[dict[str, int]]:
-        """Returns a list of time entries within the parameters specified.
-
-        DEPRECATED: Use ['search_time_entries'][toggl_api.reports.SummaryReportEndpoint.search_time_entries] instead.
-
-        [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-search-time-entries)
-
-        Args:
-            body: Body parameters to filter time entries by.
-
-        Returns:
-            A list of dictionaries with the filtered tracker data.
-        """
-        warnings.warn(
-            "Deprecated: Use 'search_time_entries' instead.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
-        return self.search_time_entries(body)
 
     def export_report(
         self,
@@ -453,7 +454,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             collapse: Whether collapse others. Inserted into body.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
 
         Returns:
             A format ready to be saved as a file or used for further processing.
@@ -463,7 +464,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         return cast(
             Response,
             self.request(
-                f"summary/time_entries.{extension}",
+                f"{self.endpoint}/summary/time_entries.{extension}",
                 method=RequestMethod.POST,
                 body=body.format(
                     f"summary_report_{extension}",
@@ -474,40 +475,9 @@ class SummaryReportEndpoint(ReportEndpoint):
             ),
         ).content
 
-    def export_summary(
-        self,
-        body: ReportBody,
-        extension: REPORT_FORMATS,
-        *,
-        collapse: bool = False,
-    ) -> bytes:
-        """Downloads summary report in the specified in the specified format: csv or pdf.
-
-        DEPRECATED: Use ['export_report'][toggl_api.reports.SummaryReportEndpoint.export_report] instead.
-
-        [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-export-summary-report)
-
-        Args:
-            body: Body parameters to filter the report by.
-            extension: What format to use for the report. CSV or PDF.
-            collapse: Whether collapse others. Inserted into body.
-
-        Raises:
-            ValueError: If extension is not pdf or csv.
-
-        Returns:
-            A format ready to be saved as a file or used for further processing.
-        """
-        warnings.warn(
-            "Deprecated: Use 'export_report' instead.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
-        return self.export_report(body, extension, collapse=collapse)
-
     @property
     def endpoint(self) -> str:
-        return f"workspace/{self.workspace_id}/"
+        return f"workspace/{self.workspace_id}"
 
 
 class DetailedReportEndpoint(ReportEndpoint):
@@ -561,7 +531,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         request: Response = cast(
             Response,
             self.request(
-                "",
+                self.endpoint,
                 body=self._paginate_body(
                     body.format(
                         "detail_search_time",
@@ -596,7 +566,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             hide_amounts: Whether amounts should be hidden.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
             HTTPStatusError: If the request is not a success.
 
         Returns:
@@ -608,7 +578,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         request = cast(
             Response,
             self.request(
-                f".{extension}",
+                f"{self.endpoint}.{extension}",
                 body=self._paginate_body(
                     body.format(
                         f"detail_report_{extension}",
@@ -645,7 +615,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         return cast(
             dict[str, int],
             self.request(
-                "/totals",
+                f"{self.endpoint}/totals",
                 body=body.format(
                     "detail_totals",
                     workspace_id=self.workspace_id,
@@ -681,7 +651,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
         return cast(
             list[dict[str, Any]],
             self.request(
-                "",
+                self.endpoint,
                 body=body.format(
                     "weekly_time_entries",
                     workspace_id=self.workspace_id,
@@ -700,7 +670,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             extension: extension: Format of the exported report. PDF or CSV.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
 
         Returns:
             Report ready to be saved or further processed in python.
@@ -709,7 +679,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
         return cast(
             Response,
             self.request(
-                f".{extension}",
+                f"{self.endpoint}.{extension}",
                 body=body.format(
                     f"weekly_report_{extension}",
                     workspace_id=self.workspace_id,
