@@ -1,6 +1,6 @@
 import logging
 import os
-from configparser import ConfigParser, NoOptionError
+from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 
 from httpx import BasicAuth
@@ -153,9 +153,7 @@ def retrieve_togglrc_workspace_id(config_path: Path | None = None) -> int:
 
     Raises:
         FileNotFoundError: If a togglrc file has not been found.
-        NoSectionError: If no option section is found in the config file.
-        NoOptionError: If no 'default_wid' section is found in the config file.
-        ValueError: If the workspace value is not an integer.
+        WorkspaceMissingError: If no workspace is found or the workspace is invalid.
 
     Returns:
         The id of the workspace.
@@ -163,7 +161,12 @@ def retrieve_togglrc_workspace_id(config_path: Path | None = None) -> int:
 
     config = _get_togglrc(config_path)
 
-    return int(config.get("options", "default_wid"))
+    try:
+        workspace = int(config.get("options", "default_wid"))
+    except (ValueError, NoSectionError, NoOptionError) as err:
+        raise WorkspaceMissingError from err
+
+    return workspace
 
 
 if __name__ == "__main__":

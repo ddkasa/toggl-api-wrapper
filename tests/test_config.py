@@ -1,4 +1,4 @@
-from configparser import ConfigParser, NoOptionError, NoSectionError
+from configparser import ConfigParser
 from pathlib import Path
 
 import pytest
@@ -60,7 +60,7 @@ def test_use_togglrc(tmp_path, faker):
 
         path.unlink(missing_ok=True)
 
-    with pytest.raises(AuthenticationError):
+    with pytest.raises(FileNotFoundError):
         use_togglrc(tmp_path)
     file_path = tmp_path / ".togglrc"
     file_path.touch()
@@ -106,14 +106,14 @@ def test_use_togglrc_workspace_id(tmp_path, faker, get_workspace_id):
     config = ConfigParser(interpolation=None)
     config.write(file_path)
 
-    with pytest.raises(NoSectionError):
+    with pytest.raises(WorkspaceMissingError):
         retrieve_togglrc_workspace_id(tmp_path)
 
     config.add_section("options")
     with file_path.open("w", encoding="utf-8") as f:
         config.write(f)
 
-    with pytest.raises(NoOptionError):
+    with pytest.raises(WorkspaceMissingError):
         assert retrieve_togglrc_workspace_id(tmp_path)
 
     config.set("options", "default_wid", str(get_workspace_id))
