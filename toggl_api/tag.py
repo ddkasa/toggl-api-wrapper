@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import warnings
 from typing import TYPE_CHECKING, cast
 
 from httpx import HTTPStatusError, codes
@@ -145,7 +144,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             ),
         )
 
-    def edit(self, tag: TogglTag | int, name: str | None = None) -> TogglTag:
+    def edit(self, tag: TogglTag | int, name: str) -> TogglTag:
         """Sets the name of the tag based on the tag object.
 
         This endpoint always hit the external API in order to keep tags consistent.
@@ -162,9 +161,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         Args:
             tag: TogglTag or integer as the id.
-                *Currently can accept the tag as the 'name' input as well.*
-            name: New name for the tag. Will become required in the next major
-                version.
+            name: New name for the tag.
 
         Raises:
             NamingError: If the name is not at the minimum length.
@@ -173,13 +170,6 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             The edited tag.
         """
-
-        if isinstance(tag, TogglTag) and name is None:
-            warnings.warn(
-                "DEPRECATED: the 'name' argument will replace the internal usage of the 'Tag.name' attribute.",
-                stacklevel=2,
-            )
-            name = tag.name
 
         if not name:
             msg = "The tag name needs to be at least one character long."

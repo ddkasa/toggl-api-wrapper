@@ -37,10 +37,9 @@ def test_tag_creation_name(tag_object, get_workspace_id, faker):
 
 @pytest.mark.integration
 def test_tag_update(tag_object, get_workspace_id, add_tag, monkeypatch, faker):
-    monkeypatch.setattr(add_tag, "name", faker.name())
-    tag = tag_object.edit(add_tag)
+    tag = tag_object.edit(add_tag, (name := faker.name()))
     assert isinstance(tag, TogglTag)
-    assert tag.name == add_tag.name
+    assert tag.name == name
 
 
 @pytest.mark.unit
