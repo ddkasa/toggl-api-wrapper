@@ -1,6 +1,5 @@
 import logging
 import os
-import warnings
 from configparser import ConfigParser, NoOptionError
 from pathlib import Path
 
@@ -84,16 +83,7 @@ def use_togglrc(config_path: Path | None = None) -> BasicAuth:
     Returns:
         BasicAuth object that is used with httpx client.
     """
-    try:
-        config = _get_togglrc(config_path)
-    except FileNotFoundError as err:
-        warnings.warn(
-            "DEPRECATED: 'AuthenticationError' will be switched for 'FileNotFoundError'.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
-        raise AuthenticationError from err
-
+    config = _get_togglrc(config_path)
     if not config.has_section("auth"):
         msg = "No auth section in config file"
         raise AuthenticationError(msg)
