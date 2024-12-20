@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -18,16 +17,8 @@ if TYPE_CHECKING:
     from toggl_api.meta import TogglCachedEndpoint
 
 
-class MissingParentError(AttributeError, ValueError):
+class MissingParentError(AttributeError):
     """Raised when a cache object doesn't have a parent and is being called."""
-
-    def __init__(self, *args: object, name: str | None = None, obj: object = ...) -> None:
-        super().__init__(*args, name=name, obj=obj)
-        warnings.warn(
-            "DEPRECATED: 'ValueError' parent class will be removed in the future!",
-            DeprecationWarning,
-            stacklevel=2,
-        )
 
 
 class Comparison(enum.Enum):
