@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api.meta.enums import RequestMethod
@@ -12,7 +13,7 @@ from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
-    from pathlib import Path
+    from os import PathLike
 
     from toggl_api.meta import TogglCachedEndpoint
 
@@ -113,12 +114,12 @@ class TogglCache(ABC, Generic[TC]):
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint | None = None,
     ) -> None:
+        self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
-        self._cache_path = path
 
         self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
         self._parent = parent
