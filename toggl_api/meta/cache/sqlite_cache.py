@@ -1,3 +1,4 @@
+"""SQLite cache module."""
 # ruff: noqa: E402
 
 from __future__ import annotations
@@ -6,6 +7,8 @@ import atexit
 import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, TypeVar
+
+from sqlalchemy import Engine
 
 try:
     import sqlalchemy as db
@@ -38,11 +41,16 @@ class SqliteCache(TogglCache[T]):
     Disconnects database on deletion or exit.
 
     Params:
+        path: Where the SQLite database will be stored.
+            Ignored if `engine` parameter is not None.
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
         parent: Parent endpoint that will use the cache. Assigned
             automatically when supplied to a cached endpoint.
+        engine: Supply an existing database engine or otherwise one is created.
+            This may be used to supply an entirely differnt DB, but SQLite is
+            the one that is tested.
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
@@ -56,20 +64,18 @@ class SqliteCache(TogglCache[T]):
         query: Querying method that uses SQL to query cached objects.
     """
 
-    __slots__ = (
-        "database",
-        "metadata",
-        "session",
-    )
+    __slots__ = ("database", "metadata", "session")
 
     def __init__(
         self,
         path: Path,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
+        *,
+        engine: Engine | None = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.database = db.create_engine(f"sqlite:///{self.cache_path}")
+        self.database = engine or db.create_engine(f"sqlite:///{self.cache_path}")
         self.metadata = register_tables(self.database)
 
         self.session = Session(self.database)
