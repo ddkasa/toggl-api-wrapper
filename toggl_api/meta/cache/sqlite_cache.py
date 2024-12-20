@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import atexit
+from os import PathLike
 import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -68,7 +69,7 @@ class SqliteCache(TogglCache[T]):
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,

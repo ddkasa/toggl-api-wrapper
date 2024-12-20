@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
+from os import PathLike
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Sequence
@@ -144,7 +145,7 @@ class JSONCache(TogglCache, Generic[T]):
         >>> tracker_endpoint = TrackerEndpoint(231231, BasicAuth(...), cache)
 
     Params:
-        path: Path to the cache file
+        path: Path to the cache file.
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
@@ -171,7 +172,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,
