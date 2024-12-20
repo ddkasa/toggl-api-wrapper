@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import math
-import warnings
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, cast
@@ -66,7 +65,6 @@ class TrackerBody(BaseBody):
         metadata={"endpoints": ("add", "edit", "bulk_edit")},
     )
     """Start time of the tracker. If using `bulk_edit` endpoint the date is only used."""
-    start_date: date | None = field(default=None)
     stop: datetime | None = field(
         default=None,
         metadata={"endpoints": ("add", "edit", "bulk_edit")},
@@ -97,21 +95,6 @@ class TrackerBody(BaseBody):
         default="toggl-api-wrapper",
         metadata={"endpoints": ("add", "edit")},
     )
-
-    def __post_init__(self) -> None:
-        if self.start_date is not None:
-            warnings.warn(
-                'DEPRECATED: "start_date" will be removed. Use "start" parameter instead!',
-                DeprecationWarning,
-                stacklevel=3,
-            )
-            if self.start is None:
-                self.start = datetime(
-                    self.start_date.year,
-                    self.start_date.month,
-                    self.start_date.day,
-                    tzinfo=timezone.utc,
-                )
 
     def _format_bulk_edit(self) -> list[BulkEditParameter]:
         params: list[BulkEditParameter] = []
@@ -643,7 +626,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             msg = "Description must be set in order to create a tracker!"
             raise NamingError(msg)
 
-        if body.start is None and body.start_date is None:
+        if body.start is None:
             body.start = datetime.now(tz=timezone.utc)
             log.info(
                 "Body is missing a start. Setting to %s...",
