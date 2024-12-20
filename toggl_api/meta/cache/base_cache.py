@@ -1,32 +1,25 @@
 from __future__ import annotations
 
 import enum
-import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api.meta.enums import RequestMethod
 from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Sequence
-    from pathlib import Path
+    from collections.abc import Callable, Iterable
+    from os import PathLike
 
     from toggl_api.meta import TogglCachedEndpoint
 
 
-class MissingParentError(AttributeError, ValueError):
+class MissingParentError(AttributeError):
     """Raised when a cache object doesn't have a parent and is being called."""
-
-    def __init__(self, *args: object, name: str | None = None, obj: object = ...) -> None:
-        super().__init__(*args, name=name, obj=obj)
-        warnings.warn(
-            "DEPRECATED: 'ValueError' parent class will be removed in the future!",
-            DeprecationWarning,
-            stacklevel=2,
-        )
 
 
 class Comparison(enum.Enum):
@@ -121,12 +114,12 @@ class TogglCache(ABC, Generic[TC]):
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint | None = None,
     ) -> None:
+        self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
-        self._cache_path = path
 
         self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
         self._parent = parent
@@ -135,32 +128,36 @@ class TogglCache(ABC, Generic[TC]):
     def commit(self) -> None: ...
 
     @abstractmethod
-    def load_cache(self) -> Iterable[TC]: ...
+    def load(self) -> Iterable[TC]: ...
+
+    def save(self, entry: list[TC] | TC, method: RequestMethod) -> None:
+        func = self.find_method(method)
+        if func is None:
+            return
+        func(*entry) if isinstance(entry, Sequence) else func(entry)
+        self.commit()
 
     @abstractmethod
-    def save_cache(self, entry: list[TC] | TC, method: RequestMethod) -> None: ...
+    def find(self, entry: TC | dict[str, Any]) -> TC | None: ...
 
     @abstractmethod
-    def find_entry(self, entry: TC | dict[str, Any]) -> TC | None: ...
+    def add(self, *entries: TC) -> None: ...
 
     @abstractmethod
-    def add_entries(self, update: list[TC]) -> None: ...
+    def update(self, *entries: TC) -> None: ...
 
     @abstractmethod
-    def update_entries(self, update: list[TC] | TC) -> None: ...
-
-    @abstractmethod
-    def delete_entries(self, update: list[TC] | TC) -> None: ...
+    def delete(self, *entries: TC) -> None: ...
 
     @abstractmethod
     def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
 
     def find_method(self, method: RequestMethod) -> Callable | None:
         match_func: Final[dict[RequestMethod, Callable]] = {
-            RequestMethod.GET: self.add_entries,
-            RequestMethod.POST: self.update_entries,
-            RequestMethod.PATCH: self.update_entries,
-            RequestMethod.PUT: self.add_entries,
+            RequestMethod.GET: self.add,
+            RequestMethod.POST: self.update,
+            RequestMethod.PATCH: self.update,
+            RequestMethod.PUT: self.add,
         }
         return match_func.get(method)
 

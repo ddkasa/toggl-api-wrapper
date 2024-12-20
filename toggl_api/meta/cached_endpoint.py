@@ -12,7 +12,6 @@ Classes:
 from __future__ import annotations
 
 import logging
-from abc import abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
@@ -35,6 +34,10 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 T = TypeVar("T", bound=TogglClass)
+
+
+class NoCacheAssignedError(AttributeError):
+    """Raised when an endpoint doesn't have cache assocciated."""
 
 
 class TogglCachedEndpoint(TogglEndpoint[T]):
@@ -70,21 +73,14 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
 
     def __init__(
         self,
-        workspace_id: int,
         auth: BasicAuth,
-        cache: TogglCache[T],
+        cache: TogglCache[T] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            workspace_id=workspace_id,
-            auth=auth,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth=auth, timeout=timeout, re_raise=re_raise, retries=retries)
         self.cache = cache
 
     def request(  # type: ignore[override]
@@ -115,8 +111,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             Toggl API response data processed into TogglClass objects or not
                 depending on arguments.
         """
-
-        data = self.load_cache() if self.MODEL is not None else None
+        data = self.load_cache() if self.cache and self.MODEL is not None else None
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -139,14 +134,17 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         if response is None or method == RequestMethod.DELETE:
             return None
 
-        if self.MODEL is not None:
+        if self.cache and self.MODEL is not None:
             self.save_cache(response, method)  # type: ignore[arg-type]
 
         return response
 
     def load_cache(self) -> Iterable[T]:
         """Direct loading method for retrieving all models from cache."""
-        return self.cache.load_cache()
+        if self.cache is None:
+            raise NoCacheAssignedError
+
+        return self.cache.load()
 
     def save_cache(
         self,
@@ -154,13 +152,15 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         method: RequestMethod,
     ) -> None:
         """Direct saving method for retrieving all models from cache."""
+        if self.cache is None:
+            raise NoCacheAssignedError
         if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
             log.debug(
                 "Cache is set to immediately expire!",
                 extra={"expiry": self.cache.expire_after},
             )
             return None
-        return self.cache.save_cache(response, method)
+        return self.cache.save(response, method)
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
         """Query wrapper for the cache method.
@@ -175,19 +175,16 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         Returns:
             A list objects depending on the endpoint.
         """
+        if self.cache is None:
+            raise NoCacheAssignedError
         return list(self.cache.query(*query, distinct=distinct))
 
     @property
-    @abstractmethod
-    def endpoint(self) -> str:
-        pass
-
-    @property
-    def cache(self) -> TogglCache[T]:
+    def cache(self) -> TogglCache[T] | None:
         return self._cache
 
     @cache.setter
-    def cache(self, value: TogglCache) -> None:
+    def cache(self, value: TogglCache | None) -> None:
         self._cache = value
-        if self.cache._parent is not self:  # noqa: SLF001
+        if self.cache and self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self

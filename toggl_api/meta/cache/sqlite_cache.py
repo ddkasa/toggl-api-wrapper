@@ -1,11 +1,15 @@
+"""SQLite cache module."""
 # ruff: noqa: E402
 
 from __future__ import annotations
 
 import atexit
+from os import PathLike
 import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, TypeVar
+
+from sqlalchemy import Engine
 
 try:
     import sqlalchemy as db
@@ -14,7 +18,7 @@ except ImportError:
     pass
 
 import contextlib
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
 from toggl_api.models import TogglClass
 from toggl_api.models.schema import register_tables
@@ -25,7 +29,7 @@ from .base_cache import Comparison, TogglCache, TogglQuery
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from toggl_api.meta import RequestMethod, TogglCachedEndpoint
+    from toggl_api.meta import TogglCachedEndpoint
 
 
 T = TypeVar("T", bound=TogglClass)
@@ -38,11 +42,16 @@ class SqliteCache(TogglCache[T]):
     Disconnects database on deletion or exit.
 
     Params:
+        path: Where the SQLite database will be stored.
+            Ignored if `engine` parameter is not None.
         expire_after: Time after which the cache should be refreshed.
             If using an integer it will be assumed as seconds.
             If set to None the cache will never expire.
         parent: Parent endpoint that will use the cache. Assigned
             automatically when supplied to a cached endpoint.
+        engine: Supply an existing database engine or otherwise one is created.
+            This may be used to supply an entirely different DB, but SQLite is
+            the one that is tested & supported.
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
@@ -56,20 +65,18 @@ class SqliteCache(TogglCache[T]):
         query: Querying method that uses SQL to query cached objects.
     """
 
-    __slots__ = (
-        "database",
-        "metadata",
-        "session",
-    )
+    __slots__ = ("database", "metadata", "session")
 
     def __init__(
         self,
-        path: Path,
+        path: Path | PathLike | str,
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
+        *,
+        engine: Engine | None = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.database = db.create_engine(f"sqlite:///{self.cache_path}")
+        self.database = engine or db.create_engine(f"sqlite:///{self.cache_path}")
         self.metadata = register_tables(self.database)
 
         self.session = Session(self.database)
@@ -78,50 +85,35 @@ class SqliteCache(TogglCache[T]):
     def commit(self) -> None:
         self.session.commit()
 
-    def save_cache(self, entry: list[T] | T, method: RequestMethod) -> None:
-        func = self.find_method(method)
-        if func is None:
-            return
-        func(entry)
-
-    def load_cache(self) -> Query[T]:
+    def load(self) -> Query[T]:
         query = self.session.query(self.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
             query.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
         return query
 
-    def add_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
-            if self.find_entry(item):
-                self.update_entries(item)
+    def add(self, *entries: T) -> None:
+        for item in entries:
+            if self.find(item):
+                self.update(item)
                 continue
             self.session.add(item)
         self.commit()
 
-    def update_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
+    def update(self, *entries: T) -> None:
+        for item in entries:
             self.session.merge(item)
         self.commit()
 
-    def delete_entries(self, entry: Iterable[T] | T) -> None:
-        if not isinstance(entry, Iterable):
-            entry = (entry,)
-
-        for item in entry:
-            if self.find_entry(item):
+    def delete(self, *entries: T) -> None:
+        for entry in entries:
+            if self.find(entry):
                 self.session.query(
                     self.model,
-                ).filter_by(id=item.id).delete()
+                ).filter_by(id=entry.id).delete()
         self.commit()
 
-    def find_entry(self, query: T | dict[str, Any]) -> T | None:
+    def find(self, query: T | dict[str, Any]) -> T | None:
         if isinstance(query, TogglClass):
             query = {"id": query.id}
 
@@ -167,7 +159,7 @@ class SqliteCache(TogglCache[T]):
         return query_obj
 
     def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
-        value = getattr(self.parent.model, query.key)  # type: ignore[union-attr]
+        value = getattr(self.model, query.key)  # type: ignore[union-attr]
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(query.value, str):
                 return query_obj.filter(value.in_(query.value))

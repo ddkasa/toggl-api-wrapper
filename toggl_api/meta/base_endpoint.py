@@ -10,10 +10,9 @@ import atexit
 import logging
 import random
 import time
-import warnings
 from abc import ABC
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, TypeVar
+from typing import Any, ClassVar, Final, Generic, TypeVar
 
 import httpx
 from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
@@ -21,9 +20,6 @@ from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
 from toggl_api.models import TogglClass
 
 from .enums import RequestMethod
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -40,7 +36,6 @@ class TogglEndpoint(ABC, Generic[T]):
         client: Httpx client that is used for making requests to the API.
 
     Params:
-        workspace_id: DEPRECATED and moved to child classes.
         auth: Authentication for the client.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
@@ -59,21 +54,12 @@ class TogglEndpoint(ABC, Generic[T]):
 
     def __init__(
         self,
-        workspace_id: int | None,
         auth: BasicAuth,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        if workspace_id:
-            warnings.warn(
-                "DEPRECATED: 'workspace_id' is being removed from the base Toggl endpoint!",
-                DeprecationWarning,
-                stacklevel=3,
-            )
-
-        self.workspace_id = workspace_id
         self.re_raise = re_raise
         self.retries = max(0, retries)
 
@@ -85,21 +71,6 @@ class TogglEndpoint(ABC, Generic[T]):
             auth=auth,
         )
         atexit.register(self.client.close)
-
-    def method(self, method: RequestMethod) -> Callable:
-        warnings.warn(
-            "DEPRECATED: Use `httpx.Client.build_request` instead!",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        match_dict: dict[RequestMethod, Callable] = {
-            RequestMethod.GET: self.client.get,
-            RequestMethod.POST: self.client.post,
-            RequestMethod.PUT: self.client.put,
-            RequestMethod.DELETE: self.client.delete,
-            RequestMethod.PATCH: self.client.patch,
-        }
-        return match_dict.get(method, self.client.get)
 
     def _request_handle_error(
         self,
@@ -161,7 +132,7 @@ class TogglEndpoint(ABC, Generic[T]):
         body: dict | list | None,
         method: RequestMethod,
     ) -> Request:
-        url = self.BASE_ENDPOINT + self.endpoint + parameters
+        url = self.BASE_ENDPOINT + parameters
         headers = headers or self.HEADERS
 
         requires_body = method not in {RequestMethod.DELETE, RequestMethod.GET}
@@ -225,24 +196,6 @@ class TogglEndpoint(ABC, Generic[T]):
     def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
         assert cls.MODEL is not None
         return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
-
-    @property
-    def model(self) -> type[T] | None:
-        warnings.warn(
-            "DEPRECATED: Use 'Endpoint.MODEL' ClassVar instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.MODEL
-
-    @property
-    def endpoint(self) -> str:
-        warnings.warn(
-            "DEPRECATED: Use 'Endpoint.BASE_ENDPOINT' ClassVar instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.BASE_ENDPOINT
 
     @staticmethod
     def api_status() -> bool:

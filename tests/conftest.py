@@ -81,8 +81,8 @@ def project_object(get_workspace_id, config_setup, get_json_cache):
 
 
 @pytest.fixture
-def user_object(get_workspace_id, config_setup, get_json_cache) -> UserEndpoint:
-    return UserEndpoint(get_workspace_id, config_setup, get_json_cache)
+def user_object(config_setup, get_json_cache) -> UserEndpoint:
+    return UserEndpoint(config_setup)
 
 
 @pytest.fixture
@@ -133,19 +133,15 @@ class ModelTest(TogglClass):
 class EndPointTest(TogglCachedEndpoint):
     MODEL = TogglTracker
 
-    @property
-    def endpoint(self) -> str:
-        return ""
-
 
 @pytest.fixture
 def meta_object(config_setup, get_workspace_id, get_json_cache):
-    return EndPointTest(get_workspace_id, config_setup, get_json_cache)
+    return EndPointTest(config_setup, get_json_cache)
 
 
 @pytest.fixture
 def meta_object_sqlite(config_setup, get_workspace_id, get_sqlite_cache):
-    return EndPointTest(get_workspace_id, config_setup, get_sqlite_cache)
+    return EndPointTest(config_setup, get_sqlite_cache)
 
 
 def pytest_sessionstart(session: pytest.Session):

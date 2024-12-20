@@ -6,6 +6,7 @@ import pytest
 from httpx import HTTPStatusError
 
 from toggl_api import NamingError, TogglTag, TogglTracker, TrackerBody
+from toggl_api.tracker import TrackerEndpoint
 
 
 @pytest.mark.unit
@@ -51,8 +52,6 @@ def test_tracker_creation_dates(tracker_object, faker, httpx_mock):
 @pytest.mark.unit
 def test_tracker_creation_description(tracker_object):
     body = TrackerBody()
-    with pytest.raises(TypeError):
-        tracker_object.add(body)
 
     body.description = ""
     with pytest.raises(NamingError):
@@ -81,7 +80,7 @@ def test_tracker_editing_mock(tracker_object, httpx_mock, faker, number):
 
 
 @pytest.mark.integration
-def test_tracker_stop(tracker_object, add_tracker, user_object):
+def test_tracker_stop(tracker_object, add_tracker):
     diff = 5
     time.sleep(diff)
     trackstop = tracker_object.stop(tracker=add_tracker)
@@ -100,16 +99,16 @@ def test_tracker_stop_mock(tracker_object, httpx_mock, number):
 
 @pytest.mark.integration
 @pytest.mark.order(after="test_tracker_stop")
-def test_tracker_deletion(tracker_object, user_object, add_tracker):
+def test_tracker_deletion(tracker_object, add_tracker):
     tracker_object.delete(add_tracker)
-    assert add_tracker != user_object.get(add_tracker.id, refresh=True)
-    assert add_tracker != user_object.get(add_tracker.id)
+    assert add_tracker != tracker_object.get(add_tracker.id, refresh=True)
+    assert add_tracker != tracker_object.get(add_tracker.id)
 
 
 @pytest.mark.integration
-def test_tracker_deletion_id(tracker_object, user_object, add_tracker):
+def test_tracker_deletion_id(tracker_object, add_tracker):
     tracker_object.delete(add_tracker.id)
-    assert add_tracker != user_object.get(add_tracker.id)
+    assert add_tracker != tracker_object.get(add_tracker.id)
 
 
 @pytest.mark.unit
@@ -143,3 +142,155 @@ def test_tracker_bulk_edit(tracker_object, add_multiple_trackers, faker):
     )
     edit = tracker_object.bulk_edit(*add_multiple_trackers, body=body)
     assert all(t.id in edit.successes for t in add_multiple_trackers)
+
+
+@pytest.mark.integration
+def test_current_tracker(tracker_object, add_tracker):
+    current = tracker_object.current()
+    assert isinstance(current, TogglTracker)
+    assert current.name == add_tracker.name
+    assert current.id == add_tracker.id
+    assert current.start == add_tracker.start
+
+    tracker_object.stop(add_tracker)
+    assert tracker_object.current() is None
+
+
+@pytest.mark.integration
+def test_current_tracker_cached(add_tracker, tracker_object):
+    current = tracker_object.current(refresh=False)
+    assert current.id == add_tracker.id
+    assert current.name == add_tracker.name
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("status_code"),
+    [
+        405,
+        pytest.param(
+            440,
+            marks=pytest.mark.xfail(
+                raises=HTTPStatusError,
+                reason="Anything that is not a 200 or 405 code should raise a HTTPStatusError.",
+            ),
+        ),
+    ],
+)
+def test_current_tracker_not_running(status_code, tracker_object, httpx_mock):
+    httpx_mock.add_response(status_code=status_code)
+    assert tracker_object.current(refresh=True) is None
+
+
+@pytest.mark.unit
+def test_current_tracker_re_raise(tracker_object, httpx_mock, monkeypatch):
+    httpx_mock.add_response(status_code=405)
+    monkeypatch.setattr(tracker_object, "re_raise", True)
+    with pytest.raises(HTTPStatusError):
+        assert tracker_object.current(refresh=True) is None
+
+
+@pytest.mark.integration
+def test_tracker_get(tracker_object, add_tracker):
+    t = tracker_object.get(add_tracker.id)
+    assert isinstance(t, TogglTracker)
+    assert t.name == add_tracker.name
+    assert t.id == add_tracker.id
+    assert t.start == add_tracker.start
+
+    t = tracker_object.get(add_tracker.id, refresh=True)
+    assert isinstance(t, TogglTracker)
+    assert t.name == add_tracker.name
+    assert t.id == add_tracker.id
+    assert t.start == add_tracker.start
+
+
+@pytest.mark.unit
+def test_tracker_get_error(tracker_object, httpx_mock):
+    httpx_mock.add_response(status_code=460)
+    with pytest.raises(HTTPStatusError):
+        tracker_object.get(1, refresh=True)
+
+
+@pytest.mark.integration
+def test_tracker_collection(tracker_object: TrackerEndpoint, add_tracker):
+    # NOTE: Make sure tracker object is missing from cache for the refresh.
+    assert tracker_object.cache is not None
+    tracker_object.cache.delete(add_tracker)
+    tracker_object.cache.commit()
+
+    collection = tracker_object.collect(refresh=True)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+    time.sleep(1)
+
+    collection = tracker_object.collect()
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+
+@pytest.mark.integration
+def test_tracker_collection_param_since(tracker_object, add_tracker):
+    collection = tracker_object.collect(since=int(datetime.now(tz=timezone.utc).timestamp()), refresh=True)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+    time.sleep(1)
+
+    collection = tracker_object.collect(since=datetime.now(tz=timezone.utc) - timedelta(1))
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collection)
+
+
+@pytest.mark.integration
+def test_tracker_collection_param_before(tracker_object, add_tracker):
+    tracker_object.stop(add_tracker)
+
+    ts = datetime.now(tz=timezone.utc)
+    before = ts - timedelta(weeks=1)
+    collect = tracker_object.collect(before=before.date(), refresh=False)
+    assert not any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+    collect = tracker_object.collect(before=ts)
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+
+@pytest.mark.integration
+def test_tracker_collection_date(tracker_object, add_tracker):
+    ts = datetime.now(tz=timezone.utc)
+    collect = tracker_object.collect(
+        start_date=ts.replace(hour=(ts.hour - 1) % 24),
+        end_date=ts.replace(year=ts.year + 1),
+        refresh=True,
+    )
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+    collect = tracker_object.collect(
+        start_date=ts.replace(hour=(ts.hour - 1) % 24),
+        end_date=ts.replace(year=ts.year + 1),
+    )
+    assert any(add_tracker.id == t.id and add_tracker.name == t.name for t in collect)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("start_date", "end_date", "match"),
+    [
+        (
+            lambda x: x,
+            lambda x: x - timedelta(weeks=4),
+            "end_date must be after the start_date!",
+        ),
+        (
+            lambda x: x + timedelta(weeks=55),
+            lambda x: x + timedelta(weeks=110),
+            "start_date must not be earlier than the current date!",
+        ),
+    ],
+)
+def test_tracker_collection_errors(tracker_object, start_date, end_date, match):
+    now = datetime.now(tz=timezone.utc)
+
+    with pytest.raises(ValueError, match=match):
+        tracker_object.collect(
+            start_date=start_date(now),
+            end_date=end_date(now),
+            refresh=True,
+        )

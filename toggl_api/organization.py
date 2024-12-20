@@ -29,7 +29,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
     Params:
         auth: Authentication for the client.
-        cache: Cache object where trackers are stored.
+        cache: Cache object where the organization models are stored.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise HTTPStatusError errors and not handle them
@@ -43,14 +43,13 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     def __init__(
         self,
         auth: BasicAuth,
-        cache: TogglCache[TogglOrganization],
+        cache: TogglCache[TogglOrganization] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
         super().__init__(
-            0,
             auth,
             cache,
             timeout=timeout,
@@ -83,8 +82,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         if isinstance(organization, TogglOrganization):
             organization = organization.id
 
-        if not refresh:
-            return self.cache.find_entry({"id": organization})  # type: ignore[return-value]
+        if self.cache and not refresh:
+            return self.cache.find({"id": organization})
 
         try:
             response = self.request(f"organizations/{organization}", refresh=refresh)
@@ -163,8 +162,9 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         )
 
         edit = TogglOrganization(organization, name)
-        self.cache.update_entries(edit)
-        self.cache.commit()
+        if self.cache:
+            self.cache.update(edit)
+            self.cache.commit()
 
         return edit
 
@@ -215,14 +215,16 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
                 "Organization with id %s was either already deleted or did not exist in the first place!",
                 org_id,
             )
+        if self.cache is None:
+            return
 
         if isinstance(organization, int):
-            org = self.cache.find_entry({"id": organization})
+            org = self.cache.find({"id": organization})
             if not isinstance(org, TogglOrganization):
                 return
             organization = org
 
-        self.cache.delete_entries(organization)
+        self.cache.delete(organization)
         self.cache.commit()
 
     @property
