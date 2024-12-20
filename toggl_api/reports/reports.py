@@ -46,6 +46,10 @@ class PaginatedResult(Generic[T]):
         return PaginationOptions(page_size, self.next_id, self.next_row)
 
 
+class InvalidExtensionError(ValueError):
+    """Extension argument needs to be 'pdf' or 'csv'."""
+
+
 def _validate_extension(extension: REPORT_FORMATS) -> None:
     if extension not in {"pdf", "csv"}:
         msg = "Extension argument needs to be 'pdf' or 'csv'."
