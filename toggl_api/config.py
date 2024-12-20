@@ -110,6 +110,10 @@ def use_togglrc(config_path: Path | None = None) -> BasicAuth:
     return BasicAuth(email, password)
 
 
+class WorkspaceMissingError(ValueError):
+    """No workspace was found in the configuration."""
+
+
 # NOTE: For .togglrc compatibility.
 def retrieve_workspace_id(default: int | None = None) -> int:
     """Helper function that collect the default workspace from the environment.
@@ -123,7 +127,7 @@ def retrieve_workspace_id(default: int | None = None) -> int:
         default: Workspace id alternative if not set through environment.
 
     Raises:
-        ValueError: If no workspace was found at the **TOGGL_WORKSPACE_ID**
+        WorkspaceMissingError: If no workspace was found at the **TOGGL_WORKSPACE_ID**
             variable or the workspace set is not an integer.
 
     Returns:
@@ -133,7 +137,7 @@ def retrieve_workspace_id(default: int | None = None) -> int:
     workspace = os.environ.get("TOGGL_WORKSPACE_ID", default)
     if workspace is None:
         msg = "Default workspace has not been set in the environment variables."
-        raise ValueError(msg)
+        raise WorkspaceMissingError(msg)
 
     return int(workspace)
 

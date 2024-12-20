@@ -6,6 +6,7 @@ from httpx import BasicAuth
 
 from toggl_api.config import (
     AuthenticationError,
+    WorkspaceMissingError,
     generate_authentication,
     retrieve_togglrc_workspace_id,
     retrieve_workspace_id,
@@ -38,7 +39,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
     monkeypatch.delenv("TOGGL_WORKSPACE_ID")
 
     with pytest.raises(
-        ValueError,
+        WorkspaceMissingError,
         match="Default workspace has not been set in the environment variables.",
     ):
         assert retrieve_workspace_id()
@@ -50,7 +51,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 def test_use_togglrc(tmp_path, faker):
     path = Path.home() / ".togglrc"
     if not path.exists():
-        with pytest.raises(AuthenticationError):
+        with pytest.raises(FileNotFoundError):
             use_togglrc()
 
         path.touch()
