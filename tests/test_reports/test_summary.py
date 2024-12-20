@@ -15,7 +15,7 @@ def summary_report(get_workspace_id, config_setup):
 @pytest.mark.unit
 def test_verify_summary_endpoint_url(summary_report, get_workspace_id):
     assert summary_report.workspace_id == get_workspace_id
-    assert summary_report.endpoint.endswith(f"workspace/{get_workspace_id}/")
+    assert summary_report.endpoint.endswith(f"workspace/{get_workspace_id}")
 
 
 @pytest.mark.unit
@@ -51,7 +51,7 @@ def test_time_entries(
     report_body,
     add_multiple_trackers,
 ):
-    trackers = summary_report.time_entries(report_body)
+    trackers = summary_report.search_time_entries(report_body)
     assert isinstance(trackers, dict)
 
 
@@ -69,4 +69,4 @@ def test_export_summary(
     report_body: ReportBody,
     add_multiple_trackers,
 ):
-    assert isinstance(summary_report.export_summary(report_body, extension), bytes)
+    assert isinstance(summary_report.export_report(report_body, extension), bytes)

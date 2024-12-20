@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import warnings
 from typing import TYPE_CHECKING, cast
 
 from httpx import HTTPStatusError, codes
@@ -53,20 +52,13 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         self,
         workspace_id: int | TogglWorkspace,
         auth: BasicAuth,
-        cache: TogglCache[TogglTag],
+        cache: TogglCache[TogglTag] | None = None,
         *,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(
-            0,
-            auth,
-            cache,
-            timeout=timeout,
-            re_raise=re_raise,
-            retries=retries,
-        )
+        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
@@ -117,7 +109,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             A list of tags collected from the API or local cache.
         """
-        return cast(list[TogglTag], self.request("", refresh=refresh))
+        return cast(list[TogglTag], self.request(self.endpoint, refresh=refresh))
 
     def add(self, name: str) -> TogglTag:
         """Create a new tag.
@@ -145,14 +137,14 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         return cast(
             TogglTag,
             self.request(
-                "",
+                self.endpoint,
                 body={"name": name},
                 method=RequestMethod.POST,
                 refresh=True,
             ),
         )
 
-    def edit(self, tag: TogglTag | int, name: str | None = None) -> TogglTag:
+    def edit(self, tag: TogglTag | int, name: str) -> TogglTag:
         """Sets the name of the tag based on the tag object.
 
         This endpoint always hit the external API in order to keep tags consistent.
@@ -169,9 +161,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
 
         Args:
             tag: TogglTag or integer as the id.
-                *Currently can accept the tag as the 'name' input as well.*
-            name: New name for the tag. Will become required in the next major
-                version.
+            name: New name for the tag.
 
         Raises:
             NamingError: If the name is not at the minimum length.
@@ -181,13 +171,6 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
             The edited tag.
         """
 
-        if isinstance(tag, TogglTag) and name is None:
-            warnings.warn(
-                "DEPRECATED: the 'name' argument will replace the internal usage of the 'Tag.name' attribute.",
-                stacklevel=2,
-            )
-            name = tag.name
-
         if not name:
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
@@ -195,7 +178,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         return cast(
             TogglTag,
             self.request(
-                f"/{tag.id if isinstance(tag, TogglTag) else tag}",
+                f"{self.endpoint}/{tag.id if isinstance(tag, TogglTag) else tag}",
                 body={"name": name},
                 method=RequestMethod.PUT,
                 refresh=True,
@@ -218,7 +201,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         tag_id = tag if isinstance(tag, int) else tag.id
         try:
             self.request(
-                f"/{tag_id}",
+                f"{self.endpoint}/{tag_id}",
                 method=RequestMethod.DELETE,
                 refresh=True,
             )
@@ -230,13 +213,16 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
                 tag_id,
             )
 
+        if self.cache is None:
+            return
+
         if isinstance(tag, int):
-            tag_model = self.cache.find_entry({"id": tag})
+            tag_model = self.cache.find({"id": tag})
             if not isinstance(tag_model, TogglTag):
                 return
             tag = tag_model
 
-        self.cache.delete_entries(tag)
+        self.cache.delete(tag)
         self.cache.commit()
 
     @property

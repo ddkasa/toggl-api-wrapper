@@ -1,4 +1,4 @@
-from configparser import ConfigParser, NoOptionError, NoSectionError
+from configparser import ConfigParser
 from pathlib import Path
 
 import pytest
@@ -6,11 +6,13 @@ from httpx import BasicAuth
 
 from toggl_api.config import (
     AuthenticationError,
+    WorkspaceMissingError,
     generate_authentication,
     retrieve_togglrc_workspace_id,
     retrieve_workspace_id,
     use_togglrc,
 )
+from toggl_api.user import UserEndpoint
 
 
 @pytest.mark.unit
@@ -19,8 +21,8 @@ def test_generate_authentication(config_setup):
 
 
 @pytest.mark.integration
-def test_auth_integration(user_object):
-    assert user_object.check_authentication()
+def test_auth_integration(config_setup):
+    assert UserEndpoint.verify_authentication(config_setup)
 
 
 @pytest.mark.unit
@@ -37,7 +39,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
     monkeypatch.delenv("TOGGL_WORKSPACE_ID")
 
     with pytest.raises(
-        ValueError,
+        WorkspaceMissingError,
         match="Default workspace has not been set in the environment variables.",
     ):
         assert retrieve_workspace_id()
@@ -49,7 +51,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 def test_use_togglrc(tmp_path, faker):
     path = Path.home() / ".togglrc"
     if not path.exists():
-        with pytest.raises(AuthenticationError):
+        with pytest.raises(FileNotFoundError):
             use_togglrc()
 
         path.touch()
@@ -58,7 +60,7 @@ def test_use_togglrc(tmp_path, faker):
 
         path.unlink(missing_ok=True)
 
-    with pytest.raises(AuthenticationError):
+    with pytest.raises(FileNotFoundError):
         use_togglrc(tmp_path)
     file_path = tmp_path / ".togglrc"
     file_path.touch()
@@ -104,14 +106,14 @@ def test_use_togglrc_workspace_id(tmp_path, faker, get_workspace_id):
     config = ConfigParser(interpolation=None)
     config.write(file_path)
 
-    with pytest.raises(NoSectionError):
+    with pytest.raises(WorkspaceMissingError):
         retrieve_togglrc_workspace_id(tmp_path)
 
     config.add_section("options")
     with file_path.open("w", encoding="utf-8") as f:
         config.write(f)
 
-    with pytest.raises(NoOptionError):
+    with pytest.raises(WorkspaceMissingError):
         assert retrieve_togglrc_workspace_id(tmp_path)
 
     config.set("options", "default_wid", str(get_workspace_id))
