@@ -52,8 +52,7 @@ class InvalidExtensionError(ValueError):
 
 def _validate_extension(extension: REPORT_FORMATS) -> None:
     if extension not in {"pdf", "csv"}:
-        msg = "Extension argument needs to be 'pdf' or 'csv'."
-        raise ValueError(msg)
+        raise InvalidExtensionError
 
 
 @dataclass
@@ -455,7 +454,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             collapse: Whether collapse others. Inserted into body.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
 
         Returns:
             A format ready to be saved as a file or used for further processing.
@@ -567,7 +566,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             hide_amounts: Whether amounts should be hidden.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
             HTTPStatusError: If the request is not a success.
 
         Returns:
@@ -671,7 +670,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             extension: extension: Format of the exported report. PDF or CSV.
 
         Raises:
-            ValueError: If extension is not pdf or csv.
+            InvalidExtensionError: If extension is not pdf or csv.
 
         Returns:
             Report ready to be saved or further processed in python.
