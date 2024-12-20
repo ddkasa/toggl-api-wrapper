@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -65,3 +65,11 @@ def test_tracker_body_iter(faker):
 
     del body["tags"]
     assert body.tags == []
+
+
+@pytest.mark.unit
+def test_timedelta_conversion(number):
+    body = TrackerBody(duration=timedelta(seconds=(value := number.randint(50, 200))))
+
+    fmt = body.format("add")
+    assert fmt["duration"] == value

@@ -146,7 +146,7 @@ class TrackerBody(BaseBody):
         )
 
         if self.duration:
-            dur = self.duration.total_seconds() if isinstance(self.duration, timedelta) else self.duration
+            dur = int(self.duration.total_seconds()) if isinstance(self.duration, timedelta) else self.duration
             body["duration"] = dur
         elif not self.stop and self.start:
             body["duration"] = -1
