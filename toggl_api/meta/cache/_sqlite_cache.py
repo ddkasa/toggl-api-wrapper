@@ -128,7 +128,7 @@ class SqliteCache(TogglCache[T]):
 
         Filters cached model by set of supplied queries.
 
-        Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
+        Supports queries with various comparisons with the [Comparison][toggl_api.meta.cache.Comparison]
         enumeration.
 
         Args:
