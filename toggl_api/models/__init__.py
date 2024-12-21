@@ -1,7 +1,7 @@
 from dataclasses import fields
 from typing import Any
 
-from .models import (
+from ._models import (
     TogglClass,
     TogglClient,
     TogglOrganization,
@@ -11,6 +11,7 @@ from .models import (
     TogglWorkspace,
     WorkspaceChild,
 )
+from ._schema import register_tables
 
 
 def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
@@ -39,4 +40,5 @@ __all__ = (
     "TogglWorkspace",
     "WorkspaceChild",
     "as_dict_custom",
+    "register_tables",
 )

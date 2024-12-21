@@ -6,7 +6,7 @@ import pytest
 import tomli
 
 from toggl_api import __version__
-from toggl_api.utility import _requires, format_iso, get_workspace, parse_iso  # noqa: PLC2701
+from toggl_api._utility import _requires, format_iso, get_workspace, parse_iso  # noqa: PLC2701
 
 
 @pytest.mark.unit

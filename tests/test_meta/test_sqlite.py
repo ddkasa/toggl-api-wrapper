@@ -10,11 +10,9 @@ import sqlalchemy
 from sqlalchemy.orm import Query, Session
 
 from toggl_api.meta import RequestMethod
-from toggl_api.meta.cache.base_cache import Comparison, MissingParentError, TogglQuery
-from toggl_api.meta.cache.sqlite_cache import SqliteCache
-from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace
+from toggl_api.meta.cache import Comparison, MissingParentError, SqliteCache, TogglQuery
+from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
 from toggl_api.models._decorators import UTCDateTime  # noqa: PLC2701
-from toggl_api.models.schema import register_tables
 
 
 @pytest.fixture

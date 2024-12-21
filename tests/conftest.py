@@ -11,16 +11,20 @@ from faker import Faker
 from httpx import BasicAuth
 
 from scripts.utils import cleanup
-from toggl_api.client import ClientEndpoint
+from toggl_api import (
+    ClientEndpoint,
+    ProjectBody,
+    ProjectEndpoint,
+    TagEndpoint,
+    TrackerBody,
+    TrackerEndpoint,
+    UserEndpoint,
+    WorkspaceEndpoint,
+)
 from toggl_api.config import generate_authentication
-from toggl_api.meta import JSONCache, TogglCachedEndpoint
-from toggl_api.meta.cache.sqlite_cache import SqliteCache
+from toggl_api.meta import TogglCachedEndpoint
+from toggl_api.meta.cache import JSONCache, SqliteCache
 from toggl_api.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
-from toggl_api.project import ProjectBody, ProjectEndpoint
-from toggl_api.tag import TagEndpoint
-from toggl_api.tracker import TrackerBody, TrackerEndpoint
-from toggl_api.user import UserEndpoint
-from toggl_api.workspace import WorkspaceEndpoint
 
 
 @pytest.fixture(autouse=True)

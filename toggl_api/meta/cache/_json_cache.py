@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-from os import PathLike
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Sequence
@@ -11,6 +10,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
 
+from toggl_api._utility import parse_iso
+from toggl_api._version import version
 from toggl_api.models import (
     TogglClass,
     TogglClient,
@@ -20,13 +21,12 @@ from toggl_api.models import (
     TogglWorkspace,
     as_dict_custom,
 )
-from toggl_api.utility import parse_iso
-from toggl_api.version import version
 
-from .base_cache import Comparison, TogglCache, TogglQuery
+from ._base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from os import PathLike
     from pathlib import Path
 
     from toggl_api.meta import RequestMethod

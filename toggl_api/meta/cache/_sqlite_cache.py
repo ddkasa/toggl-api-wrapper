@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import atexit
-from os import PathLike
 import warnings
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -20,13 +19,14 @@ except ImportError:
 import contextlib
 from collections.abc import Sequence
 
+from toggl_api._utility import _requires
 from toggl_api.models import TogglClass
-from toggl_api.models.schema import register_tables
-from toggl_api.utility import _requires
+from toggl_api.models._schema import register_tables
 
-from .base_cache import Comparison, TogglCache, TogglQuery
+from ._base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
+    from os import PathLike
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint

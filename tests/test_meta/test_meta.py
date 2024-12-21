@@ -2,9 +2,8 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from toggl_api.meta import BaseBody
-from toggl_api.meta.base_endpoint import TogglEndpoint
-from toggl_api.models import TogglTracker
+from toggl_api import TogglTracker
+from toggl_api.meta import BaseBody, TogglEndpoint
 
 
 @pytest.mark.unit

@@ -7,14 +7,9 @@ from pathlib import Path
 
 from httpx import BasicAuth, HTTPError
 
-from toggl_api.client import ClientEndpoint
+from toggl_api import ClientEndpoint, JSONCache, OrganizationEndpoint, ProjectEndpoint, TagEndpoint, TrackerEndpoint
 from toggl_api.config import generate_authentication
-from toggl_api.meta import JSONCache
 from toggl_api.meta.cache import TogglCache
-from toggl_api.organization import OrganizationEndpoint
-from toggl_api.project import ProjectEndpoint
-from toggl_api.tag import TagEndpoint
-from toggl_api.tracker import TrackerEndpoint
 
 log = logging.getLogger("toggl-api-wrapper.scripts")
 

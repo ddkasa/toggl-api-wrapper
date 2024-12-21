@@ -4,8 +4,7 @@ from string import ascii_lowercase
 
 import pytest
 
-from toggl_api.models import TogglOrganization
-from toggl_api.organization import OrganizationEndpoint
+from toggl_api import OrganizationEndpoint, TogglOrganization
 
 
 @pytest.fixture
