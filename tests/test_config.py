@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from httpx import BasicAuth
 
+from toggl_api import UserEndpoint
 from toggl_api.config import (
     AuthenticationError,
     WorkspaceMissingError,
@@ -12,7 +13,6 @@ from toggl_api.config import (
     retrieve_workspace_id,
     use_togglrc,
 )
-from toggl_api.user import UserEndpoint
 
 
 @pytest.mark.unit

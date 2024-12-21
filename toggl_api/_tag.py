@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, cast
 
 from httpx import HTTPStatusError, codes
 
-from toggl_api.meta.cache.base_cache import TogglQuery
+from toggl_api.meta.cache import TogglQuery
 
 from ._exceptions import NamingError
 from .meta import RequestMethod, TogglCachedEndpoint

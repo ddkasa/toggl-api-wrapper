@@ -19,7 +19,7 @@ from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
 
 from toggl_api.models import TogglClass
 
-from .enums import RequestMethod
+from ._enums import RequestMethod
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 

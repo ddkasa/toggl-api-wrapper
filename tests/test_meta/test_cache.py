@@ -10,11 +10,17 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import EndPointTest
-from toggl_api.meta import CustomDecoder, CustomEncoder, JSONCache, RequestMethod
-from toggl_api.meta.cache.base_cache import Comparison, MissingParentError, TogglQuery
-from toggl_api.meta.cache.json_cache import JSONSession
-from toggl_api.models.models import TogglTag, TogglTracker
-from toggl_api.tracker import TrackerEndpoint
+from toggl_api import TogglTag, TogglTracker, TrackerEndpoint
+from toggl_api.meta import RequestMethod
+from toggl_api.meta.cache import (
+    Comparison,
+    CustomDecoder,
+    CustomEncoder,
+    JSONCache,
+    JSONSession,
+    MissingParentError,
+    TogglQuery,
+)
 
 
 @pytest.mark.unit
