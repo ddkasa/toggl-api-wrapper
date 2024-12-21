@@ -3,7 +3,6 @@ classDiagram
   }
   class BaseBody {
     format(endpoint: str)* dict[str, Any]
-    verify_endpoint_parameter(parameter: str, endpoint: str) bool
   }
   class BulkEditParameter {
     op : Literal['add', 'remove', 'replace']
@@ -11,17 +10,17 @@ classDiagram
     value : Any
   }
   class ClientBody {
-    name : Optional[str]
-    notes : Optional[str]
-    status : Optional[CLIENT_STATUS]
+    name : str | None
+    notes : str | None
+    status : CLIENT_STATUS | None
     format(endpoint: str) dict[str, Any]
   }
   class ClientEndpoint {
+    MODEL
     endpoint
-    model
     workspace_id
     add(body: ClientBody) TogglClient | None
-    collect(body: Optional[ClientBody]) list[TogglClient]
+    collect(body: ClientBody | None) list[TogglClient]
     delete(client: TogglClient | int) None
     edit(client: TogglClient | int, body: ClientBody) TogglClient | None
     get(client_id: int | TogglClient) TogglClient | None
@@ -40,28 +39,28 @@ classDiagram
   }
   class DetailedReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: Optional[PaginationOptions]) PaginatedResult[bytes]
-    search_time_entries(body: ReportBody, pagination: Optional[PaginationOptions]) PaginatedResult[list]
+    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions | None) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list]
     totals_report(body: ReportBody) dict[str, int]
   }
   class Edits {
     failures : list[int]
     successes : list[int]
   }
+  class InvalidExtensionError {
+  }
   class JSONCache {
     cache_path
     parent
     session : JSONSession[T]
-    add_entries(update: list[T] | T) None
-    add_entry(item: T) None
+    add() None
     commit() None
-    delete_entries(update: list[T] | T) None
-    delete_entry(entry: T) None
-    find_entry(entry: T | dict[str, int]) T | None
-    load_cache() list[T]
-    query() list[TogglClass]
-    save_cache(update: Iterable[T] | T, method: RequestMethod) None
-    update_entries(update: list[T] | T) None
+    delete() None
+    find(entry: T | dict[str, int]) T | None
+    load() list[T]
+    query() list[T]
+    save(update: Iterable[T] | T, method: RequestMethod) None
+    update() None
   }
   class JSONSession {
     data : list[T]
@@ -77,9 +76,11 @@ classDiagram
   }
   class NamingError {
   }
+  class NoCacheAssignedError {
+  }
   class OrganizationEndpoint {
+    MODEL
     endpoint
-    model
     add(name: str, workspace_name: str) TogglOrganization
     collect() list[TogglOrganization]
     delete(organization: TogglOrganization | int) None
@@ -87,39 +88,39 @@ classDiagram
     get(organization: TogglOrganization | int) TogglOrganization | None
   }
   class PaginatedResult {
-    next_id : Optional[int]
-    next_row : Optional[int]
+    next_id : int | None
+    next_row : int | None
     result : T
     next_options(page_size: int) PaginationOptions
   }
   class PaginationOptions {
-    next_id : Optional[int]
-    next_row : Optional[int]
+    next_id : int | None
+    next_row : int | None
     page_size : int
   }
   class ProjectBody {
     active : bool | Literal['both']
-    client_id : Optional[int]
+    client_id : int | None
     client_ids : list[int]
-    client_name : Optional[str]
-    color : Optional[str]
-    end_date : Optional[date]
+    client_name : str | None
+    color : str | None
+    end_date : date | None
     group_ids : list[int]
-    is_private : Optional[bool]
-    name : Optional[str]
-    since : Optional[date | int]
-    start_date : Optional[date]
+    is_private : bool | None
+    name : str | None
+    since : date | int | None
+    start_date : date | None
     statuses : list[TogglProject.Status]
     user_ids : list[int]
     format(endpoint: str) dict[str, Any]
   }
   class ProjectEndpoint {
     BASIC_COLORS : Final[dict[str, str]]
+    MODEL
     endpoint
-    model
     workspace_id
     add(body: ProjectBody) TogglProject
-    collect(body: Optional[ProjectBody]) list[TogglProject]
+    collect(body: ProjectBody | None) list[TogglProject]
     delete(project: TogglProject | int) None
     edit(project: TogglProject | int, body: ProjectBody) TogglProject
     get(project_id: int | TogglProject) TogglProject | None
@@ -130,32 +131,34 @@ classDiagram
   class ReportBody {
     client_ids : list[int | None]
     date_format : Literal['MM/DD/YYYY', 'DD-MM-YYYY', 'MM-DD-YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY', 'DD.MM.YYYY']
-    description : Optional[str]
+    description : str | None
     duration_format : Literal['classic', 'decimal', 'improved']
-    end_date : Optional[date]
+    end_date : date | None
     enrich_response : bool
     group_ids : list[int]
     grouped : bool
-    grouping : Optional[str]
+    grouping : str | None
     include_time_entry_ids : bool
-    max_duration_seconds : Optional[int]
-    min_duration_seconds : Optional[int]
-    order_by : Optional[Literal['title', 'duration']]
-    order_dir : Optional[Literal['ASC', 'DESC']]
+    max_duration_seconds : int | None
+    min_duration_seconds : int | None
+    order_by : Literal['title', 'duration'] | None
+    order_dir : Literal['ASC', 'DESC'] | None
     project_ids : list[int | None]
-    resolution : Optional[str]
-    rounding : Optional[int]
-    rounding_minutes : Optional[Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240]]
-    start_date : Optional[date]
-    sub_grouping : Optional[str]
+    resolution : str | None
+    rounding : int | None
+    rounding_minutes : Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240] | None
+    start_date : date | None
+    sub_grouping : str | None
     tag_ids : list[int | None]
     time_entry_ids : list[int]
     user_ids : list[int]
     format(endpoint: str) dict[str, Any]
   }
   class ReportEndpoint {
-    BASE_ENDPOINT : str
-    model
+    BASE_ENDPOINT : ClassVar[str]
+    workspace_id
+    export_report(body: ReportBody)*
+    search_time_entries(body: ReportBody)*
   }
   class RequestMethod {
     name
@@ -165,14 +168,13 @@ classDiagram
     database
     metadata
     session
-    add_entries(entry: Iterable[T] | T) None
+    add() None
     commit() None
-    delete_entries(entry: Iterable[T] | T) None
-    find_entry(query: T | dict[str, Any]) T | None
-    load_cache() Query[T]
+    delete() None
+    find(query: T | dict[str, Any]) T | None
+    load() Query[T]
     query() Query[T]
-    save_cache(entry: list[T] | T, method: RequestMethod) None
-    update_entries(entry: Iterable[T] | T) None
+    update() None
   }
   class Status {
     name
@@ -180,42 +182,40 @@ classDiagram
   class SummaryReportEndpoint {
     endpoint
     export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
-    export_summary(body: ReportBody, extension: REPORT_FORMATS) bytes
     project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
-    project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) list[dict[str, int]]
+    project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) dict[str, int]
     search_time_entries(body: ReportBody) list[dict[str, int]]
-    time_entries(body: ReportBody) list[dict[str, int]]
   }
   class TagEndpoint {
+    MODEL
     endpoint
-    model
     workspace_id
     add(name: str) TogglTag
     collect() list[TogglTag]
     delete(tag: TogglTag | int) None
-    edit(tag: TogglTag | int, name: Optional[str]) TogglTag
+    edit(tag: TogglTag | int, name: str) TogglTag
     get(tag: TogglTag | int) TogglTag | None
   }
   class TogglCache {
     cache_path
     expire_after
+    model
     parent
-    add_entries(update: list[TC])* None
+    add()* None
     commit()* None
-    delete_entries(update: list[TC] | TC)* None
-    find_entry(entry: TC | dict[str, Any])* TC | None
+    delete()* None
+    find(entry: TC | dict[str, Any])* TC | None
     find_method(method: RequestMethod) Callable | None
-    load_cache()* Iterable[TC]
+    load()* Iterable[TC]
     query()* Iterable[TC]
-    save_cache(entry: list[TC] | TC, method: RequestMethod)* None
-    update_entries(update: list[TC] | TC)* None
+    save(entry: list[TC] | TC, method: RequestMethod) None
+    update()* None
   }
   class TogglCachedEndpoint {
     cache
-    endpoint
     load_cache() Iterable[T]
     query() list[T]
-    request(parameters: str, headers: Optional[dict], body: Optional[dict | list], method: RequestMethod) Any
+    request(parameters: str, headers: dict[str, Any] | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
     save_cache(response: list[T] | T, method: RequestMethod) None
   }
   class TogglClass {
@@ -225,19 +225,19 @@ classDiagram
     from_kwargs()* TogglClass
   }
   class TogglClient {
+    from_kwargs() TogglClient
   }
   class TogglEndpoint {
     BASE_ENDPOINT : ClassVar[str]
+    ENDPOINT : ClassVar[str]
     HEADERS : Final[dict]
-    endpoint
-    model
+    MODEL : type[T] | None
+    client
     re_raise : bool
     retries
-    workspace_id : int | None
     api_status() bool
-    method(method: RequestMethod) Callable
     process_models(data: list[dict[str, Any]]) list[T]
-    request(parameters: str, headers: Optional[dict], body: Optional[dict | list], method: RequestMethod) Any
+    request(parameters: str, headers: dict | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
   }
   class TogglOrganization {
     from_kwargs() TogglOrganization
@@ -245,9 +245,9 @@ classDiagram
   }
   class TogglProject {
     active : bool
-    client : Optional[int]
+    client : int | None
     color : str
-    end_date : Optional[date]
+    end_date : date | None
     start_date : date
     stop_date : date
     from_kwargs() TogglProject
@@ -262,10 +262,10 @@ classDiagram
     from_kwargs() TogglTag
   }
   class TogglTracker {
-    duration : Optional[timedelta]
-    project : Optional[int]
+    duration : timedelta | None
+    project : int | None
     start : datetime
-    stop : Optional[datetime | str]
+    stop : datetime | str | None
     tags : list[TogglTag]
     from_kwargs() TogglTracker
     get_tags() list[TogglTag]
@@ -279,48 +279,43 @@ classDiagram
   }
   class TrackerBody {
     created_with : str
-    description : Optional[str]
-    duration : Optional[int | timedelta]
-    project_id : Optional[int]
+    description : str | None
+    duration : int | timedelta | None
+    project_id : int | None
     shared_with_user_ids : list[int]
-    start : Optional[datetime]
-    start_date : Optional[date]
-    stop : Optional[datetime]
-    tag_action : Optional[Literal['add', 'remove']]
+    start : datetime | None
+    stop : datetime | None
+    tag_action : Literal['add', 'remove'] | None
     tag_ids : list[int]
     tags : list[str]
     format(endpoint: str) dict[str, Any]
   }
   class TrackerEndpoint {
+    MODEL
     TRACKER_ALREADY_STOPPED : Final[int]
+    TRACKER_NOT_RUNNING : Final[int]
     endpoint
-    model
     workspace_id
-    add(body: TrackerBody) TogglTracker | None
+    add(body: TrackerBody) TogglTracker
     bulk_edit() Edits
+    collect(since: int | datetime | None, before: date | None, start_date: date | None, end_date: date | None) list[TogglTracker]
+    current() TogglTracker | None
     delete(tracker: TogglTracker | int) None
     edit(tracker: TogglTracker | int, body: TrackerBody) TogglTracker
+    get(tracker_id: int | TogglTracker) TogglTracker | None
     stop(tracker: TogglTracker | int) TogglTracker | None
   }
   class UTCDateTime {
     cache_ok : bool
     impl
     process_bind_param(value: datetime, _) datetime | None
-    process_result_value(value: Optional[datetime], _) datetime | None
+    process_result_value(value: datetime | None, _) datetime | None
   }
   class User {
     name : str
     user_id : int
   }
   class UserEndpoint {
-    TRACKER_NOT_RUNNING : Final[int]
-    endpoint
-    model
-    workspace_id
-    check_authentication() bool
-    collect(since: Optional[int | datetime], before: Optional[date], start_date: Optional[date], end_date: Optional[date]) list[TogglTracker]
-    current() TogglTracker | None
-    get(tracker_id: int | TogglTracker) TogglTracker | None
     get_details() dict[str, Any]
     verify_authentication(auth: BasicAuth) bool
   }
@@ -331,7 +326,7 @@ classDiagram
   }
   class WorkspaceBody {
     admins : list[int]
-    name : Optional[str]
+    name : str | None
     only_admins_may_create_projects : bool
     only_admins_may_create_tags : bool
     only_admins_see_billable_rates : bool
@@ -339,10 +334,10 @@ classDiagram
     projects_billable_by_default : bool
     projects_enforce_billable : bool
     projects_private_by_default : bool
-    rate_change_mode : Optional[Literal['start-today', 'override-current', 'override-all']]
+    rate_change_mode : Literal['start-today', 'override-current', 'override-all'] | None
     reports_collapse : bool
-    rounding : Optional[int]
-    rounding_minutes : Optional[int]
+    rounding : int | None
+    rounding_minutes : int | None
     format(endpoint: str) dict[str, Any]
   }
   class WorkspaceChild {
@@ -350,15 +345,16 @@ classDiagram
     from_kwargs() WorkspaceChild
   }
   class WorkspaceEndpoint {
-    endpoint
-    model
+    MODEL
     organization_id
     add(body: WorkspaceBody) TogglWorkspace
-    collect(since: Optional[datetime | int]) list[TogglWorkspace]
+    collect(since: datetime | int | None) list[TogglWorkspace]
     edit(workspace_id: TogglWorkspace | int, body: WorkspaceBody) TogglWorkspace
-    get(workspace: Optional[TogglWorkspace | int]) TogglWorkspace | None
+    get(workspace: TogglWorkspace | int) TogglWorkspace | None
     statistics(workspace_id: TogglWorkspace | int) WorkspaceStatistics
     tracker_constraints(workspace_id: TogglWorkspace | int) dict[str, bool]
+  }
+  class WorkspaceMissingError {
   }
   class WorkspaceStatistics {
     admins : list[User]
@@ -367,9 +363,16 @@ classDiagram
   }
   ClientBody --|> BaseBody
   ClientEndpoint --|> TogglCachedEndpoint
+  OrganizationEndpoint --|> TogglCachedEndpoint
+  ProjectBody --|> BaseBody
+  ProjectEndpoint --|> TogglCachedEndpoint
+  TagEndpoint --|> TogglCachedEndpoint
+  TrackerBody --|> BaseBody
+  TrackerEndpoint --|> TogglCachedEndpoint
+  UserEndpoint --|> TogglEndpoint
+  TogglCachedEndpoint --|> TogglEndpoint
   JSONCache --|> TogglCache
   SqliteCache --|> TogglCache
-  TogglCachedEndpoint --|> TogglEndpoint
   TogglClient --|> WorkspaceChild
   TogglOrganization --|> TogglClass
   TogglProject --|> WorkspaceChild
@@ -377,19 +380,17 @@ classDiagram
   TogglTracker --|> WorkspaceChild
   TogglWorkspace --|> TogglClass
   WorkspaceChild --|> TogglClass
-  OrganizationEndpoint --|> TogglCachedEndpoint
-  ProjectBody --|> BaseBody
-  ProjectEndpoint --|> TogglCachedEndpoint
   DetailedReportEndpoint --|> ReportEndpoint
   ReportBody --|> BaseBody
   ReportEndpoint --|> TogglEndpoint
   SummaryReportEndpoint --|> ReportEndpoint
   WeeklyReportEndpoint --|> ReportEndpoint
-  TagEndpoint --|> TogglCachedEndpoint
-  TrackerBody --|> BaseBody
-  TrackerEndpoint --|> TogglCachedEndpoint
-  UserEndpoint --|> TogglCachedEndpoint
   WorkspaceBody --|> BaseBody
   WorkspaceEndpoint --|> TogglCachedEndpoint
   Comparison --* TogglQuery : comparison
-  TogglCache --o TogglCachedEndpoint : _cache
+  TogglClient --* ClientEndpoint : MODEL
+  TogglOrganization --* OrganizationEndpoint : MODEL
+  TogglProject --* ProjectEndpoint : MODEL
+  TogglTag --* TagEndpoint : MODEL
+  TogglTracker --* TrackerEndpoint : MODEL
+  TogglWorkspace --* WorkspaceEndpoint : MODEL

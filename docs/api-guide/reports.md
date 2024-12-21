@@ -19,7 +19,7 @@
 
 # Detailed Reports
 
-::: toggl_api.reports.reports.PaginatedResult
+::: toggl_api.reports.PaginatedResult
     options:
         show_source: true
 

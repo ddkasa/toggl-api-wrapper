@@ -4,7 +4,7 @@
 {% include "static/mermaid/cache.mmd" %}
 ```
 
-::: toggl_api.MissingParentError
+::: toggl_api.meta.cache.MissingParentError
 
 ::: toggl_api.meta.cache.TogglCache
 
@@ -12,11 +12,11 @@
 
 # Querying
 
-::: toggl_api.Comparison
+::: toggl_api.meta.cache.Comparison
     options:
         show_source: true
 
-::: toggl_api.TogglQuery
+::: toggl_api.meta.cache.TogglQuery
     options:
         show_source: true
 
@@ -27,7 +27,7 @@
 > [!INFO]
 > Make sure to install SQLAlchemy if using SqliteCache with `pip install toggl-api-wrapper[sqlite]`
 
-::: toggl_api.meta.cache.sqlite_cache.SqliteCache
+::: toggl_api.meta.cache.SqliteCache
     options:
         show_source: true
 
@@ -35,10 +35,10 @@
 
 # JSON
 
-::: toggl_api.meta.cache.json_cache.JSONSession
+::: toggl_api.meta.cache.JSONSession
     options:
         show_source: true
 
-::: toggl_api.JSONCache
+::: toggl_api.meta.cache.JSONCache
     options:
         show_source: true

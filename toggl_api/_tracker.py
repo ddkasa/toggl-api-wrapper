@@ -184,7 +184,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         >>> tracker_endpoint = TrackerEndpoint(324525, BasicAuth(...), JSONCache(Path("cache")))
 
         >>> body = TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
-        >>> tracker = tracker_endpoint.add(body)
+        >>> tracker_endpoint.add(body)
         TogglTracker(id=58687689, name="What a wonderful tracker description!", project=2123132, ...)
 
         >>> tracker_endpoint.delete(tracker)
