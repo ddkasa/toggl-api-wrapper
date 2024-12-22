@@ -1,35 +1,33 @@
 toggl_api
-├── client.py
+├── _client.py
 ├── config.py
 ├── _exceptions.py
 ├── __init__.py
 ├── meta
-│   ├── base_endpoint.py
-│   ├── body.py
+│   ├── _base_endpoint.py
+│   ├── _body.py
 │   ├── cache
-│   │   ├── base_cache.py
+│   │   ├── _base_cache.py
 │   │   ├── __init__.py
-│   │   ├── json_cache.py
-│   │   └── sqlite_cache.py
-│   ├── cached_endpoint.py
-│   ├── enums.py
+│   │   ├── _json_cache.py
+│   │   └── _sqlite_cache.py
+│   ├── _cached_endpoint.py
+│   ├── _enums.py
 │   └── __init__.py
 ├── models
 │   ├── _decorators.py
 │   ├── __init__.py
-│   ├── models.py
-│   └── schema.py
-├── organization.py
-├── project.py
+│   ├── _models.py
+│   └── _schema.py
+├── _organization.py
+├── _project.py
 ├── py.typed
-├── reports
-│   ├── __init__.py
-│   └── reports.py
-├── tag.py
-├── tracker.py
-├── user.py
-├── utility.py
-├── version.py
+├── reports.py
+├── _tag.py
+├── _tracker.py
+├── _user.py
+├── _utility.py
+├── _version.py
 └── workspace.py
 
-5 directories, 28 files
+4 directories, 27 files

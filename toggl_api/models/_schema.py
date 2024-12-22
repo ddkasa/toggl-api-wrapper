@@ -12,9 +12,9 @@ with contextlib.suppress(ImportError):
     from sqlalchemy.sql import func
 
 
-from toggl_api.utility import _requires
+from toggl_api._utility import _requires
 
-from .models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from ._models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 
 with contextlib.suppress(ImportError):
     from ._decorators import UTCDateTime
