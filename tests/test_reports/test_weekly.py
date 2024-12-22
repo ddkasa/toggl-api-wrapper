@@ -1,8 +1,10 @@
 import pytest
 from httpx import HTTPStatusError
 
-from toggl_api.reports import WeeklyReportEndpoint
-from toggl_api.reports.reports import _validate_extension  # noqa: PLC2701
+from toggl_api.reports import (
+    WeeklyReportEndpoint,
+    _validate_extension,  # noqa: PLC2701
+)
 
 
 @pytest.fixture

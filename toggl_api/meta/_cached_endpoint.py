@@ -17,17 +17,17 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from toggl_api.models import TogglClass
 
-from .base_endpoint import TogglEndpoint
-from .enums import RequestMethod
+from ._base_endpoint import TogglEndpoint
+from ._enums import RequestMethod
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from httpx import BasicAuth, Response
 
-    from toggl_api.meta.cache.base_cache import TogglQuery
+    from toggl_api.meta.cache._base_cache import TogglQuery
 
-    from .cache import TogglCache
+    from ._cache import TogglCache
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")

@@ -1,145 +1,132 @@
 classDiagram
   class toggl_api {
   }
+  class _client {
+  }
   class _exceptions {
   }
-  class client {
+  class _organization {
+  }
+  class _project {
+  }
+  class _tag {
+  }
+  class _tracker {
+  }
+  class _user {
+  }
+  class _utility {
+  }
+  class _version {
   }
   class config {
   }
   class meta {
   }
-  class base_endpoint {
+  class _base_endpoint {
   }
-  class body {
+  class _body {
+  }
+  class _cached_endpoint {
+  }
+  class _enums {
   }
   class cache {
   }
-  class base_cache {
+  class _base_cache {
   }
-  class json_cache {
+  class _json_cache {
   }
-  class sqlite_cache {
-  }
-  class cached_endpoint {
-  }
-  class enums {
+  class _sqlite_cache {
   }
   class models {
   }
   class _decorators {
   }
-  class models {
+  class _models {
   }
-  class schema {
-  }
-  class organization {
-  }
-  class project {
+  class _schema {
   }
   class reports {
-  }
-  class reports {
-  }
-  class tag {
-  }
-  class tracker {
-  }
-  class user {
-  }
-  class utility {
-  }
-  class version {
   }
   class workspace {
   }
+  toggl_api --> _client
   toggl_api --> _exceptions
-  toggl_api --> client
-  toggl_api --> config
-  toggl_api --> meta
-  toggl_api --> cache
-  toggl_api --> base_cache
+  toggl_api --> _organization
+  toggl_api --> _project
+  toggl_api --> _tag
+  toggl_api --> _tracker
+  toggl_api --> _user
+  toggl_api --> _version
+  toggl_api --> _base_cache
   toggl_api --> models
-  toggl_api --> organization
-  toggl_api --> project
-  toggl_api --> tag
-  toggl_api --> tracker
-  toggl_api --> user
-  toggl_api --> version
   toggl_api --> workspace
-  client --> _exceptions
-  client --> meta
-  client --> base_cache
-  client --> models
-  meta --> base_endpoint
-  meta --> body
-  meta --> cache
-  meta --> cached_endpoint
-  meta --> enums
-  base_endpoint --> enums
-  base_endpoint --> models
-  cache --> base_cache
-  cache --> json_cache
-  base_cache --> enums
-  base_cache --> models
-  json_cache --> base_cache
-  json_cache --> models
-  json_cache --> utility
-  json_cache --> version
-  sqlite_cache --> base_cache
-  sqlite_cache --> models
-  sqlite_cache --> schema
-  sqlite_cache --> utility
-  cached_endpoint --> base_endpoint
-  cached_endpoint --> enums
-  cached_endpoint --> models
-  models --> models
-  models --> _exceptions
-  models --> utility
-  schema --> _decorators
-  schema --> models
-  schema --> utility
-  organization --> meta
-  organization --> meta
-  organization --> models
-  project --> _exceptions
-  project --> meta
-  project --> cache
-  project --> models
-  project --> utility
-  reports --> reports
+  _client --> _exceptions
+  _client --> meta
+  _client --> cache
+  _client --> models
+  _organization --> meta
+  _organization --> meta
+  _organization --> cache
+  _organization --> models
+  _project --> _exceptions
+  _project --> _utility
+  _project --> meta
+  _project --> cache
+  _project --> models
+  _tag --> _exceptions
+  _tag --> meta
+  _tag --> cache
+  _tag --> models
+  _tracker --> _exceptions
+  _tracker --> _utility
+  _tracker --> meta
+  _tracker --> cache
+  _tracker --> models
+  _user --> meta
+  meta --> _base_endpoint
+  meta --> _body
+  meta --> _cached_endpoint
+  meta --> _enums
+  _base_endpoint --> _enums
+  _base_endpoint --> models
+  _cached_endpoint --> _base_endpoint
+  _cached_endpoint --> _enums
+  _cached_endpoint --> models
+  cache --> _base_cache
+  cache --> _json_cache
+  cache --> _sqlite_cache
+  _base_cache --> _enums
+  _base_cache --> models
+  _json_cache --> _utility
+  _json_cache --> _version
+  _json_cache --> meta
+  _json_cache --> _base_cache
+  _json_cache --> models
+  _sqlite_cache --> _utility
+  _sqlite_cache --> _base_cache
+  _sqlite_cache --> models
+  _sqlite_cache --> _schema
+  models --> _models
+  models --> _schema
+  _models --> _exceptions
+  _models --> _utility
+  _schema --> _utility
+  _schema --> _decorators
+  _schema --> _models
+  reports --> _utility
   reports --> meta
-  reports --> enums
   reports --> models
-  reports --> utility
-  tag --> _exceptions
-  tag --> meta
-  tag --> base_cache
-  tag --> models
-  tracker --> _exceptions
-  tracker --> meta
-  tracker --> models
-  tracker --> utility
-  user --> toggl_api
-  user --> _exceptions
-  user --> meta
-  user --> models
-  user --> utility
   workspace --> _exceptions
+  workspace --> _utility
   workspace --> meta
-  workspace --> body
-  workspace --> base_cache
-  workspace --> enums
+  workspace --> cache
   workspace --> models
-  workspace --> utility
-  base_cache ..> meta
-  json_cache ..> meta
-  json_cache ..> cached_endpoint
-  sqlite_cache ..> meta
-  cached_endpoint ..> cache
-  cached_endpoint ..> base_cache
-  organization ..> base_cache
-  project ..> meta
-  tag ..> meta
-  tracker ..> toggl_api
-  user ..> models
+  _project ..> meta
+  _tag ..> meta
+  _tracker ..> toggl_api
+  _tracker ..> cache
+  _cached_endpoint ..> _base_cache
+  _base_cache ..> meta
+  _sqlite_cache ..> meta

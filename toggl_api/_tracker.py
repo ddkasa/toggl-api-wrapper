@@ -8,18 +8,17 @@ from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, ca
 
 from httpx import HTTPStatusError, Response, codes
 
-from toggl_api import Comparison, TogglQuery
-from toggl_api._exceptions import DateTimeError, NamingError
-from toggl_api.meta import BaseBody, RequestMethod, TogglCache, TogglCachedEndpoint
-from toggl_api.models import TogglTracker
-
-from .utility import format_iso, get_timestamp
+from ._exceptions import DateTimeError, NamingError
+from ._utility import format_iso, get_timestamp
+from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
+from .meta.cache import Comparison, TogglQuery
+from .models import TogglTracker
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
     from toggl_api import TogglWorkspace
-    from toggl_api.meta import TogglCache
+    from toggl_api.meta.cache import TogglCache
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -185,7 +184,7 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         >>> tracker_endpoint = TrackerEndpoint(324525, BasicAuth(...), JSONCache(Path("cache")))
 
         >>> body = TrackerBody(description="What a wonderful tracker description!", project_id=2123132)
-        >>> tracker = tracker_endpoint.add(body)
+        >>> tracker_endpoint.add(body)
         TogglTracker(id=58687689, name="What a wonderful tracker description!", project=2123132, ...)
 
         >>> tracker_endpoint.delete(tracker)

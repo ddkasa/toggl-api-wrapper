@@ -20,13 +20,14 @@ except ImportError:
 import contextlib
 from collections.abc import Sequence
 
+from toggl_api._utility import _requires
 from toggl_api.models import TogglClass
-from toggl_api.models.schema import register_tables
-from toggl_api.utility import _requires
+from toggl_api.models._schema import register_tables
 
-from .base_cache import Comparison, TogglCache, TogglQuery
+from ._base_cache import Comparison, TogglCache, TogglQuery
 
 if TYPE_CHECKING:
+    from os import PathLike
     from pathlib import Path
 
     from toggl_api.meta import TogglCachedEndpoint
@@ -50,8 +51,8 @@ class SqliteCache(TogglCache[T]):
         parent: Parent endpoint that will use the cache. Assigned
             automatically when supplied to a cached endpoint.
         engine: Supply an existing database engine or otherwise one is created.
-            This may be used to supply an entirely differnt DB, but SQLite is
-            the one that is tested.
+            This may be used to supply an entirely different DB, but SQLite is
+            the one that is tested & supported.
 
     Attributes:
         expire_after: Time after which the cache should be refreshed.
@@ -128,7 +129,7 @@ class SqliteCache(TogglCache[T]):
 
         Filters cached model by set of supplied queries.
 
-        Supports queries with various comparisons with the [Comparison][toggl_api.Comparison]
+        Supports queries with various comparisons with the [Comparison][toggl_api.meta.cache.Comparison]
         enumeration.
 
         Args:

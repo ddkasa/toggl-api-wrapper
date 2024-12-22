@@ -10,14 +10,11 @@ from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from httpx import HTTPStatusError, Response, codes
 
-from toggl_api.meta.body import BaseBody
-from toggl_api.meta.cache.base_cache import Comparison, TogglQuery
-from toggl_api.meta.enums import RequestMethod
-
 from ._exceptions import DateTimeError, NamingError
-from .meta import TogglCache, TogglCachedEndpoint
+from ._utility import get_timestamp
+from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
+from .meta.cache import Comparison, TogglCache, TogglQuery
 from .models import TogglWorkspace
-from .utility import get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth

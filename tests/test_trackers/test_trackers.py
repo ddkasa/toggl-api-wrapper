@@ -5,8 +5,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from httpx import HTTPStatusError
 
-from toggl_api import NamingError, TogglTag, TogglTracker, TrackerBody
-from toggl_api.tracker import TrackerEndpoint
+from toggl_api import NamingError, TogglTag, TogglTracker, TrackerBody, TrackerEndpoint
 
 
 @pytest.mark.unit

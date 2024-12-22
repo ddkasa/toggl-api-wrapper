@@ -4,9 +4,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from httpx import HTTPStatusError, codes
 
-from toggl_api.models import TogglProject
-from toggl_api.project import ProjectBody, ProjectEndpoint
-from toggl_api.utility import format_iso
+from toggl_api import ProjectBody, ProjectEndpoint, TogglProject
+from toggl_api._utility import format_iso  # noqa: PLC2701
 
 
 @pytest.fixture
