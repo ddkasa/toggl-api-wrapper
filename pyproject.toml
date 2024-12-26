@@ -40,9 +40,12 @@ clean-toggl-account = "scripts.clean_account:main"
 python = "^3.10"
 httpx = "^0.27.0"
 sqlalchemy = { version = "^2.0.30", optional = true }
+greenlet = { version = "^3.1.1", optional = true }
 
 [tool.poetry.extras]
 sqlite = ["sqlalchemy"]
+async-sqlite = ["sqlalchemy", "greenlet"]
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
