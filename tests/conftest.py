@@ -259,3 +259,16 @@ def add_multiple_trackers(tracker_object, faker, create_project):
     for tracker in trackers:
         time.sleep(1)
         tracker_object.delete(tracker)
+
+
+@pytest.fixture
+def generate_tracker(faker, number, get_workspace_id):
+    def gen_tracker():
+        return TogglTracker(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+            workspace=get_workspace_id,
+            start=datetime.now(tz=timezone.utc),
+        )
+
+    return gen_tracker
