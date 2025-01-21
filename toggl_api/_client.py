@@ -15,7 +15,7 @@ from .models import TogglClient
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from .meta import TogglCache
+    from .meta.cache import TogglCache
     from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -96,7 +96,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
-    def add(self, body: ClientBody) -> TogglClient | None:
+    def add(self, body: ClientBody) -> TogglClient:
         """Create a Client based on parameters set in the provided body.
 
         This endpoint always hit the external API in order to keep clients consistent.
@@ -159,7 +159,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
 
         return cast(TogglClient, response) or None
 
-    def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient | None:
+    def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient:
         """Edit a client with the supplied parameters from the body.
 
         This endpoint always hit the external API in order to keep clients consistent.

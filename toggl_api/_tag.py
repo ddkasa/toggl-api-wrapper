@@ -14,7 +14,7 @@ from .models import TogglTag
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from toggl_api.meta import TogglCache
+    from toggl_api.meta.cache import TogglCache
 
     from .models import TogglWorkspace
 
