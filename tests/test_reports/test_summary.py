@@ -34,13 +34,13 @@ def test_report_body(report_body, get_workspace_id):
 
 
 @pytest.mark.integration
-def test_project_summary(summary_report, create_project):
-    summ = summary_report.project_summary(create_project, date.today(), date.today())
+def test_project_summary(summary_report, gen_proj):
+    summ = summary_report.project_summary(gen_proj, date.today(), date.today())
     assert isinstance(summ, dict)
 
 
 @pytest.mark.integration
-def test_project_summaries(summary_report, create_project):
+def test_project_summaries(summary_report, gen_proj):
     summ = summary_report.project_summaries(date.today(), date.today())
     assert isinstance(summ, list)
 
