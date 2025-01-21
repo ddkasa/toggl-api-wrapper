@@ -6,7 +6,7 @@ import contextlib
 from typing import TYPE_CHECKING
 
 with contextlib.suppress(ImportError):
-    import sqlalchemy as db
+    from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, Interval, MetaData, String, Table
     from sqlalchemy.exc import ArgumentError
     from sqlalchemy.orm import registry, relationship
     from sqlalchemy.sql import func
@@ -21,107 +21,112 @@ with contextlib.suppress(ImportError):
 
 
 if TYPE_CHECKING:
-    from sqlalchemy import MetaData, Table
     from sqlalchemy.engine import Engine
 
 
 @_requires("sqlalchemy")
-def register_tables(engine: Engine) -> MetaData:
-    metadata = db.MetaData()
-
-    organization = db.Table(
+def _create_mappings(metadata: MetaData) -> None:
+    organization = Table(
         "organization",
         metadata,
-        db.Column(
+        Column(
             "created",
             UTCDateTime(timezone=True),
             server_default=func.now(),
         ),
-        db.Column("timestamp", UTCDateTime(timezone=True)),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
+        Column("timestamp", UTCDateTime(timezone=True)),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
     )
-    _map_imperatively(TogglOrganization, organization)
+    _map_imperatively(TogglOrganization, metadata, organization)
 
-    workspace = db.Table(
+    workspace = Table(
         "workspace",
         metadata,
-        db.Column(
+        Column(
             "created",
             UTCDateTime(timezone=True),
             server_default=func.now(),
         ),
-        db.Column("timestamp", UTCDateTime(timezone=True)),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
-        db.Column("organization", db.Integer),
+        Column("timestamp", UTCDateTime(timezone=True)),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
+        Column("organization", Integer),
     )
 
-    _map_imperatively(TogglWorkspace, workspace)
+    _map_imperatively(TogglWorkspace, metadata, workspace)
 
-    client = db.Table(
+    client = Table(
         "client",
         metadata,
-        db.Column("created", UTCDateTime(timezone=True), server_default=func.now()),
-        db.Column("timestamp", UTCDateTime),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
-        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
+        Column("created", UTCDateTime(timezone=True), server_default=func.now()),
+        Column("timestamp", UTCDateTime),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
+        Column("workspace", Integer, ForeignKey("workspace.id")),
     )
-    _map_imperatively(TogglClient, client)
+    _map_imperatively(TogglClient, metadata, client)
 
-    project = db.Table(
+    project = Table(
         "project",
         metadata,
-        db.Column("created", UTCDateTime, server_default=func.now()),
-        db.Column("timestamp", UTCDateTime),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
-        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
-        db.Column("color", db.String(6)),
-        db.Column("client", db.Integer, db.ForeignKey("client.id")),
-        db.Column("active", db.Boolean),
-        db.Column("start_date", UTCDateTime),
-        db.Column("stop_date", UTCDateTime),
+        Column("created", UTCDateTime, server_default=func.now()),
+        Column("timestamp", UTCDateTime),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
+        Column("workspace", Integer, ForeignKey("workspace.id")),
+        Column("color", String(6)),
+        Column("client", Integer, ForeignKey("client.id")),
+        Column("active", Boolean),
+        Column("start_date", Date),
+        Column("stop_date", Date),
     )
-    _map_imperatively(TogglProject, project)
+    _map_imperatively(TogglProject, metadata, project)
 
-    tag = db.Table(
+    tag = Table(
         "tag",
         metadata,
-        db.Column("created", UTCDateTime, server_default=func.now()),
-        db.Column("timestamp", UTCDateTime),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
-        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
+        Column("created", UTCDateTime, server_default=func.now()),
+        Column("timestamp", UTCDateTime),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
+        Column("workspace", Integer, ForeignKey("workspace.id")),
     )
-    _map_imperatively(TogglTag, tag)
+    _map_imperatively(TogglTag, metadata, tag)
 
-    tracker = db.Table(
+    tracker = Table(
         "tracker",
         metadata,
-        db.Column("created", UTCDateTime, server_default=func.now()),
-        db.Column("timestamp", UTCDateTime),
-        db.Column("id", db.Integer, primary_key=True),
-        db.Column("name", db.String(255)),
-        db.Column("workspace", db.Integer, db.ForeignKey("workspace.id")),
-        db.Column("start", UTCDateTime),
-        db.Column("duration", db.Interval, nullable=True),
-        db.Column("stop", UTCDateTime, nullable=True),
-        db.Column("project", db.Integer, db.ForeignKey("project.id"), nullable=True),
+        Column("created", UTCDateTime, server_default=func.now()),
+        Column("timestamp", UTCDateTime),
+        Column("id", Integer, primary_key=True),
+        Column("name", String(255)),
+        Column("workspace", Integer, ForeignKey("workspace.id")),
+        Column("start", UTCDateTime),
+        Column("duration", Interval, nullable=True),
+        Column("stop", UTCDateTime, nullable=True),
+        Column("project", Integer, ForeignKey("project.id"), nullable=True),
     )
 
-    tracker_tag = db.Table(
+    tracker_tag = Table(
         "tracker_tag",
         metadata,
-        db.Column("tracker", db.ForeignKey("tracker.id")),
-        db.Column("tag", db.ForeignKey("tag.id")),
+        Column("tracker", ForeignKey("tracker.id")),
+        Column("tag", ForeignKey("tag.id")),
     )
     _map_imperatively(
         TogglTracker,
+        metadata,
         tracker,
         properties={"tags": relationship(TogglTag, secondary=tracker_tag)},
     )
+
+
+@_requires("sqlalchemy")
+def register_tables(engine: Engine) -> MetaData:
+    metadata = MetaData()
+
+    _create_mappings(metadata)
 
     metadata.create_all(engine)
 
@@ -131,10 +136,11 @@ def register_tables(engine: Engine) -> MetaData:
 @_requires("sqlalchemy")
 def _map_imperatively(
     cls: type,
+    metadata: MetaData,
     table: Table,
     properties: dict | None = None,
 ) -> None:
-    mapper_registry = registry()
+    mapper_registry = registry(metadata=metadata)
     properties = properties or {}
     with contextlib.suppress(ArgumentError):
         mapper_registry.map_imperatively(cls, table, properties=properties)
