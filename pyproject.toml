@@ -76,7 +76,6 @@ mkdocs-click = "^0.8.1"
 mkdocs-redirects = "^1.2.1"
 mkdocs-autorefs = "^1.0.1"
 mkdocs-literate-nav = "^0.6.1"
-mkdocstrings = { extras = ["python"], version = "^0.25.1" }
 mkdocs-simple-hooks = "^0.1.5"
 mkdocs-material = "^9.5.24"
 mkdocs-glightbox = "^0.4.0"
@@ -86,6 +85,7 @@ pygments = "^2.18.0"
 mkdocs-panzoom-plugin = "^0.1.1"
 git-cliff = "^2.6.1"
 ruff = "^0.9.2"
+mkdocstrings-python = "^1.13.0"
 
 [tool.poetry.group.types.dependencies]
 types-sqlalchemy = "^1.4.53.38"
