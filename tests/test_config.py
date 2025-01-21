@@ -40,7 +40,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 
     with pytest.raises(
         WorkspaceMissingError,
-        match="Default workspace has not been set in the environment variables.",
+        match=r"Default workspace has not been set in the environment variables.",
     ):
         assert retrieve_workspace_id()
 
