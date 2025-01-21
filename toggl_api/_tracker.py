@@ -176,7 +176,6 @@ class TrackerBody(BaseBody):
 class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
     """Endpoint for modifying and creating trackers.
 
-    See the [UserEndpoint][toggl_api.UserEndpoint] for _GET_ specific requests.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/time_entries)
 
