@@ -9,3 +9,5 @@
             - edit
             - delete
             - collect
+
+::: toggl_api.asyncio.AsyncClientEndpoint

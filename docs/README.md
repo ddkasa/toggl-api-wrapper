@@ -24,6 +24,12 @@ Or if using SQLite cache:
 pip install "toggl-api-wrapper[sqlite]"
 ```
 
+Or if using async classes:
+
+```bash
+pip install "toggl-api-wrapper[async]"
+```
+
 ## Usage
 
 - Currently supports interacting with Trackers, Projects, Clients, Tags, Reports and some extras.

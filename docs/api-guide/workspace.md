@@ -14,6 +14,8 @@
             - tracker_constraints
             - statistics
 
+::: toggl_api.asyncio.AsyncWorkspaceEndpoint
+
 
 # Types
 

@@ -8,6 +8,8 @@
 
 ::: toggl_api.meta.cache.TogglCache
 
+::: toggl_api.asyncio.TogglAsyncCache
+
 ---
 
 # Querying
@@ -28,6 +30,12 @@
 > Make sure to install SQLAlchemy if using SqliteCache with `pip install toggl-api-wrapper[sqlite]`
 
 ::: toggl_api.meta.cache.SqliteCache
+    options:
+        show_source: true
+
+::: toggl_api.asyncio.AsyncSqliteCache
+
+::: toggl_api.asyncio.async_register_tables
     options:
         show_source: true
 

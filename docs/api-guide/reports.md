@@ -7,6 +7,8 @@
 
 ::: toggl_api.reports.ReportEndpoint
 
+::: toggl_api.asyncio.AsyncReportEndpoint
+
 ---
 
 # Summary Reports
@@ -14,6 +16,8 @@
 ::: toggl_api.reports.SummaryReportEndpoint
     options:
         show_source: true
+
+::: toggl_api.asyncio.AsyncSummaryReportEndpoint
 
 ---
 
@@ -31,6 +35,8 @@
     options:
         show_source: true
 
+::: toggl_api.asyncio.AsyncDetailedReportEndpoint
+    
 ---
 
 # Weekly Reports
@@ -38,3 +44,5 @@
 ::: toggl_api.reports.WeeklyReportEndpoint
     options:
         show_source: true
+
+::: toggl_api.asyncio.AsyncWeeklyReportEndpoint
