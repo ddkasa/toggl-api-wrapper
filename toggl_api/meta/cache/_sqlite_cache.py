@@ -4,15 +4,14 @@
 from __future__ import annotations
 
 import atexit
-from os import PathLike
 import warnings
 from datetime import datetime, timedelta, timezone
+from os import PathLike
 from typing import TYPE_CHECKING, Any, TypeVar
-
-from sqlalchemy import Engine
 
 try:
     import sqlalchemy as db
+    from sqlalchemy import Engine
     from sqlalchemy.orm import Query, Session
 except ImportError:
     pass
