@@ -6,16 +6,6 @@ from httpx import HTTPStatusError
 from toggl_api import ClientBody, TogglClient
 
 
-@pytest.fixture
-def create_client_body(get_workspace_id, faker):
-    return ClientBody(name=faker.name())
-
-
-@pytest.fixture
-def create_client(client_object, create_client_body):
-    return client_object.add(create_client_body)
-
-
 @pytest.mark.unit
 def test_client_model(get_workspace_id):
     data = {"id": 1, "name": "Test", "wid": get_workspace_id}
