@@ -22,7 +22,7 @@ def test_api_status(body, status_code, expected, httpx_mock):
 
 @pytest.mark.unit
 def test_headers(meta_object):
-    assert {"content-type": "application/json"} == meta_object.HEADERS
+    assert meta_object.HEADERS == {"content-type": "application/json"}
 
 
 @pytest.mark.unit
