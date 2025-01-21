@@ -115,7 +115,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
-                self.endpoint,
+                self.BASE_ENDPOINT,
                 parameters,
                 extra={"body": body, "headers": headers, "method": method},
             )

@@ -46,7 +46,6 @@ class TogglEndpoint(ABC, Generic[T]):
     """
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
-    ENDPOINT: ClassVar[str]
     HEADERS: Final[dict] = {"content-type": "application/json"}
     MODEL: type[T] | None = None
 

@@ -3,12 +3,12 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-from os import PathLike
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from os import PathLike
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
 
 from toggl_api._utility import parse_iso
