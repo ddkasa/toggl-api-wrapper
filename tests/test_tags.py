@@ -73,3 +73,21 @@ def test_delete_tag_raise(tag_object, number, httpx_mock):
     httpx_mock.add_response(status_code=450)
     with pytest.raises(HTTPStatusError):
         assert tag_object.delete(number.randint(10, sys.maxsize)) is None
+
+
+@pytest.mark.integration
+def test_tag_get(tag_object, number, httpx_mock, faker):
+    httpx_mock.add_response(
+        json=(
+            json := {
+                "id": number.randint(100, sys.maxsize),
+                "name": faker.name(),
+                "workspace_id": tag_object.workspace_id,
+            }
+        ),
+        status_code=200,
+    )
+    tag = tag_object.get(json["id"], refresh=True)
+    assert tag.id == json["id"]
+    assert tag.name == json["name"]
+    assert tag.workspace == json["workspace_id"]
