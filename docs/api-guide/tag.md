@@ -6,3 +6,5 @@
             - add
             - edit
             - delete
+
+::: toggl_api.asyncio.AsyncTagEndpoint

@@ -15,6 +15,8 @@
             - model
             - api_status
 
+::: toggl_api.asyncio.TogglAsyncEndpoint
+
 ***
 
 ::: toggl_api.meta.TogglCachedEndpoint
@@ -27,3 +29,4 @@
             - cache
             - query
 
+::: toggl_api.asyncio.TogglAsyncCachedEndpoint

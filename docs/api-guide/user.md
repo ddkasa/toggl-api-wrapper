@@ -4,3 +4,6 @@
         members:
             - verify_authentication
             - get_details
+
+::: toggl_api.asyncio.AsyncUserEndpoint
+

@@ -16,6 +16,9 @@
             - delete
             - stop
 
+
+::: toggl_api.asyncio.AsyncTrackerEndpoint 
+
 ## Types
 
 ::: toggl_api.BulkEditParameter
