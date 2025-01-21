@@ -39,10 +39,14 @@ clean-toggl-account = "scripts.clean_account:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 httpx = "^0.27.0"
-sqlalchemy = { version = "^2.0.30", optional = true }
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.37"}
+greenlet = { version = "^3.1.1", optional = true }
+aiosqlite = "^0.20.0"
 
 [tool.poetry.extras]
 sqlite = ["sqlalchemy"]
+async-sqlite = ["sqlalchemy", "greenlet", "aiosqlite"]
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
@@ -59,6 +63,7 @@ pytest-replay = "^1.5.2"
 pytest-rerunfailures = "^14.0"
 pytest-dependency = "^0.6.0"
 tomli = "^2.0.2"
+pytest-asyncio = "^0.25.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.0"
@@ -207,6 +212,7 @@ markers = [
 ]
 testpaths = ["tests"]
 addopts = "--report-log=logs/pytest.jsonl --cov --cov-append  --cov-report xml"
+asyncio_mode = "auto"
 
 
 [tool.tox]

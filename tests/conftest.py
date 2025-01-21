@@ -4,7 +4,7 @@ import os
 import random
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 from faker import Faker
@@ -12,10 +12,12 @@ from httpx import BasicAuth
 
 from scripts.utils import cleanup
 from toggl_api import (
+    ClientBody,
     ClientEndpoint,
     ProjectBody,
     ProjectEndpoint,
     TagEndpoint,
+    TogglOrganization,
     TrackerBody,
     TrackerEndpoint,
     UserEndpoint,
@@ -25,6 +27,7 @@ from toggl_api.config import generate_authentication
 from toggl_api.meta import TogglCachedEndpoint
 from toggl_api.meta.cache import JSONCache, SqliteCache
 from toggl_api.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from toggl_api.reports import ReportBody
 
 
 @pytest.fixture(autouse=True)
@@ -226,30 +229,41 @@ def get_test_data(get_workspace_id, faker, number):
 
 
 @pytest.fixture
-def project_body(faker, get_workspace_id):
-    return ProjectBody(
-        name=faker.name(),
-        active=True,
-        color=ProjectEndpoint.get_color("red"),
-    )
+def gen_proj_bd(faker, get_workspace_id):
+    def gen_proj_bd():
+        return ProjectBody(
+            name=faker.name(),
+            active=True,
+            color=ProjectEndpoint.get_color("red"),
+        )
+
+    return gen_proj_bd
 
 
 @pytest.fixture
-def create_project(
+def gen_proj(
     project_object,
-    project_body,
+    gen_proj_bd,
 ):
-    return project_object.add(project_body)
+    return project_object.add(gen_proj_bd())
 
 
 @pytest.fixture
-def add_multiple_trackers(tracker_object, faker, create_project):
+def gen_project(faker, number):
+    def gen_proj():
+        return TogglProject(number.randint(100, sys.maxsize), faker.name())
+
+    return gen_proj
+
+
+@pytest.fixture
+def add_multiple_trackers(tracker_object, faker, gen_proj):
     trackers = []
     for i in range(5, 10):
         time.sleep(1)
         body = TrackerBody(
             description=faker.name(),
-            project_id=create_project.id,
+            project_id=gen_proj.id,
             start=datetime.now(tz=timezone.utc).replace(hour=i),
             stop=datetime.now(tz=timezone.utc).replace(hour=i + 1),
         )
@@ -259,3 +273,89 @@ def add_multiple_trackers(tracker_object, faker, create_project):
     for tracker in trackers:
         time.sleep(1)
         tracker_object.delete(tracker)
+
+
+@pytest.fixture
+def generate_tracker(faker, number, get_workspace_id):
+    def gen_tracker():
+        return TogglTracker(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+            workspace=get_workspace_id,
+            start=datetime.now(tz=timezone.utc),
+        )
+
+    return gen_tracker
+
+
+@pytest.fixture
+def gen_tracker_bd(faker, number, get_workspace_id):
+    def gen_tracker():
+        return TrackerBody(
+            faker.name(),
+            start=datetime.now(tz=timezone.utc),
+        )
+
+    return gen_tracker
+
+
+@pytest.fixture
+def gen_client(faker, number, get_workspace_id):
+    def gen_client():
+        return TogglClient(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+            workspace=get_workspace_id,
+        )
+
+    return gen_client
+
+
+@pytest.fixture
+def gen_tag(faker, number, get_workspace_id):
+    def gen_tag():
+        return TogglTag(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+            workspace=get_workspace_id,
+        )
+
+    return gen_tag
+
+
+@pytest.fixture
+def gen_workspace(faker, number, organization_id):
+    def gen_workspace():
+        return TogglWorkspace(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+            organization=organization_id,
+        )
+
+    return gen_workspace
+
+
+@pytest.fixture
+def gen_org(faker, number):
+    def gen_org():
+        return TogglOrganization(
+            number.randint(50, sys.maxsize),
+            faker.name(),
+        )
+
+    return gen_org
+
+
+@pytest.fixture
+def report_body(get_workspace_id):
+    return ReportBody(date.today(), date.today())  # noqa: DTZ011
+
+
+@pytest.fixture
+def create_client_body(get_workspace_id, faker):
+    return ClientBody(name=faker.name())
+
+
+@pytest.fixture
+def create_client(client_object, create_client_body):
+    return client_object.add(create_client_body)

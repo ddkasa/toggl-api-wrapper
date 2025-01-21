@@ -1,0 +1,226 @@
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING, cast
+
+from httpx import HTTPStatusError, codes
+
+from toggl_api.meta import RequestMethod
+from toggl_api.models import TogglOrganization, TogglWorkspace
+
+from ._async_endpoint import TogglAsyncCachedEndpoint
+
+if TYPE_CHECKING:
+    from httpx import BasicAuth
+
+    from ._async_sqlite_cache import AsyncSqliteCache
+
+
+log = logging.getLogger("toggl-api-wrapper.endpoint")
+
+
+class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
+    """Endpoint to do with handling organization specific details.
+
+    [Official Documentation](https://engineering.toggl.com/docs/api/organizations)
+
+    Examples:
+        >>> org_endpoint = OrganizationEndpoint(BasicAuth(...), AsyncSqliteCache(...))
+
+    Params:
+        auth: Authentication for the client.
+        cache: Cache object where the organization models are stored.
+        timeout: How long it takes for the client to timeout. Keyword Only.
+            Defaults to 10 seconds.
+        re_raise: Whether to raise HTTPStatusError errors and not handle them
+            internally. Keyword Only.
+        retries: Max retries to attempt if the server returns a *5xx* status_code.
+            Has no effect if re_raise is `True`. Keyword Only.
+    """
+
+    MODEL = TogglOrganization
+
+    def __init__(
+        self,
+        auth: BasicAuth,
+        cache: AsyncSqliteCache[TogglOrganization] | None = None,
+        *,
+        timeout: int = 10,
+        re_raise: bool = False,
+        retries: int = 3,
+    ) -> None:
+        super().__init__(
+            auth,
+            cache,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
+
+    async def get(
+        self,
+        organization: TogglOrganization | int,
+        *,
+        refresh: bool = False,
+    ) -> TogglOrganization | None:
+        """Creates a new organization with a single workspace and assigns
+        current user as the organization owner
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#get-organization-data)
+
+        Args:
+            organization: Organization to retrieve.
+            refresh: Whether to ignore cache completely.
+
+        Raises:
+            HTTPStatusError: If any error except a '404' was received.
+
+        Returns:
+            Organization object that was retrieve or None if not found.
+        """
+
+        if isinstance(organization, TogglOrganization):
+            organization = organization.id
+
+        if self.cache and not refresh:
+            return await self.cache.find(organization)
+
+        try:
+            response = await self.request(f"organizations/{organization}", refresh=refresh)
+        except HTTPStatusError as err:
+            if not self.re_raise and err.response.status_code in {codes.NOT_FOUND, codes.FORBIDDEN}:
+                log.warning(err)
+                return None
+            raise
+
+        return cast(TogglOrganization, response)
+
+    async def add(self, name: str, workspace_name: str = "Default-Workspace") -> TogglOrganization:
+        """Creates a new organization with a single workspace and assigns
+        current user as the organization owner
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#post-creates-a-new-organization)
+
+        Examples:
+            >>> org = await organization_endpoint.add("New-Workspace")
+            >>> org.name
+            "New-Workspace"
+
+        Args:
+            name: Name of the new orgnization.
+            workspace_name: Name of the default workspace in the organization.
+                No space characters allowed.
+
+        Raises:
+            NamingError: If any of the names are invalid or the wrong length.
+            HTTPStatusError: If the request is not a success.
+
+        Returns:
+            The newly created organization.
+        """
+
+        TogglOrganization.validate_name(name)
+        TogglWorkspace.validate_name(workspace_name)
+
+        response = await self.request(
+            "organizations",
+            body={"name": name, "workspace_name": workspace_name},
+            method=RequestMethod.POST,
+            refresh=True,
+        )
+
+        return cast(TogglOrganization, response)
+
+    async def edit(self, organization: TogglOrganization | int, name: str) -> TogglOrganization:
+        """Updates an existing organization.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#put-updates-an-existing-organization)
+
+        Args:
+            organization: The id of the organization to edit.
+            name: What name to change the org to.
+
+        Raises:
+            NamingError: If the new name is invalid.
+            HTTPStatusError: If the request is not a success.
+
+        Returns:
+            The newly edited organization.
+        """
+
+        TogglOrganization.validate_name(name)
+
+        if isinstance(organization, TogglOrganization):
+            organization = organization.id
+
+        await self.request(
+            f"organizations/{organization}",
+            body={"name": name},
+            refresh=True,
+            method=RequestMethod.PUT,
+        )
+
+        edit = TogglOrganization(organization, name)
+        if self.cache:
+            await self.cache.update(edit)
+
+        return edit
+
+    async def collect(self, *, refresh: bool = False) -> list[TogglOrganization]:
+        """Get all organizations a given user is part of.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/me#get-organizations-that-a-user-is-part-of)
+
+        Args:
+            refresh: Whether to use cache or not.
+
+        Raises:
+            HTTPStatusError: If the request is not a success.
+
+        Returns:
+            A list of organization objects or empty if none found.
+        """
+        request = await self.request("me/organizations", refresh=refresh)
+        return cast(list[TogglOrganization], request)
+
+    async def delete(self, organization: TogglOrganization | int) -> None:
+        """Leaves organization, effectively delete user account in org and
+        delete organization if it is last user.
+
+        Deletion might not be instant on the API end and might take a few
+        seconds to propogate, so the object might appear in the 'get' or
+        'collect' method.
+
+        [Official Documentation](https://engineering.toggl.com/docs/api/organizations#delete-leaves-organization)
+
+        Args:
+            organization: Organization to delete.
+
+        Raises:
+            HTTPStatusError: If the response status_code is not '200' or '404'.
+        """
+        org_id = organization if isinstance(organization, int) else organization.id
+        try:
+            await self.request(
+                f"organizations/{org_id}/users/leave",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
+        except HTTPStatusError as err:
+            if self.re_raise or err.response.status_code != codes.NOT_FOUND:
+                raise
+            log.exception("%s")
+            log.warning(
+                "Organization with id %s was either already deleted or did not exist in the first place!",
+                org_id,
+            )
+        if self.cache is None:
+            return
+
+        if isinstance(organization, int):
+            org = await self.cache.find(organization)
+            if not isinstance(org, TogglOrganization):
+                return
+            organization = org
+
+        await self.cache.delete(organization)

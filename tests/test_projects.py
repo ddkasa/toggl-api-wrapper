@@ -30,9 +30,8 @@ def test_project_model(get_workspace_id, faker, project_sample):
 
 
 @pytest.mark.unit
-def test_project_body(project_body, get_workspace_id):
-    assert isinstance(project_body, ProjectBody)
-    formatted = project_body.format("endpoint", workspace_id=get_workspace_id)
+def test_project_body(gen_proj_bd, get_workspace_id):
+    formatted = gen_proj_bd().format("endpoint", workspace_id=get_workspace_id)
     assert formatted["workspace_id"] == get_workspace_id
     assert isinstance(formatted["active"], bool)
     assert isinstance(formatted["is_private"], bool)
@@ -89,7 +88,8 @@ def test_project_body_collect_params(get_workspace_id):
 
 
 @pytest.mark.unit
-def test_project_body_dates(project_body, get_workspace_id, monkeypatch):
+def test_project_body_dates(gen_proj_bd, get_workspace_id, monkeypatch):
+    project_body = gen_proj_bd()
     monkeypatch.setattr(project_body, "start_date", datetime.now(tz=timezone.utc))
     monkeypatch.setattr(project_body, "end_date", datetime.now(tz=timezone.utc) - timedelta(hours=1))
     formatted = project_body.format("edit", workspace_id=get_workspace_id)
@@ -105,7 +105,9 @@ def test_project_body_dates(project_body, get_workspace_id, monkeypatch):
 
 
 @pytest.mark.unit
-def test_project_body_client(project_body, get_workspace_id):
+def test_project_body_client(gen_proj_bd, get_workspace_id):
+    project_body = gen_proj_bd()
+
     project_body.client_id = 123
     project_body.client_name = "Test Client"
     formatted = project_body.format("endpoint", workspace_id=get_workspace_id)
@@ -118,10 +120,10 @@ def test_project_body_client(project_body, get_workspace_id):
 
 
 @pytest.mark.integration
-def test_create_project(create_project):
-    assert isinstance(create_project, TogglProject)
-    assert isinstance(create_project.id, int)
-    assert create_project.active
+def test_gen_proj(gen_proj):
+    assert isinstance(gen_proj, TogglProject)
+    assert isinstance(gen_proj.id, int)
+    assert gen_proj.active
 
 
 @pytest.mark.unit
@@ -135,18 +137,18 @@ def test_project_name_validation(project_object):
 
 
 @pytest.mark.integration
-def test_get_project(create_project, project_object):
-    assert isinstance(create_project, TogglProject)
+def test_get_project(gen_proj, project_object):
+    assert isinstance(gen_proj, TogglProject)
 
-    check_project = project_object.get(create_project.id, refresh=True)
+    check_project = project_object.get(gen_proj.id, refresh=True)
     assert isinstance(check_project, TogglProject)
-    assert check_project.name == create_project.name
-    assert check_project.color == create_project.color
+    assert check_project.name == gen_proj.name
+    assert check_project.color == gen_proj.color
 
-    check_project = project_object.get(create_project)
+    check_project = project_object.get(gen_proj)
     assert isinstance(check_project, TogglProject)
-    assert check_project.name == create_project.name
-    assert check_project.color == create_project.color
+    assert check_project.name == gen_proj.name
+    assert check_project.color == gen_proj.color
 
 
 @pytest.mark.unit
@@ -160,12 +162,13 @@ def test_get_project_raise(project_object, httpx_mock, number):
 
 
 @pytest.mark.integration
-def test_edit_project(project_object, create_project, faker, project_body):
+def test_edit_project(project_object, gen_proj, faker, gen_proj_bd):
+    project_body = gen_proj_bd()
     project_body.name = faker.name()
     project_body.color = ProjectEndpoint.get_color("blue")
 
     project = project_object.edit(
-        create_project,
+        gen_proj,
         project_body,
     )
     assert isinstance(project, TogglProject)
@@ -174,17 +177,17 @@ def test_edit_project(project_object, create_project, faker, project_body):
 
 
 @pytest.mark.integration
-def test_delete_project_id(create_project, project_object):
-    assert isinstance(create_project, TogglProject)
-    project_object.delete(create_project.id)
-    assert project_object.get(create_project.id) is None
+def test_delete_project_id(gen_proj, project_object):
+    assert isinstance(gen_proj, TogglProject)
+    project_object.delete(gen_proj.id)
+    assert project_object.get(gen_proj.id) is None
 
 
 @pytest.mark.integration
-def test_delete_project_model(create_project, project_object):
-    assert isinstance(create_project, TogglProject)
-    project_object.delete(create_project)
-    assert project_object.get(create_project) is None
+def test_delete_project_model(gen_proj, project_object):
+    assert isinstance(gen_proj, TogglProject)
+    project_object.delete(gen_proj)
+    assert project_object.get(gen_proj) is None
 
 
 @pytest.mark.unit
@@ -216,7 +219,7 @@ def test_collect_project_cache(project_object, httpx_mock, project_sample):
 
 
 @pytest.mark.integration
-def test_collect_project(project_object, create_project, user_id):
+def test_collect_project(project_object, gen_proj, user_id):
     body = ProjectBody(
         active="both",
         statuses=[TogglProject.Status.ACTIVE],
