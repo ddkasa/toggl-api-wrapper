@@ -9,14 +9,9 @@ from itertools import chain
 from os import PathLike
 from typing import TYPE_CHECKING, TypeVar, cast
 
-try:
-    from sqlalchemy import ColumnElement, MetaData, select
-    from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-except ImportError:
-    pass
+from sqlalchemy import ColumnElement, MetaData, select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
-
-from toggl_api._utility import _requires
 from toggl_api.models import TogglClass
 from toggl_api.models._schema import _create_mappings
 
@@ -29,8 +24,6 @@ if TYPE_CHECKING:
     from ._async_endpoint import TogglAsyncCachedEndpoint
 
 
-@_requires("greenlet")
-@_requires("sqlalchemy")
 async def async_register_tables(engine: AsyncEngine) -> MetaData:
     """Helper function for setting up database with SQLAlchemy models."""
     meta = MetaData()
