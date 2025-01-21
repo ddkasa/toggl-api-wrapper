@@ -6,9 +6,9 @@ from ._tag import TagEndpoint
 from ._tracker import BulkEditParameter, Edits, TrackerBody, TrackerEndpoint
 from ._user import UserEndpoint
 from ._version import version
+from ._workspace import User, WorkspaceBody, WorkspaceEndpoint, WorkspaceStatistics
 from .meta.cache._base_cache import MissingParentError
 from .models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
-from .workspace import WorkspaceBody, WorkspaceEndpoint
 
 __author__ = "David Kasakaitis"
 __version__ = version
@@ -39,4 +39,6 @@ __all__ = (  # noqa: RUF022
     "TogglOrganization",
     "OrganizationEndpoint",
     "MissingParentError",
+    "User",
+    "WorkspaceStatistics",
 )

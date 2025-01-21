@@ -17,10 +17,10 @@
 
 # Types
 
-::: toggl_api.workspace.User
+::: toggl_api.User
     options:
         show_source: true
 
-::: toggl_api.workspace.WorkspaceStatistics
+::: toggl_api.WorkspaceStatistics
     options:
         show_source: true
