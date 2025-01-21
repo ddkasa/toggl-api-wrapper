@@ -4,10 +4,9 @@
 name = "aiosqlite"
 version = "0.20.0"
 description = "asyncio bridge to the standard sqlite3 module"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"async-sqlite\""
 files = [
     {file = "aiosqlite-0.20.0-py3-none-any.whl", hash = "sha256:36a1deaca0cac40ebe32aac9977a6e2bbc7f5189f23f4a54d5908986729e5bd6"},
     {file = "aiosqlite-0.20.0.tar.gz", hash = "sha256:6d35c8c256637f4672f843c31021464090805bf925385ac39473fb16eaaca3d7"},
@@ -515,7 +514,7 @@ files = [
     {file = "greenlet-3.1.1-cp39-cp39-win_amd64.whl", hash = "sha256:3319aa75e0e0639bc15ff54ca327e8dc7a6fe404003496e3c6925cd3142e0e22"},
     {file = "greenlet-3.1.1.tar.gz", hash = "sha256:4ce3ac6cdb6adf7946475d7ef31777c26d94bccc377e070a7986bd2d5c515467"},
 ]
-markers = {main = "extra == \"sqlite\" and python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or extra == \"async-sqlite\"", dev = "python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or extra == \"async-sqlite\""}
+markers = {main = "extra == \"sqlite\" and python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or extra == \"async\"", dev = "python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or extra == \"async\""}
 
 [package.extras]
 docs = ["Sphinx", "furo"]
@@ -1801,7 +1800,7 @@ files = [
     {file = "SQLAlchemy-2.0.37-py3-none-any.whl", hash = "sha256:a8998bf9f8658bd3839cbc44ddbe982955641863da0c1efe5b00c1ab4f5c16b1"},
     {file = "sqlalchemy-2.0.37.tar.gz", hash = "sha256:12b28d99a9c14eaf4055810df1001557176716de0167b91026e648e65229bffb"},
 ]
-markers = {main = "extra == \"sqlite\" or extra == \"async-sqlite\""}
+markers = {main = "extra == \"sqlite\" or extra == \"async\""}
 
 [package.dependencies]
 greenlet = [
@@ -1979,7 +1978,6 @@ files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
 ]
-markers = {main = "extra == \"sqlite\" or extra == \"async-sqlite\" or python_version < \"3.13\""}
 
 [[package]]
 name = "urllib3"
@@ -2064,10 +2062,10 @@ files = [
 watchmedo = ["PyYAML (>=3.10)"]
 
 [extras]
-async-sqlite = ["aiosqlite", "greenlet", "sqlalchemy"]
+async = ["greenlet", "sqlalchemy"]
 sqlite = ["sqlalchemy"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "d9a58ad5b1b1c3d8af6907141394f19fd2ffaab7e62f6503b99f722b6e8f5783"
+content-hash = "bf9fb06e953116af3be08181c6af00adf245a1eab0e0d3fce08b2c36919dba58"
