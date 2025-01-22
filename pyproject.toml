@@ -214,6 +214,7 @@ markers = [
 testpaths = ["tests"]
 addopts = "--report-log=logs/pytest.jsonl --cov --cov-append  --cov-report xml"
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 
 [tool.tox]
