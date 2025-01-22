@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, cast
 
-from httpx import HTTPStatusError, Response, codes
+from httpx import Client, HTTPStatusError, Response, Timeout, codes
 
 from ._exceptions import DateTimeError, NamingError
 from ._utility import format_iso, get_timestamp
@@ -193,6 +193,8 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         workspace_id: The workspace the Toggl trackers belong to.
         auth: Authentication for the client.
         cache: Where to cache trackers.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -211,11 +213,19 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         auth: BasicAuth,
         cache: TogglCache[TogglTracker] | None = None,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            cache,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     def _current_refresh(self, tracker: TogglTracker | None) -> None:

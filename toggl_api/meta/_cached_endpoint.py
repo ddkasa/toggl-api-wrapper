@@ -23,7 +23,7 @@ from ._enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from httpx import BasicAuth, Response
+    from httpx import BasicAuth, Client, Response, Timeout
 
     from toggl_api.meta.cache._base_cache import TogglQuery
 
@@ -49,6 +49,8 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         auth: Authentication for the client.
         cache: Cache object for caching toggl API data to disk. Builtin cache
             types are JSONCache and SqliteCache.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -76,11 +78,18 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         auth: BasicAuth,
         cache: TogglCache[T] | None = None,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth=auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth=auth,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.cache = cache
 
     def request(  # type: ignore[override]

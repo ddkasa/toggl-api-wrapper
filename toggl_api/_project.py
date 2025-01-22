@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import Client, HTTPStatusError, Timeout, codes
 
 from toggl_api._exceptions import NamingError
 from toggl_api._utility import format_iso, get_timestamp
@@ -183,6 +183,8 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         workspace_id: The workspace the projects belong to.
         auth: Basic authentication with an api token or username/password combo.
         cache: Cache to push the projects to.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -220,11 +222,19 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         auth: BasicAuth,
         cache: TogglCache[TogglProject] | None = None,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            cache,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @staticmethod

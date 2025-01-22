@@ -8,7 +8,7 @@ from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
-from httpx import HTTPStatusError, Response, codes
+from httpx import Client, HTTPStatusError, Response, Timeout, codes
 
 from ._exceptions import DateTimeError, NamingError
 from ._utility import get_timestamp
@@ -195,6 +195,10 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         organization_id: Workspace endpoint takes an organization id instead of
             a workspace id.
         auth: Authentication for the client.
+        cache: Cache object for caching toggl workspace data to disk. Builtin cache
+            types are JSONCache and SqliteCache.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -211,13 +215,15 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         auth: BasicAuth,
         cache: TogglCache[TogglWorkspace] | None = None,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
         super().__init__(
             auth,
             cache,
+            client=client,
             timeout=timeout,
             re_raise=re_raise,
             retries=retries,

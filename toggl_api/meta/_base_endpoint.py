@@ -15,7 +15,7 @@ from json import JSONDecodeError
 from typing import Any, ClassVar, Final, Generic, TypeVar
 
 import httpx
-from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, codes
+from httpx import BasicAuth, Client, HTTPStatusError, Request, Response, Timeout, codes
 
 from toggl_api.models import TogglClass
 
@@ -37,6 +37,8 @@ class TogglEndpoint(ABC, Generic[T]):
 
     Params:
         auth: Authentication for the client.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -55,7 +57,8 @@ class TogglEndpoint(ABC, Generic[T]):
         self,
         auth: BasicAuth,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
@@ -64,11 +67,11 @@ class TogglEndpoint(ABC, Generic[T]):
 
         # NOTE: USES BASE_ENDPOINT instead of endpoint property for base_url
         # as current httpx concatenation is causing appended slashes.
-        self.client = Client(
-            base_url=self.BASE_ENDPOINT,
-            timeout=timeout,
-            auth=auth,
-        )
+        self.client = client = client or Client()
+        client.auth = auth
+        client.base_url = self.BASE_ENDPOINT
+        client.timeout = timeout if isinstance(timeout, Timeout) else Timeout(timeout)
+
         atexit.register(self.client.close)
 
     def _request_handle_error(
