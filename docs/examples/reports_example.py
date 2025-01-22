@@ -6,11 +6,11 @@ from datetime import date, datetime
 import pandas as pd
 import plotly.express as px
 
-from toggl_api import generate_authentication
+from toggl_api.config import generate_authentication
 from toggl_api.reports import DetailedReportEndpoint, ReportBody
 
 # Setup Endpoint
-WORKSPACE_ID = int(os.environ.get("TOGGL_WORKSPACE_ID", 0))
+WORKSPACE_ID = int(os.environ.get("TOGGL_WORKSPACE_ID", "0"))
 AUTH = generate_authentication()
 detailed_report_endpoint = DetailedReportEndpoint(WORKSPACE_ID, AUTH)
 
