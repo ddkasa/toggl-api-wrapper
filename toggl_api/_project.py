@@ -33,7 +33,7 @@ class ProjectBody(BaseBody):
     name: str | None = field(default=None)
     """Name of the project. Defaults to None. Will be required if its a POST request."""
 
-    active: bool | Literal["both"] = field(default="both")
+    active: bool | Literal["both"] = field(default=True)
     """Whether the project is archived or active.
     The literal 'both' is used for querying."""
     is_private: bool | None = field(
