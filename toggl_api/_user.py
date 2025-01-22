@@ -3,8 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, cast
 
-import httpx
-from httpx import HTTPStatusError, Response, codes
+from httpx import Client, HTTPStatusError, Response, Timeout, codes
 
 from .meta import TogglEndpoint
 
@@ -22,6 +21,8 @@ class UserEndpoint(TogglEndpoint):
 
     Params:
         auth: Authentication for the client.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -34,14 +35,21 @@ class UserEndpoint(TogglEndpoint):
         self,
         auth: BasicAuth,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
 
     @staticmethod
-    def verify_authentication(auth: BasicAuth) -> bool:
+    def verify_authentication(auth: BasicAuth, *, client: Client | None = None) -> bool:
         """Check if user is correctly authenticated with the Toggl API.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
@@ -57,6 +65,8 @@ class UserEndpoint(TogglEndpoint):
         Args:
             auth: Basic authentication object either created manually or one
                 of the provided authentication utilities.
+            client: Optional client for making the requests with when using a
+                singleton/global client.
 
         Raises:
             HTTPStatusError: If anything that is error status code that is not
@@ -65,8 +75,9 @@ class UserEndpoint(TogglEndpoint):
         Returns:
             True if successfully verified authentication else False.
         """
+        client = client or Client()
         try:
-            httpx.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()
+            client.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()
         except HTTPStatusError as err:
             log.critical("Failed to verify authentication!")
             log.exception("%s")

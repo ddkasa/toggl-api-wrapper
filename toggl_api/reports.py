@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
 
-from httpx import BasicAuth, Response
+from httpx import BasicAuth, Client, Response, Timeout
 
 from ._utility import format_iso
 from .meta import BaseBody, RequestMethod, TogglEndpoint
@@ -333,11 +333,12 @@ class ReportEndpoint(TogglEndpoint):
         workspace_id: TogglWorkspace | int,
         auth: BasicAuth,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(auth, client=client, timeout=timeout, re_raise=re_raise, retries=retries)
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @abstractmethod

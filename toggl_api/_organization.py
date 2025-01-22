@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import Client, HTTPStatusError, Timeout, codes
 
 from toggl_api.meta import RequestMethod
 
@@ -30,6 +30,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
     Params:
         auth: Authentication for the client.
         cache: Cache object where the organization models are stored.
+        client: Optional client to be passed to be used for requests. Useful
+            when a global client is used and needs to be recycled.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise HTTPStatusError errors and not handle them
@@ -45,13 +47,15 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         auth: BasicAuth,
         cache: TogglCache[TogglOrganization] | None = None,
         *,
-        timeout: int = 10,
+        client: Client | None = None,
+        timeout: Timeout | int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
         super().__init__(
             auth,
             cache,
+            client=client,
             timeout=timeout,
             re_raise=re_raise,
             retries=retries,
