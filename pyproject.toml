@@ -233,7 +233,7 @@ setenv =
 
 allowlist_externals = poetry
 commands_pre = 
-    poetry install --without=docs
+    poetry install --without=docs --all-extras
 commands = 
     poetry run pytest {posargs}
 
