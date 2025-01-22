@@ -7,8 +7,8 @@
 
 1. `git clone https://github.com/ddkasa/toggl-api-wrapper`
 2. `cd toggl-api-wrapper`
-3. `poetry shell`
-4. `poetry install`
+3. `poetry env use 3.12`
+4. `poetry install --all-extras`
 
 - Lint with `ruff toggl_api`
 - Check typing with `mypy toggl_api`
@@ -35,3 +35,4 @@
 - Run `mkdocs serve --strict` to build and preview documentation
 - Run `git cliff -o docs/CHANGELOG.md` to generate new changelog. _Requires git-cliff to be installed._
 - Use Google [styleguide](https://google.github.io/styleguide/pyguide.html) for docstring format
+- Run `sh ./scripts/create_diagrams.sh` to generate documentation mermaid diagrams and file tree.
