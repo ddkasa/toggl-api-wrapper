@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
+from toggl_api._exceptions import MissingParentError
 from toggl_api.meta._enums import RequestMethod
 from toggl_api.models import TogglClass
 
@@ -16,10 +17,6 @@ if TYPE_CHECKING:
     from os import PathLike
 
     from toggl_api.meta import TogglCachedEndpoint
-
-
-class MissingParentError(AttributeError):
-    """Raised when a cache object doesn't have a parent and is being called."""
 
 
 class Comparison(enum.Enum):

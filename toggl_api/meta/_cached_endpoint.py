@@ -15,6 +15,7 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.models import TogglClass
 
 from ._base_endpoint import TogglEndpoint
@@ -34,10 +35,6 @@ log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
 T = TypeVar("T", bound=TogglClass)
-
-
-class NoCacheAssignedError(AttributeError):
-    """Raised when an endpoint doesn't have cache assocciated."""
 
 
 class TogglCachedEndpoint(TogglEndpoint[T]):

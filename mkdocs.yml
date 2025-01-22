@@ -64,9 +64,10 @@ nav:
       - Overview: api-guide/index.md
       - Configuration: api-guide/config.md
       - Endpoint: api-guide/endpoint.md
-      - User: api-guide/user.md
       - Cache: api-guide/cache.md
+      - Exceptions: api-guide/exceptions.md
       - Models: api-guide/model.md
+      - User: api-guide/user.md
       - Organization: api-guide/organization.md
       - Workspace: api-guide/workspace.md
       - Trackers: api-guide/tracker.md
