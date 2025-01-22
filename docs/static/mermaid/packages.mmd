@@ -19,6 +19,32 @@ classDiagram
   }
   class _version {
   }
+  class _workspace {
+  }
+  class asyncio {
+  }
+  class _async_cache {
+  }
+  class _async_client {
+  }
+  class _async_endpoint {
+  }
+  class _async_organization {
+  }
+  class _async_project {
+  }
+  class _async_reports {
+  }
+  class _async_sqlite_cache {
+  }
+  class _async_tag {
+  }
+  class _async_tracker {
+  }
+  class _async_user {
+  }
+  class _async_workspace {
+  }
   class config {
   }
   class meta {
@@ -49,8 +75,6 @@ classDiagram
   }
   class reports {
   }
-  class workspace {
-  }
   toggl_api --> _client
   toggl_api --> _exceptions
   toggl_api --> _organization
@@ -59,9 +83,8 @@ classDiagram
   toggl_api --> _tracker
   toggl_api --> _user
   toggl_api --> _version
-  toggl_api --> _base_cache
+  toggl_api --> _workspace
   toggl_api --> models
-  toggl_api --> workspace
   _client --> _exceptions
   _client --> meta
   _client --> cache
@@ -85,18 +108,79 @@ classDiagram
   _tracker --> cache
   _tracker --> models
   _user --> meta
+  _workspace --> _exceptions
+  _workspace --> _utility
+  _workspace --> meta
+  _workspace --> cache
+  _workspace --> models
+  asyncio --> _async_cache
+  asyncio --> _async_client
+  asyncio --> _async_endpoint
+  asyncio --> _async_organization
+  asyncio --> _async_project
+  asyncio --> _async_reports
+  asyncio --> _async_sqlite_cache
+  asyncio --> _async_tag
+  asyncio --> _async_tracker
+  asyncio --> _async_user
+  asyncio --> _async_workspace
+  _async_cache --> _exceptions
+  _async_cache --> _enums
+  _async_cache --> models
+  _async_client --> toggl_api
+  _async_client --> _async_endpoint
+  _async_client --> _async_sqlite_cache
+  _async_client --> meta
+  _async_endpoint --> _exceptions
+  _async_endpoint --> meta
+  _async_endpoint --> models
+  _async_organization --> _async_endpoint
+  _async_organization --> meta
+  _async_organization --> models
+  _async_project --> toggl_api
+  _async_project --> _exceptions
+  _async_project --> _async_endpoint
+  _async_project --> _async_sqlite_cache
+  _async_project --> meta
+  _async_reports --> toggl_api
+  _async_reports --> _utility
+  _async_reports --> _async_endpoint
+  _async_reports --> meta
+  _async_reports --> reports
+  _async_sqlite_cache --> _async_cache
+  _async_sqlite_cache --> models
+  _async_sqlite_cache --> _schema
+  _async_tag --> toggl_api
+  _async_tag --> _async_endpoint
+  _async_tag --> meta
+  _async_tag --> _cached_endpoint
+  _async_tracker --> toggl_api
+  _async_tracker --> _exceptions
+  _async_tracker --> _tracker
+  _async_tracker --> _utility
+  _async_tracker --> _async_endpoint
+  _async_tracker --> _async_sqlite_cache
+  _async_tracker --> meta
+  _async_user --> _async_endpoint
+  _async_workspace --> toggl_api
+  _async_workspace --> _utility
+  _async_workspace --> _async_endpoint
+  _async_workspace --> _async_sqlite_cache
+  _async_workspace --> meta
   meta --> _base_endpoint
   meta --> _body
   meta --> _cached_endpoint
   meta --> _enums
   _base_endpoint --> _enums
   _base_endpoint --> models
+  _cached_endpoint --> _exceptions
   _cached_endpoint --> _base_endpoint
   _cached_endpoint --> _enums
   _cached_endpoint --> models
   cache --> _base_cache
   cache --> _json_cache
   cache --> _sqlite_cache
+  _base_cache --> _exceptions
   _base_cache --> _enums
   _base_cache --> models
   _json_cache --> _utility
@@ -118,15 +202,15 @@ classDiagram
   reports --> _utility
   reports --> meta
   reports --> models
-  workspace --> _exceptions
-  workspace --> _utility
-  workspace --> meta
-  workspace --> cache
-  workspace --> models
-  _project ..> meta
-  _tag ..> meta
+  _client ..> cache
   _tracker ..> toggl_api
   _tracker ..> cache
+  _async_cache ..> _async_endpoint
+  _async_endpoint ..> _async_sqlite_cache
+  _async_organization ..> _async_sqlite_cache
+  _async_project ..> _project
+  _async_sqlite_cache ..> _async_endpoint
+  _async_tag ..> _async_sqlite_cache
   _cached_endpoint ..> _base_cache
   _base_cache ..> meta
   _sqlite_cache ..> meta
