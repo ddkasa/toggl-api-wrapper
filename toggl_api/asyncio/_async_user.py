@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, cast
 
-from httpx import Response
+from httpx import AsyncClient, Response
 
 from ._async_endpoint import TogglAsyncEndpoint
 
@@ -24,6 +24,7 @@ class AsyncUserEndpoint(TogglAsyncEndpoint):
 
     Params:
         auth: Authentication for the client.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -36,11 +37,18 @@ class AsyncUserEndpoint(TogglAsyncEndpoint):
         self,
         auth: BasicAuth,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
 
     async def get_details(self) -> dict[str, Any]:
         """Returns details for the current user.

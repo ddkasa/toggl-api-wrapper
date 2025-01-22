@@ -6,7 +6,7 @@ import math
 from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING, Final, cast
 
-from httpx import HTTPStatusError, Response, codes
+from httpx import AsyncClient, HTTPStatusError, Response, codes
 from sqlalchemy import ColumnElement, ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,6 +47,7 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
         workspace_id: The workspace the Toggl trackers belong to.
         auth: Authentication for the client.
         cache: Where to cache trackers. Currently async only supports SQLite.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -65,11 +66,19 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
         auth: BasicAuth,
         cache: AsyncSqliteCache[TogglTracker] | None = None,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            cache,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     async def _current_refresh(self, tracker: TogglTracker | None) -> None:

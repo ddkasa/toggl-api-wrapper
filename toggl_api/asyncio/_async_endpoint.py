@@ -17,7 +17,7 @@ from toggl_api.models import TogglClass
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from toggl_api.concurrent._async_cache import TogglAsyncCache
+    from ._async_sqlite_cache import AsyncSqliteCache
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -34,7 +34,7 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
 
     Params:
         auth: Authentication for the client.
-        client: An async client if to be passed in.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -195,6 +195,7 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
         auth: Authentication for the client.
         cache: Cache object for caching toggl API data to disk.
             AsyncSqlitecache only available for now.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -205,6 +206,7 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
     Attributes:
         cache: Cache object the endpoint will use for storing models. Assigns
             itself as the parent automatically.
+        client: Async httpx client that is used for making requests to the API.
 
     Methods:
         request: Overriden method that implements the cache into the request chain.
@@ -218,7 +220,7 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
     def __init__(
         self,
         auth: BasicAuth,
-        cache: TogglAsyncCache[T] | None = None,
+        cache: AsyncSqliteCache[T] | None = None,
         *,
         client: AsyncClient | None = None,
         timeout: int = 10,
@@ -323,11 +325,11 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
         return task
 
     @property
-    def cache(self) -> TogglAsyncCache[T] | None:
+    def cache(self) -> AsyncSqliteCache[T] | None:
         return self._cache
 
     @cache.setter
-    def cache(self, value: TogglAsyncCache | None) -> None:
+    def cache(self, value: AsyncSqliteCache | None) -> None:
         self._cache = value
         if self.cache and self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self

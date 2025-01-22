@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import AsyncClient, HTTPStatusError, codes
 
 from toggl_api.meta import RequestMethod
 from toggl_api.models import TogglOrganization, TogglWorkspace
@@ -30,6 +30,7 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
     Params:
         auth: Authentication for the client.
         cache: Cache object where the organization models are stored.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise HTTPStatusError errors and not handle them
@@ -45,6 +46,7 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         auth: BasicAuth,
         cache: AsyncSqliteCache[TogglOrganization] | None = None,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
@@ -52,6 +54,7 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         super().__init__(
             auth,
             cache,
+            client=client,
             timeout=timeout,
             re_raise=re_raise,
             retries=retries,

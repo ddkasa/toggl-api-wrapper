@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, cast
 
-from httpx import HTTPStatusError, codes
+from httpx import AsyncClient, HTTPStatusError, codes
 
 from toggl_api import NamingError, TogglTag
 from toggl_api.meta import RequestMethod
@@ -37,6 +37,7 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
         workspace_id: The workspace the tags belong to.
         auth: Authentication for the client.
         cache: Cache object where tags are stored.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -53,11 +54,19 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
         auth: BasicAuth,
         cache: AsyncSqliteCache[TogglTag] | None = None,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, cache, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            cache,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     async def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
