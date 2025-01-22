@@ -12,7 +12,7 @@ async def aorg_ep(async_sqlite_cache, config_setup):  # noqa: RUF029
 
 @pytest.mark.integration
 @pytest.mark.slow
-@pytest.mark.flaky(rerun_except="httpx.HTTPStatusError", reruns=3)
+@pytest.mark.flaky(rerun_except="httpx.HTTPStatusError", reruns=5)
 async def test_org_ep_method_flow(aorg_ep: AsyncOrganizationEndpoint, faker):
     assert isinstance(aorg_ep.cache, AsyncSqliteCache)
 
@@ -20,7 +20,7 @@ async def test_org_ep_method_flow(aorg_ep: AsyncOrganizationEndpoint, faker):
     org = await aorg_ep.add(name := faker.name())
     assert name == org.name
 
-    await asyncio.sleep(10)
+    await asyncio.sleep(20)
     assert (await aorg_ep.get(org.id, refresh=True)) == org
 
     # Test Edit
