@@ -66,6 +66,29 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 
 ![Total recorded monthly minutes spent on Toggl API Wrapper in 2024](../static/images/total-minutes-may-to-october-2024.svg)
 
+### Asyncio Example
+
+- With all dependencies from `toggl-api-wrapper[async]`
+
+```python
+{% include "examples/asyncio_example.py" %}
+```
+
+**Outputs**:
+
+```python
+TogglProject(
+    id=208596838,
+    name='New Project',
+    workspace=8876353,
+    color='#0b83d9',
+    client=None,
+    active=True,
+    start_date=datetime.date(2025, 1, 22),
+    end_date=None
+)
+```
+
 ### Logging Example
 
 ```python
