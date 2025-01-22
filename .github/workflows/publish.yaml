@@ -62,6 +62,11 @@ jobs:
           pip install poetry tox-gh-actions tox ruff mypy
 
       - name: Run tests
+        if: ${{ matrix.python-version != '3.12' || matrix.os != 'ubuntu-latest' }}
+        run: tox -- -m "not slow"
+
+      - name: Run tests
+        if: ${{ matrix.python-version == '3.12' || matrix.os == 'ubuntu-latest' }}
         run: tox
 
       - name: Upload coverage reports to Codecov
