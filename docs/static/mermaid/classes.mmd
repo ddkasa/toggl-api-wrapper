@@ -1,4 +1,109 @@
 classDiagram
+  class AsyncClientEndpoint {
+    MODEL
+    endpoint
+    workspace_id
+    add(body: ClientBody) TogglClient
+    collect(body: ClientBody | None) list[TogglClient]
+    delete(client: TogglClient | int) None
+    edit(client: TogglClient | int, body: ClientBody) TogglClient
+    get(client_id: int | TogglClient) TogglClient | None
+  }
+  class AsyncDetailedReportEndpoint {
+    endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions | None) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list]
+    totals_report(body: ReportBody) dict[str, int]
+  }
+  class AsyncOrganizationEndpoint {
+    MODEL
+    add(name: str, workspace_name: str) TogglOrganization
+    collect() list[TogglOrganization]
+    delete(organization: TogglOrganization | int) None
+    edit(organization: TogglOrganization | int, name: str) TogglOrganization
+    get(organization: TogglOrganization | int) TogglOrganization | None
+  }
+  class AsyncProjectEndpoint {
+    BASIC_COLORS : Final[dict[str, str]]
+    MODEL
+    endpoint
+    workspace_id
+    add(body: ProjectBody) TogglProject
+    collect(body: ProjectBody | None) list[TogglProject]
+    delete(project: TogglProject | int) None
+    edit(project: TogglProject | int, body: ProjectBody) TogglProject
+    get(project_id: int | TogglProject) TogglProject | None
+    get_color(name: str) str
+    get_color_id(color: str) int
+    status_to_query(status: TogglProject.Status, statement: Select) Select
+  }
+  class AsyncReportEndpoint {
+    BASE_ENDPOINT : ClassVar[URL]
+    workspace_id
+    export_report(body: ReportBody)*
+    search_time_entries(body: ReportBody)*
+  }
+  class AsyncSqliteCache {
+    cache_path
+    database
+    metadata
+    session
+    add() None
+    delete() None
+    find(pk: int) T | None
+    load() list[T]
+    update() None
+  }
+  class AsyncSummaryReportEndpoint {
+    endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
+    project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) dict[str, int]
+    search_time_entries(body: ReportBody) list[dict[str, int]]
+  }
+  class AsyncTagEndpoint {
+    MODEL
+    endpoint
+    workspace_id
+    add(name: str) TogglTag
+    collect() list[TogglTag]
+    delete(tag: TogglTag | int) None
+    edit(tag: TogglTag | int, name: str) TogglTag
+    get(tag: TogglTag | int) TogglTag | None
+  }
+  class AsyncTrackerEndpoint {
+    MODEL
+    TRACKER_ALREADY_STOPPED : Final[int]
+    TRACKER_NOT_RUNNING : Final[int]
+    endpoint
+    workspace_id
+    add(body: TrackerBody) TogglTracker
+    bulk_edit() Edits
+    collect(since: int | datetime | None, before: date | None, start_date: date | None, end_date: date | None) list[TogglTracker]
+    current() TogglTracker | None
+    delete(tracker: TogglTracker | int) None
+    edit(tracker: TogglTracker | int, body: TrackerBody) TogglTracker
+    get(tracker_id: int | TogglTracker) TogglTracker | None
+    stop(tracker: TogglTracker | int) TogglTracker | None
+  }
+  class AsyncUserEndpoint {
+    get_details() dict[str, Any]
+  }
+  class AsyncWeeklyReportEndpoint {
+    endpoint
+    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    search_time_entries(body: ReportBody) list[dict[str, Any]]
+  }
+  class AsyncWorkspaceEndpoint {
+    MODEL
+    organization_id
+    add(body: WorkspaceBody) TogglWorkspace
+    collect(since: datetime | int | None) list[TogglWorkspace]
+    edit(workspace_id: TogglWorkspace | int, body: WorkspaceBody) TogglWorkspace
+    get(workspace: TogglWorkspace | int) TogglWorkspace | None
+    statistics(workspace_id: TogglWorkspace | int) WorkspaceStatistics
+    tracker_constraints(workspace_id: TogglWorkspace | int) dict[str, bool]
+  }
   class AuthenticationError {
   }
   class BaseBody {
@@ -19,10 +124,10 @@ classDiagram
     MODEL
     endpoint
     workspace_id
-    add(body: ClientBody) TogglClient | None
+    add(body: ClientBody) TogglClient
     collect(body: ClientBody | None) list[TogglClient]
     delete(client: TogglClient | int) None
-    edit(client: TogglClient | int, body: ClientBody) TogglClient | None
+    edit(client: TogglClient | int, body: ClientBody) TogglClient
     get(client_id: int | TogglClient) TogglClient | None
   }
   class Comparison {
@@ -196,6 +301,36 @@ classDiagram
     edit(tag: TogglTag | int, name: str) TogglTag
     get(tag: TogglTag | int) TogglTag | None
   }
+  class TogglAsyncCache {
+    cache_path
+    expire_after
+    model
+    parent
+    add()* None
+    delete()* None
+    find(pk: int)* T | None
+    find_method(method: RequestMethod) Callable[[Any], Awaitable[Any]] | None
+    load()* Iterable[T]
+    save(entry: list[T] | T, method: RequestMethod) None
+    update()* None
+  }
+  class TogglAsyncCachedEndpoint {
+    cache
+    load_cache() Iterable[T]
+    request(parameters: str, headers: dict[str, Any] | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+    save_cache(response: list[T] | T, method: RequestMethod) None
+  }
+  class TogglAsyncEndpoint {
+    BASE_ENDPOINT : ClassVar[URL]
+    HEADERS : Final[dict]
+    MODEL : type[T] | None
+    client
+    re_raise : bool
+    retries
+    api_status() bool
+    process_models(data: list[dict[str, Any]]) list[T]
+    request(parameters: str, headers: dict | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+  }
   class TogglCache {
     cache_path
     expire_after
@@ -229,7 +364,6 @@ classDiagram
   }
   class TogglEndpoint {
     BASE_ENDPOINT : ClassVar[str]
-    ENDPOINT : ClassVar[str]
     HEADERS : Final[dict]
     MODEL : type[T] | None
     client
@@ -370,6 +504,21 @@ classDiagram
   TrackerBody --|> BaseBody
   TrackerEndpoint --|> TogglCachedEndpoint
   UserEndpoint --|> TogglEndpoint
+  WorkspaceBody --|> BaseBody
+  WorkspaceEndpoint --|> TogglCachedEndpoint
+  AsyncClientEndpoint --|> TogglAsyncCachedEndpoint
+  TogglAsyncCachedEndpoint --|> TogglAsyncEndpoint
+  AsyncOrganizationEndpoint --|> TogglAsyncCachedEndpoint
+  AsyncProjectEndpoint --|> TogglAsyncCachedEndpoint
+  AsyncDetailedReportEndpoint --|> AsyncReportEndpoint
+  AsyncReportEndpoint --|> TogglAsyncEndpoint
+  AsyncSummaryReportEndpoint --|> AsyncReportEndpoint
+  AsyncWeeklyReportEndpoint --|> AsyncReportEndpoint
+  AsyncSqliteCache --|> TogglAsyncCache
+  AsyncTagEndpoint --|> TogglAsyncCachedEndpoint
+  AsyncTrackerEndpoint --|> TogglAsyncCachedEndpoint
+  AsyncUserEndpoint --|> TogglAsyncEndpoint
+  AsyncWorkspaceEndpoint --|> TogglAsyncCachedEndpoint
   TogglCachedEndpoint --|> TogglEndpoint
   JSONCache --|> TogglCache
   SqliteCache --|> TogglCache
@@ -385,12 +534,16 @@ classDiagram
   ReportEndpoint --|> TogglEndpoint
   SummaryReportEndpoint --|> ReportEndpoint
   WeeklyReportEndpoint --|> ReportEndpoint
-  WorkspaceBody --|> BaseBody
-  WorkspaceEndpoint --|> TogglCachedEndpoint
   Comparison --* TogglQuery : comparison
   TogglClient --* ClientEndpoint : MODEL
+  TogglClient --* AsyncClientEndpoint : MODEL
   TogglOrganization --* OrganizationEndpoint : MODEL
+  TogglOrganization --* AsyncOrganizationEndpoint : MODEL
   TogglProject --* ProjectEndpoint : MODEL
+  TogglProject --* AsyncProjectEndpoint : MODEL
   TogglTag --* TagEndpoint : MODEL
+  TogglTag --* AsyncTagEndpoint : MODEL
   TogglTracker --* TrackerEndpoint : MODEL
+  TogglTracker --* AsyncTrackerEndpoint : MODEL
   TogglWorkspace --* WorkspaceEndpoint : MODEL
+  TogglWorkspace --* AsyncWorkspaceEndpoint : MODEL
