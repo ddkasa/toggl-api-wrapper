@@ -61,15 +61,16 @@ def test_add_org(org_object: OrganizationEndpoint, faker, request, number):
 
 # NOTE: Orgs might take a bit to create so reruns are enabled.
 @pytest.mark.integration
+@pytest.mark.slow
 @pytest.mark.dependency(depends=["test_add_org"])
-@pytest.mark.flaky(rerun_except="httpx.HTTPStatusError", reruns=3)
+@pytest.mark.flaky(rerun_except="httpx.HTTPStatusError", reruns=5)
 def test_edit_org(org_object: OrganizationEndpoint, faker, request):
     cache = request.config.cache.get("org", {})
     with pytest.raises(ValueError, match="The organization name need at least have one letter!"):
         org_object.edit(cache["id"], "")
     name = faker.name().replace("", "-")
 
-    time.sleep(1)
+    time.sleep(10)
 
     edit = org_object.edit(cache["id"], name)
     assert isinstance(edit, TogglOrganization)
@@ -79,10 +80,11 @@ def test_edit_org(org_object: OrganizationEndpoint, faker, request):
 
 # NOTE: API can be slow in deleting the organization so reruns are enabled.
 @pytest.mark.integration
+@pytest.mark.slow
 @pytest.mark.dependency(depends=["test_edit_org"])
-@pytest.mark.flaky(only_rerun=["AssertionError", "httpx.HTTPStatusError"], reruns=3)
+@pytest.mark.flaky(only_rerun=["AssertionError", "httpx.HTTPStatusError"], reruns=5)
 def test_delete_org(org_object: OrganizationEndpoint, faker, request):
     cache = request.config.cache.get("org", {})
     org_object.delete(cache["id"])
-    time.sleep(3)
+    time.sleep(10)
     assert org_object.get(cache["id"], refresh=True) is None
