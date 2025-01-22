@@ -4,7 +4,7 @@ from abc import abstractmethod
 from datetime import date
 from typing import Any, ClassVar, Literal, cast
 
-from httpx import URL, BasicAuth, Response
+from httpx import URL, AsyncClient, BasicAuth, Response
 
 from toggl_api import TogglProject, TogglWorkspace
 from toggl_api._utility import format_iso
@@ -24,11 +24,18 @@ class AsyncReportEndpoint(TogglAsyncEndpoint):
         workspace_id: TogglWorkspace | int,
         auth: BasicAuth,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
     ) -> None:
-        super().__init__(auth, timeout=timeout, re_raise=re_raise, retries=retries)
+        super().__init__(
+            auth,
+            client=client,
+            timeout=timeout,
+            re_raise=re_raise,
+            retries=retries,
+        )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @abstractmethod

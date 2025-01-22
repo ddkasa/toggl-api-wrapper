@@ -7,7 +7,7 @@ import time
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, cast
 
-from httpx import HTTPStatusError, Response, codes
+from httpx import AsyncClient, HTTPStatusError, Response, codes
 from sqlalchemy import ColumnElement, ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -42,6 +42,7 @@ class AsyncWorkspaceEndpoint(TogglAsyncCachedEndpoint[TogglWorkspace]):
         organization_id: Workspace endpoint takes an organization id instead of
             a workspace id.
         auth: Authentication for the client.
+        client: Optional async client to be passed to be used for requests.
         timeout: How long it takes for the client to timeout. Keyword Only.
             Defaults to 10 seconds.
         re_raise: Whether to raise all HTTPStatusError errors and not handle them
@@ -58,6 +59,7 @@ class AsyncWorkspaceEndpoint(TogglAsyncCachedEndpoint[TogglWorkspace]):
         auth: BasicAuth,
         cache: AsyncSqliteCache[TogglWorkspace] | None = None,
         *,
+        client: AsyncClient | None = None,
         timeout: int = 10,
         re_raise: bool = False,
         retries: int = 3,
@@ -65,6 +67,7 @@ class AsyncWorkspaceEndpoint(TogglAsyncCachedEndpoint[TogglWorkspace]):
         super().__init__(
             auth,
             cache,
+            client=client,
             timeout=timeout,
             re_raise=re_raise,
             retries=retries,
