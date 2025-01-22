@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 import argparse
-import logging as log
+import logging
 import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from toggl_api import generate_authentication
-from toggl_api.config import AuthenticationError
-from toggl_api.meta.cache.json_cache import JSONCache
+from toggl_api.config import AuthenticationError, generate_authentication
 
 from .utils import _client_cleanup, _org_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
+
+log = logging.getLogger("toggl-api-wrapper.scripts")
+
 
 DEFAULT_OBJECT: frozenset[str] = frozenset({"tracker", "project", "tag", "client", "org"})
 
@@ -35,27 +36,26 @@ def _target_objects() -> set[str]:
 
 def _clean(args: set[str], auth: BasicAuth, workspace: int) -> None:
     cache_loc = Path() / "cache"
-    cache = JSONCache(cache_loc)
 
     if "tracker" in args:
         log.info("Cleaning trackers...")
-        _tracker_cleanup(cache, workspace, auth, 1)
+        _tracker_cleanup(workspace, auth, 1)
 
     if "project" in args:
         log.info("Cleaning projects...")
-        _project_cleanup(cache, workspace, auth, 1)
+        _project_cleanup(workspace, auth, 1)
 
     if "tag" in args:
         log.info("Cleaning tags...")
-        _tag_cleanup(cache, workspace, auth, 1)
+        _tag_cleanup(workspace, auth, 1)
 
     if "client" in args:
         log.info("Cleaning clients...")
-        _client_cleanup(cache, workspace, auth, 1)
+        _client_cleanup(workspace, auth, 1)
 
     if "org" in args:
         log.info("Cleaning organizations...")
-        _org_cleanup(cache, auth, 1)
+        _org_cleanup(auth, 1)
 
     log.info("Cleaning cache...")
     _path_cleanup(cache_loc)
@@ -69,7 +69,7 @@ def main() -> None:
     """
 
     fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    log.basicConfig(encoding="utf-8", level=log.INFO, format=fmt)
+    logging.basicConfig(encoding="utf-8", level=logging.INFO, format=fmt)
     log.info("Starting to clean toggl-account!")
 
     args = _target_objects()
@@ -80,7 +80,7 @@ def main() -> None:
         log.critical("Failed to find authentication: %s Exiting...", err)
         sys.exit(1)
 
-    workspace = int(os.environ.get("TOGGL_WORKSPACE_ID", 0))
+    workspace = int(os.environ.get("TOGGL_WORKSPACE_ID", "0"))
     if not workspace:
         log.critical("Default toggl worspace not set at 'TOGGL_WORKSPACE_ID'.")
         sys.exit(1)
