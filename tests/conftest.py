@@ -131,7 +131,7 @@ def tag_object(get_workspace_id, config_setup, get_json_cache):
 class ModelTest(TogglClass):
     @classmethod
     def from_kwargs(cls, **kwargs) -> TogglClass:
-        return cls(
+        return cls(  # pragma: no cover
             id=kwargs["id"],
             name=kwargs["name"],
         )
@@ -151,13 +151,13 @@ def meta_object_sqlite(config_setup, get_workspace_id, get_sqlite_cache):
     return EndPointTest(config_setup, get_sqlite_cache)
 
 
-def pytest_sessionstart(session: pytest.Session):
+def pytest_sessionstart(session: pytest.Session):  # pragma: no cover
     marks = session.config.getoption("-m", default="")
     if not marks or "integration" in marks:
         cleanup()
 
 
-def pytest_sessionfinish(session, exitstatus):
+def pytest_sessionfinish(session, exitstatus):  # pragma: no cover
     marks = session.config.getoption("-m", default="")
     if not marks or "integration" in marks:
         cleanup()

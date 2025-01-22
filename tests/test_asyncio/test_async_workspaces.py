@@ -53,5 +53,4 @@ async def test_workspace_statistics(aworkspace_ep, get_workspace_id, faker):
 @pytest.mark.integration
 @pytest.mark.xfail(reason="Premium Feature", raises=HTTPStatusError)
 async def test_tracker_constraints(aworkspace_ep, get_workspace_id, faker):
-    constraints = await aworkspace_ep.tracker_constraints(TogglWorkspace(get_workspace_id, faker.name()))
-    assert isinstance(constraints, dict)
+    assert isinstance(await aworkspace_ep.tracker_constraints(TogglWorkspace(get_workspace_id, faker.name())), dict)

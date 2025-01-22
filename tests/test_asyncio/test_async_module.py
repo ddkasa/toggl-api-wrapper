@@ -21,4 +21,4 @@ def test_module_reqs(module):
             if "toggl_api.asyncio" in sys.modules:
                 importlib.reload(sys.modules["toggl_api.asyncio"])
             else:
-                importlib.import_module("toggl_api.asyncio")
+                importlib.import_module("toggl_api.asyncio")  # pragma: no cover
