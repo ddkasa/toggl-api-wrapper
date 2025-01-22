@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, TypeVar, cast
 
 from httpx import URL, AsyncClient, BasicAuth, HTTPStatusError, Request, Response, Timeout, codes
 
-from toggl_api.meta import NoCacheAssignedError, RequestMethod
+from toggl_api._exceptions import NoCacheAssignedError
+from toggl_api.meta import RequestMethod
 from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:

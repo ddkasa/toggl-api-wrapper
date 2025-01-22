@@ -2,8 +2,16 @@ from __future__ import annotations
 
 
 class NamingError(ValueError):
-    """Raised when a description or name is invalid."""
+    """Description or name is invalid."""
 
 
 class DateTimeError(ValueError):
-    """Raised when a date is invalid or out of range."""
+    """Datetime is invalid or out of range."""
+
+
+class MissingParentError(AttributeError):
+    """Cache object doesn't have a parent endpoint associated and is being called used."""
+
+
+class NoCacheAssignedError(AttributeError):
+    """Endpoint doesn't have cache object associated with it and try's to manipulate cache."""

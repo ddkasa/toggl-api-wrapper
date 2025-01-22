@@ -10,8 +10,8 @@ from os import PathLike
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
+from toggl_api._exceptions import MissingParentError
 from toggl_api.meta._enums import RequestMethod
-from toggl_api.meta.cache import MissingParentError
 from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
