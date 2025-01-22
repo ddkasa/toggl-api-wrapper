@@ -224,12 +224,6 @@ def test_expiration_sqlite(meta_object_sqlite, model_data):
     assert meta_object_sqlite.cache.find(tracker_data) is None
 
 
-@pytest.fixture
-def user_object_sqlite(user_object, get_sqlite_cache):
-    user_object.cache = get_sqlite_cache
-    return user_object
-
-
 @pytest.mark.unit
 def test_tracker_cache(
     tracker_object_sqlite,

@@ -50,7 +50,7 @@ def test_get_workspace_id(get_workspace_id, monkeypatch):
 @pytest.mark.unit
 def test_use_togglrc(tmp_path, faker):
     path = Path.home() / ".togglrc"
-    if not path.exists():
+    if not path.exists():  # pragma: no cover
         with pytest.raises(FileNotFoundError):
             use_togglrc()
 

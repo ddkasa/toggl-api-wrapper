@@ -107,7 +107,7 @@ def test_cache_json_int_arg():
 @pytest.mark.unit
 def test_cache_functionality_json(meta_object, model_data):
     model_data = model_data["tracker"]
-    if meta_object.cache.cache_path.exists():
+    if meta_object.cache.cache_path.exists():  # pragma: no cover
         meta_object.cache.cache_path.unlink()
     meta_object.cache.save(model_data, RequestMethod.GET)
     assert model_data in meta_object.load_cache()

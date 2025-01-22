@@ -43,9 +43,6 @@ def test_process_models(meta_object, get_test_data, meta_object_sqlite):
 class BodyTest(BaseBody):
     parameter: str = field(metadata={"endpoints": frozenset(("generic_endpoint",))})
 
-    def format(self, endpoint: str, **kwargs) -> dict:
-        return kwargs
-
 
 @pytest.mark.parametrize(
     ("parameter", "endpoint", "expected"),
