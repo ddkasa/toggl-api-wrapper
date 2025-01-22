@@ -77,16 +77,16 @@ All Tracker, Client, Project & Tag endpoints will have most of these methods:
 **Outputs**:
 
 ```python
-TogglProject(
-    id=208596838,
-    name='New Project',
-    workspace=8876353,
-    color='#0b83d9',
-    client=None,
-    active=True,
-    start_date=datetime.date(2025, 1, 22),
-    end_date=None
-)
+>>> TogglProject(
+        id=208596838,
+        name='New Project',
+        workspace=8876353,
+        color='#0b83d9',
+        client=None,
+        active=True,
+        start_date=datetime.date(2025, 1, 22),
+        end_date=None
+    )
 ```
 
 ### Logging Example

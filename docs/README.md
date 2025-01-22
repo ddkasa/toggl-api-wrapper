@@ -44,12 +44,9 @@ pip install "toggl-api-wrapper[async]"
 from datetime import timedelta
 from pathlib import Path
 
-from toggl_api import (
-    TrackerBody,
-    TrackerEndpoint,
-    generate_authentication,
-    JSONCache
-)
+from toggl_api.config import generate_authentication
+from toggl_api import TrackerBody, TrackerEndpoint, JSONCache
+
 
 WORKSPACE_ID = 2313123123
 AUTH = generate_authentication()
@@ -79,40 +76,41 @@ print(tracker)
 </details>
 
 <details>
-  <summary>User Endpoint</summary>
+  <summary>Project Endpoint</summary>
 
 ```python
 from datetime import timedelta
 from pathlib import Path
 
-from toggl_api import (
-    UserEndpoint,
-    generate_authentication,
-    JSONCache,
+from toggl_api import ProjectBody, ProjectEndpoint, TogglProject
+from toggl_api.config import retrieve_togglrc_workspace_id, use_togglrc
+from toggl_api.meta.cache import JSONCache
+
+WORKSPACE_ID = retrieve_togglrc_workspace_id()
+AUTH = use_togglrc()
+cache = JSONCache[TogglProject](Path("cache"), timedelta(hours=24))
+endpoint = ProjectEndpoint(WORKSPACE_ID, AUTH, cache)
+
+color = ProjectEndpoint.get_color("red")
+body = ProjectBody(
+    "My First Project",
+    client_name="My First Client",
+    color=color,
 )
-from toggl_api.config import retrieve_workspace_id
-
-WORKSPACE_ID = retrieve_workspace_id()
-AUTH = generate_authentication()
-cache = JSONCache(Path("cache"), timedelta(weeks=1))
-endpoint = UserEndpoint(workspace_id, AUTH, CACHE)
-
-tracker = endpoint.get(3482231563, refresh=True)
-print(tracker)
+project = endpoint.add(body)
+print(project)
 ```
 
 <strong>Outputs:</strong>
 
 ```python
->>> TogglTracker(
-        id=3482231563,
-        name="My First Tracker",
+>>> TogglProject(
+        id=203366783,
+        name='My First Project',
         workspace=2313123123,
-        start=datetime.datetime(2024, 6, 10, 14, 59, 20, tzinfo=datetime.timezone.utc),
-        duration=datetime.timedelta(seconds=1, microseconds=179158),
-        stop=None,
-        project=None,
-        tags=[],
+        color='#d92b2b',
+        client=65298912,
+        active=True,
     )
 ```
 
