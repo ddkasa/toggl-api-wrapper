@@ -1,19 +1,26 @@
 from __future__ import annotations
 
 import enum
+import logging
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    Protocol,
+    TypeVar,
+    cast,
+)
 
 from toggl_api._exceptions import MissingParentError
 from toggl_api.meta._enums import RequestMethod
 from toggl_api.models import TogglClass
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
     from os import PathLike
 
     from toggl_api.meta import TogglCachedEndpoint
@@ -29,6 +36,8 @@ class Comparison(enum.Enum):
 
 T = TypeVar("T")
 
+log = logging.getLogger("toggl_api.cache")
+
 
 @dataclass
 class TogglQuery(Generic[T]):
@@ -42,11 +51,16 @@ class TogglQuery(Generic[T]):
     """The way the value should be compared. None 'EQUALS' comparisons for None numeric or time based values."""
 
     def __post_init__(self) -> None:
-        if not isinstance(self.value, date | int | timedelta) and self.comparison != Comparison.EQUAL:
+        if (
+            not isinstance(self.value, date | int | timedelta)
+            and self.comparison != Comparison.EQUAL
+        ):
             msg = "None 'EQUAL' comparisons only available for time or numeric based values."
             raise TypeError(msg)
 
-        if isinstance(self.value, date) and not isinstance(self.value, datetime):
+        if isinstance(self.value, date) and not isinstance(
+            self.value, datetime
+        ):
             if self.comparison in {
                 Comparison.LESS_THEN,
                 Comparison.GREATER_THEN_OR_EQUAL,
@@ -62,6 +76,13 @@ class TogglQuery(Generic[T]):
                     datetime.max.time(),
                     tzinfo=timezone.utc,
                 )
+
+
+_T = TypeVar("_T", bound=TogglClass, contravariant=True)
+
+
+class CacheCallable(Protocol, Generic[_T]):
+    def __call__(self, *entries: _T) -> None: ...
 
 
 TC = TypeVar("TC", bound=TogglClass)
@@ -111,14 +132,18 @@ class TogglCache(ABC, Generic[TC]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
-        parent: TogglCachedEndpoint | None = None,
+        parent: TogglCachedEndpoint[TC] | None = None,
     ) -> None:
         self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
 
-        self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
+        self._expire_after = (
+            timedelta(seconds=expire_after)
+            if isinstance(expire_after, int)
+            else expire_after
+        )
         self._parent = parent
 
     @abstractmethod
@@ -127,11 +152,13 @@ class TogglCache(ABC, Generic[TC]):
     @abstractmethod
     def load(self) -> Iterable[TC]: ...
 
-    def save(self, entry: list[TC] | TC, method: RequestMethod) -> None:
-        func = self.find_method(method)
-        if func is None:
+    def save(self, entry: Iterable[TC] | TC, method: RequestMethod) -> None:
+        try:
+            func = self.find_method(method)
+        except NotImplementedError as err:
+            log.debug(err)
             return
-        func(*entry) if isinstance(entry, Sequence) else func(entry)
+        func(*entry) if isinstance(entry, Sequence | Iterable) else func(entry)
         self.commit()
 
     @abstractmethod
@@ -147,16 +174,21 @@ class TogglCache(ABC, Generic[TC]):
     def delete(self, *entries: TC) -> None: ...
 
     @abstractmethod
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Iterable[TC]: ...
+    def query(
+        self,
+        *query: TogglQuery[Any],
+        distinct: bool = False,
+    ) -> Iterable[TC]: ...
 
-    def find_method(self, method: RequestMethod) -> Callable | None:
-        match_func: Final[dict[RequestMethod, Callable]] = {
-            RequestMethod.GET: self.add,
-            RequestMethod.POST: self.update,
-            RequestMethod.PATCH: self.update,
-            RequestMethod.PUT: self.add,
-        }
-        return match_func.get(method)
+    def find_method(self, method: RequestMethod) -> CacheCallable[TC]:
+        if method in {RequestMethod.GET, RequestMethod.PUT}:
+            return self.add
+        elif method in {RequestMethod.PATCH, RequestMethod.PUT}:
+            return self.update
+
+        raise NotImplementedError(
+            f"{method.value} Request method is not implemented."
+        )
 
     @property
     @abstractmethod

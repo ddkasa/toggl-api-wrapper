@@ -135,7 +135,7 @@ class JSONSession(Generic[T]):
         return data[: self.max_length]
 
 
-class JSONCache(TogglCache, Generic[T]):
+class JSONCache(TogglCache[T]):
     """Class for caching Toggl data to disk in JSON format.
 
     Examples:
@@ -174,7 +174,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,
@@ -238,7 +238,11 @@ class JSONCache(TogglCache, Generic[T]):
         for entry in entries:
             self._delete_entry(entry)
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
+    def query(
+        self,
+        *query: TogglQuery[Any],
+        distinct: bool = False,
+    ) -> list[T]:
         """Query method for filtering Toggl objects from cache.
 
         Filters cached Toggl objects by set of supplied queries.
@@ -285,7 +289,7 @@ class JSONCache(TogglCache, Generic[T]):
     def _query_helper(
         self,
         model: T,
-        queries: tuple[TogglQuery, ...],
+        queries: tuple[TogglQuery[Any], ...],
         existing: dict[str, set[Any]],
         min_ts: datetime | None,
         *,
@@ -316,7 +320,7 @@ class JSONCache(TogglCache, Generic[T]):
         return True
 
     @staticmethod
-    def _match_equal(model: T, query: TogglQuery) -> bool:
+    def _match_equal(model: T, query: TogglQuery[Any]) -> bool:
         if isinstance(query.value, Sequence) and not isinstance(
             query.value, str
         ):
@@ -330,7 +334,7 @@ class JSONCache(TogglCache, Generic[T]):
         return model[query.key] == query.value
 
     @staticmethod
-    def _match_query(model: T, query: TogglQuery) -> bool:
+    def _match_query(model: T, query: TogglQuery[Any]) -> bool:
         if query.comparison == Comparison.EQUAL:
             return JSONCache._match_equal(model, query)
         if query.comparison == Comparison.LESS_THEN:

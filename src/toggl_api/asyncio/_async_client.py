@@ -223,7 +223,7 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
                 cast(ColumnElement[bool], TogglClient.name == body.name)
             )
 
-        cache = cast(AsyncSqliteCache, self.cache)
+        cache = cast(AsyncSqliteCache[TogglClient], self.cache)
         async with AsyncSession(
             cache.database, expire_on_commit=False
         ) as session:

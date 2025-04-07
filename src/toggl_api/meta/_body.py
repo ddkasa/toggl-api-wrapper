@@ -5,7 +5,7 @@ from typing import Any
 
 
 @dataclass
-class BaseBody(Mapping):
+class BaseBody(Mapping[str, Any]):
     @abstractmethod
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
         pass

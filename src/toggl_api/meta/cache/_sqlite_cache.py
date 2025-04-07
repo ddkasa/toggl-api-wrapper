@@ -71,7 +71,7 @@ class SqliteCache(TogglCache[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,
@@ -131,7 +131,11 @@ class SqliteCache(TogglCache[T]):
             )
         return search.filter_by(**query).first()
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> Query[T]:
+    def query(
+        self,
+        *query: TogglQuery[Any],
+        distinct: bool = False,
+    ) -> Query[T]:
         """Query method for filtering models from cache.
 
         Filters cached model by set of supplied queries.
@@ -163,14 +167,20 @@ class SqliteCache(TogglCache[T]):
         return search
 
     def _query_helper(
-        self, query: list[TogglQuery], query_obj: Query[T]
+        self,
+        query: list[TogglQuery[Any]],
+        query_obj: Query[T],
     ) -> Query[T]:
         if query:
             query_obj = self._match_query(query.pop(0), query_obj)
             return self._query_helper(query, query_obj)
         return query_obj
 
-    def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
+    def _match_query(
+        self,
+        query: TogglQuery[Any],
+        query_obj: Query[T],
+    ) -> Query[T]:
         value = getattr(self.model, query.key)
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(

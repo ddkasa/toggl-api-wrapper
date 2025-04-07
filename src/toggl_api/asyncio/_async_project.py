@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timezone
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Any, Final, cast
 
 from httpx import AsyncClient, HTTPStatusError, codes
 from sqlalchemy import Column, select
@@ -103,8 +103,9 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
 
     @staticmethod
     def status_to_query(
-        status: TogglProject.Status, statement: Select
-    ) -> Select:
+        status: TogglProject.Status,
+        statement: Select[Any],
+    ) -> Select[Any]:
         """Creates a list of queries depending on the desired project status.
 
         Args:
@@ -162,14 +163,16 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
                 statement = statement.filter(
                     cast(
                         ColumnElement[bool],
-                        cast(Column, TogglProject.client).in_(body.client_ids),
+                        cast(Column[int], TogglProject.client).in_(
+                            body.client_ids
+                        ),
                     ),
                 )
             if body.statuses:
                 for status in body.statuses:
                     statement = self.status_to_query(status, statement)
 
-        cache = cast(AsyncSqliteCache, self.cache)
+        cache = cast(AsyncSqliteCache[TogglProject], self.cache)
         async with AsyncSession(
             cache.database, expire_on_commit=False
         ) as session:

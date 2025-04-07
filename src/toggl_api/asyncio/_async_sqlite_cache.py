@@ -79,7 +79,7 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglAsyncCachedEndpoint[T] | None = None,
         *,

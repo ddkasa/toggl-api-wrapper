@@ -15,6 +15,8 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from httpx import Headers
+
 from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.models import TogglClass
 
@@ -90,8 +92,8 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
     def request(  # type: ignore[override]
         self,
         parameters: str,
-        headers: dict[str, Any] | None = None,
-        body: dict | list | None = None,
+        headers: Headers | None = None,
+        body: dict[str, Any] | list[Any] | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
@@ -173,14 +175,18 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             return None
         return self.cache.save(response, method)
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
+    def query(
+        self,
+        *query: TogglQuery[Any],
+        distinct: bool = False,
+    ) -> list[T]:
         """Query wrapper for the cache method.
 
         If the original data structure is required use the query on the
         *.cache* attribute instead.
 
         Args:
-            query: An arbitary amount of queries to match the models to.
+            *query: An arbitary amount of queries to match the models to.
             distinct: A boolean that remove duplicate values if present.
 
         Returns:
@@ -195,7 +201,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         return self._cache
 
     @cache.setter
-    def cache(self, value: TogglCache | None) -> None:
+    def cache(self, value: TogglCache[T] | None) -> None:
         self._cache = value
         if self.cache and self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self

@@ -12,13 +12,21 @@ import random
 import time
 from abc import ABC
 from json import JSONDecodeError
-from typing import Any, ClassVar, Final, Generic, TypeVar
+from typing import (
+    Any,
+    ClassVar,
+    Final,
+    Generic,
+    TypeVar,
+    TYPE_CHECKING,
+)
 
 import httpx
 from httpx import (
     BasicAuth,
     Client,
     HTTPStatusError,
+    Headers,
     Request,
     Response,
     Timeout,
@@ -28,6 +36,9 @@ from httpx import (
 from toggl_api.models import TogglClass
 
 from ._enums import RequestMethod
+
+if TYPE_CHECKING:
+    pass
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -56,7 +67,7 @@ class TogglEndpoint(ABC, Generic[T]):
     """
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
-    HEADERS: Final[dict] = {"content-type": "application/json"}
+    HEADERS: Final[Headers] = Headers({"content-type": "application/json"})
     MODEL: type[T] | None = None
 
     __slots__ = ("client", "re_raise", "retries", "workspace_id")
@@ -87,8 +98,8 @@ class TogglEndpoint(ABC, Generic[T]):
     def _request_handle_error(
         self,
         response: Response,
-        body: dict | list | None,
-        headers: dict | None,
+        body: dict[str, Any] | list[dict[str, Any]] | None,
+        headers: Headers | None,
         method: RequestMethod,
         parameters: str,
         *,
@@ -107,7 +118,9 @@ class TogglEndpoint(ABC, Generic[T]):
             retries -= 1
             log.error(
                 (
-                    "Status code %s is a server error. Retrying request in %s seconds. There are %s retries left."
+                    "Status code %s is a server error."
+                    "Retrying request in %s seconds."
+                    "There are %s retries left."
                 ),
                 response.status_code,
                 delay,
@@ -148,8 +161,8 @@ class TogglEndpoint(ABC, Generic[T]):
     def _build_request(
         self,
         parameters: str,
-        headers: dict | None,
-        body: dict | list | None,
+        headers: Headers | None,
+        body: dict[str, Any] | list[dict[str, Any]] | None,
         method: RequestMethod,
     ) -> Request:
         url = self.BASE_ENDPOINT + parameters
@@ -166,8 +179,8 @@ class TogglEndpoint(ABC, Generic[T]):
     def request(
         self,
         parameters: str,
-        headers: dict | None = None,
-        body: dict | list | None = None,
+        headers: Headers | None = None,
+        body: dict[str, Any] | list[dict[str, Any]] | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class UserEndpoint(TogglEndpoint):
+class UserEndpoint(TogglEndpoint[Any]):
     """Endpoint for retrieving user data.
 
     [Official Documentation](https://engineering.toggl.com/docs/api/me)
@@ -49,7 +49,9 @@ class UserEndpoint(TogglEndpoint):
         )
 
     @staticmethod
-    def verify_authentication(auth: BasicAuth, *, client: Client | None = None) -> bool:
+    def verify_authentication(
+        auth: BasicAuth, *, client: Client | None = None
+    ) -> bool:
         """Check if user is correctly authenticated with the Toggl API.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-logged)
@@ -77,7 +79,9 @@ class UserEndpoint(TogglEndpoint):
         """
         client = client or Client()
         try:
-            client.get(TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth).raise_for_status()
+            client.get(
+                TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth
+            ).raise_for_status()
         except HTTPStatusError as err:
             log.critical("Failed to verify authentication!")
             log.exception("%s")

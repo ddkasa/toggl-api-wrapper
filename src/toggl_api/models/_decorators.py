@@ -6,7 +6,7 @@ from sqlalchemy.types import DateTime, TypeDecorator
 
 
 # NOTE: From sqlalchemy-utc package.
-class UTCDateTime(TypeDecorator):
+class UTCDateTime(TypeDecorator[datetime]):
     """Almost equivalent to :class:`~sqlalchemy.types.DateTime` with
     ``timezone=True`` option, but it differs from that by:
 

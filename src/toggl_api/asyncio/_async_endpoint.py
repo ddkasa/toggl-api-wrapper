@@ -9,7 +9,17 @@ from datetime import timedelta
 from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Generic, TypeVar, cast
 
-from httpx import URL, AsyncClient, BasicAuth, HTTPStatusError, Request, Response, Timeout, codes
+from httpx import (
+    URL,
+    AsyncClient,
+    BasicAuth,
+    HTTPStatusError,
+    Headers,
+    Request,
+    Response,
+    Timeout,
+    codes,
+)
 
 from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.meta import RequestMethod
@@ -45,7 +55,7 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
     """
 
     BASE_ENDPOINT: ClassVar[URL] = URL("https://api.track.toggl.com/api/v9/")
-    HEADERS: Final[dict] = {"content-type": "application/json"}
+    HEADERS: Final[Headers] = Headers({"content-type": "application/json"})
     MODEL: type[T] | None = None
 
     def __init__(
@@ -60,7 +70,9 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
         self.client = client = client or AsyncClient()
         client.auth = auth
         client.base_url = self.BASE_ENDPOINT
-        client.timeout = timeout if isinstance(timeout, Timeout) else Timeout(timeout)
+        client.timeout = (
+            timeout if isinstance(timeout, Timeout) else Timeout(timeout)
+        )
 
         self.re_raise = re_raise
         self.retries = max(0, retries)
@@ -68,8 +80,8 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
     async def _request_handle_error(
         self,
         response: Response,
-        body: dict | list | None,
-        headers: dict | None,
+        body: dict[str, Any] | list[dict[str, Any]] | None,
+        headers: Headers | None,
         method: RequestMethod,
         parameters: str,
         *,
@@ -79,11 +91,17 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
         msg = "Request failed with status code %s: %s"
         log.error(msg, response.status_code, response.text)
 
-        if not self.re_raise and codes.is_server_error(response.status_code) and retries:
+        if (
+            not self.re_raise
+            and codes.is_server_error(response.status_code)
+            and retries
+        ):
             delay = random.randint(1, 5)
             retries -= 1
             log.error(
-                ("Status code %s is a server error. Retrying request in %s seconds. There are %s retries left."),
+                (
+                    "Status code %s is a server error. Retrying request in %s seconds. There are %s retries left."
+                ),
                 response.status_code,
                 delay,
                 retries,
@@ -92,17 +110,22 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
             await asyncio.sleep(delay)
             return await TogglAsyncEndpoint.request(
                 self,
-                parameters,
-                headers,
-                body,
-                method,
+                parameters=parameters,
+                headers=headers,
+                body=body,
+                method=method,
                 raw=raw,
                 retries=retries,
             )
 
         return response.raise_for_status()
 
-    async def _process_response(self, response: Response, *, raw: bool) -> T | list[T] | Response | None:
+    async def _process_response(
+        self,
+        response: Response,
+        *,
+        raw: bool,
+    ) -> T | list[T] | Response | None:
         try:
             data = response if raw else response.json()
         except ValueError:
@@ -121,8 +144,8 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
     async def _build_request(
         self,
         parameters: str,
-        headers: dict | None,
-        body: dict | list | None,
+        headers: Headers | None,
+        body: dict[str, Any] | list[dict[str, Any]] | None,
         method: RequestMethod,
     ) -> Request:
         url = self.BASE_ENDPOINT.join(parameters)
@@ -139,8 +162,8 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
     async def request(
         self,
         parameters: str,
-        headers: dict | None = None,
-        body: dict | list | None = None,
+        headers: Headers | None = None,
+        body: dict[str, Any] | list[dict[str, Any]] | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         raw: bool = False,
@@ -174,7 +197,9 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
     async def api_status() -> bool:
         """Method for verifying that the Toggl API is up."""
         try:
-            request = await AsyncClient().get("https://api.track.toggl.com/api/v9/status")
+            request = await AsyncClient().get(
+                "https://api.track.toggl.com/api/v9/status"
+            )
             result = request.json()
         except (HTTPStatusError, JSONDecodeError):
             log.critical("Failed to get a response from the Toggl API!")
@@ -184,7 +209,7 @@ class TogglAsyncEndpoint(ABC, Generic[T]):
         return bool(result) and result.get("status") == "OK"
 
 
-_T = TypeVar("_T", bound=Coroutine)
+_T = TypeVar("_T", bound=Coroutine[Any, Any, Any])
 
 
 class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
@@ -237,13 +262,13 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
         )
         self.cache = cache
 
-        self.__tasks: set[asyncio.Task] = set()
+        self.__tasks: set[asyncio.Task[Any]] = set()
 
     async def request(  # type: ignore[override]
         self,
         parameters: str,
-        headers: dict[str, Any] | None = None,
-        body: dict | list | None = None,
+        headers: Headers | None = None,
+        body: dict[str, Any] | list[Any] | None = None,
         method: RequestMethod = RequestMethod.GET,
         *,
         refresh: bool = False,
@@ -267,7 +292,11 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
             Toggl API response data processed into TogglClass objects or not
                 depending on arguments.
         """
-        data = await self.load_cache() if self.cache and self.MODEL is not None else None
+        data = (
+            await self.load_cache()
+            if self.cache and self.MODEL is not None
+            else None
+        )
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -310,7 +339,10 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
         """Direct saving method for retrieving all models from cache."""
         if self.cache is None:
             raise NoCacheAssignedError
-        if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
+        if (
+            isinstance(self.cache.expire_after, timedelta)
+            and not self.cache.expire_after.total_seconds()
+        ):
             log.debug(
                 "Cache is set to immediately expire!",
                 extra={"expiry": self.cache.expire_after},
@@ -330,7 +362,7 @@ class TogglAsyncCachedEndpoint(TogglAsyncEndpoint[T]):
         return self._cache
 
     @cache.setter
-    def cache(self, value: AsyncSqliteCache | None) -> None:
+    def cache(self, value: AsyncSqliteCache[T] | None) -> None:
         self._cache = value
         if self.cache and self.cache._parent is not self:  # noqa: SLF001
             self.cache.parent = self
