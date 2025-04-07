@@ -6,16 +6,17 @@ from typing import TYPE_CHECKING, cast
 from httpx import AsyncClient, HTTPStatusError, codes
 
 from toggl_api import NamingError, TogglTag
+from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.meta import RequestMethod
-from toggl_api.meta._cached_endpoint import NoCacheAssignedError
 
 from ._async_endpoint import TogglAsyncCachedEndpoint
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from ._async_sqlite_cache import AsyncSqliteCache
     from toggl_api import TogglWorkspace
+
+    from ._async_sqlite_cache import AsyncSqliteCache
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
