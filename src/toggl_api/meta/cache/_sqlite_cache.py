@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 try:
     import sqlalchemy as db
-    from sqlalchemy import Engine
+    from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Query, Session
 except ImportError:
     pass
@@ -76,7 +76,9 @@ class SqliteCache(TogglCache[T]):
         engine: Engine | None = None,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.database = engine or db.create_engine(f"sqlite:///{self.cache_path}")
+        self.database = engine or db.create_engine(
+            f"sqlite:///{self.cache_path}"
+        )
         self.metadata = register_tables(self.database)
 
         self.session = Session(self.database)
@@ -152,7 +154,9 @@ class SqliteCache(TogglCache[T]):
                 search = search.distinct(*data).group_by(*data)  # type: ignore[arg-type]
         return search
 
-    def _query_helper(self, query: list[TogglQuery], query_obj: Query[T]) -> Query[T]:
+    def _query_helper(
+        self, query: list[TogglQuery], query_obj: Query[T]
+    ) -> Query[T]:
         if query:
             query_obj = self._match_query(query.pop(0), query_obj)
             return self._query_helper(query, query_obj)
@@ -161,7 +165,9 @@ class SqliteCache(TogglCache[T]):
     def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
         value = getattr(self.model, query.key)  # type: ignore[union-attr]
         if query.comparison == Comparison.EQUAL:
-            if isinstance(query.value, Sequence) and not isinstance(query.value, str):
+            if isinstance(query.value, Sequence) and not isinstance(
+                query.value, str
+            ):
                 return query_obj.filter(value.in_(query.value))
             return query_obj.filter(value == query.value)
         if query.comparison == Comparison.LESS_THEN:

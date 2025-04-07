@@ -26,9 +26,7 @@ if TYPE_CHECKING:
 
     from httpx import BasicAuth, Client, Response, Timeout
 
-    from toggl_api.meta.cache._base_cache import TogglQuery
-
-    from ._cache import TogglCache
+    from toggl_api.meta.cache._base_cache import TogglQuery, TogglCache
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -117,7 +115,11 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             Toggl API response data processed into TogglClass objects or not
                 depending on arguments.
         """
-        data = self.load_cache() if self.cache and self.MODEL is not None else None
+        data = (
+            self.load_cache()
+            if self.cache and self.MODEL is not None
+            else None
+        )
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -160,7 +162,10 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         """Direct saving method for retrieving all models from cache."""
         if self.cache is None:
             raise NoCacheAssignedError
-        if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
+        if (
+            isinstance(self.cache.expire_after, timedelta)
+            and not self.cache.expire_after.total_seconds()
+        ):
             log.debug(
                 "Cache is set to immediately expire!",
                 extra={"expiry": self.cache.expire_after},

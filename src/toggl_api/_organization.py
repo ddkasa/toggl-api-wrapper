@@ -13,7 +13,7 @@ from .models import TogglOrganization, TogglWorkspace
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from toggl_api.meta.cache.base_cache import TogglCache
+    from toggl_api.meta.cache import TogglCache
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -90,16 +90,23 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             return self.cache.find({"id": organization})
 
         try:
-            response = self.request(f"organizations/{organization}", refresh=refresh)
+            response = self.request(
+                f"organizations/{organization}", refresh=refresh
+            )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code in {codes.NOT_FOUND, codes.FORBIDDEN}:
+            if not self.re_raise and err.response.status_code in {
+                codes.NOT_FOUND,
+                codes.FORBIDDEN,
+            }:
                 log.warning(err)
                 return None
             raise
 
         return cast(TogglOrganization, response)
 
-    def add(self, name: str, workspace_name: str = "Default-Workspace") -> TogglOrganization:
+    def add(
+        self, name: str, workspace_name: str = "Default-Workspace"
+    ) -> TogglOrganization:
         """Creates a new organization with a single workspace and assigns
         current user as the organization owner
 
@@ -136,7 +143,9 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             ),
         )
 
-    def edit(self, organization: TogglOrganization | int, name: str) -> TogglOrganization:
+    def edit(
+        self, organization: TogglOrganization | int, name: str
+    ) -> TogglOrganization:
         """Updates an existing organization.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#put-updates-an-existing-organization)
@@ -186,7 +195,10 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Returns:
             A list of organization objects or empty if none found.
         """
-        return cast(list[TogglOrganization], self.request("me/organizations", refresh=refresh))
+        return cast(
+            list[TogglOrganization],
+            self.request("me/organizations", refresh=refresh),
+        )
 
     def delete(self, organization: TogglOrganization | int) -> None:
         """Leaves organization, effectively delete user account in org and
@@ -204,7 +216,9 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Raises:
             HTTPStatusError: If the response status_code is not '200' or '404'.
         """
-        org_id = organization if isinstance(organization, int) else organization.id
+        org_id = (
+            organization if isinstance(organization, int) else organization.id
+        )
         try:
             self.request(
                 f"organizations/{org_id}/users/leave",
