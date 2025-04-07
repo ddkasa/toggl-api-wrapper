@@ -7,7 +7,7 @@
 ::: toggl_api.config.use_togglrc
 
 > [!NOTE]  
-> The [UserEndpoint](user.md#toggl_api.UserEndpoint) has a [verify_authentication](user.md#toggl_api.UserEndpoint.check_authentication) method for verifying authentication with the Toggl API.
+> The [UserEndpoint](user.md#toggl_api.UserEndpoint) has a [verify_authentication](user.md#toggl_api.UserEndpoint.verify_authentication) method for verifying authentication with the Toggl API.
 
 ## Default Workspace
 
