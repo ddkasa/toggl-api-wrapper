@@ -370,10 +370,16 @@ class ReportEndpoint(TogglEndpoint[Any]):
         )
 
     @abstractmethod
-    def search_time_entries(self, body: ReportBody, *args, **kwargs): ...
+    def search_time_entries(
+        self, body: ReportBody, *args: Any, **kwargs: Any
+    ) -> Any: ...
 
     @abstractmethod
-    def export_report(self, body: ReportBody, *args, **kwargs): ...
+    def export_report(
+        self, body: ReportBody, *args: Any, **kwargs: Any
+    ) -> Any: ...
+
+    # REFACTOR: These abstract methods should have more concrete types.
 
 
 class SummaryReportEndpoint(ReportEndpoint):

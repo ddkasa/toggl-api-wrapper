@@ -49,10 +49,16 @@ class AsyncReportEndpoint(TogglAsyncEndpoint[Any]):
         )
 
     @abstractmethod
-    async def search_time_entries(self, body: ReportBody, *args, **kwargs): ...
+    async def search_time_entries(
+        self, body: ReportBody, *args: Any, **kwargs: Any
+    ) -> Any: ...
 
     @abstractmethod
-    async def export_report(self, body: ReportBody, *args, **kwargs): ...
+    async def export_report(
+        self, body: ReportBody, *args: Any, **kwargs: Any
+    ) -> Any: ...
+
+    # REFACTOR: More concrete function signatures.
 
 
 class AsyncSummaryReportEndpoint(AsyncReportEndpoint):

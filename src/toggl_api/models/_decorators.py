@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from sqlalchemy import Dialect
 from sqlalchemy.types import DateTime, TypeDecorator
 
 
@@ -22,10 +23,10 @@ class UTCDateTime(TypeDecorator[datetime]):
     impl = DateTime(timezone=True)
     cache_ok = True
 
-    def process_bind_param(  # type: ignore[override]
+    def process_bind_param(
         self,
-        value: datetime,
-        _,
+        value: datetime | None,
+        dialect: Dialect,
     ) -> datetime | None:
         if value is not None:
             if not isinstance(value, datetime):
@@ -41,7 +42,7 @@ class UTCDateTime(TypeDecorator[datetime]):
     def process_result_value(
         self,
         value: datetime | None,
-        _,
+        dialect: Dialect,
     ) -> datetime | None:
         if value is not None:
             value = (

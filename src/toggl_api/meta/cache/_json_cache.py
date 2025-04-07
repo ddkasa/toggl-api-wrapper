@@ -81,7 +81,7 @@ class JSONSession(Generic[T]):
             return True
         return False
 
-    def _save(self, path: Path, data: dict[str, Any]):
+    def _save(self, path: Path, data: dict[str, Any]) -> None:
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
