@@ -4,8 +4,10 @@ import logging
 from typing import TYPE_CHECKING, cast
 
 from httpx import AsyncClient, HTTPStatusError, codes
-from sqlalchemy import ColumnElement, ScalarResult, select
+from sqlalchemy import select
+from sqlalchemy.engine import ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import ColumnElement
 
 from toggl_api import ClientBody, NamingError, TogglClient
 from toggl_api.meta import RequestMethod
@@ -16,7 +18,7 @@ from ._async_sqlite_cache import AsyncSqliteCache
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-    from .models import TogglWorkspace
+    from toggl_api import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -66,7 +68,9 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        self.workspace_id = (
+            workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        )
 
     async def add(self, body: ClientBody) -> TogglClient:
         """Create a Client based on parameters set in the provided body.
@@ -98,7 +102,9 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
 
         return cast(TogglClient, response)
 
-    async def get(self, client_id: int | TogglClient, *, refresh: bool = False) -> TogglClient | None:
+    async def get(
+        self, client_id: int | TogglClient, *, refresh: bool = False
+    ) -> TogglClient | None:
         """Request a client based on its id.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-load-client-from-id)
@@ -126,14 +132,19 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
+            if (
+                not self.re_raise
+                and err.response.status_code == codes.NOT_FOUND
+            ):
                 log.warning("Client with id %s does not exist!", client_id)
                 return None
             raise
 
         return cast(TogglClient | None, response)
 
-    async def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient:
+    async def edit(
+        self, client: TogglClient | int, body: ClientBody
+    ) -> TogglClient:
         """Edit a client with the supplied parameters from the body.
 
         This endpoint always hit the external API in order to keep clients consistent.
@@ -176,7 +187,11 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
         """
         client_id = client if isinstance(client, int) else client.id
         try:
-            await self.request(f"{self.endpoint}/{client_id}", method=RequestMethod.DELETE, refresh=True)
+            await self.request(
+                f"{self.endpoint}/{client_id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -194,16 +209,24 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
 
         await self.cache.delete(client)
 
-    async def _collect_cache(self, body: ClientBody | None) -> ScalarResult[TogglClient]:
+    async def _collect_cache(
+        self, body: ClientBody | None
+    ) -> ScalarResult[TogglClient]:
         if body and body.status is not None:
-            log.warning("Client body 'status' parameter is not implemented with cache!")
+            log.warning(
+                "Client body 'status' parameter is not implemented with cache!"
+            )
 
         statement = select(TogglClient)
         if body and body.name:
-            statement = statement.filter(cast(ColumnElement[bool], TogglClient.name == body.name))
+            statement = statement.filter(
+                cast(ColumnElement[bool], TogglClient.name == body.name)
+            )
 
-        cache = cast(AsyncSqliteCache, self.cache)
-        async with AsyncSession(cache.database, expire_on_commit=False) as session:
+        cache = cast(AsyncSqliteCache[TogglClient], self.cache)
+        async with AsyncSession(
+            cache.database, expire_on_commit=False
+        ) as session:
             return (await session.execute(statement)).scalars()
 
     async def collect(
@@ -236,7 +259,9 @@ class AsyncClientEndpoint(TogglAsyncCachedEndpoint[TogglClient]):
                 url += "?"
             url += f"{body.name}"
 
-        response = await self.request(url, method=RequestMethod.GET, refresh=refresh)
+        response = await self.request(
+            url, method=RequestMethod.GET, refresh=refresh
+        )
         return cast(list[TogglClient], response)
 
     @property

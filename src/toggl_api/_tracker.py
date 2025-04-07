@@ -4,7 +4,15 @@ import logging
 import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, TypedDict, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Final,
+    Literal,
+    NamedTuple,
+    TypedDict,
+    cast,
+)
 
 from httpx import Client, HTTPStatusError, Response, Timeout, codes
 
@@ -108,19 +116,35 @@ class TrackerBody(BaseBody):
             )
 
         if self.tags and self.tag_action:
-            params += [{"op": self.tag_action, "path": "/tags", "value": self.tags}]
+            params += [
+                {"op": self.tag_action, "path": "/tags", "value": self.tags}
+            ]
 
         if self.start:
-            start = self.start.date() if isinstance(self.start, datetime) else self.start
-            params.append({"op": "replace", "path": "/start", "value": format_iso(start)})
+            start = (
+                self.start.date()
+                if isinstance(self.start, datetime)
+                else self.start
+            )
+            params.append(
+                {"op": "replace", "path": "/start", "value": format_iso(start)}
+            )
 
             if self.stop and self.start > self.stop:
-                log.warning("Start is after the stop time! Ignoring 'stop' parameter!")
+                log.warning(
+                    "Start is after the stop time! Ignoring 'stop' parameter!"
+                )
                 self.stop = None
 
         if self.stop:
-            stop = self.stop.date() if isinstance(self.stop, datetime) else self.stop
-            params.append({"op": "replace", "path": "/stop", "value": format_iso(stop)})
+            stop = (
+                self.stop.date()
+                if isinstance(self.stop, datetime)
+                else self.stop
+            )
+            params.append(
+                {"op": "replace", "path": "/stop", "value": format_iso(stop)}
+            )
 
         return params
 
@@ -145,7 +169,11 @@ class TrackerBody(BaseBody):
         )
 
         if self.duration:
-            dur = int(self.duration.total_seconds()) if isinstance(self.duration, timedelta) else self.duration
+            dur = (
+                int(self.duration.total_seconds())
+                if isinstance(self.duration, timedelta)
+                else self.duration
+            )
             body["duration"] = dur
         elif not self.stop and self.start:
             body["duration"] = -1
@@ -226,7 +254,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        self.workspace_id = (
+            workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        )
 
     def _current_refresh(self, tracker: TogglTracker | None) -> None:
         if self.cache and tracker is None:
@@ -269,7 +299,10 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         try:
             response = self.request("me/time_entries/current", refresh=refresh)
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == self.TRACKER_NOT_RUNNING:
+            if (
+                not self.re_raise
+                and err.response.status_code == self.TRACKER_NOT_RUNNING
+            ):
                 log.warning("No tracker is currently running!")
                 response = None
             else:
@@ -291,19 +324,31 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             queries: list[TogglQuery[date]] = []
 
             if since:
-                since = datetime.fromtimestamp(since, tz=timezone.utc) if isinstance(since, int) else since
-                queries.append(TogglQuery("timestamp", since, Comparison.GREATER_THEN))
+                since = (
+                    datetime.fromtimestamp(since, tz=timezone.utc)
+                    if isinstance(since, int)
+                    else since
+                )
+                queries.append(
+                    TogglQuery("timestamp", since, Comparison.GREATER_THEN)
+                )
 
             if before:
-                queries.append(TogglQuery("start", before, Comparison.LESS_THEN))
+                queries.append(
+                    TogglQuery("start", before, Comparison.LESS_THEN)
+                )
 
             cache.extend(self.query(*queries))
 
         elif start_date and end_date:
             cache.extend(
                 self.query(
-                    TogglQuery("start", start_date, Comparison.GREATER_THEN_OR_EQUAL),
-                    TogglQuery("start", end_date, Comparison.LESS_THEN_OR_EQUAL),
+                    TogglQuery(
+                        "start", start_date, Comparison.GREATER_THEN_OR_EQUAL
+                    ),
+                    TogglQuery(
+                        "start", end_date, Comparison.LESS_THEN_OR_EQUAL
+                    ),
                 ),
             )
         else:
@@ -414,7 +459,10 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
+            if (
+                not self.re_raise
+                and err.response.status_code == codes.NOT_FOUND
+            ):
                 log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise
@@ -461,7 +509,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
             self.request(
                 f"{self.endpoint}/{tracker}",
                 method=RequestMethod.PUT,
-                body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
+                body=body.format(
+                    "edit", workspace_id=self.workspace_id, meta=meta
+                ),
                 refresh=True,
             ),
         )
@@ -472,15 +522,18 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         body: list[BulkEditParameter],
     ) -> dict[str, list[int]]:
         return cast(
-            Response,
-            self.request(
-                f"{self.endpoint}/" + ",".join([str(t) for t in trackers]),
-                body=body,
-                refresh=True,
-                method=RequestMethod.PATCH,
-                raw=True,
-            ),
-        ).json()
+            dict[str, list[int]],
+            cast(
+                Response,
+                self.request(
+                    f"{self.endpoint}/" + ",".join([str(t) for t in trackers]),
+                    body=body,
+                    refresh=True,
+                    method=RequestMethod.PATCH,
+                    raw=True,
+                ),
+            ).json(),
+        )
 
     def bulk_edit(
         self,
@@ -520,7 +573,9 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
 
         fmt_body = body._format_bulk_edit()  # noqa: SLF001
         for i in range(requests):
-            edit = self._bulk_edit(tracker_ids[100 * i : 100 + (100 * i)], fmt_body)
+            edit = self._bulk_edit(
+                tracker_ids[100 * i : 100 + (100 * i)], fmt_body
+            )
             success.extend(edit["success"])
             failure.extend(edit["failure"])
 
@@ -548,7 +603,11 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
         """
         tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
-            self.request(f"{self.endpoint}/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
+            self.request(
+                f"{self.endpoint}/{tracker_id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -600,7 +659,10 @@ class TrackerEndpoint(TogglCachedEndpoint[TogglTracker]):
                 ),
             )
         except HTTPStatusError as err:
-            if self.re_raise or err.response.status_code != self.TRACKER_ALREADY_STOPPED:
+            if (
+                self.re_raise
+                or err.response.status_code != self.TRACKER_ALREADY_STOPPED
+            ):
                 raise
             log.warning("Tracker with id %s was already stopped!", tracker)
         return None

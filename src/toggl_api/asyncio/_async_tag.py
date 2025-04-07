@@ -6,16 +6,17 @@ from typing import TYPE_CHECKING, cast
 from httpx import AsyncClient, HTTPStatusError, codes
 
 from toggl_api import NamingError, TogglTag
+from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.meta import RequestMethod
-from toggl_api.meta._cached_endpoint import NoCacheAssignedError
 
 from ._async_endpoint import TogglAsyncCachedEndpoint
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
+    from toggl_api import TogglWorkspace
+
     from ._async_sqlite_cache import AsyncSqliteCache
-    from .models import TogglWorkspace
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -67,9 +68,13 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        self.workspace_id = (
+            workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        )
 
-    async def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
+    async def get(
+        self, tag: TogglTag | int, *, refresh: bool = False
+    ) -> TogglTag | None:
         """Get endpoint convenience method for querying single tags from cache.
 
         This endpoint doesn't exist on the API so it locally queries for tags
@@ -116,7 +121,9 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
         Returns:
             A list of tags collected from the API or local cache.
         """
-        return cast(list[TogglTag], await self.request(self.endpoint, refresh=refresh))
+        return cast(
+            list[TogglTag], await self.request(self.endpoint, refresh=refresh)
+        )
 
     async def add(self, name: str) -> TogglTag:
         """Create a new tag.

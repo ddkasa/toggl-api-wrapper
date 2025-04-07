@@ -7,7 +7,9 @@ from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING, Final, cast
 
 from httpx import AsyncClient, HTTPStatusError, Response, codes
-from sqlalchemy import ColumnElement, ScalarResult, select
+from sqlalchemy.sql.expression import ColumnElement
+from sqlalchemy.engine import ScalarResult
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from toggl_api import TogglTracker, TrackerBody
@@ -79,18 +81,26 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        self.workspace_id = (
+            workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        )
 
     async def _current_refresh(self, tracker: TogglTracker | None) -> None:
         if self.cache and tracker is None:
             running = await self._find_running()
-            await asyncio.gather(*[self.get(tracker, refresh=True) for tracker in running])
+            await asyncio.gather(
+                *[self.get(tracker, refresh=True) for tracker in running]
+            )
 
     async def _find_running(self) -> ScalarResult[TogglTracker]:
-        stmt = select(TogglTracker).filter(cast(ColumnElement[bool], TogglTracker.stop == None))  # noqa: E711
+        stmt = select(TogglTracker).filter(
+            cast(ColumnElement[bool], TogglTracker.stop is None)
+        )  # noqa: E711
 
         cache = cast(AsyncSqliteCache[TogglTracker], self.cache)
-        async with AsyncSession(cache.database, expire_on_commit=False) as session:
+        async with AsyncSession(
+            cache.database, expire_on_commit=False
+        ) as session:
             return (await session.execute(stmt)).scalars()
 
     async def current(self, *, refresh: bool = True) -> TogglTracker | None:
@@ -122,15 +132,23 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
             return (await self._find_running()).first()
 
         try:
-            response = await self.request("me/time_entries/current", refresh=refresh)
+            response = await self.request(
+                "me/time_entries/current", refresh=refresh
+            )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == self.TRACKER_NOT_RUNNING:
+            if (
+                not self.re_raise
+                and err.response.status_code == self.TRACKER_NOT_RUNNING
+            ):
                 log.warning("No tracker is currently running!")
                 response = None
             else:
                 raise
 
-        await self._create_task(self._current_refresh(cast(TogglTracker | None, response)), name="current")
+        await self._create_task(
+            self._current_refresh(cast(TogglTracker | None, response)),
+            name="current",
+        )
 
         return cast(TogglTracker | None, response)
 
@@ -144,10 +162,18 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
         stmt = select(TogglTracker)
         if since or before:
             if since:
-                since = datetime.fromtimestamp(since, tz=timezone.utc) if isinstance(since, int) else since
-                stmt = stmt.filter(cast(ColumnElement[bool], TogglTracker.timestamp > since))
+                since = (
+                    datetime.fromtimestamp(since, tz=timezone.utc)
+                    if isinstance(since, int)
+                    else since
+                )
+                stmt = stmt.filter(
+                    cast(ColumnElement[bool], TogglTracker.timestamp > since)
+                )
             if before:
-                stmt = stmt.filter(cast(ColumnElement[bool], TogglTracker.start < before))
+                stmt = stmt.filter(
+                    cast(ColumnElement[bool], TogglTracker.start < before)
+                )
 
         elif start_date and end_date:
             stmt = stmt.filter(
@@ -155,7 +181,9 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
                 cast(ColumnElement[bool], TogglTracker.start < end_date),
             )
         cache = cast(AsyncSqliteCache[TogglTracker], self.cache)
-        async with AsyncSession(cache.database, expire_on_commit=False) as session:
+        async with AsyncSession(
+            cache.database, expire_on_commit=False
+        ) as session:
             return (await session.execute(stmt)).scalars()
 
     async def collect(
@@ -210,7 +238,9 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
                 raise DateTimeError(msg)
 
         if not refresh:
-            return list(await self._collect_cache(since, before, start_date, end_date))
+            return list(
+                await self._collect_cache(since, before, start_date, end_date)
+            )
 
         params = "me/time_entries"
         if since or before:
@@ -261,7 +291,10 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
+            if (
+                not self.re_raise
+                and err.response.status_code == codes.NOT_FOUND
+            ):
                 log.warning("Tracker with id %s does not exist!", tracker_id)
                 return None
             raise
@@ -306,7 +339,9 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
         response = await self.request(
             f"{self.endpoint}/{tracker}",
             method=RequestMethod.PUT,
-            body=body.format("edit", workspace_id=self.workspace_id, meta=meta),
+            body=body.format(
+                "edit", workspace_id=self.workspace_id, meta=meta
+            ),
             refresh=True,
         )
 
@@ -324,7 +359,7 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
             method=RequestMethod.PATCH,
             raw=True,
         )
-        return cast(Response, response).json()
+        return cast(dict[str, list[int]], cast(Response, response).json())
 
     async def bulk_edit(
         self,
@@ -364,7 +399,9 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
 
         fmt_body = body._format_bulk_edit()  # noqa: SLF001
         for i in range(requests):
-            edit = await self._bulk_edit(tracker_ids[100 * i : 100 + (100 * i)], fmt_body)
+            edit = await self._bulk_edit(
+                tracker_ids[100 * i : 100 + (100 * i)], fmt_body
+            )
             success.extend(edit["success"])
             failure.extend(edit["failure"])
 
@@ -392,7 +429,11 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
         """
         tracker_id = tracker if isinstance(tracker, int) else tracker.id
         try:
-            await self.request(f"{self.endpoint}/{tracker_id}", method=RequestMethod.DELETE, refresh=True)
+            await self.request(
+                f"{self.endpoint}/{tracker_id}",
+                method=RequestMethod.DELETE,
+                refresh=True,
+            )
         except HTTPStatusError as err:
             if self.re_raise or err.response.status_code != codes.NOT_FOUND:
                 raise
@@ -441,7 +482,10 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
             )
             return cast(TogglTracker, response)
         except HTTPStatusError as err:
-            if self.re_raise or err.response.status_code != self.TRACKER_ALREADY_STOPPED:
+            if (
+                self.re_raise
+                or err.response.status_code != self.TRACKER_ALREADY_STOPPED
+            ):
                 raise
             log.warning("Tracker with id %s was already stopped!", tracker)
         return None

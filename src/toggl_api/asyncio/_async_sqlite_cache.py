@@ -9,8 +9,13 @@ from itertools import chain
 from os import PathLike
 from typing import TYPE_CHECKING, TypeVar, cast
 
-from sqlalchemy import ColumnElement, MetaData, select
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.sql.expression import ColumnElement
+from sqlalchemy import MetaData, select
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine,
+)
 
 from toggl_api.models import TogglClass
 from toggl_api.models._schema import _create_mappings
@@ -74,7 +79,7 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglAsyncCachedEndpoint[T] | None = None,
         *,
@@ -82,18 +87,22 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
         echo_db: bool = False,
     ) -> None:
         super().__init__(path, expire_after, parent)
-        self.database = engine = engine or create_async_engine(f"sqlite+aiosqlite:///{self.cache_path}")
+        self.database = engine = engine or create_async_engine(
+            f"sqlite+aiosqlite:///{self.cache_path}"
+        )
         self.database.echo = echo_db
 
         # NOTE: Tests for an existing loop otherwise gets/creates a new one.
         try:
             asyncio.get_running_loop()
             task = asyncio.create_task(async_register_tables(engine))
-            task.add_done_callback(lambda x: setattr(self, "metadata", x.result()))
+            task.add_done_callback(
+                lambda x: setattr(self, "metadata", x.result())
+            )
         except RuntimeError:
             self.metadata = asyncio.run(async_register_tables(engine))
 
-    async def load(self) -> list[T]:  # type: ignore[override]
+    async def load(self) -> list[T]:
         """Loads data from the database, discarding items if they are past expiration.
 
         Rather crude load method as it will load all items into memory.
@@ -105,10 +114,16 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
         if self.expire_after is not None:
             # TODO: Routine that checks for expiration and discards instead of ignoring on load.
             min_ts = datetime.now(timezone.utc) - self.expire_after
-            stmt = stmt.filter(cast(ColumnElement[bool], self.model.timestamp > min_ts))
+            stmt = stmt.filter(
+                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+            )
 
-        async with AsyncSession(self.database, expire_on_commit=False) as session:
-            return list(chain.from_iterable((await session.execute(stmt)).fetchall()))
+        async with AsyncSession(
+            self.database, expire_on_commit=False
+        ) as session:
+            return list(
+                chain.from_iterable((await session.execute(stmt)).fetchall())
+            )
 
     async def add(self, *entries: T) -> None:
         """Add multiple entries to the database."""
@@ -117,14 +132,18 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
 
     async def update(self, *entries: T) -> None:
         """Update entries in the database."""
-        async with AsyncSession(self.database, expire_on_commit=False) as session:
+        async with AsyncSession(
+            self.database, expire_on_commit=False
+        ) as session:
             for entry in entries:
                 await session.merge(entry)
             await session.commit()
 
     async def delete(self, *entries: T) -> None:
         """Delete multiple entries in the database"""
-        async with AsyncSession(self.database, expire_on_commit=False) as session:
+        async with AsyncSession(
+            self.database, expire_on_commit=False
+        ) as session:
             await asyncio.gather(*(session.delete(e) for e in entries))
             await session.commit()
 
@@ -137,7 +156,9 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
         Returns:
             The found model or None if not found.
         """
-        async with AsyncSession(self.database, expire_on_commit=False) as session:
+        async with AsyncSession(
+            self.database, expire_on_commit=False
+        ) as session:
             return await session.get(self.model, pk)
 
     @property

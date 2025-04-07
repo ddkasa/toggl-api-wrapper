@@ -3,10 +3,20 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 with contextlib.suppress(ImportError):
-    from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, Interval, MetaData, String, Table
+    from sqlalchemy import (
+        Boolean,
+        Column,
+        Date,
+        ForeignKey,
+        Integer,
+        Interval,
+        MetaData,
+        String,
+        Table,
+    )
     from sqlalchemy.exc import ArgumentError
     from sqlalchemy.orm import registry, relationship
     from sqlalchemy.sql import func
@@ -14,7 +24,14 @@ with contextlib.suppress(ImportError):
 
 from toggl_api._utility import _requires
 
-from ._models import TogglClient, TogglOrganization, TogglProject, TogglTag, TogglTracker, TogglWorkspace
+from ._models import (
+    TogglClient,
+    TogglOrganization,
+    TogglProject,
+    TogglTag,
+    TogglTracker,
+    TogglWorkspace,
+)
 
 with contextlib.suppress(ImportError):
     from ._decorators import UTCDateTime
@@ -59,7 +76,9 @@ def _create_mappings(metadata: MetaData) -> None:
     client = Table(
         "client",
         metadata,
-        Column("created", UTCDateTime(timezone=True), server_default=func.now()),
+        Column(
+            "created", UTCDateTime(timezone=True), server_default=func.now()
+        ),
         Column("timestamp", UTCDateTime),
         Column("id", Integer, primary_key=True),
         Column("name", String(255)),
@@ -138,7 +157,7 @@ def _map_imperatively(
     cls: type,
     metadata: MetaData,
     table: Table,
-    properties: dict | None = None,
+    properties: dict[str, Any] | None = None,
 ) -> None:
     mapper_registry = registry(metadata=metadata)
     properties = properties or {}

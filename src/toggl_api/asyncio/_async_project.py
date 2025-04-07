@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timezone
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Any, Final, cast
 
 from httpx import AsyncClient, HTTPStatusError, codes
-from sqlalchemy import Column, ColumnElement, ScalarResult, Select, select
+from sqlalchemy import Column, select
+from sqlalchemy.engine import ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import ColumnElement, Select
 
 from toggl_api import TogglProject
 from toggl_api._exceptions import NamingError
@@ -95,10 +97,15 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        self.workspace_id = (
+            workspace_id if isinstance(workspace_id, int) else workspace_id.id
+        )
 
     @staticmethod
-    def status_to_query(status: TogglProject.Status, statement: Select) -> Select:
+    def status_to_query(
+        status: TogglProject.Status,
+        statement: Select[Any],
+    ) -> Select[Any]:
         """Creates a list of queries depending on the desired project status.
 
         Args:
@@ -113,38 +120,62 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
         """
 
         if status == TogglProject.Status.ARCHIVED:
-            return statement.filter(cast(ColumnElement[bool], not TogglProject.active))
+            return statement.filter(
+                cast(ColumnElement[bool], not TogglProject.active)
+            )
 
         now = datetime.now(timezone.utc)
         if status == TogglProject.Status.UPCOMING:
-            return statement.filter(cast(ColumnElement[bool], TogglProject.start_date <= now))
+            return statement.filter(
+                cast(ColumnElement[bool], TogglProject.start_date <= now)
+            )
 
         if status == TogglProject.Status.ENDED:
-            return statement.filter(cast(ColumnElement[bool], cast(date, TogglProject.end_date) > now))
+            return statement.filter(
+                cast(
+                    ColumnElement[bool],
+                    cast(date, TogglProject.end_date) > now,
+                )
+            )
 
         msg = f"{status} status is not supported by local cache queries!"
         raise NotImplementedError(msg)
 
-    async def _collect_cache(self, body: ProjectBody | None) -> ScalarResult[TogglProject]:
+    async def _collect_cache(
+        self, body: ProjectBody | None
+    ) -> ScalarResult[TogglProject]:
         statement = select(self.MODEL)
         if body:
             if isinstance(body.active, bool):
-                statement = statement.filter(cast(ColumnElement[bool], TogglProject.active == body.active))
+                statement = statement.filter(
+                    cast(
+                        ColumnElement[bool], TogglProject.active == body.active
+                    )
+                )
             if body.since:
-                statement = statement.filter(cast(ColumnElement[bool], TogglProject.timestamp >= body.since))  # type: ignore[operator]
+                statement = statement.filter(
+                    cast(
+                        ColumnElement[bool],
+                        TogglProject.timestamp >= cast(datetime, body.since),
+                    )
+                )
             if body.client_ids:
                 statement = statement.filter(
                     cast(
                         ColumnElement[bool],
-                        cast(Column, TogglProject.client).in_(body.client_ids),
+                        cast(Column[int], TogglProject.client).in_(
+                            body.client_ids
+                        ),
                     ),
                 )
             if body.statuses:
                 for status in body.statuses:
                     statement = self.status_to_query(status, statement)
 
-        cache = cast(AsyncSqliteCache, self.cache)
-        async with AsyncSession(cache.database, expire_on_commit=False) as session:
+        cache = cast(AsyncSqliteCache[TogglProject], self.cache)
+        async with AsyncSession(
+            cache.database, expire_on_commit=False
+        ) as session:
             return (await session.execute(statement)).scalars()
 
     async def collect(
@@ -202,7 +233,9 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
 
         return cast(list[TogglProject], response)
 
-    async def get(self, project_id: int | TogglProject, *, refresh: bool = False) -> TogglProject | None:
+    async def get(
+        self, project_id: int | TogglProject, *, refresh: bool = False
+    ) -> TogglProject | None:
         """Request a project based on its id.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceproject)
@@ -233,7 +266,10 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
+            if (
+                not self.re_raise
+                and err.response.status_code == codes.NOT_FOUND
+            ):
                 log.warning("Project with id %s was not found!", project_id)
                 return None
             raise
@@ -282,7 +318,9 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
 
         await self.cache.delete(project)
 
-    async def edit(self, project: TogglProject | int, body: ProjectBody) -> TogglProject:
+    async def edit(
+        self, project: TogglProject | int, body: ProjectBody
+    ) -> TogglProject:
         """Edit a project based on its id with the parameters provided in the body.
 
         This endpoint always hit the external API in order to keep projects consistent.

@@ -9,7 +9,7 @@ from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from os import PathLike
-from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api._utility import parse_iso
 from toggl_api._version import version
@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
-    from toggl_api.meta import RequestMethod
-    from toggl_api.meta.cached_endpoint import TogglCachedEndpoint
+    from toggl_api.meta import RequestMethod, TogglCachedEndpoint
 
 log = logging.getLogger("toggl-api-wrapper.cache")
 
@@ -82,7 +81,7 @@ class JSONSession(Generic[T]):
             return True
         return False
 
-    def _save(self, path: Path, data: dict[str, Any]):
+    def _save(self, path: Path, data: dict[str, Any]) -> None:
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, cls=CustomEncoder)
 
@@ -108,7 +107,9 @@ class JSONSession(Generic[T]):
         for mid in model_ids:
             old = old_models.get(mid)
             new = new_models.get(mid)
-            if (old is None and new is not None) or (new and old and new.timestamp >= old.timestamp):
+            if (old is None and new is not None) or (
+                new and old and new.timestamp >= old.timestamp
+            ):
                 new_data.append(new)
             elif old and old.timestamp.timestamp() * 10**9 >= mtime:
                 new_data.append(old)
@@ -117,7 +118,7 @@ class JSONSession(Generic[T]):
 
     def _load(self, path: Path) -> dict[str, Any]:
         with path.open("r", encoding="utf-8") as f:
-            return json.load(f, cls=CustomDecoder)
+            return cast(dict[str, Any], json.load(f, cls=CustomDecoder))
 
     def load(self, path: Path) -> None:
         if path.exists():
@@ -134,7 +135,7 @@ class JSONSession(Generic[T]):
         return data[: self.max_length]
 
 
-class JSONCache(TogglCache, Generic[T]):
+class JSONCache(TogglCache[T]):
     """Class for caching Toggl data to disk in JSON format.
 
     Examples:
@@ -173,7 +174,7 @@ class JSONCache(TogglCache, Generic[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglCachedEndpoint[T] | None = None,
         *,
@@ -195,14 +196,18 @@ class JSONCache(TogglCache, Generic[T]):
         if self.expire_after is None:
             return self.session.data
         min_ts = datetime.now(timezone.utc) - self.expire_after
-        return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
+        return [m for m in self.session.data if m.timestamp >= min_ts]
 
     def find(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)
         if not self.session.data:
             return None
         for item in self.session.data:
-            if item is not None and item["id"] == entry["id"] and isinstance(item, self.model):
+            if (
+                item is not None
+                and item["id"] == entry["id"]
+                and isinstance(item, self.model)
+            ):
                 return item
         return None
 
@@ -233,7 +238,11 @@ class JSONCache(TogglCache, Generic[T]):
         for entry in entries:
             self._delete_entry(entry)
 
-    def query(self, *query: TogglQuery, distinct: bool = False) -> list[T]:
+    def query(
+        self,
+        *query: TogglQuery[Any],
+        distinct: bool = False,
+    ) -> list[T]:
         """Query method for filtering Toggl objects from cache.
 
         Filters cached Toggl objects by set of supplied queries.
@@ -250,9 +259,17 @@ class JSONCache(TogglCache, Generic[T]):
             A list of models with the query parameters that matched.
         """
 
-        log.debug("Querying cache with %s parameters.", len(query), extra={"query": query})
+        log.debug(
+            "Querying cache with %s parameters.",
+            len(query),
+            extra={"query": query},
+        )
 
-        min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
+        min_ts = (
+            datetime.now(timezone.utc) - self.expire_after
+            if self.expire_after
+            else None
+        )
         self.session.load(self.cache_path)
         search = self.session.data
         existing: defaultdict[str, set[Any]] = defaultdict(set)
@@ -272,18 +289,25 @@ class JSONCache(TogglCache, Generic[T]):
     def _query_helper(
         self,
         model: T,
-        queries: tuple[TogglQuery, ...],
+        queries: tuple[TogglQuery[Any], ...],
         existing: dict[str, set[Any]],
         min_ts: datetime | None,
         *,
         distinct: bool,
     ) -> bool:
-        if self.expire_after and min_ts and model.timestamp and min_ts >= model.timestamp:
+        if (
+            self.expire_after
+            and min_ts
+            and model.timestamp
+            and min_ts >= model.timestamp
+        ):
             return False
 
         for query in queries:
             if (
-                distinct and not isinstance(query.value, list) and model[query.key] in existing[query.key]
+                distinct
+                and not isinstance(query.value, list)
+                and model[query.key] in existing[query.key]
             ) or not self._match_query(model, query):
                 return False
 
@@ -296,8 +320,10 @@ class JSONCache(TogglCache, Generic[T]):
         return True
 
     @staticmethod
-    def _match_equal(model: T, query: TogglQuery) -> bool:
-        if isinstance(query.value, Sequence) and not isinstance(query.value, str):
+    def _match_equal(model: T, query: TogglQuery[Any]) -> bool:
+        if isinstance(query.value, Sequence) and not isinstance(
+            query.value, str
+        ):
             value = model[query.key]
 
             if isinstance(value, Sequence) and not isinstance(value, str):
@@ -305,20 +331,20 @@ class JSONCache(TogglCache, Generic[T]):
 
             return any(value == comp for comp in query.value)
 
-        return model[query.key] == query.value
+        return bool(model[query.key] == query.value)
 
     @staticmethod
-    def _match_query(model: T, query: TogglQuery) -> bool:
+    def _match_query(model: T, query: TogglQuery[Any]) -> bool:
         if query.comparison == Comparison.EQUAL:
             return JSONCache._match_equal(model, query)
         if query.comparison == Comparison.LESS_THEN:
-            return model[query.key] < query.value
+            return bool(model[query.key] < query.value)
         if query.comparison == Comparison.LESS_THEN_OR_EQUAL:
-            return model[query.key] <= query.value
+            return bool(model[query.key] <= query.value)
         if query.comparison == Comparison.GREATER_THEN:
-            return model[query.key] > query.value
+            return bool(model[query.key] > query.value)
         if query.comparison == Comparison.GREATER_THEN_OR_EQUAL:
-            return model[query.key] >= query.value
+            return bool(model[query.key] >= query.value)
         msg = f"{query.comparison} is not implemented!"
         raise NotImplementedError(msg)
 

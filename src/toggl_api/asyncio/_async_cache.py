@@ -67,14 +67,18 @@ class TogglAsyncCache(ABC, Generic[T]):
 
     def __init__(
         self,
-        path: Path | PathLike | str,
+        path: Path | PathLike[str],
         expire_after: timedelta | int | None = None,
         parent: TogglAsyncCachedEndpoint[T] | None = None,
     ) -> None:
         self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
 
-        self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
+        self._expire_after = (
+            timedelta(seconds=expire_after)
+            if isinstance(expire_after, int)
+            else expire_after
+        )
         self._parent = parent
 
     @abstractmethod
@@ -98,8 +102,12 @@ class TogglAsyncCache(ABC, Generic[T]):
     @abstractmethod
     async def delete(self, *entries: T) -> None: ...
 
-    def find_method(self, method: RequestMethod) -> Callable[[Any], Awaitable[Any]] | None:
-        match_func: Final[dict[RequestMethod, Callable[[Any], Awaitable[Any]]]] = {
+    def find_method(
+        self, method: RequestMethod
+    ) -> Callable[[Any], Awaitable[Any]] | None:
+        match_func: Final[
+            dict[RequestMethod, Callable[[Any], Awaitable[Any]]]
+        ] = {
             RequestMethod.GET: self.add,
             RequestMethod.POST: self.add,
             RequestMethod.PATCH: self.update,

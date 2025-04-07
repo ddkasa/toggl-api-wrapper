@@ -229,7 +229,9 @@ class TogglProject(WorkspaceChild):
     client: int | None = field(default=None)
     active: bool = field(default=True)
 
-    start_date: date = field(default_factory=lambda: datetime.now(tz=timezone.utc).date())
+    start_date: date = field(
+        default_factory=lambda: datetime.now(tz=timezone.utc).date()
+    )
     end_date: date | None = field(default=None)
 
     def __post_init__(self) -> None:
@@ -254,7 +256,8 @@ class TogglProject(WorkspaceChild):
             client=kwargs.get("client_id") or kwargs.get("client"),
             active=kwargs["active"],
             timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
-            start_date=kwargs.get("start_date") or datetime.now(tz=timezone.utc).date(),
+            start_date=kwargs.get("start_date")
+            or datetime.now(tz=timezone.utc).date(),
             end_date=kwargs.get("end_date"),
         )
 
@@ -332,7 +335,10 @@ class TogglTracker(WorkspaceChild):
         start = kwargs.get("start")
         if start is None:
             start = datetime.now(tz=timezone.utc)
-            log.info("No start time provided. Using current time as start time: %s", start)
+            log.info(
+                "No start time provided. Using current time as start time: %s",
+                start,
+            )
 
         return cls(
             id=kwargs["id"],
@@ -359,7 +365,7 @@ class TogglTracker(WorkspaceChild):
             for i, t in zip(tag_id, tag, strict=True):
                 tags.append(TogglTag(id=i, name=t, workspace=workspace))
         else:
-            tags = tag or tags  # type: ignore[assignment]
+            tags = tag or tags
 
         return tags
 

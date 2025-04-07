@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
 
-class AsyncUserEndpoint(TogglAsyncEndpoint):
+class AsyncUserEndpoint(TogglAsyncEndpoint[Any]):
     """Endpoint for retrieving user data.
 
     The synchronous sibling [UserEndpoint][toggl_api.UserEndpoint] has access to static
@@ -62,4 +62,5 @@ class AsyncUserEndpoint(TogglAsyncEndpoint):
             User details in a dictionary.
         """
         request = await self.request("me", raw=True)
-        return cast(Response, request).json()
+        # TODO: Create a user details type dict.
+        return cast(dict[str, Any], cast(Response, request).json())
