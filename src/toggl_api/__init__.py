@@ -1,3 +1,5 @@
+"""Main module with all synchronous code imported."""
+
 from ._client import ClientBody, ClientEndpoint
 from ._exceptions import DateTimeError, MissingParentError, NamingError, NoCacheAssignedError
 from ._organization import OrganizationEndpoint

@@ -9,7 +9,6 @@ from itertools import chain
 from os import PathLike
 from typing import TYPE_CHECKING, TypeVar, cast
 
-from sqlalchemy.sql.expression import ColumnElement
 from sqlalchemy import MetaData, select
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -26,11 +25,21 @@ if TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
+    from sqlalchemy.sql.expression import ColumnElement
+
     from ._async_endpoint import TogglAsyncCachedEndpoint
 
 
 async def async_register_tables(engine: AsyncEngine) -> MetaData:
-    """Helper function for setting up database with SQLAlchemy models."""
+    """Set up the database with SQLAlchemy models.
+
+    Args:
+        engine: The engine to use when registering tables.
+
+    Returns:
+        Engine metadata with the table implemented.
+
+    """
     meta = MetaData()
 
     _create_mappings(meta)
@@ -88,7 +97,7 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = engine = engine or create_async_engine(
-            f"sqlite+aiosqlite:///{self.cache_path}"
+            f"sqlite+aiosqlite:///{self.cache_path}",
         )
         self.database.echo = echo_db
 
@@ -97,13 +106,13 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
             asyncio.get_running_loop()
             task = asyncio.create_task(async_register_tables(engine))
             task.add_done_callback(
-                lambda x: setattr(self, "metadata", x.result())
+                lambda x: setattr(self, "metadata", x.result()),
             )
         except RuntimeError:
             self.metadata = asyncio.run(async_register_tables(engine))
 
     async def load(self) -> list[T]:
-        """Loads data from the database, discarding items if they are past expiration.
+        """Load data from the database, discarding items if they are past expiration.
 
         Rather crude load method as it will load all items into memory.
 
@@ -112,43 +121,46 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
         """
         stmt = select(self.model)
         if self.expire_after is not None:
-            # TODO: Routine that checks for expiration and discards instead of ignoring on load.
+            # TODO: Routine that checks for expiration
+            # discards instead of ignoring on load.
             min_ts = datetime.now(timezone.utc) - self.expire_after
             stmt = stmt.filter(
-                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+                cast("ColumnElement[bool]", self.model.timestamp > min_ts),
             )
 
         async with AsyncSession(
-            self.database, expire_on_commit=False
+            self.database,
+            expire_on_commit=False,
         ) as session:
             return list(
-                chain.from_iterable((await session.execute(stmt)).fetchall())
+                chain.from_iterable((await session.execute(stmt)).fetchall()),
             )
 
     async def add(self, *entries: T) -> None:
         """Add multiple entries to the database."""
-
         await self.update(*entries)
 
     async def update(self, *entries: T) -> None:
         """Update entries in the database."""
         async with AsyncSession(
-            self.database, expire_on_commit=False
+            self.database,
+            expire_on_commit=False,
         ) as session:
             for entry in entries:
                 await session.merge(entry)
             await session.commit()
 
     async def delete(self, *entries: T) -> None:
-        """Delete multiple entries in the database"""
+        """Delete multiple entries in the database."""
         async with AsyncSession(
-            self.database, expire_on_commit=False
+            self.database,
+            expire_on_commit=False,
         ) as session:
             await asyncio.gather(*(session.delete(e) for e in entries))
             await session.commit()
 
     async def find(self, pk: int) -> T | None:
-        """Finds a model based on a primary key.
+        """Find a model based on a primary key.
 
         Args:
             pk: Primary integer key of the model.
@@ -157,10 +169,12 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
             The found model or None if not found.
         """
         async with AsyncSession(
-            self.database, expire_on_commit=False
+            self.database,
+            expire_on_commit=False,
         ) as session:
             return await session.get(self.model, pk)
 
     @property
     def cache_path(self) -> Path:
+        """Full path to the SQLLite database."""
         return super().cache_path / "cache.sqlite"

@@ -74,11 +74,7 @@ class TogglAsyncCache(ABC, Generic[T]):
         self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
 
-        self._expire_after = (
-            timedelta(seconds=expire_after)
-            if isinstance(expire_after, int)
-            else expire_after
-        )
+        self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
         self._parent = parent
 
     @abstractmethod
@@ -103,11 +99,10 @@ class TogglAsyncCache(ABC, Generic[T]):
     async def delete(self, *entries: T) -> None: ...
 
     def find_method(
-        self, method: RequestMethod
+        self,
+        method: RequestMethod,
     ) -> Callable[[Any], Awaitable[Any]] | None:
-        match_func: Final[
-            dict[RequestMethod, Callable[[Any], Awaitable[Any]]]
-        ] = {
+        match_func: Final[dict[RequestMethod, Callable[[Any], Awaitable[Any]]]] = {
             RequestMethod.GET: self.add,
             RequestMethod.POST: self.add,
             RequestMethod.PATCH: self.update,
@@ -142,4 +137,4 @@ class TogglAsyncCache(ABC, Generic[T]):
 
     @property
     def model(self) -> type[T]:
-        return cast(type[T], self.parent.MODEL)
+        return cast("type[T]", self.parent.MODEL)

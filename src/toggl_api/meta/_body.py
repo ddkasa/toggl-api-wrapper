@@ -12,7 +12,18 @@ class BaseBody(Mapping[str, Any]):
 
     @classmethod
     def _verify_endpoint_parameter(cls, parameter: str, endpoint: str) -> bool:
-        """Checks if a body parameter is valid for a specified endpoint."""
+        """Check if a body parameter is valid for a specified endpoint.
+
+        Args:
+            parameter: Name of the attribute to check.
+            endpoint: The endpoint to check for.
+
+        Raises:
+            KeyError: If the parameter is not present in the dataclass.
+
+        Returns:
+            True if the parameter is valid for the endpoint.
+        """
         field = cls.__dataclass_fields__.get(parameter)
         if field is None:
             msg = "Validating a non-existant field!"

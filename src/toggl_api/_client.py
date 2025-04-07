@@ -35,7 +35,7 @@ class ClientBody(BaseBody):
     notes: str | None = field(default=None)
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
-        """Formats the body for JSON requests.
+        """Format the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
 
@@ -45,9 +45,9 @@ class ClientBody(BaseBody):
                 If passing workspace id to client endpoints use 'wid' instead.
 
         Returns:
-            dict: JSON compatible formatted body.
+            JSON compatible formatted body.
         """
-
+        del endpoint
         if isinstance(self.name, str):
             body["name"] = self.name
         if self.status in get_args(CLIENT_STATUS):
@@ -122,13 +122,12 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
         Returns:
             Newly created client with specified parameters.
         """
-
         if body.name is None:
             msg = "Name must be set in order to create a client!"
             raise NamingError(msg)
 
         return cast(
-            TogglClient,
+            "TogglClient",
             self.request(
                 self.endpoint,
                 body=body.format("add", wid=self.workspace_id),
@@ -146,6 +145,9 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             client_id: Which client to look for.
             refresh: Whether to only check cache. It will default to True if id
                 is not found in cache. Defaults to False.
+
+        Raises:
+            HTTPStatusError: Any error that is not a 404 code or `re_raise` is True.
 
         Returns:
             A TogglClient if the client was found else None.
@@ -167,7 +169,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
                 return None
             raise
 
-        return cast(TogglClient, response) or None
+        return cast("TogglClient", response) or None
 
     def edit(self, client: TogglClient | int, body: ClientBody) -> TogglClient:
         """Edit a client with the supplied parameters from the body.
@@ -191,7 +193,7 @@ class ClientEndpoint(TogglCachedEndpoint[TogglClient]):
             client = client.id
 
         return cast(
-            TogglClient,
+            "TogglClient",
             self.request(
                 f"{self.endpoint}/{client}",
                 body=body.format("edit", wid=self.workspace_id),

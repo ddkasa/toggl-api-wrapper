@@ -66,8 +66,7 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         *,
         refresh: bool = False,
     ) -> TogglOrganization | None:
-        """Creates a new organization with a single workspace and assigns
-        current user as the organization owner
+        """Create a new organization with a single workspace.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#get-organization-data)
 
@@ -81,7 +80,6 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         Returns:
             Organization object that was retrieve or None if not found.
         """
-
         if isinstance(organization, TogglOrganization):
             organization = organization.id
 
@@ -96,11 +94,10 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
                 return None
             raise
 
-        return cast(TogglOrganization, response)
+        return cast("TogglOrganization", response)
 
     async def add(self, name: str, workspace_name: str = "Default-Workspace") -> TogglOrganization:
-        """Creates a new organization with a single workspace and assigns
-        current user as the organization owner
+        """Create a new organization with a single workspace.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#post-creates-a-new-organization)
 
@@ -121,7 +118,6 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         Returns:
             The newly created organization.
         """
-
         TogglOrganization.validate_name(name)
         TogglWorkspace.validate_name(workspace_name)
 
@@ -132,10 +128,10 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
             refresh=True,
         )
 
-        return cast(TogglOrganization, response)
+        return cast("TogglOrganization", response)
 
     async def edit(self, organization: TogglOrganization | int, name: str) -> TogglOrganization:
-        """Updates an existing organization.
+        """Update an existing organization.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#put-updates-an-existing-organization)
 
@@ -150,7 +146,6 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
         Returns:
             The newly edited organization.
         """
-
         TogglOrganization.validate_name(name)
 
         if isinstance(organization, TogglOrganization):
@@ -184,11 +179,12 @@ class AsyncOrganizationEndpoint(TogglAsyncCachedEndpoint[TogglOrganization]):
             A list of organization objects or empty if none found.
         """
         request = await self.request("me/organizations", refresh=refresh)
-        return cast(list[TogglOrganization], request)
+        return cast("list[TogglOrganization]", request)
 
     async def delete(self, organization: TogglOrganization | int) -> None:
-        """Leaves organization, effectively delete user account in org and
-        delete organization if it is last user.
+        """Leave organization, effectively delete user account in org.
+
+        If another user is in the organization it will remain active.
 
         Deletion might not be instant on the API end and might take a few
         seconds to propogate, so the object might appear in the 'get' or

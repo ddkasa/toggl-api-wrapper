@@ -1,3 +1,5 @@
+"""Public module for all related dataclasses for Toggl and additonal utility."""
+
 from dataclasses import fields
 from typing import Any
 
@@ -15,6 +17,14 @@ from ._schema import register_tables
 
 
 def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
+    """Convert a `TogglClass` to a dictionary.
+
+    Args:
+        obj: An intialized Toggl class.
+
+    Returns:
+        A `TogglClass` converted to a dictionary.
+    """
     data: dict[str, Any] = {"class": obj.__tablename__}
 
     for field in fields(obj):

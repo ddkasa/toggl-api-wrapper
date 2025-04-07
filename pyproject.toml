@@ -110,12 +110,34 @@ exclude = [
     "dist",
     "venv",
 ]
-line-length = 79
+line-length = 120
 indent-width = 4
 
 [tool.ruff.lint]
 preview = true
-# select = ["ALL"]
+select = ["ALL"]
+ignore = [
+    "CPY001",  # Copyright notice.
+    "D413",    # Wrong Documentation Style
+    "PLR0913", # Too many arguments
+    "ANN",     # Annotations should be checked by MyPy
+    "S311",    # Random module usage
+    "PLR0912", # Too much complexity
+    "D107",    # Init docstrings moved to class docstring.
+    "C90",     # Complexity
+    "PLR0912", # Branch Complexity
+    "TD",      # NOTE: Temporarily remove todos
+    "FIX",     # NOTE: Temporarily remove todos
+    "D203",    # Uneeded line before class name
+    "COM812",  # Deal with commas when formatting
+    "DOC502",  # Not explicitly raised errors.
+    "PLR6301", # Methods can be functions, classmethods or static
+
+]
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 
 [tool.mypy]
