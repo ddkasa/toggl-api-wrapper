@@ -91,6 +91,7 @@ build-backend = "hatchling.build"
 packages = ["src/toggl_api"]
 
 [tool.ruff]
+target-version = "py310"
 exclude = [
     ".bzr",
     ".direnv",
@@ -109,93 +110,13 @@ exclude = [
     "dist",
     "venv",
 ]
-line-length = 120
+line-length = 79
 indent-width = 4
-target-version = "py310"
 
 [tool.ruff.lint]
 preview = true
-select = [
-    "F",
-    "E",
-    "W",
-    "C90",
-    "I",
-    "N",
-    "UP",
-    "YTT",
-    "ASYNC",
-    "S",
-    "BLE",
-    "FBT",
-    "B",
-    "A",
-    "COM",
-    "C4",
-    "DTZ",
-    "T10",
-    "DJ",
-    "EM",
-    "EXE",
-    "FA",
-    'ISC',
-    "ICN",
-    "G",
-    'INP',
-    'PIE',
-    "T20",
-    'PYI',
-    'PT',
-    "Q",
-    "RSE",
-    "RET",
-    "SLF",
-    "SLOT",
-    "SIM",
-    "TID",
-    "TCH",
-    "INT",
-    "PTH",
-    "ERA",
-    "PD",
-    "PGH",
-    "PL",
-    "TRY",
-    "FLY",
-    "NPY",
-    "AIR",
-    "PERF",
-    "FURB",
-    "LOG",
-    "RUF",
-]
-ignore = [
-    "S101",    # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
-    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-    "SIM102",  # Sometimes it's better to nest
-    "N802",
-    "TC006",
-    "PLW2901",
-    "UP017",   # Python 3.10 backwards compatibility
-    "PLR6301", # Class Method Suggestion
-    "S311",    # Unsafe pseudo-random generator
-    "PLR0913", # Too many arguments.
-    "C901",    # Complex functions
-]
-# Allow fix for all enabled rules (when `--fix`) is provided.
-fixable = ["ALL"]
-unfixable = []
-# Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# select = ["ALL"]
 
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-
-[tool.ruff.lint.per-file-ignores]
-"docs/examples/*" = ["inp001", "t201"]
 
 [tool.mypy]
 python_version = "3.10"
