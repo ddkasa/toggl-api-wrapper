@@ -1,3 +1,5 @@
+"""Utility functions for gathering authentication and configuration data."""
+
 import logging
 import os
 from configparser import ConfigParser, NoOptionError, NoSectionError
@@ -13,7 +15,7 @@ class AuthenticationError(ValueError):
 
 
 def generate_authentication() -> BasicAuth:
-    """Gathers credentials from environment variables.
+    """Gather credentials from environment variables.
 
     If using an API token as authentication: **TOGGL_API_TOKEN**.
 
@@ -27,7 +29,7 @@ def generate_authentication() -> BasicAuth:
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
-        BasicAuth object that is used with Httpx client.
+        BasicAuth object that is used with HTTPx client.
     """
     api_token = os.getenv("TOGGL_API_TOKEN")
     if api_token is None:
@@ -62,7 +64,7 @@ def _get_togglrc(config_path: Path | None = None) -> ConfigParser:
 
 # NOTE: For .togglrc compatibility.
 def use_togglrc(config_path: Path | None = None) -> BasicAuth:
-    """Gathers credentials from a .togglrc file.
+    """Gather credentials from a .togglrc file.
 
     Mainly here for togglcli backwards compatibility.
 
@@ -81,7 +83,7 @@ def use_togglrc(config_path: Path | None = None) -> BasicAuth:
         AuthenticationError: If credentials are not set or invalid.
 
     Returns:
-        BasicAuth object that is used with httpx client.
+        BasicAuth object that is used with HTTPx client.
     """
     config = _get_togglrc(config_path)
     if not config.has_section("auth"):
@@ -116,7 +118,7 @@ class WorkspaceMissingError(ValueError):
 
 # NOTE: For .togglrc compatibility.
 def retrieve_workspace_id(default: int | None = None) -> int:
-    """Helper function that collect the default workspace from the environment.
+    """Collect the default workspace from the environment.
 
     Examples:
         >>> retrieve_workspace_id()
@@ -133,7 +135,6 @@ def retrieve_workspace_id(default: int | None = None) -> int:
     Returns:
         The id of the workspace.
     """
-
     workspace = os.environ.get("TOGGL_WORKSPACE_ID", default)
     if workspace is None:
         msg = "Default workspace has not been set in the environment variables."
@@ -143,7 +144,7 @@ def retrieve_workspace_id(default: int | None = None) -> int:
 
 
 def retrieve_togglrc_workspace_id(config_path: Path | None = None) -> int:
-    """Helper function that collects the default workspace id from a togglrc file.
+    """Collect the default workspace id from a togglrc file.
 
     Examples:
         >>> retrieve_togglrc_workspace_id()
@@ -158,7 +159,6 @@ def retrieve_togglrc_workspace_id(config_path: Path | None = None) -> int:
     Returns:
         The id of the workspace.
     """
-
     config = _get_togglrc(config_path)
 
     try:

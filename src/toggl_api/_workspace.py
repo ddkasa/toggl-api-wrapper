@@ -100,9 +100,7 @@ class WorkspaceBody(BaseBody):
     """Whether projects will be set to private by default, optional.
     Will be true initially."""
 
-    rate_change_mode: (
-        Literal["start-today", "override-current", "override-all"] | None
-    ) = field(
+    rate_change_mode: Literal["start-today", "override-current", "override-all"] | None = field(
         default=None,
         metadata={
             "endpoints": frozenset(("add", "edit")),
@@ -148,7 +146,7 @@ class WorkspaceBody(BaseBody):
                 log.warning("Updated to new name: %s!", self.name)
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
-        """Formats the body into a usable format for a request.
+        """Format the body into a usable format for a request.
 
         Gets called form within an endpoint method.
 
@@ -157,9 +155,8 @@ class WorkspaceBody(BaseBody):
             body: Prefilled body with extra arguments.
 
         Returns:
-            dict: A JSON body with the relevant parameters prefilled.
+            A JSON body with the relevant parameters prefilled.
         """
-
         for fld in fields(self):
             if not self._verify_endpoint_parameter(fld.name, endpoint):
                 continue
@@ -230,11 +227,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.organization_id = (
-            organization_id
-            if isinstance(organization_id, int)
-            else organization_id.id
-        )
+        self.organization_id = organization_id if isinstance(organization_id, int) else organization_id.id
 
     def get(
         self,
@@ -256,7 +249,6 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         Returns:
             Model of workspace if found else none.
         """
-
         if isinstance(workspace, TogglWorkspace):
             workspace = workspace.id
 
@@ -267,14 +259,11 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             response = self.request(f"workspaces/{workspace}", refresh=refresh)
         except HTTPStatusError as err:
             log.exception("%s")
-            if (
-                not self.re_raise
-                and err.response.status_code == codes.NOT_FOUND
-            ):
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 return None
             raise
 
-        return cast(TogglWorkspace, response)
+        return cast("TogglWorkspace", response)
 
     def add(self, body: WorkspaceBody) -> TogglWorkspace:
         """Create a new workspace.
@@ -290,7 +279,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             A newly created workspace with the supplied params.
         """
         return cast(
-            TogglWorkspace,
+            "TogglWorkspace",
             self.request(
                 f"organizations/{self.organization_id}/workspaces",
                 body=body.format("add", organization_id=self.organization_id),
@@ -302,11 +291,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
     def _collect_cache(self, since: int | None) -> list[TogglWorkspace]:
         if isinstance(since, int):
             ts = datetime.fromtimestamp(since, timezone.utc)
-            return list(
-                self.query(
-                    TogglQuery("timestamp", ts, Comparison.GREATER_THEN)
-                )
-            )
+            return list(self.query(TogglQuery("timestamp", ts, Comparison.GREATER_THEN)))
         return list(self.load_cache())
 
     def _validate_collect_since(self, since: datetime | int) -> int:
@@ -323,7 +308,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         *,
         refresh: bool = False,
     ) -> list[TogglWorkspace]:
-        """Lists workspaces for given user.
+        """List workspaces for given user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-workspaces)
 
@@ -337,7 +322,6 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         Returns:
             A list of workspaces or empty if there are None assocciated with the user.
         """
-
         if since is not None:
             since = self._validate_collect_since(since)
 
@@ -347,13 +331,11 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         body = {"since": since} if since else None
 
         return cast(
-            list[TogglWorkspace],
+            "list[TogglWorkspace]",
             self.request("me/workspaces", body=body, refresh=refresh),
         )
 
-    def edit(
-        self, workspace_id: TogglWorkspace | int, body: WorkspaceBody
-    ) -> TogglWorkspace:
+    def edit(self, workspace_id: TogglWorkspace | int, body: WorkspaceBody) -> TogglWorkspace:
         """Update a specific workspace.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#put-update-workspace)
@@ -368,7 +350,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id = workspace_id.id
 
         return cast(
-            TogglWorkspace,
+            "TogglWorkspace",
             self.request(
                 f"workspaces/{workspace_id}",
                 body=body.format("edit"),
@@ -377,9 +359,7 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             ),
         )
 
-    def tracker_constraints(
-        self, workspace_id: TogglWorkspace | int
-    ) -> dict[str, bool]:
+    def tracker_constraints(self, workspace_id: TogglWorkspace | int) -> dict[str, bool]:
         """Get the time entry constraints for a given workspace.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/workspaces#get-get-workspace-time-entry-constraints)
@@ -402,14 +382,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
         Returns:
             A dictionary of booleans containing the settings.
         """
-
         if isinstance(workspace_id, TogglWorkspace):
             workspace_id = workspace_id.id
 
         return cast(
-            dict[str, bool],
+            "dict[str, bool]",
             cast(
-                Response,
+                "Response",
                 self.request(
                     f"workspaces/{workspace_id}/time_entry_constraints",
                     raw=True,
@@ -418,10 +397,8 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             ).json(),
         )
 
-    def statistics(
-        self, workspace_id: TogglWorkspace | int
-    ) -> WorkspaceStatistics:
-        """Returns workspace admins list, members count and groups count.
+    def statistics(self, workspace_id: TogglWorkspace | int) -> WorkspaceStatistics:
+        """Return workspace admins list, members count and groups count.
 
         [Official Documentation](https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/statistics)
 
@@ -432,14 +409,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             A dictionary containing relevant statistics.
                 Refer to WorkspaceStatistics typed dict for reference.
         """
-
         if isinstance(workspace_id, TogglWorkspace):
             workspace_id = workspace_id.id
 
         return cast(
-            WorkspaceStatistics,
+            "WorkspaceStatistics",
             cast(
-                Response,
+                "Response",
                 self.request(
                     f"workspaces/{workspace_id}/statistics",
                     refresh=True,

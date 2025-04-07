@@ -3,12 +3,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, cast
 
-from httpx import AsyncClient, Response
-
 from ._async_endpoint import TogglAsyncEndpoint
 
 if TYPE_CHECKING:
-    from httpx import BasicAuth
+    from httpx import AsyncClient, BasicAuth, Response
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -51,7 +49,7 @@ class AsyncUserEndpoint(TogglAsyncEndpoint[Any]):
         )
 
     async def get_details(self) -> dict[str, Any]:
-        """Returns details for the current user.
+        """Return details for the current user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-me)
 
@@ -63,4 +61,4 @@ class AsyncUserEndpoint(TogglAsyncEndpoint[Any]):
         """
         request = await self.request("me", raw=True)
         # TODO: Create a user details type dict.
-        return cast(dict[str, Any], cast(Response, request).json())
+        return cast("dict[str, Any]", cast("Response", request).json())

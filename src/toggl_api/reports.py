@@ -7,6 +7,8 @@ from typing import Any, ClassVar, Generic, Literal, TypeVar, cast
 
 from httpx import BasicAuth, Client, Response, Timeout
 
+from toggl_api._exceptions import DateTimeError
+
 from ._utility import format_iso
 from .meta import BaseBody, RequestMethod, TogglEndpoint
 from .models import TogglProject, TogglWorkspace
@@ -35,6 +37,7 @@ class PaginatedResult(Generic[T]):
     next_row: int | None = field(default=None)
 
     def __post_init__(self) -> None:
+        """Post init method that converts any numeric values to actual ints."""
         # NOTE: Header types are strings so post init converts to integer.
         if self.next_id:
             self.next_id = int(self.next_id)
@@ -42,6 +45,14 @@ class PaginatedResult(Generic[T]):
             self.next_row = int(self.next_row)
 
     def next_options(self, page_size: int = 50) -> PaginationOptions:
+        """Create the next options with a newly defined page size.
+
+        Args:
+            page_size: Override the page size.
+
+        Returns:
+            New pagination options for the next request.
+        """
         return PaginationOptions(page_size, self.next_id, self.next_row)
 
 
@@ -130,9 +141,7 @@ class ReportBody(BaseBody):
     rounding: int | None = field(default=None)
     """Whether time should be rounded, optional, default from user preferences."""
 
-    rounding_minutes: Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240] | None = (
-        field(default=None)
-    )
+    rounding_minutes: Literal[0, 1, 5, 6, 10, 12, 15, 30, 60, 240] | None = field(default=None)
     """Rounding minutes value, optional, default from user preferences.
     Should be 0, 1, 5, 6, 10, 12, 15, 30, 60 or 240."""
 
@@ -254,7 +263,19 @@ class ReportBody(BaseBody):
     )
     """It will force the detailed report to return as much information as possible, as it does for the export."""
 
-    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:  # noqa: PLR0912
+    def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
+        """Format a body into the correct values types.
+
+        Args:
+            endpoint: The name of the endpoint for filtering.
+            body: Body pre-filled with miscellanous values:
+
+        Raises:
+            DateTimeError: If the start date is after the end date.
+
+        Returns:
+            Dictionary of formatted values.
+        """
         body.update(
             {
                 "client_ids": self.client_ids,
@@ -269,7 +290,7 @@ class ReportBody(BaseBody):
             body["start_date"] = format_iso(self.start_date)
             if self.end_date is not None and self.start_date > self.end_date:
                 msg = "Start date needs to be on or before the end date!"
-                raise AttributeError(msg)
+                raise DateTimeError(msg)
 
         if self.end_date:
             body["end_date"] = format_iso(self.end_date)
@@ -280,9 +301,7 @@ class ReportBody(BaseBody):
         if self._verify_endpoint_parameter("duration_format", endpoint):
             body["duration_format"] = self.duration_format
 
-        if self.include_time_entry_ids and self._verify_endpoint_parameter(
-            "include_time_entry_ids", endpoint
-        ):
+        if self.include_time_entry_ids and self._verify_endpoint_parameter("include_time_entry_ids", endpoint):
             body["include_time_entry_ids"] = self.include_time_entry_ids
 
         if self.description is not None:
@@ -291,14 +310,10 @@ class ReportBody(BaseBody):
         if self.group_ids:
             body["group_ids"] = self.group_ids
 
-        if self.grouping and self._verify_endpoint_parameter(
-            "grouping", endpoint
-        ):
+        if self.grouping and self._verify_endpoint_parameter("grouping", endpoint):
             body["grouping"] = self.grouping
 
-        if self.grouped and self._verify_endpoint_parameter(
-            "grouped", endpoint
-        ):
+        if self.grouped and self._verify_endpoint_parameter("grouped", endpoint):
             body["grouped"] = self.grouped
 
         if isinstance(self.max_duration_seconds, int):
@@ -313,29 +328,19 @@ class ReportBody(BaseBody):
         if isinstance(self.rounding_minutes, int):
             body["rounding_minutes"] = self.rounding_minutes
 
-        if self.sub_grouping is not None and self._verify_endpoint_parameter(
-            "sub_grouping", endpoint
-        ):
+        if self.sub_grouping is not None and self._verify_endpoint_parameter("sub_grouping", endpoint):
             body["sub_grouping"] = self.sub_grouping
 
-        if self.order_by is not None and self._verify_endpoint_parameter(
-            "order_by", endpoint
-        ):
+        if self.order_by is not None and self._verify_endpoint_parameter("order_by", endpoint):
             body["order_by"] = self.order_by
 
-        if self.order_dir is not None and self._verify_endpoint_parameter(
-            "order_dir", endpoint
-        ):
+        if self.order_dir is not None and self._verify_endpoint_parameter("order_dir", endpoint):
             body["order_dir"] = self.order_dir
 
-        if self.resolution is not None and self._verify_endpoint_parameter(
-            "resolution", endpoint
-        ):
+        if self.resolution is not None and self._verify_endpoint_parameter("resolution", endpoint):
             body["resolution"] = self.resolution
 
-        if self.enrich_response and self._verify_endpoint_parameter(
-            "enrich_response", endpoint
-        ):
+        if self.enrich_response and self._verify_endpoint_parameter("enrich_response", endpoint):
             body["enrich_response"] = self.enrich_response
 
         return body
@@ -344,9 +349,7 @@ class ReportBody(BaseBody):
 class ReportEndpoint(TogglEndpoint[Any]):
     """Abstract baseclass for the reports endpoint that overrides BASE_ENDPOINT."""
 
-    BASE_ENDPOINT: ClassVar[str] = (
-        "https://api.track.toggl.com/reports/api/v3/"
-    )
+    BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/reports/api/v3/"
 
     def __init__(
         self,
@@ -365,19 +368,15 @@ class ReportEndpoint(TogglEndpoint[Any]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = (
-            workspace_id if isinstance(workspace_id, int) else workspace_id.id
-        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @abstractmethod
-    def search_time_entries(
-        self, body: ReportBody, *args: Any, **kwargs: Any
-    ) -> Any: ...
+    def search_time_entries(self, body: ReportBody, *args: Any, **kwargs: Any) -> Any:
+        """Search for time entries for the given report endpoint."""
 
     @abstractmethod
-    def export_report(
-        self, body: ReportBody, *args: Any, **kwargs: Any
-    ) -> Any: ...
+    def export_report(self, body: ReportBody, *args: Any, **kwargs: Any) -> Any:
+        """Export a report for the given report endpoint."""
 
     # REFACTOR: These abstract methods should have more concrete types.
 
@@ -394,7 +393,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         start_date: date | str,
         end_date: date | str,
     ) -> dict[str, int]:
-        """Returns a specific projects summary within the parameters provided.
+        """Return a specific projects summary within the parameters provided.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-load-project-summary)
 
@@ -406,9 +405,8 @@ class SummaryReportEndpoint(ReportEndpoint):
         Returns:
             A list of dictionary with the summary data.
         """
-
         return cast(
-            dict[str, int],
+            "dict[str, int]",
             self.request(
                 f"{self.endpoint}/projects/{project.id if isinstance(project, TogglProject) else project}/summary",
                 method=RequestMethod.POST,
@@ -424,7 +422,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         start_date: date | str,
         end_date: date | str,
     ) -> list[dict[str, int]]:
-        """Returns a summary of user projects according to parameters provided.
+        """Return a summary of user projects according to parameters provided.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-list-project-users)
 
@@ -435,9 +433,8 @@ class SummaryReportEndpoint(ReportEndpoint):
         Returns:
             A list of dictionary with the summary data.
         """
-
         return cast(
-            list[dict[str, int]],
+            "list[dict[str, int]]",
             self.request(
                 f"{self.endpoint}/projects/summary",
                 method=RequestMethod.POST,
@@ -449,7 +446,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         )
 
     def search_time_entries(self, body: ReportBody) -> list[dict[str, int]]:
-        """Returns a list of time entries within the parameters specified.
+        """Return a list of time entries within the parameters specified.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-search-time-entries)
 
@@ -460,7 +457,7 @@ class SummaryReportEndpoint(ReportEndpoint):
             A list of dictionaries with the filtered tracker data.
         """
         return cast(
-            list[dict[str, int]],
+            "list[dict[str, int]]",
             self.request(
                 f"{self.endpoint}/summary/time_entries",
                 method=RequestMethod.POST,
@@ -478,7 +475,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         *,
         collapse: bool = False,
     ) -> bytes:
-        """Downloads summary report in the specified in the specified format: csv or pdf.
+        """Download summary report in the specified in the specified format: csv or pdf.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-export-summary-report)
 
@@ -496,7 +493,7 @@ class SummaryReportEndpoint(ReportEndpoint):
         _validate_extension(extension)
 
         return cast(
-            Response,
+            "Response",
             self.request(
                 f"{self.endpoint}/summary/time_entries.{extension}",
                 method=RequestMethod.POST,
@@ -511,6 +508,7 @@ class SummaryReportEndpoint(ReportEndpoint):
 
     @property
     def endpoint(self) -> str:
+        """Summary report endpoint url parameters."""
         return f"workspace/{self.workspace_id}"
 
 
@@ -521,9 +519,7 @@ class DetailedReportEndpoint(ReportEndpoint):
     """
 
     @staticmethod
-    def _paginate(
-        request: Response, *, raw: bool = False
-    ) -> PaginatedResult[Any]:
+    def _paginate(request: Response, *, raw: bool = False) -> PaginatedResult[Any]:
         return PaginatedResult(
             request.content if raw else request.json(),
             request.headers.get("x-next-id"),
@@ -549,7 +545,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[list[dict[str, Any]]]:
-        """Returns time entries for detailed report according to the given filters.
+        """Return time entries for detailed report according to the given filters.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
 
@@ -561,11 +557,10 @@ class DetailedReportEndpoint(ReportEndpoint):
         Returns:
             Data with pagination information if required.
         """
-
         pagination = pagination or PaginationOptions()
 
         request: Response = cast(
-            Response,
+            "Response",
             self.request(
                 self.endpoint,
                 body=self._paginate_body(
@@ -591,7 +586,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[bytes]:
-        """Downloads detailed report in pdf or csv format.
+        """Download detailed report in pdf or csv format.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-export-detailed-report)
 
@@ -612,7 +607,7 @@ class DetailedReportEndpoint(ReportEndpoint):
 
         pagination = pagination or PaginationOptions()
         request = cast(
-            Response,
+            "Response",
             self.request(
                 f"{self.endpoint}.{extension}",
                 body=self._paginate_body(
@@ -636,7 +631,7 @@ class DetailedReportEndpoint(ReportEndpoint):
         granularity: Literal["day", "week", "month"] = "day",
         with_graph: bool = False,
     ) -> dict[str, int]:
-        """Returns totals sums for detailed report.
+        """Return totals sums for detailed report.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-load-totals-detailed-report)
 
@@ -649,7 +644,7 @@ class DetailedReportEndpoint(ReportEndpoint):
             With the totals relevant to the provided filters.
         """
         return cast(
-            dict[str, int],
+            "dict[str, int]",
             self.request(
                 f"{self.endpoint}/totals",
                 body=body.format(
@@ -664,6 +659,7 @@ class DetailedReportEndpoint(ReportEndpoint):
 
     @property
     def endpoint(self) -> str:
+        """Detailed report endpoint url parameters."""
         return f"workspace/{self.workspace_id}/search/time_entries"
 
 
@@ -674,7 +670,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
     """
 
     def search_time_entries(self, body: ReportBody) -> list[dict[str, Any]]:
-        """Returns time entries for weekly report according to the given filters.
+        """Return time entries for weekly report according to the given filters.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
 
@@ -685,7 +681,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
             A List of time entries filted by the formatted body.
         """
         return cast(
-            list[dict[str, Any]],
+            "list[dict[str, Any]]",
             self.request(
                 self.endpoint,
                 body=body.format(
@@ -696,10 +692,8 @@ class WeeklyReportEndpoint(ReportEndpoint):
             ),
         )
 
-    def export_report(
-        self, body: ReportBody, extension: ReportFormats
-    ) -> bytes:
-        """Downloads weekly report in pdf or csv format.
+    def export_report(self, body: ReportBody, extension: ReportFormats) -> bytes:
+        """Download weekly report in pdf or csv format.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/weekly_reports#post-export-weekly-report)
 
@@ -715,7 +709,7 @@ class WeeklyReportEndpoint(ReportEndpoint):
         """
         _validate_extension(extension)
         return cast(
-            Response,
+            "Response",
             self.request(
                 f"{self.endpoint}.{extension}",
                 body=body.format(
@@ -729,4 +723,5 @@ class WeeklyReportEndpoint(ReportEndpoint):
 
     @property
     def endpoint(self) -> str:
+        """Weekly report endpoint url parameters."""
         return f"workspace/{self.workspace_id}/weekly/time_entries"

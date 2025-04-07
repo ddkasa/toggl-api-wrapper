@@ -7,14 +7,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Generic,
-    Protocol,
-    TypeVar,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar
 
 from toggl_api._exceptions import MissingParentError
 from toggl_api.meta._enums import RequestMethod
@@ -51,15 +44,13 @@ class TogglQuery(Generic[T]):
     """The way the value should be compared. None 'EQUALS' comparisons for None numeric or time based values."""
 
     def __post_init__(self) -> None:
-        if (
-            not isinstance(self.value, date | int | timedelta)
-            and self.comparison != Comparison.EQUAL
-        ):
+        if not isinstance(self.value, date | int | timedelta) and self.comparison != Comparison.EQUAL:
             msg = "None 'EQUAL' comparisons only available for time or numeric based values."
             raise TypeError(msg)
 
         if isinstance(self.value, date) and not isinstance(
-            self.value, datetime
+            self.value,
+            datetime,
         ):
             if self.comparison in {
                 Comparison.LESS_THEN,
@@ -78,11 +69,11 @@ class TogglQuery(Generic[T]):
                 )
 
 
-_T = TypeVar("_T", bound=TogglClass, contravariant=True)
+_T_contra = TypeVar("_T_contra", bound=TogglClass, contravariant=True)
 
 
-class CacheCallable(Protocol, Generic[_T]):
-    def __call__(self, *entries: _T) -> None: ...
+class CacheCallable(Protocol, Generic[_T_contra]):
+    def __call__(self, *entries: _T_contra) -> None: ...
 
 
 TC = TypeVar("TC", bound=TogglClass)
@@ -139,11 +130,7 @@ class TogglCache(ABC, Generic[TC]):
         self._cache_path = path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
 
-        self._expire_after = (
-            timedelta(seconds=expire_after)
-            if isinstance(expire_after, int)
-            else expire_after
-        )
+        self._expire_after = timedelta(seconds=expire_after) if isinstance(expire_after, int) else expire_after
         self._parent = parent
 
     @abstractmethod
@@ -183,12 +170,11 @@ class TogglCache(ABC, Generic[TC]):
     def find_method(self, method: RequestMethod) -> CacheCallable[TC]:
         if method in {RequestMethod.GET, RequestMethod.PUT}:
             return self.add
-        elif method in {RequestMethod.PATCH, RequestMethod.PUT}:
+        if method in {RequestMethod.PATCH, RequestMethod.PUT}:
             return self.update
 
-        raise NotImplementedError(
-            f"{method.value} Request method is not implemented."
-        )
+        msg = f"{method} request method is not implemented."
+        raise NotImplementedError(msg)
 
     @property
     @abstractmethod
@@ -217,4 +203,4 @@ class TogglCache(ABC, Generic[TC]):
 
     @property
     def model(self) -> type[TC]:
-        return cast(type[TC], self.parent.MODEL)
+        return self.parent.MODEL

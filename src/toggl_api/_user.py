@@ -50,7 +50,9 @@ class UserEndpoint(TogglEndpoint[Any]):
 
     @staticmethod
     def verify_authentication(
-        auth: BasicAuth, *, client: Client | None = None
+        auth: BasicAuth,
+        *,
+        client: Client | None = None,
     ) -> bool:
         """Check if user is correctly authenticated with the Toggl API.
 
@@ -80,7 +82,8 @@ class UserEndpoint(TogglEndpoint[Any]):
         client = client or Client()
         try:
             client.get(
-                TogglEndpoint.BASE_ENDPOINT + "me/logged", auth=auth
+                TogglEndpoint.BASE_ENDPOINT + "me/logged",
+                auth=auth,
             ).raise_for_status()
         except HTTPStatusError as err:
             log.critical("Failed to verify authentication!")
@@ -93,7 +96,7 @@ class UserEndpoint(TogglEndpoint[Any]):
         return True
 
     def get_details(self) -> dict[str, Any]:
-        """Returns details for the current user.
+        """Return details for the current user.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/me#get-me)
 
@@ -104,9 +107,9 @@ class UserEndpoint(TogglEndpoint[Any]):
             User details in a raw dictionary.
         """
         return cast(
-            dict[str, Any],
+            "dict[str, Any]",
             cast(
-                Response,
+                "Response",
                 self.request("me", raw=True),
             ).json(),
         )

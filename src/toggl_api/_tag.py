@@ -71,7 +71,12 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         )
         self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
-    def get(self, tag: TogglTag | int, *, refresh: bool = False) -> TogglTag | None:
+    def get(
+        self,
+        tag: TogglTag | int,
+        *,
+        refresh: bool = False,
+    ) -> TogglTag | None:
         """Get endpoint convenience method for querying single tags from cache.
 
         This endpoint doesn't exist on the API so it locally queries for tags
@@ -84,6 +89,9 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Args:
             tag: Which tag to retrieve. Can be an existing model or its id.
             refresh: Whether to collect all tags from the API first.
+
+        Raises:
+            HTTPStatusError: If an error is raised and `re_raise` is True.
 
         Returns:
             A tag model if it was found otherwise None.
@@ -119,7 +127,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             A list of tags collected from the API or local cache.
         """
-        return cast(list[TogglTag], self.request(self.endpoint, refresh=refresh))
+        return cast("list[TogglTag]", self.request(self.endpoint, refresh=refresh))
 
     def add(self, name: str) -> TogglTag:
         """Create a new tag.
@@ -139,13 +147,12 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             The newly created tag.
         """
-
         if not name:
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
 
         return cast(
-            TogglTag,
+            "TogglTag",
             self.request(
                 self.endpoint,
                 body={"name": name},
@@ -155,7 +162,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         )
 
     def edit(self, tag: TogglTag | int, name: str) -> TogglTag:
-        """Sets the name of the tag based on the tag object.
+        """Set the name of the tag based on the tag object.
 
         This endpoint always hit the external API in order to keep tags consistent.
 
@@ -180,13 +187,12 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         Returns:
             The edited tag.
         """
-
         if not name:
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
 
         return cast(
-            TogglTag,
+            "TogglTag",
             self.request(
                 f"{self.endpoint}/{tag.id if isinstance(tag, TogglTag) else tag}",
                 body={"name": name},
@@ -196,7 +202,7 @@ class TagEndpoint(TogglCachedEndpoint[TogglTag]):
         )
 
     def delete(self, tag: TogglTag | int) -> None:
-        """Deletes a tag based on its ID or model.
+        """Delete a tag based on its ID or model.
 
         This endpoint always hit the external API in order to keep tags consistent.
 

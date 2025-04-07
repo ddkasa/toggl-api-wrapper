@@ -68,12 +68,13 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = (
-            workspace_id if isinstance(workspace_id, int) else workspace_id.id
-        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     async def get(
-        self, tag: TogglTag | int, *, refresh: bool = False
+        self,
+        tag: TogglTag | int,
+        *,
+        refresh: bool = False,
     ) -> TogglTag | None:
         """Get endpoint convenience method for querying single tags from cache.
 
@@ -90,6 +91,7 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
 
         Raises:
             NoCacheAssignedError: If no cache has been assigned to the endpoint.
+            HTTPStatusError: If any error is raised and `re_raise` is True.
 
         Returns:
             A tag model if it was found otherwise None.
@@ -122,7 +124,8 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
             A list of tags collected from the API or local cache.
         """
         return cast(
-            list[TogglTag], await self.request(self.endpoint, refresh=refresh)
+            "list[TogglTag]",
+            await self.request(self.endpoint, refresh=refresh),
         )
 
     async def add(self, name: str) -> TogglTag:
@@ -143,7 +146,6 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
         Returns:
             The newly created tag.
         """
-
         if not name:
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
@@ -155,10 +157,10 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
             refresh=True,
         )
 
-        return cast(TogglTag, response)
+        return cast("TogglTag", response)
 
     async def edit(self, tag: TogglTag | int, name: str) -> TogglTag:
-        """Sets the name of the tag based on the tag object.
+        """Rename an existing tag.
 
         This endpoint always hit the external API in order to keep tags consistent.
 
@@ -183,7 +185,6 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
         Returns:
             The edited tag.
         """
-
         if not name:
             msg = "The tag name needs to be at least one character long."
             raise NamingError(msg)
@@ -195,10 +196,10 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
             refresh=True,
         )
 
-        return cast(TogglTag, response)
+        return cast("TogglTag", response)
 
     async def delete(self, tag: TogglTag | int) -> None:
-        """Deletes a tag based on its ID or model.
+        """Delete a tag based on its ID or model.
 
         This endpoint always hit the external API in order to keep tags consistent.
 
@@ -238,4 +239,5 @@ class AsyncTagEndpoint(TogglAsyncCachedEndpoint[TogglTag]):
 
     @property
     def endpoint(self) -> str:
+        """Generic tag endpoint params with workspace id prefilled."""
         return f"workspaces/{self.workspace_id}/tags"

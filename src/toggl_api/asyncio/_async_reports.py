@@ -10,10 +10,10 @@ from toggl_api import TogglProject, TogglWorkspace
 from toggl_api._utility import format_iso
 from toggl_api.meta import RequestMethod
 from toggl_api.reports import (
-    ReportFormats,
     PaginatedResult,
     PaginationOptions,
     ReportBody,
+    ReportFormats,
     _validate_extension,
 )
 
@@ -24,7 +24,7 @@ class AsyncReportEndpoint(TogglAsyncEndpoint[Any]):
     """Abstract baseclass for the async report endpoints that overrides BASE_ENDPOINT."""
 
     BASE_ENDPOINT: ClassVar[URL] = URL(
-        "https://api.track.toggl.com/reports/api/v3/"
+        "https://api.track.toggl.com/reports/api/v3/",
     )
 
     def __init__(
@@ -44,18 +44,22 @@ class AsyncReportEndpoint(TogglAsyncEndpoint[Any]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = (
-            workspace_id if isinstance(workspace_id, int) else workspace_id.id
-        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @abstractmethod
     async def search_time_entries(
-        self, body: ReportBody, *args: Any, **kwargs: Any
+        self,
+        body: ReportBody,
+        *args: Any,
+        **kwargs: Any,
     ) -> Any: ...
 
     @abstractmethod
     async def export_report(
-        self, body: ReportBody, *args: Any, **kwargs: Any
+        self,
+        body: ReportBody,
+        *args: Any,
+        **kwargs: Any,
     ) -> Any: ...
 
     # REFACTOR: More concrete function signatures.
@@ -73,7 +77,7 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
         start_date: date | str,
         end_date: date | str,
     ) -> dict[str, int]:
-        """Returns a specific projects summary within the parameters provided.
+        """Return a specific projects summary within the parameters provided.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-load-project-summary)
 
@@ -85,7 +89,6 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
         Returns:
             A list of dictionary with the summary data.
         """
-
         response = await self.request(
             f"{self.endpoint}/projects/{project.id if isinstance(project, TogglProject) else project}/summary",
             method=RequestMethod.POST,
@@ -95,14 +98,14 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
             },
         )
 
-        return cast(dict[str, int], response)
+        return cast("dict[str, int]", response)
 
     async def project_summaries(
         self,
         start_date: date | str,
         end_date: date | str,
     ) -> list[dict[str, int]]:
-        """Returns a summary of user projects according to parameters provided.
+        """Return a summary of user projects according to parameters provided.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-list-project-users)
 
@@ -122,12 +125,13 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
             },
         )
 
-        return cast(list[dict[str, int]], response)
+        return cast("list[dict[str, int]]", response)
 
     async def search_time_entries(
-        self, body: ReportBody
+        self,
+        body: ReportBody,
     ) -> list[dict[str, int]]:
-        """Returns a list of time entries within the parameters specified.
+        """Return a list of time entries within the parameters specified.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-search-time-entries)
 
@@ -137,7 +141,6 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
         Returns:
             A list of dictionaries with the filtered tracker data.
         """
-
         response = await self.request(
             f"{self.endpoint}/summary/time_entries",
             method=RequestMethod.POST,
@@ -146,7 +149,7 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
                 workspace_id=self.workspace_id,
             ),
         )
-        return cast(list[dict[str, int]], response)
+        return cast("list[dict[str, int]]", response)
 
     async def export_report(
         self,
@@ -155,7 +158,7 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
         *,
         collapse: bool = False,
     ) -> bytes:
-        """Downloads summary report in the specified in the specified format: csv or pdf.
+        """Download summary report in the specified in the specified format: csv or pdf.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/summary_reports#post-export-summary-report)
 
@@ -183,7 +186,7 @@ class AsyncSummaryReportEndpoint(AsyncReportEndpoint):
             raw=True,
         )
 
-        return cast(Response, response).content
+        return cast("Response", response).content
 
     @property
     def endpoint(self) -> str:
@@ -227,7 +230,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[list[dict[str, Any]]]:
-        """Returns time entries for detailed report according to the given filters.
+        """Return time entries for detailed report according to the given filters.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
 
@@ -239,7 +242,6 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
         Returns:
             Data with pagination information if required.
         """
-
         pagination = pagination or PaginationOptions()
 
         response = await self.request(
@@ -256,7 +258,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
             raw=True,
         )
 
-        return self._paginate(cast(Response, response))
+        return self._paginate(cast("Response", response))
 
     async def export_report(
         self,
@@ -266,7 +268,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
         *,
         hide_amounts: bool = False,
     ) -> PaginatedResult[bytes]:
-        """Downloads detailed report in pdf or csv format.
+        """Download detailed report in pdf or csv format.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-export-detailed-report)
 
@@ -300,7 +302,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
             method=RequestMethod.POST,
             raw=True,
         )
-        return self._paginate(cast(Response, response), raw=True)
+        return self._paginate(cast("Response", response), raw=True)
 
     async def totals_report(
         self,
@@ -309,7 +311,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
         granularity: Literal["day", "week", "month"] = "day",
         with_graph: bool = False,
     ) -> dict[str, int]:
-        """Returns totals sums for detailed report.
+        """Return totals sums for detailed report.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-load-totals-detailed-report)
 
@@ -332,7 +334,7 @@ class AsyncDetailedReportEndpoint(AsyncReportEndpoint):
             method=RequestMethod.POST,
         )
 
-        return cast(dict[str, int], response)
+        return cast("dict[str, int]", response)
 
     @property
     def endpoint(self) -> str:
@@ -346,9 +348,10 @@ class AsyncWeeklyReportEndpoint(AsyncReportEndpoint):
     """
 
     async def search_time_entries(
-        self, body: ReportBody
+        self,
+        body: ReportBody,
     ) -> list[dict[str, Any]]:
-        """Returns time entries for weekly report according to the given filters.
+        """Return time entries for weekly report according to the given filters.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/detailed_reports#post-search-time-entries)
 
@@ -367,12 +370,14 @@ class AsyncWeeklyReportEndpoint(AsyncReportEndpoint):
             method=RequestMethod.POST,
         )
 
-        return cast(list[dict[str, Any]], response)
+        return cast("list[dict[str, Any]]", response)
 
     async def export_report(
-        self, body: ReportBody, extension: ReportFormats
+        self,
+        body: ReportBody,
+        extension: ReportFormats,
     ) -> bytes:
-        """Downloads weekly report in pdf or csv format.
+        """Download weekly report in pdf or csv format.
 
         [Official Documentation](https://engineering.toggl.com/docs/reports/weekly_reports#post-export-weekly-report)
 
@@ -396,7 +401,7 @@ class AsyncWeeklyReportEndpoint(AsyncReportEndpoint):
             method=RequestMethod.POST,
             raw=True,
         )
-        return cast(Response, response).content
+        return cast("Response", response).content
 
     @property
     def endpoint(self) -> str:

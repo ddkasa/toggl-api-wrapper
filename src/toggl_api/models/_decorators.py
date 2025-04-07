@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Dialect
 from sqlalchemy.types import DateTime, TypeDecorator
+
+if TYPE_CHECKING:
+    from sqlalchemy import Dialect
 
 
 # NOTE: From sqlalchemy-utc package.
 class UTCDateTime(TypeDecorator[datetime]):
-    """Almost equivalent to :class:`~sqlalchemy.types.DateTime` with
-    ``timezone=True`` option, but it differs from that by:
+    """Equivalent to `sqlalchemy.types.DateTime` with UTC timezone.
 
     - Never silently take naive :class:`~datetime.datetime`, instead it
       always raise :exc:`ValueError` unless time zone aware value.
@@ -26,12 +28,12 @@ class UTCDateTime(TypeDecorator[datetime]):
     def process_bind_param(
         self,
         value: datetime | None,
-        dialect: Dialect,
+        _dialect: Dialect,
     ) -> datetime | None:
         if value is not None:
             if not isinstance(value, datetime):
                 raise TypeError(
-                    "Expected datetime.datetime, not " + repr(value)
+                    "Expected datetime.datetime, not " + repr(value),
                 )
             if value.tzinfo is None:
                 msg = "Naive datetime is disallowed!"
@@ -42,12 +44,8 @@ class UTCDateTime(TypeDecorator[datetime]):
     def process_result_value(
         self,
         value: datetime | None,
-        dialect: Dialect,
+        _dialect: Dialect,
     ) -> datetime | None:
         if value is not None:
-            value = (
-                value.replace(tzinfo=timezone.utc)
-                if value.tzinfo is None
-                else value.astimezone(timezone.utc)
-            )
+            value = value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
         return value

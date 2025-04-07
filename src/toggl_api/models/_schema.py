@@ -77,7 +77,9 @@ def _create_mappings(metadata: MetaData) -> None:
         "client",
         metadata,
         Column(
-            "created", UTCDateTime(timezone=True), server_default=func.now()
+            "created",
+            UTCDateTime(timezone=True),
+            server_default=func.now(),
         ),
         Column("timestamp", UTCDateTime),
         Column("id", Integer, primary_key=True),

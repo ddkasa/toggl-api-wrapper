@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import enum
 import logging
+import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from typing import Any
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 from toggl_api._exceptions import NamingError
 from toggl_api._utility import get_workspace, parse_iso
@@ -46,8 +52,12 @@ class TogglClass(ABC):
 
     @classmethod
     @abstractmethod
-    def from_kwargs(cls, **kwargs: Any) -> TogglClass:
-        """Converts an arbitrary amount of kwargs to a model."""
+    def from_kwargs(cls, **kwargs: Any) -> Self:
+        """Convert an arbitrary amount of kwargs to a model.
+
+        Returns:
+            A newly created `TogglClass`.
+        """
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -78,13 +88,25 @@ class TogglOrganization(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs: Any) -> TogglOrganization:
-        """Converts an arbitrary amount of kwargs to an organization."""
-        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+    def from_kwargs(cls, **kwargs: Any) -> Self:
+        """Convert an arbitrary amount of kwargs to an organization.
+
+        Returns:
+            A new created `TogglOrganization` object.
+        """
+        return super().from_kwargs(**kwargs)
 
     @staticmethod
     def validate_name(name: str, *, max_len: int = 140) -> None:
-        """Checks if a organization name is valid for the API."""
+        """Check if a organization name is valid for the API.
+
+        Args:
+            name: The name to check as a string.
+            max_len: Maximum length to allow.
+
+        Raises:
+            NamingError: If the name provided is not valid.
+        """
         if not name:
             msg = "The organization name need at least have one letter!"
             raise NamingError(msg)
@@ -120,8 +142,15 @@ class TogglWorkspace(TogglClass):
             log.warning("Updated to new name: %s!", self.name)
 
     @classmethod
-    def from_kwargs(cls, **kwargs: Any) -> TogglWorkspace:
-        """Converts an arbitrary amount of kwargs to a workspace."""
+    def from_kwargs(cls, **kwargs: Any) -> Self:
+        """Convert an arbitrary amount of kwargs to a workspace.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `TogglWorkspace` object.
+        """
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -131,7 +160,15 @@ class TogglWorkspace(TogglClass):
 
     @staticmethod
     def validate_name(name: str, *, max_len: int = 140) -> None:
-        """Checks if a workspace name is valid for the API."""
+        """Check if a workspace name is valid for the API.
+
+        Args:
+            name: The name to check as a string.
+            max_len: Maximum length to allow.
+
+        Raises:
+            NamingError: If the name provided is not valid.
+        """
         if not name:
             msg = "The workspace name need at least have one character!"
             raise NamingError(msg)
@@ -164,6 +201,14 @@ class WorkspaceChild(TogglClass):
 
     @classmethod
     def from_kwargs(cls, **kwargs: Any) -> WorkspaceChild:
+        """Convert an arbitrary amount of kwargs to workspace object.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `WorkspaceChild` object.
+        """
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -190,8 +235,15 @@ class TogglClient(WorkspaceChild):
 
     @classmethod
     def from_kwargs(cls, **kwargs: Any) -> TogglClient:
-        """Converts an arbitrary amount of kwargs to a client."""
-        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+        """Convert an arbitrary amount of kwargs to a client.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `TogglClient` object.
+        """
+        return cls.from_kwargs(**kwargs)
 
 
 @dataclass
@@ -230,7 +282,7 @@ class TogglProject(WorkspaceChild):
     active: bool = field(default=True)
 
     start_date: date = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc).date()
+        default_factory=lambda: datetime.now(tz=timezone.utc).date(),
     )
     end_date: date | None = field(default=None)
 
@@ -247,7 +299,14 @@ class TogglProject(WorkspaceChild):
 
     @classmethod
     def from_kwargs(cls, **kwargs: Any) -> TogglProject:
-        """Converts an arbitrary amount of kwargs to a project."""
+        """Convert an arbitrary amount of kwargs to a project.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `TogglProject` object.
+        """
         return cls(
             id=kwargs["id"],
             name=kwargs["name"],
@@ -256,13 +315,16 @@ class TogglProject(WorkspaceChild):
             client=kwargs.get("client_id") or kwargs.get("client"),
             active=kwargs["active"],
             timestamp=kwargs.get("timestamp") or datetime.now(tz=timezone.utc),
-            start_date=kwargs.get("start_date")
-            or datetime.now(tz=timezone.utc).date(),
+            start_date=kwargs.get("start_date") or datetime.now(tz=timezone.utc).date(),
             end_date=kwargs.get("end_date"),
         )
 
     def get_status(self) -> TogglProject.Status:
-        """Derive the project status from instance attributes."""
+        """Derive the project status from instance attributes.
+
+        Returns:
+            A status enumeration based on the project attributes.
+        """
         if not self.active:
             return TogglProject.Status.ARCHIVED
         now = datetime.now(timezone.utc)
@@ -326,12 +388,23 @@ class TogglTracker(WorkspaceChild):
             self.stop = parse_iso(self.stop)  # type: ignore[assignment]
 
     def running(self) -> bool:
-        """Is this tracker running?"""
+        """Is the tracker running.
+
+        Returns:
+            True if the tracker is running.
+        """
         return self.stop is None
 
     @classmethod
-    def from_kwargs(cls, **kwargs: Any) -> TogglTracker:
-        """Converts an arbitrary amount of kwargs to a tracker."""
+    def from_kwargs(cls, **kwargs: Any) -> Self:
+        """Convert an arbitrary amount of kwargs to a tracker.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `TogglTracker` object.
+        """
         start = kwargs.get("start")
         if start is None:
             start = datetime.now(tz=timezone.utc)
@@ -388,5 +461,12 @@ class TogglTag(WorkspaceChild):
 
     @classmethod
     def from_kwargs(cls, **kwargs: Any) -> TogglTag:
-        """Converts an arbitrary amount of kwargs to a tag."""
-        return super().from_kwargs(**kwargs)  # type: ignore[return-value]
+        """Convert an arbitrary amount of kwargs to a tag.
+
+        Args:
+            **kwargs: Arbitary values values to convert.
+
+        Returns:
+            An initialized `TogglTag` object.
+        """
+        return cls.from_kwargs(**kwargs)

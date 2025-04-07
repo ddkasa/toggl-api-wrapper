@@ -15,8 +15,6 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-from httpx import Headers
-
 from toggl_api._exceptions import NoCacheAssignedError
 from toggl_api.models import TogglClass
 
@@ -26,9 +24,9 @@ from ._enums import RequestMethod
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from httpx import BasicAuth, Client, Response, Timeout
+    from httpx import BasicAuth, Client, Headers, Response, Timeout
 
-    from toggl_api.meta.cache._base_cache import TogglQuery, TogglCache
+    from toggl_api.meta.cache._base_cache import TogglCache, TogglQuery
 
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
@@ -117,11 +115,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
             Toggl API response data processed into TogglClass objects or not
                 depending on arguments.
         """
-        data = (
-            self.load_cache()
-            if self.cache and self.MODEL is not None
-            else None
-        )
+        data = self.load_cache() if self.cache and self.MODEL is not None else None
         if data and not refresh:
             log.info(
                 "Loading request %s%s data from cache.",
@@ -129,7 +123,7 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
                 parameters,
                 extra={"body": body, "headers": headers, "method": method},
             )
-            return cast(list[T], data)
+            return cast("list[T]", data)
 
         response = super().request(
             parameters,
@@ -150,7 +144,14 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         return response
 
     def load_cache(self) -> Iterable[T]:
-        """Direct loading method for retrieving all models from cache."""
+        """Direct loading method for retrieving all models from cache.
+
+        Raises:
+            NoCacheAssignedError: If no cache is assigned to the endpoint.
+
+        Returns:
+            An iterable of models that have been previously saved.
+        """
         if self.cache is None:
             raise NoCacheAssignedError
 
@@ -161,13 +162,18 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         response: list[T] | T,
         method: RequestMethod,
     ) -> None:
-        """Direct saving method for retrieving all models from cache."""
+        """Direct saving method for retrieving all models from cache.
+
+        Args:
+            response: A list of values or single value to save.
+            method: To method to use when updating the cache.
+
+        Raises:
+            NoCacheAssignedError: If no cache is assigned to the endpoint.
+        """
         if self.cache is None:
             raise NoCacheAssignedError
-        if (
-            isinstance(self.cache.expire_after, timedelta)
-            and not self.cache.expire_after.total_seconds()
-        ):
+        if isinstance(self.cache.expire_after, timedelta) and not self.cache.expire_after.total_seconds():
             log.debug(
                 "Cache is set to immediately expire!",
                 extra={"expiry": self.cache.expire_after},
@@ -188,6 +194,9 @@ class TogglCachedEndpoint(TogglEndpoint[T]):
         Args:
             *query: An arbitary amount of queries to match the models to.
             distinct: A boolean that remove duplicate values if present.
+
+        Raises:
+            NoCacheAssignedError: If the current cache is set to None.
 
         Returns:
             A list objects depending on the endpoint.

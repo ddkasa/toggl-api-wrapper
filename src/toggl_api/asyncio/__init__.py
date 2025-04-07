@@ -1,3 +1,5 @@
+"""All methods for concurrent programming."""
+
 from importlib.util import find_spec
 
 if not find_spec("sqlalchemy"):

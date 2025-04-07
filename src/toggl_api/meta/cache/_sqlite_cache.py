@@ -9,11 +9,8 @@ from datetime import datetime, timedelta, timezone
 from os import PathLike
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-from sqlalchemy.sql.expression import ColumnElement
-
 try:
     import sqlalchemy as db
-    from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Query, Session
 except ImportError:
     pass
@@ -30,6 +27,9 @@ from ._base_cache import Comparison, TogglCache, TogglQuery
 if TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
+
+    from sqlalchemy.engine import Engine
+    from sqlalchemy.sql.expression import ColumnElement
 
     from toggl_api.meta import TogglCachedEndpoint
 
@@ -79,7 +79,7 @@ class SqliteCache(TogglCache[T]):
     ) -> None:
         super().__init__(path, expire_after, parent)
         self.database = engine or db.create_engine(
-            f"sqlite:///{self.cache_path}"
+            f"sqlite:///{self.cache_path}",
         )
         self.metadata = register_tables(self.database)
 
@@ -94,7 +94,7 @@ class SqliteCache(TogglCache[T]):
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
             query.filter(
-                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+                cast("ColumnElement[bool]", self.model.timestamp > min_ts),
             )
         return query
 
@@ -127,7 +127,7 @@ class SqliteCache(TogglCache[T]):
         if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
             search = search.filter(
-                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+                cast("ColumnElement[bool]", self.model.timestamp > min_ts),
             )
         return search.filter_by(**query).first()
 
@@ -150,12 +150,11 @@ class SqliteCache(TogglCache[T]):
         Returns:
             A SQLAlchemy query object with parameters filtered.
         """
-
         search = self.session.query(self.model)
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self.expire_after
             search = search.filter(
-                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+                cast("ColumnElement[bool]", self.model.timestamp > min_ts),
             )
 
         search = self._query_helper(list(query), search)
@@ -184,7 +183,8 @@ class SqliteCache(TogglCache[T]):
         value = getattr(self.model, query.key)
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(
-                query.value, str
+                query.value,
+                str,
             ):
                 return query_obj.filter(value.in_(query.value))
             return query_obj.filter(value == query.value)

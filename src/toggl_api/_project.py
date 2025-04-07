@@ -122,7 +122,7 @@ class ProjectBody(BaseBody):
             body["statuses"] = [s.name.lower() for s in self.statuses]
 
     def format(self, endpoint: str, **body: Any) -> dict[str, Any]:
-        """Formats the body for JSON requests.
+        """Format the body for JSON requests.
 
         Gets called by the endpoint methods before requesting.
 
@@ -147,23 +147,21 @@ class ProjectBody(BaseBody):
             body["client_name"] = self.client_name
 
         if self.color:
-            color = (
-                ProjectEndpoint.get_color(self.color)
-                if self.color in ProjectEndpoint.BASIC_COLORS
-                else self.color
-            )
+            color = ProjectEndpoint.get_color(self.color) if self.color in ProjectEndpoint.BASIC_COLORS else self.color
             body["color"] = color
 
         if self.start_date and self._verify_endpoint_parameter(
-            "start_date", endpoint
+            "start_date",
+            endpoint,
         ):
             body["start_date"] = format_iso(self.start_date)
         if self.end_date and self._verify_endpoint_parameter(
-            "end_date", endpoint
+            "end_date",
+            endpoint,
         ):
             if self.start_date and self.end_date < self.start_date:
                 log.warning(
-                    "End date is before the start date. Ignoring end date..."
+                    "End date is before the start date. Ignoring end date...",
                 )
             else:
                 body["end_date"] = format_iso(self.end_date)
@@ -245,13 +243,11 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             re_raise=re_raise,
             retries=retries,
         )
-        self.workspace_id = (
-            workspace_id if isinstance(workspace_id, int) else workspace_id.id
-        )
+        self.workspace_id = workspace_id if isinstance(workspace_id, int) else workspace_id.id
 
     @staticmethod
     def status_to_query(status: TogglProject.Status) -> list[TogglQuery[Any]]:
-        """Creates a list of queries depending on the desired project status.
+        """Create a list of queries depending on the desired project status.
 
         Args:
             status: What is the status you are querying for?
@@ -281,7 +277,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             queries: list[TogglQuery[Any]] = []
             if isinstance(body.active, bool):
                 queries.append(
-                    TogglQuery("active", body.active, Comparison.EQUAL)
+                    TogglQuery("active", body.active, Comparison.EQUAL),
                 )
             if body.since:
                 queries.append(
@@ -289,7 +285,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                         "timestamp",
                         body.since,
                         Comparison.GREATER_THEN_OR_EQUAL,
-                    )
+                    ),
                 )
             if body.client_ids:
                 queries.append(TogglQuery("client", body.client_ids))
@@ -310,7 +306,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         only_me: bool = False,
         only_templates: bool = False,
     ) -> list[TogglProject]:
-        """Returns all cached or remote projects.
+        """Return all cached or remote projects.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/projects#get-workspaceprojects)
 
@@ -332,12 +328,11 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         Returns:
             A list of projects or an empty list if None are found.
         """
-
         if not refresh:
             return self._collect_cache(body)
 
         return cast(
-            list[TogglProject],
+            "list[TogglProject]",
             self.request(
                 self.endpoint,
                 body=body.format(
@@ -358,7 +353,10 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         )
 
     def get(
-        self, project_id: int | TogglProject, *, refresh: bool = False
+        self,
+        project_id: int | TogglProject,
+        *,
+        refresh: bool = False,
     ) -> TogglProject | None:
         """Request a project based on its id.
 
@@ -390,18 +388,15 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
                 refresh=refresh,
             )
         except HTTPStatusError as err:
-            if (
-                not self.re_raise
-                and err.response.status_code == codes.NOT_FOUND
-            ):
+            if not self.re_raise and err.response.status_code == codes.NOT_FOUND:
                 log.warning("Project with id %s was not found!", project_id)
                 return None
             raise
 
-        return cast(TogglProject, response) or None
+        return cast("TogglProject", response) or None
 
     def delete(self, project: TogglProject | int) -> None:
-        """Deletes a project based on its id.
+        """Delete a project based on its id.
 
         This endpoint always hits the external API in order to keep projects consistent.
 
@@ -417,7 +412,6 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         Raises:
             HTTPStatusError: For anything that's not a '200' or '404' status code.
         """
-
         project_id = project if isinstance(project, int) else project.id
         try:
             self.request(
@@ -444,7 +438,9 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
         self.cache.commit()
 
     def edit(
-        self, project: TogglProject | int, body: ProjectBody
+        self,
+        project: TogglProject | int,
+        body: ProjectBody,
     ) -> TogglProject:
         """Edit a project based on its id with the parameters provided in the body.
 
@@ -471,7 +467,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             project = project.id
 
         return cast(
-            TogglProject,
+            "TogglProject",
             self.request(
                 f"{self.endpoint}/{project}",
                 method=RequestMethod.PUT,
@@ -497,6 +493,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
         Raises:
             HTTPStatusError: For anything that's not a 'ok' status code.
+            NamingError: If the new project name is invalid.
 
         Returns:
             The newly created project.
@@ -506,7 +503,7 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
             raise NamingError(msg)
 
         return cast(
-            TogglProject,
+            "TogglProject",
             self.request(
                 self.endpoint,
                 method=RequestMethod.POST,
@@ -517,7 +514,14 @@ class ProjectEndpoint(TogglCachedEndpoint[TogglProject]):
 
     @classmethod
     def get_color(cls, name: str) -> str:
-        """Get a color by name. Defaults to gray."""
+        """Get a color by name. Defaults to gray.
+
+        Args:
+            name: The name of the color.
+
+        Returns:
+            Color in a hexcode.
+        """
         return cls.BASIC_COLORS.get(name, "#525266")
 
     @classmethod

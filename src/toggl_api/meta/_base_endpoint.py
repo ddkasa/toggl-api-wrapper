@@ -18,15 +18,14 @@ from typing import (
     Final,
     Generic,
     TypeVar,
-    TYPE_CHECKING,
 )
 
 import httpx
 from httpx import (
     BasicAuth,
     Client,
-    HTTPStatusError,
     Headers,
+    HTTPStatusError,
     Request,
     Response,
     Timeout,
@@ -36,9 +35,6 @@ from httpx import (
 from toggl_api.models import TogglClass
 
 from ._enums import RequestMethod
-
-if TYPE_CHECKING:
-    pass
 
 log = logging.getLogger("toggl-api-wrapper.endpoint")
 
@@ -68,7 +64,7 @@ class TogglEndpoint(ABC, Generic[T]):
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[Headers] = Headers({"content-type": "application/json"})
-    MODEL: type[T] | None = None
+    MODEL: type[T]
 
     __slots__ = ("client", "re_raise", "retries", "workspace_id")
 
@@ -89,9 +85,7 @@ class TogglEndpoint(ABC, Generic[T]):
         self.client = client = client or Client()
         client.auth = auth
         client.base_url = self.BASE_ENDPOINT  # type: ignore[assignment] # NOTE: Setter accepts strings.
-        client.timeout = (
-            timeout if isinstance(timeout, Timeout) else Timeout(timeout)
-        )
+        client.timeout = timeout if isinstance(timeout, Timeout) else Timeout(timeout)
 
         atexit.register(self.client.close)
 
@@ -109,19 +103,11 @@ class TogglEndpoint(ABC, Generic[T]):
         msg = "Request failed with status code %s: %s"
         log.error(msg, response.status_code, response.text)
 
-        if (
-            not self.re_raise
-            and codes.is_server_error(response.status_code)
-            and retries
-        ):
+        if not self.re_raise and codes.is_server_error(response.status_code) and retries:
             delay = random.randint(1, 5)
             retries -= 1
             log.error(
-                (
-                    "Status code %s is a server error."
-                    "Retrying request in %s seconds."
-                    "There are %s retries left."
-                ),
+                ("Status code %s is a server error.Retrying request in %s seconds.There are %s retries left."),
                 response.status_code,
                 delay,
                 retries,
@@ -141,7 +127,10 @@ class TogglEndpoint(ABC, Generic[T]):
         return response.raise_for_status()
 
     def _process_response(
-        self, response: Response, *, raw: bool
+        self,
+        response: Response,
+        *,
+        raw: bool,
     ) -> T | list[T] | Response | None:
         try:
             data = response if raw else response.json()
@@ -156,7 +145,7 @@ class TogglEndpoint(ABC, Generic[T]):
         elif isinstance(data, dict):
             data = self.MODEL.from_kwargs(**data)
 
-        return data  # type: ignore[return-value]
+        return data
 
     def _build_request(
         self,
@@ -186,8 +175,7 @@ class TogglEndpoint(ABC, Generic[T]):
         raw: bool = False,
         retries: int | None = None,
     ) -> T | list[T] | Response | None:
-        """Main request method which handles putting together the final API
-        request.
+        """Request & handle data from the Toggl API.
 
         Args:
             parameters (str): Request parameters with the endpoint excluded.
@@ -227,15 +215,18 @@ class TogglEndpoint(ABC, Generic[T]):
 
     @classmethod
     def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
-        assert cls.MODEL is not None
         return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
 
     @staticmethod
     def api_status() -> bool:
-        """Method for verifying that the Toggl API is up."""
+        """Verify that the Toggl API is up.
+
+        Returns:
+            True if the API is up.
+        """
         try:
             result = httpx.get(
-                "https://api.track.toggl.com/api/v9/status"
+                "https://api.track.toggl.com/api/v9/status",
             ).json()
         except (HTTPStatusError, JSONDecodeError):
             log.critical("Failed to get a response from the Toggl API!")

@@ -107,9 +107,7 @@ class JSONSession(Generic[T]):
         for mid in model_ids:
             old = old_models.get(mid)
             new = new_models.get(mid)
-            if (old is None and new is not None) or (
-                new and old and new.timestamp >= old.timestamp
-            ):
+            if (old is None and new is not None) or (new and old and new.timestamp >= old.timestamp):
                 new_data.append(new)
             elif old and old.timestamp.timestamp() * 10**9 >= mtime:
                 new_data.append(old)
@@ -118,7 +116,7 @@ class JSONSession(Generic[T]):
 
     def _load(self, path: Path) -> dict[str, Any]:
         with path.open("r", encoding="utf-8") as f:
-            return cast(dict[str, Any], json.load(f, cls=CustomDecoder))
+            return cast("dict[str, Any]", json.load(f, cls=CustomDecoder))
 
     def load(self, path: Path) -> None:
         if path.exists():
@@ -198,16 +196,12 @@ class JSONCache(TogglCache[T]):
         min_ts = datetime.now(timezone.utc) - self.expire_after
         return [m for m in self.session.data if m.timestamp >= min_ts]
 
-    def find(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
+    def find(self, entry: T | dict[str, int], **_kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)
         if not self.session.data:
             return None
         for item in self.session.data:
-            if (
-                item is not None
-                and item["id"] == entry["id"]
-                and isinstance(item, self.model)
-            ):
+            if item is not None and item["id"] == entry["id"] and isinstance(item, self.model):
                 return item
         return None
 
@@ -258,18 +252,13 @@ class JSONCache(TogglCache[T]):
         Returns:
             A list of models with the query parameters that matched.
         """
-
         log.debug(
             "Querying cache with %s parameters.",
             len(query),
             extra={"query": query},
         )
 
-        min_ts = (
-            datetime.now(timezone.utc) - self.expire_after
-            if self.expire_after
-            else None
-        )
+        min_ts = datetime.now(timezone.utc) - self.expire_after if self.expire_after else None
         self.session.load(self.cache_path)
         search = self.session.data
         existing: defaultdict[str, set[Any]] = defaultdict(set)
@@ -295,19 +284,12 @@ class JSONCache(TogglCache[T]):
         *,
         distinct: bool,
     ) -> bool:
-        if (
-            self.expire_after
-            and min_ts
-            and model.timestamp
-            and min_ts >= model.timestamp
-        ):
+        if self.expire_after and min_ts and model.timestamp and min_ts >= model.timestamp:
             return False
 
         for query in queries:
             if (
-                distinct
-                and not isinstance(query.value, list)
-                and model[query.key] in existing[query.key]
+                distinct and not isinstance(query.value, list) and model[query.key] in existing[query.key]
             ) or not self._match_query(model, query):
                 return False
 
@@ -322,7 +304,8 @@ class JSONCache(TogglCache[T]):
     @staticmethod
     def _match_equal(model: T, query: TogglQuery[Any]) -> bool:
         if isinstance(query.value, Sequence) and not isinstance(
-            query.value, str
+            query.value,
+            str,
         ):
             value = model[query.key]
 

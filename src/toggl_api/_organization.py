@@ -67,8 +67,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         *,
         refresh: bool = False,
     ) -> TogglOrganization | None:
-        """Creates a new organization with a single workspace and assigns
-        current user as the organization owner
+        """Create a new organization with a single workspace and assigns
+        current user as the organization owner.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#get-organization-data)
 
@@ -81,8 +81,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         Returns:
             Organization object that was retrieve or None if not found.
-        """
-
+        """  # noqa: D205
         if isinstance(organization, TogglOrganization):
             organization = organization.id
 
@@ -91,7 +90,8 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
 
         try:
             response = self.request(
-                f"organizations/{organization}", refresh=refresh
+                f"organizations/{organization}",
+                refresh=refresh,
             )
         except HTTPStatusError as err:
             if not self.re_raise and err.response.status_code in {
@@ -102,13 +102,16 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
                 return None
             raise
 
-        return cast(TogglOrganization, response)
+        return cast("TogglOrganization", response)
 
     def add(
-        self, name: str, workspace_name: str = "Default-Workspace"
+        self,
+        name: str,
+        workspace_name: str = "Default-Workspace",
     ) -> TogglOrganization:
-        """Creates a new organization with a single workspace and assigns
-        current user as the organization owner
+        """Create a new organization with a single workspace.
+
+        Assigns current user as the organization owner.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#post-creates-a-new-organization)
 
@@ -129,12 +132,11 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Returns:
             The newly created organization.
         """
-
         TogglOrganization.validate_name(name)
         TogglWorkspace.validate_name(workspace_name)
 
         return cast(
-            TogglOrganization,
+            "TogglOrganization",
             self.request(
                 "organizations",
                 body={"name": name, "workspace_name": workspace_name},
@@ -144,9 +146,11 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         )
 
     def edit(
-        self, organization: TogglOrganization | int, name: str
+        self,
+        organization: TogglOrganization | int,
+        name: str,
     ) -> TogglOrganization:
-        """Updates an existing organization.
+        """Update an existing organization.
 
         [Official Documentation](https://engineering.toggl.com/docs/api/organizations#put-updates-an-existing-organization)
 
@@ -161,7 +165,6 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Returns:
             The newly edited organization.
         """
-
         TogglOrganization.validate_name(name)
 
         if isinstance(organization, TogglOrganization):
@@ -196,13 +199,14 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
             A list of organization objects or empty if none found.
         """
         return cast(
-            list[TogglOrganization],
+            "list[TogglOrganization]",
             self.request("me/organizations", refresh=refresh),
         )
 
     def delete(self, organization: TogglOrganization | int) -> None:
-        """Leaves organization, effectively delete user account in org and
-        delete organization if it is last user.
+        """Leave organization effectively deleting user account in org.
+
+        Deletes organization if it is last user.
 
         Deletion might not be instant on the API end and might take a few
         seconds to propogate, so the object might appear in the 'get' or
@@ -216,9 +220,7 @@ class OrganizationEndpoint(TogglCachedEndpoint[TogglOrganization]):
         Raises:
             HTTPStatusError: If the response status_code is not '200' or '404'.
         """
-        org_id = (
-            organization if isinstance(organization, int) else organization.id
-        )
+        org_id = organization if isinstance(organization, int) else organization.id
         try:
             self.request(
                 f"organizations/{org_id}/users/leave",
