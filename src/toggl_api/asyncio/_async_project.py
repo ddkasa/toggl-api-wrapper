@@ -157,7 +157,7 @@ class AsyncProjectEndpoint(TogglAsyncCachedEndpoint[TogglProject]):
                         ColumnElement[bool],
                         TogglProject.timestamp >= cast(datetime, body.since),
                     )
-                )  # type: ignore[operator]
+                )
             if body.client_ids:
                 statement = statement.filter(
                     cast(

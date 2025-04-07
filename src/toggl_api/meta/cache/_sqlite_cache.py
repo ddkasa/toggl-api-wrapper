@@ -7,7 +7,9 @@ import atexit
 import warnings
 from datetime import datetime, timedelta, timezone
 from os import PathLike
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
+
+from sqlalchemy.sql.expression import ColumnElement
 
 try:
     import sqlalchemy as db
@@ -91,7 +93,9 @@ class SqliteCache(TogglCache[T]):
         query = self.session.query(self.model)
         if self.expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self.expire_after
-            query.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
+            query.filter(
+                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+            )
         return query
 
     def add(self, *entries: T) -> None:
@@ -122,7 +126,9 @@ class SqliteCache(TogglCache[T]):
         search = self.session.query(self.model)
         if self._expire_after is not None:
             min_ts = datetime.now(timezone.utc) - self._expire_after
-            search = search.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
+            search = search.filter(
+                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+            )
         return search.filter_by(**query).first()
 
     def query(self, *query: TogglQuery, distinct: bool = False) -> Query[T]:
@@ -144,14 +150,16 @@ class SqliteCache(TogglCache[T]):
         search = self.session.query(self.model)
         if isinstance(self.expire_after, timedelta):
             min_ts = datetime.now(timezone.utc) - self.expire_after
-            search = search.filter(self.model.timestamp > min_ts)  # type: ignore[arg-type]
+            search = search.filter(
+                cast(ColumnElement[bool], self.model.timestamp > min_ts)
+            )
 
         search = self._query_helper(list(query), search)
         if distinct:
             data = [q.key for q in query]
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", DeprecationWarning)
-                search = search.distinct(*data).group_by(*data)  # type: ignore[arg-type]
+                search = search.distinct(*data).group_by(*data)  # type: ignore[arg-type] # FIX: Remove and use selec tobject instead.
         return search
 
     def _query_helper(
@@ -163,7 +171,7 @@ class SqliteCache(TogglCache[T]):
         return query_obj
 
     def _match_query(self, query: TogglQuery, query_obj: Query[T]) -> Query[T]:
-        value = getattr(self.model, query.key)  # type: ignore[union-attr]
+        value = getattr(self.model, query.key)
         if query.comparison == Comparison.EQUAL:
             if isinstance(query.value, Sequence) and not isinstance(
                 query.value, str

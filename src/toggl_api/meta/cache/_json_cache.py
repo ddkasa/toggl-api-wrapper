@@ -196,7 +196,7 @@ class JSONCache(TogglCache, Generic[T]):
         if self.expire_after is None:
             return self.session.data
         min_ts = datetime.now(timezone.utc) - self.expire_after
-        return [m for m in self.session.data if m.timestamp >= min_ts]  # type: ignore[operator]
+        return [m for m in self.session.data if m.timestamp >= min_ts]
 
     def find(self, entry: T | dict[str, int], **kwargs: Any) -> T | None:
         self.session.refresh(self.cache_path)

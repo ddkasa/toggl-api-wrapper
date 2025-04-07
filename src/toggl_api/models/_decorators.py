@@ -29,18 +29,24 @@ class UTCDateTime(TypeDecorator):
     ) -> datetime | None:
         if value is not None:
             if not isinstance(value, datetime):
-                raise TypeError("Expected datetime.datetime, not " + repr(value))
+                raise TypeError(
+                    "Expected datetime.datetime, not " + repr(value)
+                )
             if value.tzinfo is None:
                 msg = "Naive datetime is disallowed!"
                 raise ValueError(msg)
             return value.astimezone(timezone.utc)
         return None
 
-    def process_result_value(  # type: ignore[override]
+    def process_result_value(
         self,
         value: datetime | None,
         _,
     ) -> datetime | None:
         if value is not None:
-            value = value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+            value = (
+                value.replace(tzinfo=timezone.utc)
+                if value.tzinfo is None
+                else value.astimezone(timezone.utc)
+            )
         return value

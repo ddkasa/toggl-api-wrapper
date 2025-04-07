@@ -102,7 +102,7 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
         except RuntimeError:
             self.metadata = asyncio.run(async_register_tables(engine))
 
-    async def load(self) -> list[T]:  # type: ignore[override]
+    async def load(self) -> list[T]:
         """Loads data from the database, discarding items if they are past expiration.
 
         Rather crude load method as it will load all items into memory.

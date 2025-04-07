@@ -1258,6 +1258,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/7c/5fc8e802e7506fe8b55a03a2e1dab156eae205c91bee46305755e086d2e2/sqlalchemy-2.0.40-py3-none-any.whl", hash = "sha256:32587e2e1e359276957e6fe5dad089758bc042a971a8a09ae8ecf7a8fe23d07a", size = 1903894 },
 ]
 
+[package.optional-dependencies]
+mypy = [
+    { name = "mypy" },
+]
+
 [[package]]
 name = "super-collections"
 version = "0.5.3"
@@ -1339,7 +1344,7 @@ test = [
 ]
 type = [
     { name = "mypy" },
-    { name = "types-sqlalchemy" },
+    { name = "sqlalchemy", extra = ["mypy"] },
 ]
 
 [package.metadata]
@@ -1349,7 +1354,7 @@ requires-dist = [
     { name = "sqlalchemy", marker = "extra == 'async'", specifier = ">=2.0.37" },
     { name = "sqlalchemy", marker = "extra == 'sqlite'", specifier = ">=2.0.37" },
 ]
-provides-extras = ["async", "sqlite"]
+provides-extras = ["sqlite", "async"]
 
 [package.metadata.requires-dev]
 docs = [
@@ -1394,7 +1399,7 @@ test = [
 ]
 type = [
     { name = "mypy", specifier = ">=1.15.0" },
-    { name = "types-sqlalchemy", specifier = ">=1.4.53.38" },
+    { name = "sqlalchemy", extras = ["mypy"], specifier = ">=2.0.37" },
 ]
 
 [[package]]
@@ -1468,15 +1473,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6d/79/825b2551498a8a339699b87da52ee23fc80cae3f89a5cf7d48b46325fbb3/tox_gh_actions-3.3.0.tar.gz", hash = "sha256:6933775dd7ab98649de5134283277e604fecfd4eb44bf31150c1c6ba2b1092ef", size = 19205 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/c7/1cf26c90539746a2bdb8217f13c29e15e33a525f13595b690150bceb5bef/tox_gh_actions-3.3.0-py2.py3-none-any.whl", hash = "sha256:0e1f9db7a775d04b6d94ab801c60d2d482929a934136262969791eb0ccac65a4", size = 9948 },
-]
-
-[[package]]
-name = "types-sqlalchemy"
-version = "1.4.53.38"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ab/ce/0b7fa93dbc49b328807dedef8006223129e5a9543c74727dd7658eca5a9d/types-SQLAlchemy-1.4.53.38.tar.gz", hash = "sha256:5bb7463537e04e1aa5a3557eb725930df99226dcfd3c9bf93008025bfe5c169e", size = 118888 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/4f/033a839a35ecbc5f71c0d74655d1237e909651aaebe7ceb825ac45cfdb4b/types_SQLAlchemy-1.4.53.38-py3-none-any.whl", hash = "sha256:7e60e74f823931cc9a9e8adb0a4c05e5533e6708b8a266807893a739faf4eaaa", size = 187916 },
 ]
 
 [[package]]

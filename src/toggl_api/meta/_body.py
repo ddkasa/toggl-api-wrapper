@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from collections.abc import Iterator, Mapping
-from dataclasses import MISSING, Field, dataclass
-from typing import Any, cast
+from dataclasses import MISSING, dataclass
+from typing import Any
 
 
 @dataclass
@@ -24,7 +24,7 @@ class BaseBody(Mapping):
         yield from self.format("")
 
     def __delitem__(self, key: str, /) -> None:
-        field = cast(Field, self.__dataclass_fields__[key])
+        field = self.__dataclass_fields__[key]
         if field.default is not MISSING:
             setattr(self, key, field.default)
         elif field.default_factory is not MISSING:
