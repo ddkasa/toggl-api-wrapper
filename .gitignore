@@ -1,11 +1,18 @@
 # Environments
 .venv
 .envrc
-.cache
 files
 .tox
+
+# Coverage
 .coverage
 *,cover
 coverage.xml
+.coverage**
+
 logs
+
+# Cache
+.cache
 cache/cache.sqlite
+__pycache__/
