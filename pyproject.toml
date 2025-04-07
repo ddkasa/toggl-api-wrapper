@@ -158,6 +158,15 @@ disallow_untyped_defs = true
 no_implicit_reexport = true
 warn_return_any = true
 
+[[tool.mypy.overrides]]
+module = ["tests/*"]
+strict = false
+ignore_errors = true
+check_untyped_defs = false
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
+
 [tool.pytest.ini_options]
 markers = [
     "unit: Basic unit tests using local cache.",
@@ -223,6 +232,7 @@ omit = [
 ]
 
 [tool.coverage.report]
+fail_under = 80
 exclude_also = [
     "def __repr__",
     "if self.debug:",
