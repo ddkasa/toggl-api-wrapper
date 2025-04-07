@@ -103,4 +103,10 @@ class UserEndpoint(TogglEndpoint[Any]):
         Returns:
             User details in a raw dictionary.
         """
-        return cast(Response, self.request("me", raw=True)).json()
+        return cast(
+            dict[str, Any],
+            cast(
+                Response,
+                self.request("me", raw=True),
+            ).json(),
+        )

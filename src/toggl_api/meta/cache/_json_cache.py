@@ -9,7 +9,7 @@ from collections.abc import Hashable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from os import PathLike
-from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api._utility import parse_iso
 from toggl_api._version import version
@@ -118,7 +118,7 @@ class JSONSession(Generic[T]):
 
     def _load(self, path: Path) -> dict[str, Any]:
         with path.open("r", encoding="utf-8") as f:
-            return json.load(f, cls=CustomDecoder)
+            return cast(dict[str, Any], json.load(f, cls=CustomDecoder))
 
     def load(self, path: Path) -> None:
         if path.exists():
@@ -331,20 +331,20 @@ class JSONCache(TogglCache[T]):
 
             return any(value == comp for comp in query.value)
 
-        return model[query.key] == query.value
+        return bool(model[query.key] == query.value)
 
     @staticmethod
     def _match_query(model: T, query: TogglQuery[Any]) -> bool:
         if query.comparison == Comparison.EQUAL:
             return JSONCache._match_equal(model, query)
         if query.comparison == Comparison.LESS_THEN:
-            return model[query.key] < query.value
+            return bool(model[query.key] < query.value)
         if query.comparison == Comparison.LESS_THEN_OR_EQUAL:
-            return model[query.key] <= query.value
+            return bool(model[query.key] <= query.value)
         if query.comparison == Comparison.GREATER_THEN:
-            return model[query.key] > query.value
+            return bool(model[query.key] > query.value)
         if query.comparison == Comparison.GREATER_THEN_OR_EQUAL:
-            return model[query.key] >= query.value
+            return bool(model[query.key] >= query.value)
         msg = f"{query.comparison} is not implemented!"
         raise NotImplementedError(msg)
 

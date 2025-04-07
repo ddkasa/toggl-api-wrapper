@@ -62,4 +62,5 @@ class AsyncUserEndpoint(TogglAsyncEndpoint[Any]):
             User details in a dictionary.
         """
         request = await self.request("me", raw=True)
-        return cast(Response, request).json()
+        # TODO: Create a user details type dict.
+        return cast(dict[str, Any], cast(Response, request).json())

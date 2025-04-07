@@ -262,7 +262,7 @@ class AsyncWorkspaceEndpoint(TogglAsyncCachedEndpoint[TogglWorkspace]):
             raw=True,
             refresh=True,
         )
-        return cast(Response, response).json()
+        return cast(dict[str, bool], cast(Response, response).json())
 
     async def statistics(
         self, workspace_id: TogglWorkspace | int
@@ -286,4 +286,4 @@ class AsyncWorkspaceEndpoint(TogglAsyncCachedEndpoint[TogglWorkspace]):
             f"workspaces/{workspace_id}/statistics", refresh=True, raw=True
         )
 
-        return cast(Response, response).json()
+        return cast(WorkspaceStatistics, cast(Response, response).json())

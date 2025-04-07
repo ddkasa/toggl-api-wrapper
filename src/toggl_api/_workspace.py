@@ -407,13 +407,16 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id = workspace_id.id
 
         return cast(
-            Response,
-            self.request(
-                f"workspaces/{workspace_id}/time_entry_constraints",
-                raw=True,
-                refresh=True,
-            ),
-        ).json()
+            dict[str, bool],
+            cast(
+                Response,
+                self.request(
+                    f"workspaces/{workspace_id}/time_entry_constraints",
+                    raw=True,
+                    refresh=True,
+                ),
+            ).json(),
+        )
 
     def statistics(
         self, workspace_id: TogglWorkspace | int
@@ -434,8 +437,13 @@ class WorkspaceEndpoint(TogglCachedEndpoint[TogglWorkspace]):
             workspace_id = workspace_id.id
 
         return cast(
-            Response,
-            self.request(
-                f"workspaces/{workspace_id}/statistics", refresh=True, raw=True
-            ),
-        ).json()
+            WorkspaceStatistics,
+            cast(
+                Response,
+                self.request(
+                    f"workspaces/{workspace_id}/statistics",
+                    refresh=True,
+                    raw=True,
+                ),
+            ).json(),
+        )

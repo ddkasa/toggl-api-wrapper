@@ -94,7 +94,7 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
 
     async def _find_running(self) -> ScalarResult[TogglTracker]:
         stmt = select(TogglTracker).filter(
-            cast(ColumnElement[bool], TogglTracker.stop == None)
+            cast(ColumnElement[bool], TogglTracker.stop is None)
         )  # noqa: E711
 
         cache = cast(AsyncSqliteCache[TogglTracker], self.cache)
@@ -359,7 +359,7 @@ class AsyncTrackerEndpoint(TogglAsyncCachedEndpoint[TogglTracker]):
             method=RequestMethod.PATCH,
             raw=True,
         )
-        return cast(Response, response).json()
+        return cast(dict[str, list[int]], cast(Response, response).json())
 
     async def bulk_edit(
         self,
