@@ -31,3 +31,8 @@ repos:
     rev: v0.5.1
     hooks:
       - id: action-validator
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.5.29
+    hooks:
+      - id: uv-lock
