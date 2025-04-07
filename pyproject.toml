@@ -135,6 +135,9 @@ ignore = [
 
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "ANN", "E501", "DOC", "D"]
+"noxfile.py" = ["S101", "ANN", "E501"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -174,7 +177,7 @@ markers = [
     "slow: Tests that are slow to run or have delays included.",
 ]
 testpaths = ["tests"]
-addopts = "--report-log=logs/pytest.jsonl --cov --cov-append  --cov-report xml"
+addopts = "--report-log=logs/pytest.jsonl"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
@@ -219,6 +222,7 @@ commands = ruff check toggl_api
 """
 
 [tool.coverage.run]
+source = ["src/toggl_api", "tests/"]
 omit = [
     "*/.venv/*",
     "*/.mypy_cache/*",
