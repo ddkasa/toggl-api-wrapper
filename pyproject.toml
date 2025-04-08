@@ -136,7 +136,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "ANN", "E501", "DOC", "D"]
+"tests/**" = ["S101", "ANN", "E501", "DOC", "D", "ARG"]
 "noxfile.py" = ["S101", "ANN", "E501"]
 
 [tool.ruff.lint.pydocstyle]
