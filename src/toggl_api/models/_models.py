@@ -200,7 +200,7 @@ class WorkspaceChild(TogglClass):
         super().__post_init__()
 
     @classmethod
-    def from_kwargs(cls, **kwargs: Any) -> WorkspaceChild:
+    def from_kwargs(cls, **kwargs: Any) -> Self:
         """Convert an arbitrary amount of kwargs to workspace object.
 
         Args:
@@ -243,7 +243,7 @@ class TogglClient(WorkspaceChild):
         Returns:
             An initialized `TogglClient` object.
         """
-        return cls.from_kwargs(**kwargs)
+        return super().from_kwargs(**kwargs)
 
 
 @dataclass
@@ -469,4 +469,4 @@ class TogglTag(WorkspaceChild):
         Returns:
             An initialized `TogglTag` object.
         """
-        return cls.from_kwargs(**kwargs)
+        return super().from_kwargs(**kwargs)
