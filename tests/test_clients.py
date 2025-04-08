@@ -64,16 +64,16 @@ def test_client_collect(body, client_object, get_workspace_id, create_client):
 
 @pytest.mark.integration
 @pytest.mark.order(after="test_client_collect")
-def test_client_get(client_object, get_workspace_id, create_client):
+def test_client_get(client_object, create_client):
+    client = client_object.get(create_client, refresh=True)
+    assert isinstance(client, TogglClient)
+    assert client.id == create_client.id
+
     client = client_object.get(create_client)
     assert isinstance(client, TogglClient)
     assert client.id == create_client.id
 
     client = client_object.get(create_client.id)
-    assert isinstance(client, TogglClient)
-    assert client.id == create_client.id
-
-    client = client_object.get(create_client, refresh=True)
     assert isinstance(client, TogglClient)
     assert client.id == create_client.id
 
@@ -93,7 +93,7 @@ def test_client_get(client_object, get_workspace_id, create_client):
         200,
     ],
 )
-def test_client_get_errors(error, httpx_mock, client_object, number):
+def test_client_get_errors(error, client_object, httpx_mock, number):
     httpx_mock.add_response(status_code=error)
     assert client_object.get(number.randint(100, sys.maxsize), refresh=True) is None
 
@@ -131,6 +131,6 @@ def test_client_delete_id(client_object, get_workspace_id, create_client):
 
 @pytest.mark.unit
 def test_client_delete_error(httpx_mock, client_object, number):
-    httpx_mock.add_response(status_code=500)
+    httpx_mock.add_response(status_code=450, method="DELETE")
     with pytest.raises(HTTPStatusError):
         client_object.delete(number.randint(100, sys.maxsize))

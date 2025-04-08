@@ -156,7 +156,8 @@ def test_current_tracker(tracker_object, add_tracker):
 
 
 @pytest.mark.integration
-def test_current_tracker_cached(add_tracker, tracker_object):
+def test_current_tracker_cached(tracker_object, add_tracker):
+    tracker_object.current(refresh=True)
     current = tracker_object.current(refresh=False)
     assert current.id == add_tracker.id
     assert current.name == add_tracker.name
@@ -191,13 +192,13 @@ def test_current_tracker_re_raise(tracker_object, httpx_mock, monkeypatch):
 
 @pytest.mark.integration
 def test_tracker_get(tracker_object, add_tracker):
-    t = tracker_object.get(add_tracker.id)
+    t = tracker_object.get(add_tracker.id, refresh=True)
     assert isinstance(t, TogglTracker)
     assert t.name == add_tracker.name
     assert t.id == add_tracker.id
     assert t.start == add_tracker.start
 
-    t = tracker_object.get(add_tracker.id, refresh=True)
+    t = tracker_object.get(add_tracker.id)
     assert isinstance(t, TogglTracker)
     assert t.name == add_tracker.name
     assert t.id == add_tracker.id

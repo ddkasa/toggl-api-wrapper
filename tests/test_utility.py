@@ -12,11 +12,11 @@ from toggl_api._utility import _requires, format_iso, get_workspace, parse_iso  
 @pytest.mark.unit
 def test_version():
     with (Path.cwd() / "pyproject.toml").open("rb") as pyproject:
-        pyversion = tomli.load(pyproject)["tool"]["poetry"]["version"]
+        pyversion = tomli.load(pyproject)["project"]["version"]
 
     assert __version__ == pyversion
 
-    git_tag = subprocess.run(  # noqa: S603
+    git_tag = subprocess.run(
         ["git", "describe", "--abbrev=0", "--tags"],  # noqa: S607
         stdout=subprocess.PIPE,
         check=True,
@@ -80,7 +80,7 @@ def test_get_workspace(data, result):
         "httpx",
     ],
 )
-def test_requires_decorator(module, monkeypatch):
+def test_requires_decorator(module):
     @_requires(module)
     def test(a):
         return a

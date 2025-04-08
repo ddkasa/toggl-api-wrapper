@@ -23,7 +23,7 @@ async def test_workspace_ep_method_flow(aworkspace_ep: AsyncWorkspaceEndpoint, f
     with pytest.raises(HTTPStatusError):
         await aworkspace_ep.add(body)
 
-    assert cast(TogglWorkspace, await aworkspace_ep.get(get_workspace_id, refresh=True)).id == get_workspace_id
+    assert cast("TogglWorkspace", await aworkspace_ep.get(get_workspace_id, refresh=True)).id == get_workspace_id
 
 
 @pytest.mark.unit

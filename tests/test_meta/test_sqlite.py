@@ -9,8 +9,9 @@ import pytest
 import sqlalchemy
 from sqlalchemy.orm import Query, Session
 
+from toggl_api import MissingParentError
 from toggl_api.meta import RequestMethod
-from toggl_api.meta.cache import Comparison, MissingParentError, SqliteCache, TogglQuery
+from toggl_api.meta.cache import Comparison, SqliteCache, TogglQuery
 from toggl_api.models import TogglTag, TogglTracker, TogglWorkspace, register_tables
 from toggl_api.models._decorators import UTCDateTime  # noqa: PLC2701
 

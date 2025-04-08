@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import EndPointTest
-from toggl_api import TogglTag, TogglTracker, TrackerEndpoint
+from toggl_api import MissingParentError, TogglTag, TogglTracker, TrackerEndpoint
 from toggl_api.meta import RequestMethod
 from toggl_api.meta.cache import (
     Comparison,
@@ -18,7 +18,6 @@ from toggl_api.meta.cache import (
     CustomEncoder,
     JSONCache,
     JSONSession,
-    MissingParentError,
     TogglQuery,
 )
 
@@ -92,7 +91,7 @@ def test_cache_path(meta_object):
 
 
 @pytest.mark.unit
-def test_cache_parent(config_setup, get_sqlite_cache, get_workspace_id):
+def test_cache_parent(config_setup, get_sqlite_cache):
     assert get_sqlite_cache._parent is None  # noqa: SLF001
     endpoint = EndPointTest(config_setup, get_sqlite_cache)
     assert endpoint.cache.parent == endpoint
@@ -185,7 +184,7 @@ def test_query(model_data, tracker_object, faker):
 
 
 @pytest.mark.unit
-def test_query_distinct(model_data, tracker_object, faker):
+def test_query_distinct(model_data, tracker_object):
     t = model_data.pop("tracker")
     t.id = 1
 
@@ -292,7 +291,7 @@ def test_cache_sync(
         Comparison.EQUAL,
     ],
 )
-def test_match_query_helper(tracker_object, comparison, tmp_path, faker, number):
+def test_match_query_helper(tracker_object, comparison, faker, number):
     cache = tracker_object.cache
     params = TogglQuery("start", datetime.now(tz=timezone.utc), comparison)
 

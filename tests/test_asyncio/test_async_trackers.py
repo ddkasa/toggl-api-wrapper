@@ -27,7 +27,7 @@ async def test_tracker_ep_method_flow(gen_tracker_bd, atracker_ep: AsyncTrackerE
     assert get.start == tracker.start
 
     # Test Current
-    assert cast(TogglTracker, await atracker_ep.current(refresh=True)).id == tracker.id
+    assert cast("TogglTracker", await atracker_ep.current(refresh=True)).id == tracker.id
 
     # Test Edit
     bd.description = faker.name()
@@ -36,7 +36,7 @@ async def test_tracker_ep_method_flow(gen_tracker_bd, atracker_ep: AsyncTrackerE
     assert found.name == bd.description
 
     # Test Stop
-    assert cast(TogglTracker, await atracker_ep.stop(tracker)).id == tracker.id
+    assert cast("TogglTracker", await atracker_ep.stop(tracker)).id == tracker.id
 
     # Test Delete
     await atracker_ep.delete(tracker.id)
@@ -46,7 +46,7 @@ async def test_tracker_ep_method_flow(gen_tracker_bd, atracker_ep: AsyncTrackerE
 @pytest.mark.unit
 async def test_get_method(atracker_ep: AsyncTrackerEndpoint, generate_tracker):
     cache = [generate_tracker() for _ in range(5)]
-    await cast(AsyncSqliteCache, atracker_ep.cache).add(*cache)
+    await cast("AsyncSqliteCache", atracker_ep.cache).add(*cache)
 
     assert await atracker_ep.get(cache[0].id) is not None
 
@@ -67,7 +67,7 @@ async def test_collect_params(atracker_ep: AsyncTrackerEndpoint, generate_tracke
 
     # Add dummy trackers to cache.
     cache = [generate_tracker() for _ in range(5)]
-    await cast(AsyncSqliteCache, atracker_ep.cache).add(*cache)
+    await cast("AsyncSqliteCache", atracker_ep.cache).add(*cache)
 
     # Test for filtering
     assert len(await atracker_ep.collect(start_date=start - timedelta(days=3), end_date=start - timedelta(days=2))) == 0
@@ -84,7 +84,7 @@ async def test_bulk_edit(atracker_ep: AsyncTrackerEndpoint, gen_tracker_bd):
 
     assert tracker.id in (await atracker_ep.bulk_edit(tracker, body=new_bd)).successes
 
-    assert cast(TogglTracker, await atracker_ep.get(tracker, refresh=True)).name == new_bd.description
+    assert cast("TogglTracker", await atracker_ep.get(tracker, refresh=True)).name == new_bd.description
 
 
 @pytest.mark.integration
