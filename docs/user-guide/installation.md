@@ -26,3 +26,4 @@ pip install "toggl-api-wrapper[async]"
 
 - [SQLAlchemy](https://www.sqlalchemy.org) - _For Sqlite cache_
 - [Greenlet](https://github.com/python-greenlet/greenlet) - _For Async functionality_
+- [AIOSQLite](https://github.com/omnilib/aiosqlite) - _For Async SQLite cache_
