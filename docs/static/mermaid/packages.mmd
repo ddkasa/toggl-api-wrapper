@@ -91,7 +91,6 @@ classDiagram
   _client --> models
   _organization --> meta
   _organization --> meta
-  _organization --> cache
   _organization --> models
   _project --> _exceptions
   _project --> _utility
@@ -129,7 +128,6 @@ classDiagram
   _async_cache --> models
   _async_client --> toggl_api
   _async_client --> _async_endpoint
-  _async_client --> _async_sqlite_cache
   _async_client --> meta
   _async_endpoint --> _exceptions
   _async_endpoint --> meta
@@ -140,7 +138,6 @@ classDiagram
   _async_project --> toggl_api
   _async_project --> _exceptions
   _async_project --> _async_endpoint
-  _async_project --> _async_sqlite_cache
   _async_project --> meta
   _async_reports --> toggl_api
   _async_reports --> _utility
@@ -151,21 +148,19 @@ classDiagram
   _async_sqlite_cache --> models
   _async_sqlite_cache --> _schema
   _async_tag --> toggl_api
+  _async_tag --> _exceptions
   _async_tag --> _async_endpoint
   _async_tag --> meta
-  _async_tag --> _cached_endpoint
   _async_tracker --> toggl_api
   _async_tracker --> _exceptions
   _async_tracker --> _tracker
   _async_tracker --> _utility
   _async_tracker --> _async_endpoint
-  _async_tracker --> _async_sqlite_cache
   _async_tracker --> meta
   _async_user --> _async_endpoint
   _async_workspace --> toggl_api
   _async_workspace --> _utility
   _async_workspace --> _async_endpoint
-  _async_workspace --> _async_sqlite_cache
   _async_workspace --> meta
   meta --> _base_endpoint
   meta --> _body
@@ -185,7 +180,6 @@ classDiagram
   _base_cache --> models
   _json_cache --> _utility
   _json_cache --> _version
-  _json_cache --> meta
   _json_cache --> _base_cache
   _json_cache --> models
   _sqlite_cache --> _utility
@@ -199,18 +193,26 @@ classDiagram
   _schema --> _utility
   _schema --> _decorators
   _schema --> _models
+  reports --> _exceptions
   reports --> _utility
   reports --> meta
   reports --> models
   _client ..> cache
+  _organization ..> cache
   _tracker ..> toggl_api
   _tracker ..> cache
+  _workspace ..> toggl_api
   _async_cache ..> _async_endpoint
+  _async_client ..> _async_sqlite_cache
   _async_endpoint ..> _async_sqlite_cache
   _async_organization ..> _async_sqlite_cache
   _async_project ..> _project
+  _async_project ..> _async_sqlite_cache
   _async_sqlite_cache ..> _async_endpoint
   _async_tag ..> _async_sqlite_cache
+  _async_tracker ..> _async_sqlite_cache
+  _async_workspace ..> _async_sqlite_cache
   _cached_endpoint ..> _base_cache
   _base_cache ..> meta
+  _json_cache ..> meta
   _sqlite_cache ..> meta

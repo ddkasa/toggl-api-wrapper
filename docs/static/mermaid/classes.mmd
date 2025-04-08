@@ -11,8 +11,8 @@ classDiagram
   }
   class AsyncDetailedReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions | None) PaginatedResult[bytes]
-    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list]
+    export_report(body: ReportBody, extension: ReportFormats, pagination: PaginationOptions | None) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list[dict[str, Any]]]
     totals_report(body: ReportBody) dict[str, int]
   }
   class AsyncOrganizationEndpoint {
@@ -35,19 +35,18 @@ classDiagram
     get(project_id: int | TogglProject) TogglProject | None
     get_color(name: str) str
     get_color_id(color: str) int
-    status_to_query(status: TogglProject.Status, statement: Select) Select
+    status_to_query(status: TogglProject.Status, statement: Select[Any]) Select[Any]
   }
   class AsyncReportEndpoint {
     BASE_ENDPOINT : ClassVar[URL]
     workspace_id
-    export_report(body: ReportBody)*
-    search_time_entries(body: ReportBody)*
+    export_report(body: ReportBody)* Any
+    search_time_entries(body: ReportBody)* Any
   }
   class AsyncSqliteCache {
     cache_path
     database
     metadata
-    session
     add() None
     delete() None
     find(pk: int) T | None
@@ -56,7 +55,7 @@ classDiagram
   }
   class AsyncSummaryReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    export_report(body: ReportBody, extension: ReportFormats) bytes
     project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
     project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) dict[str, int]
     search_time_entries(body: ReportBody) list[dict[str, int]]
@@ -91,7 +90,7 @@ classDiagram
   }
   class AsyncWeeklyReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    export_report(body: ReportBody, extension: ReportFormats) bytes
     search_time_entries(body: ReportBody) list[dict[str, Any]]
   }
   class AsyncWorkspaceEndpoint {
@@ -113,6 +112,8 @@ classDiagram
     op : Literal['add', 'remove', 'replace']
     path : str
     value : Any
+  }
+  class CacheCallable {
   }
   class ClientBody {
     name : str | None
@@ -144,8 +145,8 @@ classDiagram
   }
   class DetailedReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS, pagination: PaginationOptions | None) PaginatedResult[bytes]
-    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list]
+    export_report(body: ReportBody, extension: ReportFormats, pagination: PaginationOptions | None) PaginatedResult[bytes]
+    search_time_entries(body: ReportBody, pagination: PaginationOptions | None) PaginatedResult[list[dict[str, Any]]]
     totals_report(body: ReportBody) dict[str, int]
   }
   class Edits {
@@ -231,7 +232,7 @@ classDiagram
     get(project_id: int | TogglProject) TogglProject | None
     get_color(name: str) str
     get_color_id(color: str) int
-    status_to_query(status: TogglProject.Status) list[TogglQuery]
+    status_to_query(status: TogglProject.Status) list[TogglQuery[Any]]
   }
   class ReportBody {
     client_ids : list[int | None]
@@ -262,8 +263,8 @@ classDiagram
   class ReportEndpoint {
     BASE_ENDPOINT : ClassVar[str]
     workspace_id
-    export_report(body: ReportBody)*
-    search_time_entries(body: ReportBody)*
+    export_report(body: ReportBody)* Any
+    search_time_entries(body: ReportBody)* Any
   }
   class RequestMethod {
     name
@@ -286,7 +287,7 @@ classDiagram
   }
   class SummaryReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    export_report(body: ReportBody, extension: ReportFormats) bytes
     project_summaries(start_date: date | str, end_date: date | str) list[dict[str, int]]
     project_summary(project: TogglProject | int, start_date: date | str, end_date: date | str) dict[str, int]
     search_time_entries(body: ReportBody) list[dict[str, int]]
@@ -317,19 +318,19 @@ classDiagram
   class TogglAsyncCachedEndpoint {
     cache
     load_cache() Iterable[T]
-    request(parameters: str, headers: dict[str, Any] | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+    request(parameters: str, headers: Headers | None, body: dict[str, Any] | list[Any] | None, method: RequestMethod) T | list[T] | Response | None
     save_cache(response: list[T] | T, method: RequestMethod) None
   }
   class TogglAsyncEndpoint {
     BASE_ENDPOINT : ClassVar[URL]
-    HEADERS : Final[dict]
+    HEADERS : Final[Headers]
     MODEL : type[T] | None
     client
     re_raise : bool
     retries
     api_status() bool
     process_models(data: list[dict[str, Any]]) list[T]
-    request(parameters: str, headers: dict | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+    request(parameters: str, headers: Headers | None, body: dict[str, Any] | list[dict[str, Any]] | None, method: RequestMethod) T | list[T] | Response | None
   }
   class TogglCache {
     cache_path
@@ -340,41 +341,41 @@ classDiagram
     commit()* None
     delete()* None
     find(entry: TC | dict[str, Any])* TC | None
-    find_method(method: RequestMethod) Callable | None
+    find_method(method: RequestMethod) CacheCallable[TC]
     load()* Iterable[TC]
     query()* Iterable[TC]
-    save(entry: list[TC] | TC, method: RequestMethod) None
+    save(entry: Iterable[TC] | TC, method: RequestMethod) None
     update()* None
   }
   class TogglCachedEndpoint {
     cache
     load_cache() Iterable[T]
     query() list[T]
-    request(parameters: str, headers: dict[str, Any] | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+    request(parameters: str, headers: Headers | None, body: dict[str, Any] | list[Any] | None, method: RequestMethod) T | list[T] | Response | None
     save_cache(response: list[T] | T, method: RequestMethod) None
   }
   class TogglClass {
     id : int
     name : str
     timestamp : datetime
-    from_kwargs()* TogglClass
+    from_kwargs()* Self
   }
   class TogglClient {
     from_kwargs() TogglClient
   }
   class TogglEndpoint {
     BASE_ENDPOINT : ClassVar[str]
-    HEADERS : Final[dict]
+    HEADERS : Final[Headers]
     MODEL : type[T] | None
     client
     re_raise : bool
     retries
     api_status() bool
     process_models(data: list[dict[str, Any]]) list[T]
-    request(parameters: str, headers: dict | None, body: dict | list | None, method: RequestMethod) T | list[T] | Response | None
+    request(parameters: str, headers: Headers | None, body: dict[str, Any] | list[dict[str, Any]] | None, method: RequestMethod) T | list[T] | Response | None
   }
   class TogglOrganization {
-    from_kwargs() TogglOrganization
+    from_kwargs() Self
     validate_name(name: str) None
   }
   class TogglProject {
@@ -401,14 +402,14 @@ classDiagram
     start : datetime
     stop : datetime | str | None
     tags : list[TogglTag]
-    from_kwargs() TogglTracker
+    from_kwargs() Self
     get_tags() list[TogglTag]
     running() bool
   }
   class TogglWorkspace {
     name : str
     organization : int
-    from_kwargs() TogglWorkspace
+    from_kwargs() Self
     validate_name(name: str) None
   }
   class TrackerBody {
@@ -442,8 +443,8 @@ classDiagram
   class UTCDateTime {
     cache_ok : bool
     impl
-    process_bind_param(value: datetime, _) datetime | None
-    process_result_value(value: datetime | None, _) datetime | None
+    process_bind_param(value: datetime | None, _dialect: Dialect) datetime | None
+    process_result_value(value: datetime | None, _dialect: Dialect) datetime | None
   }
   class User {
     name : str
@@ -455,7 +456,7 @@ classDiagram
   }
   class WeeklyReportEndpoint {
     endpoint
-    export_report(body: ReportBody, extension: REPORT_FORMATS) bytes
+    export_report(body: ReportBody, extension: ReportFormats) bytes
     search_time_entries(body: ReportBody) list[dict[str, Any]]
   }
   class WorkspaceBody {
@@ -476,7 +477,7 @@ classDiagram
   }
   class WorkspaceChild {
     workspace : int
-    from_kwargs() WorkspaceChild
+    from_kwargs() Self
   }
   class WorkspaceEndpoint {
     MODEL
