@@ -156,7 +156,9 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
             self.database,
             expire_on_commit=False,
         ) as session:
-            await asyncio.gather(*(session.delete(e) for e in entries))
+            for entry in entries:
+                if new := await session.get(self.model, entry.id):
+                    await session.delete(new)
             await session.commit()
 
     async def find(self, pk: int) -> T | None:
