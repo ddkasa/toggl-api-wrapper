@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 __title__ = "toggl-api-wrapper"
-__version__ = "1.6.0"
+__version__ = "2.0.0"
 __description__ = "Simple Toggl API wrapper for non-premium features."
 __author__ = "David Kasakaitis"
 __author_email__ = "davidkasakaitis@proton.me"

@@ -7,6 +7,158 @@ hide:
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-04-08
+
+### 🚀 Features
+
+- *(cached-endpoint)* Allow for no cache to be assigned
+- *(reports)* Abstract report methods
+- *(config)* Add workspace missing error exception
+- *(sqlite_cache)* Allow for an external engine param
+- *(cache)* Allow for pathlike & strings objects to be passed in
+- *(reports)* Custom invalid extension error
+- *(sqlite_cache)* Allow for an external engine param
+- *(cache)* Allow for pathlike & strings objects to be passed in
+- *(reports)* Custom invalid extension error
+- *(async)* Implement abstract endpoints
+- *(async)* Implement abstract cache
+- *(async)* Implement sqlite cache
+- *(async-tracker)* Implement async tracker endpoint
+- *(async-project)* Implement async project endpoint
+- *(async-client)* Implement async client endpoint
+- *(async-org)* Implement async org endpoint
+- *(async-tag)* Implement async tag endpoint
+- *(async-workspace)* Implement async workspace endpoint
+- *(async-user)* Implement async user endpoint
+- *(async-reports)* Implement async report endpoints
+- *(endpoints)* Implement custom client parameter
+
+### 🐛 Bug Fixes
+
+- *(scripts)* Include scripts directory in pyproject
+- *(tracker)* Body not converting timedeltas correctly
+- *(endpoints)* Remove wrong types
+- Small endpoint & cache changes
+- *(scripts)* Remove cache from utility script
+- Implement basic import fixes
+- *(typing)* Deal with extra mypy warnings
+- *(typing)* Add generic and extra typing checks
+- *(typing)* Add callable typing
+- *(typing)* Remove all implicity re-exports
+- *(async-sqlite-cache)* Make sure entry exists before deleting
+- *(models)* Revert `TogglClass.from_kwargs` changes
+
+### 🚜 Refactor
+
+- *(cache)* [**breaking**] Simplify abstract cache methods
+- *(endpoints)* Use new caching methods
+- *(body)* [**breaking**] Replace ValueError with KeyError
+- *(body)* [**breaking**] Convert BaseBody class into mapping
+- *(body)* [**breaking**] Make verify_endpoint_parameter method private
+- *(user)* [**breaking**] Remove deprecated check_authentication method
+- *(base_endpoint)* [**breaking**] Remove 'workspace_id' parameter
+- *(base_endpoint)* [**breaking**] Remove 'model' property
+- *(base_endpoint)* [**breaking**] Remove 'endpoint' property
+- *(base_endpoint)* [**breaking**] Remove 'method' helper method
+- *(tracker_endpoint)* [**breaking**] Remove typeerror from add method
+- *(tracker)* [**breaking**] Move 'current' method to tracker endpoint
+- *(tracker)* [**breaking**] Move 'collect' method to tracker endpoint
+- *(user)* User actual object for 'get_details' method
+- *(tracker)* [**breaking**] Move 'get' method to tracker endpoint
+- *(user)* [**breaking**] Remove tracker related info and attributes
+- *(endpoints)* Use endpoint property within method
+- *(workspaces)* [**breaking**] Remove deprecated workspace id param
+- *(reports)* [**breaking**] Remove deprecated methods
+- *(trackers)* [**breaking**] Remove start_date parameter from body
+- *(tags)* [**breaking**] Remove deprecated optional type from 'edit' endpoint method
+- *(config)* [**breaking**] Remove deprecated authentication error
+- *(config)* [**breaking**] Togglrc helper function using workspace missing error
+- *(base_cache)* [**breaking**] Remove deprecated value error from missing parent error exception
+- *(reports)* Use invalid extension error for extension exceptions
+- *(reports)* Use invalid extension error for extension exceptions
+- *(reports)* [**breaking**] Move reports module into main folder
+- [**breaking**] Make most modules private
+- [**breaking**] Adjust imports to new directory structure
+- *(scripts)* Remove cache requirement from cleanup utility
+- *(cache)* Update schema generation
+- *(async)* Update __init__ file
+- *(workspace)* [**breaking**] Make workspace module private
+- *(async)* All async endpoints accept client
+- *(exceptions)* Move exceptions into seperate module
+- *(project)* [**breaking**] Convert 'active' param default to a boolean
+- Use a src folder for the library
+- *(typing)* Cast any returns to correct type
+- Update all modules to new ruff rules
+- *(endpoint)* Cast model to generic class
+- *(metadata)* Convert _version.py to __about__.py
+
+### 📚 Documentation
+
+- *(user, tracker)* Split up tracker & user endpoint pages
+- *(user, tracker)* Split up tracker & user endpoint pages
+- *(scripts)* Utility for generating project diagrams
+- Update to project structure
+- Small fixes & config improvements
+- *(async)* Add references for classes
+- *(examples)* Add async example
+- *(examples)* Fix outdated imports
+- *(contributing)* Update contrib docs
+- *(api)* Update diagrams
+- *(mkdocs)* Update configurate for src layout
+- *(api-guide)* Fix bad relative links
+- *(scripts)* Update diagram script to new src layout
+- *(api-guide)* Update diagrams
+- *(contributing)* Update contributing guideline to uv
+- *(installation)* Include aiosqlite in optional dependencies
+- *(mkdocs)* Add inventories to mkdocstrings
+
+### ⚙️ Miscellaneous Tasks
+
+- *(dev-deps)* Add pytest asyncio
+- *(pytest)* Set asyncio mode
+- *(dev-deps)* Added ruff formatter
+- *(dev-deps)* Update mkdocstrings-python dependency
+- *(coverage)* Keep coverage for tests
+- *(tox)* Make sure to install all extras
+- *(actions)* Do not run slow tests on most matrix combos
+- *(pre-commit)* Update ruff & mypy pre-commit
+- *(pre-commit)* Update pre-commit configuration
+- *(git)* Update .gitignore file
+- *(pre-commit)* Add uv to configuration
+- *(ruff)* Refactor configuration
+- *(ruff)* Refactor ruff configuration
+- *(mypy)* Remove unnecessary errors codes from tests
+- *(pre-commit)* Make sure to fix in ruff pre-commit
+- *(ruff)* Ignore ARG code in tests
+- *(tox)* Update tox config to toml format
+- *(actions)* Update actions to use uv
+- *(git-cliff)* Handle ref type as a refactor
+- *(git-cliff)* Add build section to commit parser
+- *(pyproject)* Add keywords section to pyproject.toml
+
+### 🏗  Build
+
+- *(project)* Convert project management to uv
+- *(lint,type-check)* Change target python version
+- *(pre-commit)* Add SQLAlchemy stubs to pre-commit
+
+### 🧪 Testing
+
+- Replace removed methods with alternatives
+- *(async)* Base fixtures setup
+- Tracker factory fixture
+- *(async-sqlite)* All cache functionality
+- Implement generator function fixtures
+- Fix minor issues
+- *(tags)* Tag get method
+- *(org)* Mark organization tests slow
+- *(async)* Set default fixture loop scope
+- 100% test suite usage
+- *(coverage)* Add source folders
+- Adjust tests to new linting rules
+- *(async-trackers)* Use utc timezone with `datetime.now`
+- *(async-trackers)* Add flaky mark on `test_collect_params`
+
 ## [1.6.0] - 2024-12-19
 
 ### 🚀 Features

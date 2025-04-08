@@ -1,6 +1,6 @@
 [project]
 name = "toggl-api-wrapper"
-version = "1.6.0"
+version = "2.0.0"
 description = "Simple Toggl API wrapper for non-premium features."
 authors = [{ name = "David Kasakaitis", email = "davidkasakaitis@proton.me" }]
 maintainers = [
