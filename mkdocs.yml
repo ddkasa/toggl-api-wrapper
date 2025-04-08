@@ -138,6 +138,12 @@ plugins:
             separate_signature: true
             summary: true
             line_length: 79
+
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            # - https://www.python-httpx.org/objects.inv # TODO: Not available yet.
+            # https://github.com/encode/httpx/issues/3145
+            - http://docs.sqlalchemy.org/en/stable/objects.inv
   - callouts
   - panzoom:
       full_screen: true
