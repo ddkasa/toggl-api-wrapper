@@ -334,6 +334,7 @@ commit_parsers = [
     { message = "^style", group = "<!-- 6 -->🎨 Styling" },
     { message = "^test", group = "<!-- 7 -->🧪 Testing" },
     { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
+    { message = "^build", group = "<!-- 7 -->🏗  Build" },
     { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
     { message = "^revert", group = "<!-- 9 -->◀️ Revert" },
     { message = "^wip", group = "<!-- 10 -->🚧 Work In Progress" },
