@@ -53,7 +53,7 @@ async def test_get_method(atracker_ep: AsyncTrackerEndpoint, generate_tracker):
 
 @pytest.mark.unit
 async def test_collect_params(atracker_ep: AsyncTrackerEndpoint, generate_tracker):
-    start = datetime.now().astimezone()
+    start = datetime.now(tz=timezone.utc) - timedelta(minutes=10)
 
     # Test for datetime edge cases
     with pytest.raises(DateTimeError):
@@ -72,8 +72,6 @@ async def test_collect_params(atracker_ep: AsyncTrackerEndpoint, generate_tracke
     # Test for filtering
     assert len(await atracker_ep.collect(start_date=start - timedelta(days=3), end_date=start - timedelta(days=2))) == 0
     assert len(await atracker_ep.collect(since=start)) == len(cache)
-
-    # TODO: Test Remote Params
 
 
 @pytest.mark.integration
