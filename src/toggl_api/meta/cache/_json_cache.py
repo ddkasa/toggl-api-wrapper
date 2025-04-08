@@ -11,8 +11,8 @@ from datetime import date, datetime, timedelta, timezone
 from os import PathLike
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
+from toggl_api.__about__ import __version__
 from toggl_api._utility import parse_iso
-from toggl_api._version import version
 from toggl_api.models import (
     TogglClass,
     TogglClient,
@@ -70,7 +70,7 @@ class JSONSession(Generic[T]):
     """
 
     max_length: int = field(default=10_000)
-    version: str = field(init=False, default=version)
+    version: str = field(init=False, default=__version__)
     data: list[T] = field(default_factory=list)
     modified: int = field(init=False, default=0)
 
@@ -87,7 +87,7 @@ class JSONSession(Generic[T]):
 
     def commit(self, path: Path) -> None:
         self.refresh(path)
-        self.version = version
+        self.version = __version__
         data = {
             "version": self.version,
             "data": self.process_data(self.data),
@@ -125,7 +125,7 @@ class JSONSession(Generic[T]):
             self.version = data["version"]
             self.data = self.process_data(data["data"])
         else:
-            self.version = version
+            self.version = __version__
             self.modified = time.time_ns()
 
     def process_data(self, data: list[T]) -> list[T]:

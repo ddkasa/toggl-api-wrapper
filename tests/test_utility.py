@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import tomli
 
-from toggl_api import __version__
+from toggl_api.__about__ import __version__
 from toggl_api._utility import _requires, format_iso, get_workspace, parse_iso  # noqa: PLC2701
 
 
