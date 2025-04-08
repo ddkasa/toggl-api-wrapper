@@ -12,28 +12,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff mypy
+      - uses: astral-sh/setup-uv@v5
 
       - name: Type Check
         run: |
-          mypy toggl_api
+          uv sync --group type --all-extras --python=3.10
+          uv run --python=3.10 mypy src
 
       - name: Lint
         run: |
-          ruff check toggl_api
+          uv sync --group lint --all-extras --python=3.10
+          uv run --python=3.10 ruff check src
 
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
     strategy:
       max-parallel: 1
       fail-fast: true
@@ -50,27 +46,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry tox-gh-actions tox ruff mypy
+          uv sync --python ${{ matrix.python-version }}  --all-extras --group test
 
       - name: Run tests
-        if: ${{ matrix.python-version != '3.12' || matrix.os != 'ubuntu-latest' }}
-        run: tox -- -m "not slow"
+        if: ${{ matrix.python-version != '3.10' || matrix.os != 'ubuntu-latest' }}
+        run: uv run --python ${{ matrix.python-version }} tox -e ${{ matrix.python-version }} -- -m not slow and not integration
 
       - name: Run tests
-        if: ${{ matrix.python-version == '3.12' || matrix.os == 'ubuntu-latest' }}
-        run: tox
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'}}
+        run: uv run --python=3.10 tox -e 3.10
 
       - name: Upload coverage reports to Codecov
-        if: ${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
         uses: codecov/codecov-action@v4.0.1
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -78,28 +69,26 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     if: github.ref_type == 'tag'
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install ruff mypy
+          uv sync --group type --all-extras
 
       - name: Generate Stubs
-        run: stubgen toggl_api/
+        run: uv run stubgen src/toggl_api/
 
-      - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v2.0
-        with:
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
-          poetry_install_options: "--without=dev,docs"
+      - name: Build
+        run: uv build
+
+      - name: Publish
+        run: uv publish
 
   release:
     needs: build

@@ -1,7 +1,7 @@
 name: "Deploy Documentation"
 
 env:
-  PYTHON_VERSION: "3.12"
+  PYTHON_VERSION: "3.10"
 
 on:
   workflow_dispatch:
@@ -14,21 +14,13 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install Poetry
-        run: pip install poetry
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
 
       - name: Install Dependencies
-        run: poetry install --with=docs
+        run: uv sync --group=docs --all-extras
 
       - name: Deploy website
-        run: poetry run mkdocs gh-deploy --force
+        run: uv run mkdocs gh-deploy --strict --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
