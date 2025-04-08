@@ -7,7 +7,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar, cast
 
 from toggl_api._exceptions import MissingParentError
 from toggl_api.meta._enums import RequestMethod
@@ -203,4 +203,4 @@ class TogglCache(ABC, Generic[TC]):
 
     @property
     def model(self) -> type[TC]:
-        return self.parent.MODEL
+        return cast("type[TC]", self.parent.MODEL)

@@ -18,6 +18,7 @@ from typing import (
     Final,
     Generic,
     TypeVar,
+    cast,
 )
 
 import httpx
@@ -64,7 +65,7 @@ class TogglEndpoint(ABC, Generic[T]):
 
     BASE_ENDPOINT: ClassVar[str] = "https://api.track.toggl.com/api/v9/"
     HEADERS: Final[Headers] = Headers({"content-type": "application/json"})
-    MODEL: type[T]
+    MODEL: type[T] | None = None
 
     __slots__ = ("client", "re_raise", "retries", "workspace_id")
 
@@ -107,7 +108,7 @@ class TogglEndpoint(ABC, Generic[T]):
             delay = random.randint(1, 5)
             retries -= 1
             log.error(
-                ("Status code %s is a server error.Retrying request in %s seconds.There are %s retries left."),
+                ("Status code %s is a server error. Retrying request in %s seconds. There are %s retries left."),
                 response.status_code,
                 delay,
                 retries,
@@ -215,7 +216,8 @@ class TogglEndpoint(ABC, Generic[T]):
 
     @classmethod
     def process_models(cls, data: list[dict[str, Any]]) -> list[T]:
-        return [cls.MODEL.from_kwargs(**mdl) for mdl in data]
+        from_kwargs = cast("type[T]", cls.MODEL).from_kwargs
+        return [from_kwargs(**mdl) for mdl in data]
 
     @staticmethod
     def api_status() -> bool:
