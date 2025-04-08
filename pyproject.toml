@@ -24,6 +24,7 @@ classifiers = [
     "Natural Language :: English",
     "Typing :: Typed",
 ]
+keywords = ["wrapper", "toggl", "api", "httpx", "sqlalchemy", "time-tracker"]
 dependencies = ["httpx>=0.28.1"]
 
 
