@@ -442,6 +442,15 @@ class TogglTracker(WorkspaceChild):
 
         return tags
 
+    @property
+    def description(self) -> str:
+        """Alias for the name of the tracker.
+
+        Returns:
+            Description of the tracker.
+        """
+        return self.name
+
 
 @dataclass
 class TogglTag(WorkspaceChild):
