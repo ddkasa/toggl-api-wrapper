@@ -451,6 +451,11 @@ class TogglTracker(WorkspaceChild):
         """
         return self.name
 
+    @property
+    def running_duration(self) -> timedelta:
+        """Duration that gets calculated even if the tracker is running."""
+        return self.duration or (datetime.now(tz=timezone.utc) - self.start)
+
 
 @dataclass
 class TogglTag(WorkspaceChild):
