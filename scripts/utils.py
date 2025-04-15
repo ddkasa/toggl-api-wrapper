@@ -1,3 +1,5 @@
+"""Utilities for cleaning Toggl accounts mainly for testing."""
+
 import contextlib
 import logging
 import os
@@ -69,6 +71,7 @@ def _org_cleanup(config: BasicAuth, delay: int = 1) -> None:
 
 
 def cleanup() -> None:
+    """Remove all entries froma Toggl account."""
     wid = int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
     config = generate_authentication()
 
