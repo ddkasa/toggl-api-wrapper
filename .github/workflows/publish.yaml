@@ -53,7 +53,7 @@ jobs:
           uv sync --python ${{ matrix.python-version }}  --all-extras --group test
 
       - name: Run tests
-        if: ${{ matrix.python-version != '3.10' || matrix.os != 'ubuntu-latest' }}
+        if: ${{ matrix.python-version != '3.10' }}
         run: uv run --python ${{ matrix.python-version }} tox -e ${{ matrix.python-version }} -- -m not slow and not integration
 
       - name: Run tests
