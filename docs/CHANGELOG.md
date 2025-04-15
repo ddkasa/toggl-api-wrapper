@@ -7,6 +7,36 @@ hide:
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025-04-15
+
+### 🚀 Features
+
+- *(models)* Add `TogglTracker.description` property
+- *(models)* Add `TogglTracker.running_duration` property
+
+### 🐛 Bug Fixes
+
+- *(async-sqlite-cache)* Add `metadata` attribute type to class
+
+### 📚 Documentation
+
+- *(schema)* Add docstring to `register_tables` function
+- *(cache)* Add `register_tabels` function
+- *(models)* Update `as_dict_custom` helper function
+- *(models)* Add `as_dict_custom` function
+
+### ⚡ Performance
+
+- *(schema)* Index all high variance columns
+
+### 🎨 Styling
+
+- *(schema)* Remove unncessary *E402* code
+
+### ⚙️ Miscellaneous Tasks
+
+- *(tox)* Add `--cov` parameter to tests
+
 ## [2.0.0] - 2025-04-08
 
 ### 🚀 Features
@@ -157,7 +187,6 @@ All notable changes to this project will be documented in this file.
 - *(coverage)* Add source folders
 - Adjust tests to new linting rules
 - *(async-trackers)* Use utc timezone with `datetime.now`
-- *(async-trackers)* Add flaky mark on `test_collect_params`
 
 ## [1.6.0] - 2024-12-19
 
