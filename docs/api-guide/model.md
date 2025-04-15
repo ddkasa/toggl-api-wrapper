@@ -54,3 +54,7 @@
         show_source: true
         members:
             - from_kwargs
+
+::: toggl_api.models.as_dict_custom
+    options:
+        show_source: true
