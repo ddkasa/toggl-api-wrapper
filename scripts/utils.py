@@ -68,7 +68,7 @@ def _org_cleanup(config: BasicAuth, delay: int = 1) -> None:
         time.sleep(delay)
 
 
-def cleanup():
+def cleanup() -> None:
     wid = int(os.getenv("TOGGL_WORKSPACE_ID", "0"))
     config = generate_authentication()
 
