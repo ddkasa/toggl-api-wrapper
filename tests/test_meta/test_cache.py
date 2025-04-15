@@ -271,6 +271,9 @@ def test_cache_sync(
     tracker = tracker_object.get(tracker_id, refresh=True)
     assert isinstance(tracker, TogglTracker)
 
+    if sys.platform == "win32":  # pragma: no cover # NOTE: Windows Only
+        time.sleep(0.1)
+
     assert endpoint.get(tracker_id) == tracker
 
 
