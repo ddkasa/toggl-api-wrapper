@@ -223,7 +223,6 @@ commands = [["pytest", "{posargs:tests}", "--cov", "--cov-report=xml"]]
 
 
 [tool.coverage.run]
-requires = []
 source = ["src/toggl_api", "tests/"]
 omit = [
     "*/.venv/*",
