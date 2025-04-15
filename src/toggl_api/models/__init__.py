@@ -17,13 +17,13 @@ from ._schema import register_tables
 
 
 def as_dict_custom(obj: TogglClass) -> dict[str, Any]:
-    """Convert a `TogglClass` to a dictionary.
+    """Convert a TogglClass` to a dictionary.
 
     Args:
-        obj: An intialized Toggl class.
+        obj: A `ToggClass` instance.
 
     Returns:
-        A `TogglClass` converted to a dictionary.
+        `TogglClass` converted to a dictionary.
     """
     data: dict[str, Any] = {"class": obj.__tablename__}
 
