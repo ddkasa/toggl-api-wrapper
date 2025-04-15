@@ -86,6 +86,8 @@ class AsyncSqliteCache(TogglAsyncCache[T]):
 
     __slots__ = ("database", "metadata")
 
+    metadata: MetaData
+
     def __init__(
         self,
         path: Path | PathLike[str],

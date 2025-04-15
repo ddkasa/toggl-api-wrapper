@@ -33,7 +33,13 @@
     options:
         show_source: true
 
+::: toggl_api.models.register_tables
+    options:
+        show_source: true
+
 ::: toggl_api.asyncio.AsyncSqliteCache
+    options:
+        show_source: true
 
 ::: toggl_api.asyncio.async_register_tables
     options:

@@ -215,6 +215,7 @@ commands = [
     [
         "pytest",
         "{posargs:tests}",
+        "--cov",
         "--cov-append",
         "--cov-branch",
         "--cov-report=xml",
