@@ -211,16 +211,16 @@ description = "Run tests under {base_python}."
 runner = "uv-venv-lock-runner"
 extras = ["sqlite", "async"]
 dependency_groups = ["test"]
-commands = [
-    [
-        "pytest",
-        "{posargs:tests}",
-        "--cov",
-        "--cov-append",
-        "--cov-branch",
-        "--cov-report=xml",
-    ],
-]
+commands = [["pytest", "{posargs:tests}"]]
+
+[tool.tox.env.3.10]
+passenv = ["*"]
+description = "Run tests under {base_python}."
+runner = "uv-venv-lock-runner"
+extras = ["sqlite", "async"]
+dependency_groups = ["test"]
+commands = [["pytest", "{posargs:tests}", "--cov", "--cov-report=xml"]]
+
 
 [tool.coverage.run]
 requires = []
