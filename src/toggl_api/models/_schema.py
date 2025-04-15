@@ -79,9 +79,9 @@ def _create_mappings(metadata: MetaData) -> None:
             UTCDateTime(timezone=True),
             server_default=func.now(),
         ),
-        Column("timestamp", UTCDateTime),
-        Column("id", Integer, primary_key=True),
-        Column("name", String(255)),
+        Column("timestamp", UTCDateTime, index=True),
+        Column("id", Integer, primary_key=True, index=True),
+        Column("name", String(255), index=True),
         Column("workspace", Integer, ForeignKey("workspace.id")),
     )
     _map_imperatively(TogglClient, metadata, client)
@@ -90,15 +90,15 @@ def _create_mappings(metadata: MetaData) -> None:
         "project",
         metadata,
         Column("created", UTCDateTime, server_default=func.now()),
-        Column("timestamp", UTCDateTime),
-        Column("id", Integer, primary_key=True),
-        Column("name", String(255)),
+        Column("timestamp", UTCDateTime, index=True),
+        Column("id", Integer, primary_key=True, index=True),
+        Column("name", String(255), index=True),
         Column("workspace", Integer, ForeignKey("workspace.id")),
         Column("color", String(6)),
         Column("client", Integer, ForeignKey("client.id")),
         Column("active", Boolean),
-        Column("start_date", Date),
-        Column("stop_date", Date),
+        Column("start_date", Date, index=True),
+        Column("stop_date", Date, index=True),
     )
     _map_imperatively(TogglProject, metadata, project)
 
@@ -106,9 +106,9 @@ def _create_mappings(metadata: MetaData) -> None:
         "tag",
         metadata,
         Column("created", UTCDateTime, server_default=func.now()),
-        Column("timestamp", UTCDateTime),
-        Column("id", Integer, primary_key=True),
-        Column("name", String(255)),
+        Column("timestamp", UTCDateTime, index=True),
+        Column("id", Integer, primary_key=True, index=True),
+        Column("name", String(255), index=True),
         Column("workspace", Integer, ForeignKey("workspace.id")),
     )
     _map_imperatively(TogglTag, metadata, tag)
@@ -117,13 +117,13 @@ def _create_mappings(metadata: MetaData) -> None:
         "tracker",
         metadata,
         Column("created", UTCDateTime, server_default=func.now()),
-        Column("timestamp", UTCDateTime),
-        Column("id", Integer, primary_key=True),
-        Column("name", String(255)),
+        Column("timestamp", UTCDateTime, index=True),
+        Column("id", Integer, primary_key=True, index=True),
+        Column("name", String(255), index=True),
         Column("workspace", Integer, ForeignKey("workspace.id")),
-        Column("start", UTCDateTime),
-        Column("duration", Interval, nullable=True),
-        Column("stop", UTCDateTime, nullable=True),
+        Column("start", UTCDateTime, index=True),
+        Column("duration", Interval, nullable=True, index=True),
+        Column("stop", UTCDateTime, nullable=True, index=True),
         Column("project", Integer, ForeignKey("project.id"), nullable=True),
     )
 
