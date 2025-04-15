@@ -143,6 +143,23 @@ def _create_mappings(metadata: MetaData) -> None:
 
 @_requires("sqlalchemy")
 def register_tables(engine: Engine) -> MetaData:
+    """Register all Toggl dataclasses to the database.
+
+    Examples:
+        ```py
+        from sqlalchemy import create_engine
+        from toggl_api.models import register_tables
+
+        engine = create_engine("sqlite:///database.sqlite")
+        metadata = register_tables(engine)
+        ```
+
+    Args:
+        engine: An SQLAlchemy `Engine` connected to a database.
+
+    Returns:
+        `MetaData` instance with all the info about the registered tables.
+    """
     metadata = MetaData()
 
     _create_mappings(metadata)
