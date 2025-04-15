@@ -245,6 +245,7 @@ def test_query_parent(tmp_path):
 
 
 # FIX:: Flaky test that will fail occasionally on windows testing.
+# NOTE: Suspicion that time accuracy is the causing issues.
 @pytest.mark.unit
 @pytest.mark.flaky(rerun_except="AssertionError", reruns=3)
 def test_cache_sync(
