@@ -365,7 +365,7 @@ class TogglTracker(WorkspaceChild):
         ),
     )
     duration: timedelta | None = field(default=None)
-    stop: datetime | str | None = field(default=None)
+    stop: datetime | None = field(default=None)
     project: int | None = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
