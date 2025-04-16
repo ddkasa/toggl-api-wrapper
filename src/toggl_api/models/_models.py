@@ -378,12 +378,6 @@ class TogglTracker(WorkspaceChild):
         if isinstance(self.duration, float | int):
             self.duration = timedelta(seconds=self.duration)
 
-        if self.stop:
-            self.stop = parse_iso(self.stop)  # type: ignore[assignment]
-        else:
-            now = datetime.now(tz=timezone.utc)
-            self.duration = now - self.start
-
         if isinstance(self.stop, str | datetime):
             self.stop = parse_iso(self.stop)  # type: ignore[assignment]
 
