@@ -10,7 +10,6 @@ import pytest
 from faker import Faker
 from httpx import BasicAuth
 
-from scripts.utils import cleanup
 from toggl_api import (
     ClientBody,
     ClientEndpoint,
@@ -28,6 +27,7 @@ from toggl_api.meta import TogglCachedEndpoint
 from toggl_api.meta.cache import JSONCache, SqliteCache
 from toggl_api.models import TogglClass, TogglClient, TogglProject, TogglTag, TogglTracker, TogglWorkspace
 from toggl_api.reports import ReportBody
+from toggl_api.utility._cleanup import cleanup  # noqa: PLC2701
 
 
 @pytest.fixture(autouse=True)
