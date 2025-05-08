@@ -9,9 +9,9 @@ from httpx import BasicAuth, Client, Response, Timeout
 
 from toggl_api._exceptions import DateTimeError
 
-from ._utility import format_iso
 from .meta import BaseBody, RequestMethod, TogglEndpoint
 from .models import TogglProject, TogglWorkspace
+from .utility import format_iso
 
 ReportFormats = Literal["pdf", "csv"]
 

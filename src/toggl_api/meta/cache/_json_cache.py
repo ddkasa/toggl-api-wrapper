@@ -12,7 +12,6 @@ from os import PathLike
 from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar, cast
 
 from toggl_api.__about__ import __version__
-from toggl_api._utility import parse_iso
 from toggl_api.models import (
     TogglClass,
     TogglClient,
@@ -22,6 +21,7 @@ from toggl_api.models import (
     TogglWorkspace,
     as_dict_custom,
 )
+from toggl_api.utility import parse_iso
 
 from ._base_cache import Comparison, TogglCache, TogglQuery
 

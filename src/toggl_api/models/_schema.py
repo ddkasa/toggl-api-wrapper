@@ -20,7 +20,7 @@ with contextlib.suppress(ImportError):
     from sqlalchemy.sql import func
 
 
-from toggl_api._utility import _requires
+from toggl_api.utility._helpers import _requires
 
 from ._models import (
     TogglClient,

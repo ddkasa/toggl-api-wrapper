@@ -1,5 +1,4 @@
 """SQLite cache module."""
-# ruff: noqa: E402
 
 from __future__ import annotations
 
@@ -18,9 +17,9 @@ except ImportError:
 import contextlib
 from collections.abc import Sequence
 
-from toggl_api._utility import _requires
 from toggl_api.models import TogglClass
 from toggl_api.models._schema import register_tables
+from toggl_api.utility._helpers import _requires
 
 from ._base_cache import Comparison, TogglCache, TogglQuery
 
