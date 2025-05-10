@@ -238,6 +238,9 @@ omit = [
     "*/.github/*",
     "*/.tox/*",
     "*/.git/*",
+    "src/toggl_api/utility/_cleanup.py",
+    "src/toggl_api/utility/_clean_account.py",
+    "src/toggl_api/utility/_generate_fake_data.py",
 ]
 
 [tool.coverage.report]
@@ -254,6 +257,7 @@ exclude_also = [
     "if TYPE_CHECKING:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+
 ]
 
 # git-cliff ~ default configuration file
