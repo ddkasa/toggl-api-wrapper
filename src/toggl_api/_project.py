@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any, Final, Literal, cast
 from httpx import Client, HTTPStatusError, Timeout, codes
 
 from toggl_api._exceptions import NamingError
-from toggl_api._utility import format_iso, get_timestamp
 from toggl_api.meta.cache import Comparison, TogglQuery
+from toggl_api.utility import format_iso, get_timestamp
 
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .models import TogglProject

@@ -5,7 +5,7 @@ import pytest
 from httpx import HTTPStatusError, codes
 
 from toggl_api import ProjectBody, ProjectEndpoint, TogglProject
-from toggl_api._utility import format_iso  # noqa: PLC2701
+from toggl_api.utility import format_iso
 
 
 @pytest.fixture

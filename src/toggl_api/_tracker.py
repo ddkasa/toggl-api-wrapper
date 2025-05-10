@@ -17,10 +17,10 @@ from typing import (
 from httpx import Client, HTTPStatusError, Response, Timeout, codes
 
 from ._exceptions import DateTimeError, NamingError
-from ._utility import format_iso, get_timestamp
 from .meta import BaseBody, RequestMethod, TogglCachedEndpoint
 from .meta.cache import Comparison, TogglQuery
 from .models import TogglTracker
+from .utility import format_iso, get_timestamp
 
 if TYPE_CHECKING:
     from httpx import BasicAuth

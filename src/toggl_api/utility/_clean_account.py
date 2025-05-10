@@ -1,3 +1,5 @@
+"""Contains an entrypoint for cleaning out a Toggl account."""
+
 from __future__ import annotations
 
 import argparse
@@ -5,36 +7,45 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final, Literal, get_args
 
 from toggl_api.config import AuthenticationError, generate_authentication
 
-from .utils import _client_cleanup, _org_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
+from ._cleanup import _client_cleanup, _org_cleanup, _path_cleanup, _project_cleanup, _tag_cleanup, _tracker_cleanup
 
 if TYPE_CHECKING:
     from httpx import BasicAuth
 
-log = logging.getLogger("toggl-api-wrapper.scripts")
+log = logging.getLogger("toggl-api-wrapper.utility")
 
 
-DEFAULT_OBJECT: frozenset[str] = frozenset({"tracker", "project", "tag", "client", "org"})
+Sections = Literal["tracker", "project", "tag", "client", "org"]
+
+SECTIONS: Final = frozenset(get_args(Sections))
 
 
-def _target_objects() -> set[str]:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--objects", nargs="+", help="Which objects not to parse.")
+def _generate_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser("Clean Toggl Account")
+    parser.add_argument(
+        "-o",
+        "--objects",
+        nargs="+",
+        help="Which objects not to parse.",
+        choices=SECTIONS,
+    )
+    return parser
 
+
+def _target_objects(parser: argparse.ArgumentParser) -> frozenset[Sections]:
     args = parser.parse_args().objects
-    targets = set(DEFAULT_OBJECT)
+    targets = SECTIONS
     if args is None:
         return targets
 
-    targets.difference_update(args)
-
-    return targets
+    return targets.difference(args)
 
 
-def _clean(args: set[str], auth: BasicAuth, workspace: int) -> None:
+def _clean(args: frozenset[Sections], auth: BasicAuth, workspace: int) -> None:
     cache_loc = Path() / "cache"
 
     if "tracker" in args:
@@ -62,17 +73,13 @@ def _clean(args: set[str], auth: BasicAuth, workspace: int) -> None:
 
 
 def main() -> None:
-    """
-    1. Check Arguments on which to clean.
-    2. Verify Authentication.
-    3. Clean each object
-    """
+    """Entrypoint for cleaning data from a Toggl account."""
+    parser = _generate_parser()
+    args = _target_objects(parser)
 
     fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(encoding="utf-8", level=logging.INFO, format=fmt)
     log.info("Starting to clean toggl-account!")
-
-    args = _target_objects()
 
     try:
         auth = generate_authentication()

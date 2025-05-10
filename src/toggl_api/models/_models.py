@@ -15,7 +15,7 @@ else:
     from typing_extensions import Self
 
 from toggl_api._exceptions import NamingError
-from toggl_api._utility import get_workspace, parse_iso
+from toggl_api.utility import get_workspace, parse_iso
 
 log = logging.getLogger("toggl-api-wrapper.model")
 
@@ -365,7 +365,7 @@ class TogglTracker(WorkspaceChild):
         ),
     )
     duration: timedelta | None = field(default=None)
-    stop: datetime | str | None = field(default=None)
+    stop: datetime | None = field(default=None)
     project: int | None = field(default=None)
     tags: list[TogglTag] = field(default_factory=list)
 
@@ -377,12 +377,6 @@ class TogglTracker(WorkspaceChild):
             self.start = parse_iso(self.start)  # type: ignore[assignment]
         if isinstance(self.duration, float | int):
             self.duration = timedelta(seconds=self.duration)
-
-        if self.stop:
-            self.stop = parse_iso(self.stop)  # type: ignore[assignment]
-        else:
-            now = datetime.now(tz=timezone.utc)
-            self.duration = now - self.start
 
         if isinstance(self.stop, str | datetime):
             self.stop = parse_iso(self.stop)  # type: ignore[assignment]

@@ -85,6 +85,10 @@ docs = [
 type = ["mypy>=1.15.0", "sqlalchemy[mypy]>=2.0.37"]
 lint = ["ruff>=0.9.5"]
 
+[project.scripts]
+clean-toggl-account = "toggl_api.utility._clean_account:main"
+generate-fake-toggl-data = "toggl_api.utility._generate_fake_data:main"
+
 
 [build-system]
 requires = ["hatchling"]
@@ -234,6 +238,9 @@ omit = [
     "*/.github/*",
     "*/.tox/*",
     "*/.git/*",
+    "src/toggl_api/utility/_cleanup.py",
+    "src/toggl_api/utility/_clean_account.py",
+    "src/toggl_api/utility/_generate_fake_data.py",
 ]
 
 [tool.coverage.report]
@@ -250,6 +257,7 @@ exclude_also = [
     "if TYPE_CHECKING:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+
 ]
 
 # git-cliff ~ default configuration file
