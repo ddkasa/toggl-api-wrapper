@@ -13,8 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from toggl_api import TogglTracker, TrackerBody
 from toggl_api._exceptions import DateTimeError, NamingError
 from toggl_api._tracker import BulkEditParameter, Edits
-from toggl_api._utility import format_iso, get_timestamp
 from toggl_api.meta import RequestMethod
+from toggl_api.utility import format_iso, get_timestamp
 
 from ._async_endpoint import TogglAsyncCachedEndpoint
 

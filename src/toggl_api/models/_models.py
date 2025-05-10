@@ -15,7 +15,7 @@ else:
     from typing_extensions import Self
 
 from toggl_api._exceptions import NamingError
-from toggl_api._utility import get_workspace, parse_iso
+from toggl_api.utility import get_workspace, parse_iso
 
 log = logging.getLogger("toggl-api-wrapper.model")
 

@@ -7,7 +7,6 @@ from typing import Any, ClassVar, Literal, cast
 from httpx import URL, AsyncClient, BasicAuth, Response
 
 from toggl_api import TogglProject, TogglWorkspace
-from toggl_api._utility import format_iso
 from toggl_api.meta import RequestMethod
 from toggl_api.reports import (
     PaginatedResult,
@@ -16,6 +15,7 @@ from toggl_api.reports import (
     ReportFormats,
     _validate_extension,
 )
+from toggl_api.utility import format_iso
 
 from ._async_endpoint import TogglAsyncEndpoint
 

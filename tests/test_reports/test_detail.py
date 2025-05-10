@@ -47,7 +47,7 @@ def test_search_time_pagination(
     assert isinstance(result, PaginatedResult)
     assert isinstance(result.next_id, int)
     assert isinstance(result.next_row, int)
-    for _ in range(3):
+    for _ in range(3):  # pragma: no cover  # NOTE: If loop breaks beforehand.
         result = detail_summary_endpoint.search_time_entries(
             report_body,
             result.next_options(1),
