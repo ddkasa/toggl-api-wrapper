@@ -287,15 +287,15 @@ def _generate_models(cache_path: Path, seed: SeedType | None = None) -> None:
         _json_save(cache_path.with_suffix(""), orgs, workspaces, clients, projects, tags, trackers)
 
 
-def main() -> None:
-    """Entry point for generating models.
-
-    Raises:
-        SystemExit: If the user declines to overwrite an existing file.
-    """
+def _create_parser() -> ArgumentParser:
     parser = ArgumentParser(
         "generate-data",
         description="Generate fake Toggl data for testing.",
+    )
+    parser.add_argument(
+        type=str,
+        help="custom cache path",
+        dest="cache_path",
     )
     parser.add_argument(
         "-s",
@@ -306,38 +306,51 @@ def main() -> None:
         help="set the seed value",
     )
     parser.add_argument(
-        "--cache-path",
-        default="cache.sqlite",
-        type=str,
-        help="custom cache path",
-        dest="cache_path",
-    )
-    parser.add_argument(
+        "-t",
         "--cache-type",
-        default="sqlite",
+        required=False,
+        default=None,
         type=str,
         choices=["sqlite", "json"],
         help="cache storage type",
     )
+    return parser
 
+
+def main() -> None:
+    """Entry point for generating models.
+
+    Raises:
+        TypeError: If the path type is missing.
+        ImportError: If the user declines to overwrite an existing file.
+    """
+    parser = _create_parser()
     args = parser.parse_args()
     cache_type = args.cache_type
+
+    path = Path(args.cache_path)
+    if path.suffix not in {".sqlite", ".json"}:
+        if cache_type is None:
+            msg = "Cache type is required if the supplied path doesn't end with 'json' or 'sqlite'!"
+            raise TypeError(msg)
+
+        path = path.with_suffix(f".{cache_type}")
+
     if cache_type == "sqlite" and not sqlalchemy:
         msg = (
             "If generating SQLite this script requires SQLAlchemy to be installed. "
-            "Please install with `pip install sqlalchemy`"
+            "Please install with `pip install sqlalchemy`."
         )
-        raise SystemExit(msg)
+        raise ImportError(msg)
 
-    path = Path(args.cache_path).with_suffix("." + cache_type)
     if path.exists():
-        print(f"{path} exists. Are you sure you want to overwrite")
+        print(f"{path} exists. Are you sure you want to overwrite?")
         while True:
             confirm = input("[Y/y]Yes | [N/n] >").casefold()
             if confirm == "y":
                 break
             if confirm == "n":
-                raise SystemExit
+                sys.exit(0)
 
     _generate_models(path, seed=args.seed)
 
