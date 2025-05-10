@@ -75,6 +75,7 @@ nav:
       - Client: api-guide/client.md
       - Tags: api-guide/tag.md
       - Reports: api-guide/reports.md
+      - Utilities: api-guide/utility.md
   - Changelog: CHANGELOG.md
   - About:
       - Contributing: CONTRIBUTING.md
