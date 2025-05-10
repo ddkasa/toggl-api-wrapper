@@ -24,8 +24,8 @@ Sections = Literal["tracker", "project", "tag", "client", "org"]
 SECTIONS: Final = frozenset(get_args(Sections))
 
 
-def _target_objects() -> frozenset[Sections]:
-    parser = argparse.ArgumentParser()
+def _generate_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser("Clean Toggl Account")
     parser.add_argument(
         "-o",
         "--objects",
@@ -33,7 +33,10 @@ def _target_objects() -> frozenset[Sections]:
         help="Which objects not to parse.",
         choices=SECTIONS,
     )
+    return parser
 
+
+def _target_objects(parser: argparse.ArgumentParser) -> frozenset[Sections]:
     args = parser.parse_args().objects
     targets = SECTIONS
     if args is None:
@@ -71,11 +74,12 @@ def _clean(args: frozenset[Sections], auth: BasicAuth, workspace: int) -> None:
 
 def main() -> None:
     """Entrypoint for cleaning data from a Toggl account."""
+    parser = _generate_parser()
+    args = _target_objects(parser)
+
     fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(encoding="utf-8", level=logging.INFO, format=fmt)
     log.info("Starting to clean toggl-account!")
-
-    args = _target_objects()
 
     try:
         auth = generate_authentication()
