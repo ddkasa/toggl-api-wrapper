@@ -20,7 +20,8 @@ def _path_cleanup(cache_path: Path) -> None:
             _path_cleanup(cache_path)
             continue
         file.unlink()
-    cache_path.rmdir()
+    if cache_path.exists():
+        cache_path.rmdir()
 
 
 def _tracker_cleanup(wid: int, config: BasicAuth, delay: int = 1) -> None:
