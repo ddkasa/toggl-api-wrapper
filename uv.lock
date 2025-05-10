@@ -1286,7 +1286,7 @@ wheels = [
 
 [[package]]
 name = "toggl-api-wrapper"
-version = "2.1.0"
+version = "2.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
@@ -1349,6 +1349,7 @@ test = [
     { name = "tox-gh-actions" },
 ]
 type = [
+    { name = "faker" },
     { name = "mypy" },
     { name = "sqlalchemy", extra = ["mypy"] },
 ]
@@ -1406,6 +1407,7 @@ test = [
     { name = "tox-gh-actions", specifier = ">=3.2.0" },
 ]
 type = [
+    { name = "faker", specifier = ">=37.1.0" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "sqlalchemy", extras = ["mypy"], specifier = ">=2.0.37" },
 ]

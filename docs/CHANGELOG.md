@@ -7,6 +7,40 @@ hide:
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025-05-10
+
+### 🚀 Features
+
+- *(utility)* Implement fake data generator
+
+### 🐛 Bug Fixes
+
+- *(clean-account)* Check if file exists before removing
+
+### 🚜 Refactor
+
+- *(models)* Remove `str` type from `TogglTracker.stop`
+- *(models)* Remove automatic generation of `TogglTracker.duration`
+- *(scripts)* Move clean_account script to utility module
+- *(utility)* Move helpers into utility module
+- *(utility)* Convert `clean_account` to private module
+- *(generate-fake-data)* Add additional checks for cache type
+- *(clean-account)* Move `ArgumentParser` into separate function
+
+### 📚 Documentation
+
+- *(utility)* Add documentation for utility scripts
+
+### ⚙️ Miscellaneous Tasks
+
+- *(actions)* Allow Windows in *3.10* configs
+- *(scripts)* Add scripts into configuration
+- *(coverage)* Omit utility scripts
+
+### 🧪 Testing
+
+- *(detail-report)* Ignore partial coverage
+
 ## [2.1.0] - 2025-04-15
 
 ### 🚀 Features
@@ -18,12 +52,18 @@ All notable changes to this project will be documented in this file.
 
 - *(async-sqlite-cache)* Add `metadata` attribute type to class
 
+### 🚜 Refactor
+
+- *(async-sqlite-cache)* Remove unnecessary *E402* noqa code
+- *(utils)* Add return type to `cleanup` functionx
+
 ### 📚 Documentation
 
 - *(schema)* Add docstring to `register_tables` function
 - *(cache)* Add `register_tabels` function
 - *(models)* Update `as_dict_custom` helper function
 - *(models)* Add `as_dict_custom` function
+- *(utils)* Add docstring to module and `cleanup` function
 
 ### ⚡ Performance
 
@@ -36,6 +76,13 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - *(tox)* Add `--cov` parameter to tests
+- *(actions)* Run all tests on both os *3.10* configs
+- *(tox)* Only check coverage on *3.10* tests
+- *(coverage)* Remove `requires` option
+
+### 🧪 Testing
+
+- *(cache)* Add small delay on windows
 
 ## [2.0.0] - 2025-04-08
 

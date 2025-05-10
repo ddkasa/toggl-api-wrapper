@@ -1,6 +1,6 @@
 [project]
 name = "toggl-api-wrapper"
-version = "2.1.0"
+version = "2.2.0"
 description = "Simple Toggl API wrapper for non-premium features."
 authors = [{ name = "David Kasakaitis", email = "davidkasakaitis@proton.me" }]
 maintainers = [
@@ -82,7 +82,11 @@ docs = [
     "ruff>=0.9.2",
     "mkdocstrings-python>=1.13.0",
 ]
-type = ["mypy>=1.15.0", "sqlalchemy[mypy]>=2.0.37"]
+type = [
+    "faker>=37.1.0",
+    "mypy>=1.15.0",
+ "sqlalchemy[mypy]>=2.0.37",
+]
 lint = ["ruff>=0.9.5"]
 
 [project.scripts]
