@@ -1,0 +1,4122 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Simple Toggl API wrapper for non-premium features." name="description"/>
+<meta content="David Kasakaits" name="author"/>
+<link href="https://ddkasa.github.io/toggl-api-wrapper/CHANGELOG.html" rel="canonical"/>
+<link href="api-guide/utility.html" rel="prev"/>
+<link href="CONTRIBUTING.html" rel="next"/>
+<link href="assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.11" name="generator"/>
+<title>Changelog - Toggl API Wrapper</title>
+<link href="assets/stylesheets/main.4af4bdda.min.css" rel="stylesheet"/>
+<link href="assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="assets/_mkdocstrings.css" rel="stylesheet"/>
+<link href="stylesheet/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="assets/javascripts/glightbox.min.js"></script><link href="assets/stylesheets/panzoom.css" rel="stylesheet"/><meta content='{"selectors": [".d2", ".mermaid"]}' name="panzoom-data"/><meta content="material" name="panzoom-theme"/></head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#changelog">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Toggl API Wrapper" class="md-header__button md-logo" data-md-component="logo" href="." title="Toggl API Wrapper">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Toggl API Wrapper
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://www.github.com/ddkasa/toggl-api-wrapper" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
+</div>
+<div class="md-source__repository">
+    ddkasa/toggl-api-wrapper
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="index.html">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="api-guide/index.html">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="CHANGELOG.html">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="CONTRIBUTING.html">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Toggl API Wrapper" class="md-nav__button md-logo" data-md-component="logo" href="." title="Toggl API Wrapper">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Toggl API Wrapper
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://www.github.com/ddkasa/toggl-api-wrapper" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
+</div>
+<div class="md-source__repository">
+    ddkasa/toggl-api-wrapper
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="index.html">
+<span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="user-guide/installation.html">
+<span class="md-ellipsis">
+    Installation
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="user-guide/examples.html">
+<span class="md-ellipsis">
+    Examples
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="api-guide/index.html">
+<span class="md-ellipsis">
+    API Reference
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/config.html">
+<span class="md-ellipsis">
+    Configuration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/endpoint.html">
+<span class="md-ellipsis">
+    Endpoint
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/cache.html">
+<span class="md-ellipsis">
+    Cache
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/exceptions.html">
+<span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/model.html">
+<span class="md-ellipsis">
+    Models
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/user.html">
+<span class="md-ellipsis">
+    User
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/organization.html">
+<span class="md-ellipsis">
+    Organization
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/workspace.html">
+<span class="md-ellipsis">
+    Workspace
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/tracker.html">
+<span class="md-ellipsis">
+    Trackers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/project.html">
+<span class="md-ellipsis">
+    Projects
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/client.html">
+<span class="md-ellipsis">
+    Client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/tag.html">
+<span class="md-ellipsis">
+    Tags
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/reports.html">
+<span class="md-ellipsis">
+    Reports
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="api-guide/utility.html">
+<span class="md-ellipsis">
+    Utilities
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    Changelog
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="CHANGELOG.html">
+<span class="md-ellipsis">
+    Changelog
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#220-2025-05-10">
+<span class="md-ellipsis">
+      [2.2.0] - 2025-05-10
+    </span>
+</a>
+<nav aria-label="[2.2.0] - 2025-05-10" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#210-2025-04-15">
+<span class="md-ellipsis">
+      [2.1.0] - 2025-04-15
+    </span>
+</a>
+<nav aria-label="[2.1.0] - 2025-04-15" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_1">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_1">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_1">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_1">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance">
+<span class="md-ellipsis">
+      ⚡ Performance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_1">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_1">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#200-2025-04-08">
+<span class="md-ellipsis">
+      [2.0.0] - 2025-04-08
+    </span>
+</a>
+<nav aria-label="[2.0.0] - 2025-04-08" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_2">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_2">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_2">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_2">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_2">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#build">
+<span class="md-ellipsis">
+      🏗 Build
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_2">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#160-2024-12-19">
+<span class="md-ellipsis">
+      [1.6.0] - 2024-12-19
+    </span>
+</a>
+<nav aria-label="[1.6.0] - 2024-12-19" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_3">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_3">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_3">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_3">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#151-2024-11-26">
+<span class="md-ellipsis">
+      [1.5.1] - 2024-11-26
+    </span>
+</a>
+<nav aria-label="[1.5.1] - 2024-11-26" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_3">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_4">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#150-2024-11-25">
+<span class="md-ellipsis">
+      [1.5.0] - 2024-11-25
+    </span>
+</a>
+<nav aria-label="[1.5.0] - 2024-11-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_4">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_4">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_4">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_1">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_5">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_4">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_3">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#140-2024-11-11">
+<span class="md-ellipsis">
+      [1.4.0] - 2024-11-11
+    </span>
+</a>
+<nav aria-label="[1.4.0] - 2024-11-11" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_5">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_5">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_5">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_2">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_6">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_4">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#132-2024-11-05">
+<span class="md-ellipsis">
+      [1.3.2] - 2024-11-05
+    </span>
+</a>
+<nav aria-label="[1.3.2] - 2024-11-05" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_6">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_7">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_5">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#131-2024-11-02">
+<span class="md-ellipsis">
+      [1.3.1] - 2024-11-02
+    </span>
+</a>
+<nav aria-label="[1.3.1] - 2024-11-02" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_7">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_6">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_8">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#130-2024-10-31">
+<span class="md-ellipsis">
+      [1.3.0] - 2024-10-31
+    </span>
+</a>
+<nav aria-label="[1.3.0] - 2024-10-31" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_6">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_8">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_7">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_3">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_9">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_5">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_6">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#120-2024-10-27">
+<span class="md-ellipsis">
+      [1.2.0] - 2024-10-27
+    </span>
+</a>
+<nav aria-label="[1.2.0] - 2024-10-27" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_7">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_9">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_8">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_4">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_10">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#111-2024-10-25">
+<span class="md-ellipsis">
+      [1.1.1] - 2024-10-25
+    </span>
+</a>
+<nav aria-label="[1.1.1] - 2024-10-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_10">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_6">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#110-2024-10-25">
+<span class="md-ellipsis">
+      [1.1.0] - 2024-10-25
+    </span>
+</a>
+<nav aria-label="[1.1.0] - 2024-10-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_8">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_11">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_9">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_11">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_7">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#104-2024-10-24">
+<span class="md-ellipsis">
+      [1.0.4] - 2024-10-24
+    </span>
+</a>
+<nav aria-label="[1.0.4] - 2024-10-24" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_12">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_12">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#103-2024-10-22">
+<span class="md-ellipsis">
+      [1.0.3] - 2024-10-22
+    </span>
+</a>
+<nav aria-label="[1.0.3] - 2024-10-22" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_13">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_13">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_8">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#102-2024-10-18">
+<span class="md-ellipsis">
+      [1.0.2] - 2024-10-18
+    </span>
+</a>
+<nav aria-label="[1.0.2] - 2024-10-18" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_5">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_14">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_7">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#101-2024-10-16">
+<span class="md-ellipsis">
+      [1.0.1] - 2024-10-16
+    </span>
+</a>
+<nav aria-label="[1.0.1] - 2024-10-16" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_14">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_15">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_8">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_9">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#100-2024-10-15">
+<span class="md-ellipsis">
+      [1.0.0] - 2024-10-15
+    </span>
+</a>
+<nav aria-label="[1.0.0] - 2024-10-15" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_9">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_15">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_10">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_16">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_1">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_9">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_10">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#051-2024-10-07">
+<span class="md-ellipsis">
+      [0.5.1] - 2024-10-07
+    </span>
+</a>
+<nav aria-label="[0.5.1] - 2024-10-07" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_16">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_17">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_10">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#050-2024-10-06">
+<span class="md-ellipsis">
+      [0.5.0] - 2024-10-06
+    </span>
+</a>
+<nav aria-label="[0.5.0] - 2024-10-06" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_10">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_17">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_11">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_6">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_18">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_2">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_11">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_11">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#040-2024-09-23">
+<span class="md-ellipsis">
+      [0.4.0] - 2024-09-23
+    </span>
+</a>
+<nav aria-label="[0.4.0] - 2024-09-23" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_11">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_12">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_19">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_12">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_12">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#031-2024-08-13">
+<span class="md-ellipsis">
+      [0.3.1] - 2024-08-13
+    </span>
+</a>
+<nav aria-label="[0.3.1] - 2024-08-13" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_13">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_13">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_13">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#030-2024-06-26">
+<span class="md-ellipsis">
+      [0.3.0] - 2024-06-26
+    </span>
+</a>
+<nav aria-label="[0.3.0] - 2024-06-26" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_14">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_14">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#023-2024-06-22">
+<span class="md-ellipsis">
+      [0.2.3] - 2024-06-22
+    </span>
+</a>
+<nav aria-label="[0.2.3] - 2024-06-22" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_18">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_20">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_15">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_14">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#022-2024-06-21">
+<span class="md-ellipsis">
+      [0.2.2] - 2024-06-21
+    </span>
+</a>
+<nav aria-label="[0.2.2] - 2024-06-21" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_19">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_15">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_21">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_16">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#021-2024-06-21">
+<span class="md-ellipsis">
+      [0.2.1] - 2024-06-21
+    </span>
+</a>
+<nav aria-label="[0.2.1] - 2024-06-21" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_20">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_16">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_17">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_15">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#020-2024-06-20">
+<span class="md-ellipsis">
+      [0.2.0] - 2024-06-20
+    </span>
+</a>
+<nav aria-label="[0.2.0] - 2024-06-20" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_12">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_21">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_17">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_22">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_18">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#011-2024-06-11">
+<span class="md-ellipsis">
+      [0.1.1] - 2024-06-11
+    </span>
+</a>
+<nav aria-label="[0.1.1] - 2024-06-11" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_22">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_18">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_23">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_3">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_19">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#010-2024-06-10">
+<span class="md-ellipsis">
+      [0.1.0] - 2024-06-10
+    </span>
+</a>
+<nav aria-label="[0.1.0] - 2024-06-10" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_13">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_23">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#work-in-progress">
+<span class="md-ellipsis">
+      🚧 Work In Progress
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_19">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_24">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_4">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_20">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_16">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    About
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="CONTRIBUTING.html">
+<span class="md-ellipsis">
+    Contributing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="LICENSE.html">
+<span class="md-ellipsis">
+    License
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#220-2025-05-10">
+<span class="md-ellipsis">
+      [2.2.0] - 2025-05-10
+    </span>
+</a>
+<nav aria-label="[2.2.0] - 2025-05-10" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#210-2025-04-15">
+<span class="md-ellipsis">
+      [2.1.0] - 2025-04-15
+    </span>
+</a>
+<nav aria-label="[2.1.0] - 2025-04-15" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_1">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_1">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_1">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_1">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance">
+<span class="md-ellipsis">
+      ⚡ Performance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_1">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_1">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#200-2025-04-08">
+<span class="md-ellipsis">
+      [2.0.0] - 2025-04-08
+    </span>
+</a>
+<nav aria-label="[2.0.0] - 2025-04-08" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_2">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_2">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_2">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_2">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_2">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#build">
+<span class="md-ellipsis">
+      🏗 Build
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_2">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#160-2024-12-19">
+<span class="md-ellipsis">
+      [1.6.0] - 2024-12-19
+    </span>
+</a>
+<nav aria-label="[1.6.0] - 2024-12-19" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_3">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_3">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_3">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_3">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#151-2024-11-26">
+<span class="md-ellipsis">
+      [1.5.1] - 2024-11-26
+    </span>
+</a>
+<nav aria-label="[1.5.1] - 2024-11-26" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_3">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_4">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#150-2024-11-25">
+<span class="md-ellipsis">
+      [1.5.0] - 2024-11-25
+    </span>
+</a>
+<nav aria-label="[1.5.0] - 2024-11-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_4">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_4">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_4">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_1">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_5">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_4">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_3">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#140-2024-11-11">
+<span class="md-ellipsis">
+      [1.4.0] - 2024-11-11
+    </span>
+</a>
+<nav aria-label="[1.4.0] - 2024-11-11" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_5">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_5">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_5">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_2">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_6">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_4">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#132-2024-11-05">
+<span class="md-ellipsis">
+      [1.3.2] - 2024-11-05
+    </span>
+</a>
+<nav aria-label="[1.3.2] - 2024-11-05" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_6">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_7">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_5">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#131-2024-11-02">
+<span class="md-ellipsis">
+      [1.3.1] - 2024-11-02
+    </span>
+</a>
+<nav aria-label="[1.3.1] - 2024-11-02" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_7">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_6">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_8">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#130-2024-10-31">
+<span class="md-ellipsis">
+      [1.3.0] - 2024-10-31
+    </span>
+</a>
+<nav aria-label="[1.3.0] - 2024-10-31" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_6">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_8">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_7">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_3">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_9">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_5">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_6">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#120-2024-10-27">
+<span class="md-ellipsis">
+      [1.2.0] - 2024-10-27
+    </span>
+</a>
+<nav aria-label="[1.2.0] - 2024-10-27" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_7">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_9">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_8">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_4">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_10">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#111-2024-10-25">
+<span class="md-ellipsis">
+      [1.1.1] - 2024-10-25
+    </span>
+</a>
+<nav aria-label="[1.1.1] - 2024-10-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_10">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_6">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#110-2024-10-25">
+<span class="md-ellipsis">
+      [1.1.0] - 2024-10-25
+    </span>
+</a>
+<nav aria-label="[1.1.0] - 2024-10-25" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_8">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_11">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_9">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_11">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_7">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#104-2024-10-24">
+<span class="md-ellipsis">
+      [1.0.4] - 2024-10-24
+    </span>
+</a>
+<nav aria-label="[1.0.4] - 2024-10-24" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_12">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_12">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#103-2024-10-22">
+<span class="md-ellipsis">
+      [1.0.3] - 2024-10-22
+    </span>
+</a>
+<nav aria-label="[1.0.3] - 2024-10-22" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_13">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_13">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_8">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#102-2024-10-18">
+<span class="md-ellipsis">
+      [1.0.2] - 2024-10-18
+    </span>
+</a>
+<nav aria-label="[1.0.2] - 2024-10-18" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_5">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_14">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_7">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#101-2024-10-16">
+<span class="md-ellipsis">
+      [1.0.1] - 2024-10-16
+    </span>
+</a>
+<nav aria-label="[1.0.1] - 2024-10-16" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_14">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_15">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_8">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_9">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#100-2024-10-15">
+<span class="md-ellipsis">
+      [1.0.0] - 2024-10-15
+    </span>
+</a>
+<nav aria-label="[1.0.0] - 2024-10-15" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_9">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_15">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_10">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_16">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_1">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_9">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_10">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#051-2024-10-07">
+<span class="md-ellipsis">
+      [0.5.1] - 2024-10-07
+    </span>
+</a>
+<nav aria-label="[0.5.1] - 2024-10-07" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_16">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_17">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_10">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#050-2024-10-06">
+<span class="md-ellipsis">
+      [0.5.0] - 2024-10-06
+    </span>
+</a>
+<nav aria-label="[0.5.0] - 2024-10-06" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_10">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_17">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_11">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deprecations_6">
+<span class="md-ellipsis">
+      🕸 Deprecations
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_18">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_2">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_11">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_11">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#040-2024-09-23">
+<span class="md-ellipsis">
+      [0.4.0] - 2024-09-23
+    </span>
+</a>
+<nav aria-label="[0.4.0] - 2024-09-23" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_11">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_12">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_19">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_12">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_12">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#031-2024-08-13">
+<span class="md-ellipsis">
+      [0.3.1] - 2024-08-13
+    </span>
+</a>
+<nav aria-label="[0.3.1] - 2024-08-13" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_13">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_13">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_13">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#030-2024-06-26">
+<span class="md-ellipsis">
+      [0.3.0] - 2024-06-26
+    </span>
+</a>
+<nav aria-label="[0.3.0] - 2024-06-26" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_14">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_14">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#023-2024-06-22">
+<span class="md-ellipsis">
+      [0.2.3] - 2024-06-22
+    </span>
+</a>
+<nav aria-label="[0.2.3] - 2024-06-22" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_18">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_20">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_15">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_14">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#022-2024-06-21">
+<span class="md-ellipsis">
+      [0.2.2] - 2024-06-21
+    </span>
+</a>
+<nav aria-label="[0.2.2] - 2024-06-21" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_19">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_15">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_21">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_16">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#021-2024-06-21">
+<span class="md-ellipsis">
+      [0.2.1] - 2024-06-21
+    </span>
+</a>
+<nav aria-label="[0.2.1] - 2024-06-21" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_20">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_16">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_17">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_15">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#020-2024-06-20">
+<span class="md-ellipsis">
+      [0.2.0] - 2024-06-20
+    </span>
+</a>
+<nav aria-label="[0.2.0] - 2024-06-20" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_12">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_21">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_17">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_22">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_18">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#011-2024-06-11">
+<span class="md-ellipsis">
+      [0.1.1] - 2024-06-11
+    </span>
+</a>
+<nav aria-label="[0.1.1] - 2024-06-11" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_22">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_18">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_23">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_3">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_19">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#010-2024-06-10">
+<span class="md-ellipsis">
+      [0.1.0] - 2024-06-10
+    </span>
+</a>
+<nav aria-label="[0.1.0] - 2024-06-10" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#features_13">
+<span class="md-ellipsis">
+      🚀 Features
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#bug-fixes_23">
+<span class="md-ellipsis">
+      🐛 Bug Fixes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#work-in-progress">
+<span class="md-ellipsis">
+      🚧 Work In Progress
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#refactor_19">
+<span class="md-ellipsis">
+      🚜 Refactor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#documentation_24">
+<span class="md-ellipsis">
+      📚 Documentation
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling_4">
+<span class="md-ellipsis">
+      🎨 Styling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#miscellaneous-tasks_20">
+<span class="md-ellipsis">
+      ⚙️ Miscellaneous Tasks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing_16">
+<span class="md-ellipsis">
+      🧪 Testing
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://www.github.com/ddkasa/toggl-api-wrapper/blob/master/docs/CHANGELOG.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+</a>
+<a class="md-content__button md-icon" href="https://www.github.com/ddkasa/toggl-api-wrapper/raw/master/docs/CHANGELOG.md" title="View source of this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+</a>
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">¶</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<h2 id="220-2025-05-10">[2.2.0] - 2025-05-10<a class="headerlink" href="#220-2025-05-10" title="Permanent link">¶</a></h2>
+<h3 id="features">🚀 Features<a class="headerlink" href="#features" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(utility)</em> Implement fake data generator</li>
+</ul>
+<h3 id="bug-fixes">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(clean-account)</em> Check if file exists before removing</li>
+</ul>
+<h3 id="refactor">🚜 Refactor<a class="headerlink" href="#refactor" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(models)</em> Remove <code>str</code> type from <code>TogglTracker.stop</code></li>
+<li><em>(models)</em> Remove automatic generation of <code>TogglTracker.duration</code></li>
+<li><em>(scripts)</em> Move clean_account script to utility module</li>
+<li><em>(utility)</em> Move helpers into utility module</li>
+<li><em>(utility)</em> Convert <code>clean_account</code> to private module</li>
+<li><em>(generate-fake-data)</em> Add additional checks for cache type</li>
+<li><em>(clean-account)</em> Move <code>ArgumentParser</code> into separate function</li>
+</ul>
+<h3 id="documentation">📚 Documentation<a class="headerlink" href="#documentation" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(utility)</em> Add documentation for utility scripts</li>
+</ul>
+<h3 id="miscellaneous-tasks">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(actions)</em> Allow Windows in <em>3.10</em> configs</li>
+<li><em>(scripts)</em> Add scripts into configuration</li>
+<li><em>(coverage)</em> Omit utility scripts</li>
+</ul>
+<h3 id="testing">🧪 Testing<a class="headerlink" href="#testing" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(detail-report)</em> Ignore partial coverage</li>
+</ul>
+<h2 id="210-2025-04-15">[2.1.0] - 2025-04-15<a class="headerlink" href="#210-2025-04-15" title="Permanent link">¶</a></h2>
+<h3 id="features_1">🚀 Features<a class="headerlink" href="#features_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(models)</em> Add <code>TogglTracker.description</code> property</li>
+<li><em>(models)</em> Add <code>TogglTracker.running_duration</code> property</li>
+</ul>
+<h3 id="bug-fixes_1">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(async-sqlite-cache)</em> Add <code>metadata</code> attribute type to class</li>
+</ul>
+<h3 id="refactor_1">🚜 Refactor<a class="headerlink" href="#refactor_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(async-sqlite-cache)</em> Remove unnecessary <em>E402</em> noqa code</li>
+<li><em>(utils)</em> Add return type to <code>cleanup</code> functionx</li>
+</ul>
+<h3 id="documentation_1">📚 Documentation<a class="headerlink" href="#documentation_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(schema)</em> Add docstring to <code>register_tables</code> function</li>
+<li><em>(cache)</em> Add <code>register_tabels</code> function</li>
+<li><em>(models)</em> Update <code>as_dict_custom</code> helper function</li>
+<li><em>(models)</em> Add <code>as_dict_custom</code> function</li>
+<li><em>(utils)</em> Add docstring to module and <code>cleanup</code> function</li>
+</ul>
+<h3 id="performance">⚡ Performance<a class="headerlink" href="#performance" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(schema)</em> Index all high variance columns</li>
+</ul>
+<h3 id="styling">🎨 Styling<a class="headerlink" href="#styling" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(schema)</em> Remove unncessary <em>E402</em> code</li>
+</ul>
+<h3 id="miscellaneous-tasks_1">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tox)</em> Add <code>--cov</code> parameter to tests</li>
+<li><em>(actions)</em> Run all tests on both os <em>3.10</em> configs</li>
+<li><em>(tox)</em> Only check coverage on <em>3.10</em> tests</li>
+<li><em>(coverage)</em> Remove <code>requires</code> option</li>
+</ul>
+<h3 id="testing_1">🧪 Testing<a class="headerlink" href="#testing_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Add small delay on windows</li>
+</ul>
+<h2 id="200-2025-04-08">[2.0.0] - 2025-04-08<a class="headerlink" href="#200-2025-04-08" title="Permanent link">¶</a></h2>
+<h3 id="features_2">🚀 Features<a class="headerlink" href="#features_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cached-endpoint)</em> Allow for no cache to be assigned</li>
+<li><em>(reports)</em> Abstract report methods</li>
+<li><em>(config)</em> Add workspace missing error exception</li>
+<li><em>(sqlite_cache)</em> Allow for an external engine param</li>
+<li><em>(cache)</em> Allow for pathlike &amp; strings objects to be passed in</li>
+<li><em>(reports)</em> Custom invalid extension error</li>
+<li><em>(sqlite_cache)</em> Allow for an external engine param</li>
+<li><em>(cache)</em> Allow for pathlike &amp; strings objects to be passed in</li>
+<li><em>(reports)</em> Custom invalid extension error</li>
+<li><em>(async)</em> Implement abstract endpoints</li>
+<li><em>(async)</em> Implement abstract cache</li>
+<li><em>(async)</em> Implement sqlite cache</li>
+<li><em>(async-tracker)</em> Implement async tracker endpoint</li>
+<li><em>(async-project)</em> Implement async project endpoint</li>
+<li><em>(async-client)</em> Implement async client endpoint</li>
+<li><em>(async-org)</em> Implement async org endpoint</li>
+<li><em>(async-tag)</em> Implement async tag endpoint</li>
+<li><em>(async-workspace)</em> Implement async workspace endpoint</li>
+<li><em>(async-user)</em> Implement async user endpoint</li>
+<li><em>(async-reports)</em> Implement async report endpoints</li>
+<li><em>(endpoints)</em> Implement custom client parameter</li>
+</ul>
+<h3 id="bug-fixes_2">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(scripts)</em> Include scripts directory in pyproject</li>
+<li><em>(tracker)</em> Body not converting timedeltas correctly</li>
+<li><em>(endpoints)</em> Remove wrong types</li>
+<li>Small endpoint &amp; cache changes</li>
+<li><em>(scripts)</em> Remove cache from utility script</li>
+<li>Implement basic import fixes</li>
+<li><em>(typing)</em> Deal with extra mypy warnings</li>
+<li><em>(typing)</em> Add generic and extra typing checks</li>
+<li><em>(typing)</em> Add callable typing</li>
+<li><em>(typing)</em> Remove all implicity re-exports</li>
+<li><em>(async-sqlite-cache)</em> Make sure entry exists before deleting</li>
+<li><em>(models)</em> Revert <code>TogglClass.from_kwargs</code> changes</li>
+</ul>
+<h3 id="refactor_2">🚜 Refactor<a class="headerlink" href="#refactor_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> [<strong>breaking</strong>] Simplify abstract cache methods</li>
+<li><em>(endpoints)</em> Use new caching methods</li>
+<li><em>(body)</em> [<strong>breaking</strong>] Replace ValueError with KeyError</li>
+<li><em>(body)</em> [<strong>breaking</strong>] Convert BaseBody class into mapping</li>
+<li><em>(body)</em> [<strong>breaking</strong>] Make verify_endpoint_parameter method private</li>
+<li><em>(user)</em> [<strong>breaking</strong>] Remove deprecated check_authentication method</li>
+<li><em>(base_endpoint)</em> [<strong>breaking</strong>] Remove 'workspace_id' parameter</li>
+<li><em>(base_endpoint)</em> [<strong>breaking</strong>] Remove 'model' property</li>
+<li><em>(base_endpoint)</em> [<strong>breaking</strong>] Remove 'endpoint' property</li>
+<li><em>(base_endpoint)</em> [<strong>breaking</strong>] Remove 'method' helper method</li>
+<li><em>(tracker_endpoint)</em> [<strong>breaking</strong>] Remove typeerror from add method</li>
+<li><em>(tracker)</em> [<strong>breaking</strong>] Move 'current' method to tracker endpoint</li>
+<li><em>(tracker)</em> [<strong>breaking</strong>] Move 'collect' method to tracker endpoint</li>
+<li><em>(user)</em> User actual object for 'get_details' method</li>
+<li><em>(tracker)</em> [<strong>breaking</strong>] Move 'get' method to tracker endpoint</li>
+<li><em>(user)</em> [<strong>breaking</strong>] Remove tracker related info and attributes</li>
+<li><em>(endpoints)</em> Use endpoint property within method</li>
+<li><em>(workspaces)</em> [<strong>breaking</strong>] Remove deprecated workspace id param</li>
+<li><em>(reports)</em> [<strong>breaking</strong>] Remove deprecated methods</li>
+<li><em>(trackers)</em> [<strong>breaking</strong>] Remove start_date parameter from body</li>
+<li><em>(tags)</em> [<strong>breaking</strong>] Remove deprecated optional type from 'edit' endpoint method</li>
+<li><em>(config)</em> [<strong>breaking</strong>] Remove deprecated authentication error</li>
+<li><em>(config)</em> [<strong>breaking</strong>] Togglrc helper function using workspace missing error</li>
+<li><em>(base_cache)</em> [<strong>breaking</strong>] Remove deprecated value error from missing parent error exception</li>
+<li><em>(reports)</em> Use invalid extension error for extension exceptions</li>
+<li><em>(reports)</em> Use invalid extension error for extension exceptions</li>
+<li><em>(reports)</em> [<strong>breaking</strong>] Move reports module into main folder</li>
+<li>[<strong>breaking</strong>] Make most modules private</li>
+<li>[<strong>breaking</strong>] Adjust imports to new directory structure</li>
+<li><em>(scripts)</em> Remove cache requirement from cleanup utility</li>
+<li><em>(cache)</em> Update schema generation</li>
+<li><em>(async)</em> Update <strong>init</strong> file</li>
+<li><em>(workspace)</em> [<strong>breaking</strong>] Make workspace module private</li>
+<li><em>(async)</em> All async endpoints accept client</li>
+<li><em>(exceptions)</em> Move exceptions into seperate module</li>
+<li><em>(project)</em> [<strong>breaking</strong>] Convert 'active' param default to a boolean</li>
+<li>Use a src folder for the library</li>
+<li><em>(typing)</em> Cast any returns to correct type</li>
+<li>Update all modules to new ruff rules</li>
+<li><em>(endpoint)</em> Cast model to generic class</li>
+<li><em>(metadata)</em> Convert _version.py to <strong>about</strong>.py</li>
+</ul>
+<h3 id="documentation_2">📚 Documentation<a class="headerlink" href="#documentation_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user, tracker)</em> Split up tracker &amp; user endpoint pages</li>
+<li><em>(user, tracker)</em> Split up tracker &amp; user endpoint pages</li>
+<li><em>(scripts)</em> Utility for generating project diagrams</li>
+<li>Update to project structure</li>
+<li>Small fixes &amp; config improvements</li>
+<li><em>(async)</em> Add references for classes</li>
+<li><em>(examples)</em> Add async example</li>
+<li><em>(examples)</em> Fix outdated imports</li>
+<li><em>(contributing)</em> Update contrib docs</li>
+<li><em>(api)</em> Update diagrams</li>
+<li><em>(mkdocs)</em> Update configurate for src layout</li>
+<li><em>(api-guide)</em> Fix bad relative links</li>
+<li><em>(scripts)</em> Update diagram script to new src layout</li>
+<li><em>(api-guide)</em> Update diagrams</li>
+<li><em>(contributing)</em> Update contributing guideline to uv</li>
+<li><em>(installation)</em> Include aiosqlite in optional dependencies</li>
+<li><em>(mkdocs)</em> Add inventories to mkdocstrings</li>
+</ul>
+<h3 id="miscellaneous-tasks_2">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(dev-deps)</em> Add pytest asyncio</li>
+<li><em>(pytest)</em> Set asyncio mode</li>
+<li><em>(dev-deps)</em> Added ruff formatter</li>
+<li><em>(dev-deps)</em> Update mkdocstrings-python dependency</li>
+<li><em>(coverage)</em> Keep coverage for tests</li>
+<li><em>(tox)</em> Make sure to install all extras</li>
+<li><em>(actions)</em> Do not run slow tests on most matrix combos</li>
+<li><em>(pre-commit)</em> Update ruff &amp; mypy pre-commit</li>
+<li><em>(pre-commit)</em> Update pre-commit configuration</li>
+<li><em>(git)</em> Update .gitignore file</li>
+<li><em>(pre-commit)</em> Add uv to configuration</li>
+<li><em>(ruff)</em> Refactor configuration</li>
+<li><em>(ruff)</em> Refactor ruff configuration</li>
+<li><em>(mypy)</em> Remove unnecessary errors codes from tests</li>
+<li><em>(pre-commit)</em> Make sure to fix in ruff pre-commit</li>
+<li><em>(ruff)</em> Ignore ARG code in tests</li>
+<li><em>(tox)</em> Update tox config to toml format</li>
+<li><em>(actions)</em> Update actions to use uv</li>
+<li><em>(git-cliff)</em> Handle ref type as a refactor</li>
+<li><em>(git-cliff)</em> Add build section to commit parser</li>
+<li><em>(pyproject)</em> Add keywords section to pyproject.toml</li>
+</ul>
+<h3 id="build">🏗  Build<a class="headerlink" href="#build" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(project)</em> Convert project management to uv</li>
+<li><em>(lint,type-check)</em> Change target python version</li>
+<li><em>(pre-commit)</em> Add SQLAlchemy stubs to pre-commit</li>
+</ul>
+<h3 id="testing_2">🧪 Testing<a class="headerlink" href="#testing_2" title="Permanent link">¶</a></h3>
+<ul>
+<li>Replace removed methods with alternatives</li>
+<li><em>(async)</em> Base fixtures setup</li>
+<li>Tracker factory fixture</li>
+<li><em>(async-sqlite)</em> All cache functionality</li>
+<li>Implement generator function fixtures</li>
+<li>Fix minor issues</li>
+<li><em>(tags)</em> Tag get method</li>
+<li><em>(org)</em> Mark organization tests slow</li>
+<li><em>(async)</em> Set default fixture loop scope</li>
+<li>100% test suite usage</li>
+<li><em>(coverage)</em> Add source folders</li>
+<li>Adjust tests to new linting rules</li>
+<li><em>(async-trackers)</em> Use utc timezone with <code>datetime.now</code></li>
+</ul>
+<h2 id="160-2024-12-19">[1.6.0] - 2024-12-19<a class="headerlink" href="#160-2024-12-19" title="Permanent link">¶</a></h2>
+<h3 id="features_3">🚀 Features<a class="headerlink" href="#features_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Build request private helper method</li>
+<li><em>(cache)</em> Model helper property</li>
+</ul>
+<h3 id="refactor_3">🚜 Refactor<a class="headerlink" href="#refactor_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Remove unnecessary ruff ignore flag</li>
+<li><em>(endpoints)</em> Convert process_models into clasmethod</li>
+<li><em>(endpoints)</em> Make client attribute public</li>
+<li><em>(endpoints)</em> Request handle error helper private method</li>
+<li><em>(endpoints)</em> Process_response private helper method</li>
+<li><em>(endpoints)</em> Improve request method readability</li>
+<li><em>(json-cache)</em> Uses new model property</li>
+<li><em>(sqlite-cache)</em> Uses new model property</li>
+<li><em>(reports)</em> Adjust report endpoint to base</li>
+<li><em>(endpoints)</em> Use MODEL classvar instead of property</li>
+<li><em>(cached_endpoint)</em> Adjust subclass to new structure</li>
+<li><em>(cached_endpoint)</em> Log info about cache expiration</li>
+<li>Remove all optional types</li>
+</ul>
+<h3 id="deprecations">🕸 Deprecations<a class="headerlink" href="#deprecations" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Deprecate 'method' helper method in favour of build_request</li>
+<li><em>(endpoints)</em> Deprecate model property in favour of class variable</li>
+<li><em>(endpoints)</em> Deprecate 'endpoint' property in favour of 'BASE_ENDPOINT' ClassVar</li>
+</ul>
+<h3 id="documentation_3">📚 Documentation<a class="headerlink" href="#documentation_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(json_cache)</em> Encoder &amp; decoder docstrings</li>
+</ul>
+<h3 id="miscellaneous-tasks_3">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(ruff)</em> Ignore tc006 code</li>
+<li><em>(cliff)</em> Ignore merge commits</li>
+<li><em>(cliff)</em> Merge cliff.toml with pyproject</li>
+</ul>
+<h2 id="151-2024-11-26">[1.5.1] - 2024-11-26<a class="headerlink" href="#151-2024-11-26" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_3">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(models)</em> From_kwargs not incorporating organization id</li>
+</ul>
+<h3 id="documentation_4">📚 Documentation<a class="headerlink" href="#documentation_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Correct and improve docstrings</li>
+<li><em>(cache, config)</em> Remove unnecessary type on return value in docstrings</li>
+</ul>
+<h2 id="150-2024-11-25">[1.5.0] - 2024-11-25<a class="headerlink" href="#150-2024-11-25" title="Permanent link">¶</a></h2>
+<h3 id="features_4">🚀 Features<a class="headerlink" href="#features_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(workspace)</em> Organization id accepts a model</li>
+<li><em>(utility)</em> Deprecation helper method</li>
+<li><em>(tags)</em> Single get endpoint convenience method</li>
+<li><em>(models)</em> Add start and end date to project model</li>
+<li><em>(utility)</em> Get_timestamp helper function</li>
+<li><em>(models)</em> Project status enum</li>
+<li><em>(models)</em> Project get_status method</li>
+<li><em>(projects)</em> Status to query helper method</li>
+<li><em>(endpoints)</em> Implement re_raise parameter</li>
+<li><em>(endpoints)</em> Implement retries parameter</li>
+<li><em>(trackers)</em> Bulk edit item typed dict</li>
+<li><em>(trackers)</em> Edit named tuple data structure</li>
+<li><em>(trackers)</em> Bulk edit patch endpoint method</li>
+</ul>
+<h3 id="bug-fixes_4">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(projects)</em> Default color for using old gray hex code</li>
+<li><em>(models)</em> Missing pound sign on project default color</li>
+<li><em>(projects)</em> Edit &amp; add method return type had none</li>
+</ul>
+<h3 id="refactor_4">🚜 Refactor<a class="headerlink" href="#refactor_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(workspace)</em> Deprecate workspace_id argument correctly</li>
+<li><em>(user)</em> Add workspace_id param to endpoint + model type</li>
+<li><em>(tracker)</em> Add workspace_id param to endpoint + model type</li>
+<li><em>(projects)</em> Add workspace_id param to endpoint + model type</li>
+<li><em>(clients)</em> Add workspace_id param to endpoint + model type</li>
+<li><em>(tags)</em> Add workspace_id param to endpoint + model type</li>
+<li><em>(user)</em> Current endpoint will try refresh if no tracker is running</li>
+<li><em>(clients)</em> Properly implement collect endpoint cache queries</li>
+<li><em>(cache)</em> Json serializer formating date objects</li>
+<li><em>(user)</em> Collect method uses get_timestamp helper</li>
+<li><em>(workspace)</em> Collect method uses get_timestamp helper</li>
+<li><em>(projects)</em> Add collect endpoint method body attributes</li>
+<li><em>(projects)</em> Collect method endpoint format method helper</li>
+<li><em>(projects)</em> Implement new body attributes into format method</li>
+<li><em>(projects)</em> Update project collect method to include querying cache</li>
+<li><em>(models)</em> Prevent unnecessary datetime call</li>
+<li><em>(endpoints)</em> Change default timeout parameter</li>
+<li><em>(utility)</em> [<strong>breaking</strong>] Turn requires into a private function</li>
+<li><em>(tracker)</em> Improve edit endpoint method</li>
+<li><em>(endpoints)</em> Request method accepts lists as a body</li>
+<li><em>(trackers)</em> Update body parameters</li>
+</ul>
+<h3 id="deprecations_1">🕸 Deprecations<a class="headerlink" href="#deprecations_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(meta)</em> Base endpoint workspace_id argument removal</li>
+<li><em>(projects)</em> Get color argument name</li>
+<li><em>(trackers)</em> Body start_date parameter</li>
+</ul>
+<h3 id="documentation_5">📚 Documentation<a class="headerlink" href="#documentation_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Update current endpoint docstring</li>
+<li><em>(tags)</em> Update get method docstring</li>
+<li><em>(models)</em> Helper method docstrngs</li>
+<li><em>(projects)</em> Update basic color docstrings</li>
+<li><em>(projects)</em> Add and update all endpoint + body docstrings</li>
+<li><em>(cache)</em> Remove docstring newlines</li>
+<li><em>(endpoints)</em> Improve all endpoint parameter documentation</li>
+<li><em>(trackers)</em> Add new functionality</li>
+<li><em>(mermaid)</em> Update package diagrams</li>
+<li><em>(models)</em> Improve docstring parameters</li>
+<li><em>(models)</em> Document from_kwargs classmethod</li>
+</ul>
+<h3 id="miscellaneous-tasks_4">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(actions)</em> Change release &amp; documentation workflow dependency</li>
+<li><em>(ruff)</em> Ignore PLR0913 code</li>
+<li><em>(ruff)</em> Ignore C901 code</li>
+</ul>
+<h3 id="testing_3">🧪 Testing<a class="headerlink" href="#testing_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(projects)</em> Validate new body params</li>
+<li><em>(projects)</em> Validate status_to_query method</li>
+<li><em>(projects)</em> Sample data fixture</li>
+<li><em>(projects)</em> Check collect method endpoint parameters</li>
+<li><em>(user)</em> Validate re_raise works with current tracker</li>
+<li><em>(trackers)</em> Validate bulk edit endpoint</li>
+<li><em>(utils)</em> Improve version testing</li>
+</ul>
+<h2 id="140-2024-11-11">[1.4.0] - 2024-11-11<a class="headerlink" href="#140-2024-11-11" title="Permanent link">¶</a></h2>
+<h3 id="features_5">🚀 Features<a class="headerlink" href="#features_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(exceptions)</em> Custom exceptions for commonly raised value errors</li>
+<li><em>(cache)</em> Custom missing parent error</li>
+</ul>
+<h3 id="bug-fixes_5">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(project)</em> Wrong hex code for gray color</li>
+<li><em>(utils)</em> Remove unnecessary import</li>
+</ul>
+<h3 id="refactor_5">🚜 Refactor<a class="headerlink" href="#refactor_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tag)</em> Edit endpoint method accepts seperate name argument</li>
+<li><em>(tag)</em> Validate minimum name length</li>
+<li><em>(endpoint)</em> Use generics with base endpoint</li>
+<li><em>(cache)</em> User generic type with cache</li>
+<li><em>(endpoint)</em> Assign generics to all endpoints</li>
+<li><em>(endpoint)</em> Cache query method always returns list</li>
+<li><em>(typing)</em> Generics implementation</li>
+<li><em>(workspace)</em> Use custom exceptions for raised errors</li>
+<li><em>(user)</em> Use custom exceptions for raised errors</li>
+<li><em>(user)</em> Use custom exceptions for raised errors</li>
+<li><em>(tag)</em> Use custom exceptions for raised errors</li>
+<li><em>(project)</em> Use custom exceptions for raised errors</li>
+<li><em>(client)</em> Use custom exceptions for raised errors</li>
+<li><em>(models)</em> Use naming error instead of value error</li>
+<li><em>(cache)</em> Implement new error subclass</li>
+</ul>
+<h3 id="deprecations_2">🕸 Deprecations<a class="headerlink" href="#deprecations_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tag)</em> Remove the internal usage of a modified name in a tag</li>
+<li><em>(trackers)</em> Change exception type in add endpoint method</li>
+</ul>
+<h3 id="documentation_6">📚 Documentation<a class="headerlink" href="#documentation_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tag)</em> Update edit endpoint docstring</li>
+<li><em>(tag)</em> Improve delete endpoint docstring</li>
+<li><em>(tag)</em> Improve add endpoint method docstring</li>
+<li><em>(tag)</em> Improve endpoint class docstring</li>
+<li><em>(organization)</em> Use custom exceptions for raised errors docstring</li>
+<li><em>(exceptions)</em> Document new exception classes</li>
+<li><em>(mkdocs)</em> Enable symbols in table of contents</li>
+<li><em>(config)</em> Reconfigure headings</li>
+</ul>
+<h3 id="testing_4">🧪 Testing<a class="headerlink" href="#testing_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tag)</em> Validate tag name length</li>
+<li><em>(conftest)</em> Rate limit trackers teardown</li>
+<li><em>(utility)</em> Make sure version is updated</li>
+</ul>
+<h2 id="132-2024-11-05">[1.3.2] - 2024-11-05<a class="headerlink" href="#132-2024-11-05" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_6">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Json query hashable type error</li>
+<li><em>(cache)</em> Check for all sequences</li>
+</ul>
+<h3 id="documentation_7">📚 Documentation<a class="headerlink" href="#documentation_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Improve cached endpoint docstrings</li>
+<li><em>(cache)</em> Improve base cache docstring</li>
+<li><em>(cache)</em> Improve json cache docstrings</li>
+<li><em>(cache)</em> Improve sqlite cache docstrings</li>
+</ul>
+<h3 id="testing_5">🧪 Testing<a class="headerlink" href="#testing_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Test for distinct flag and unhashable types</li>
+</ul>
+<h2 id="131-2024-11-02">[1.3.1] - 2024-11-02<a class="headerlink" href="#131-2024-11-02" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_7">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Refresh not getting passed to request</li>
+<li><em>(cache)</em> Json query distinct &amp; list comparisons</li>
+</ul>
+<h3 id="refactor_6">🚜 Refactor<a class="headerlink" href="#refactor_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Add future type import</li>
+</ul>
+<h3 id="documentation_8">📚 Documentation<a class="headerlink" href="#documentation_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tracker)</em> Add examples to docstrings</li>
+</ul>
+<h2 id="130-2024-10-31">[1.3.0] - 2024-10-31<a class="headerlink" href="#130-2024-10-31" title="Permanent link">¶</a></h2>
+<h3 id="features_6">🚀 Features<a class="headerlink" href="#features_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(workspace)</em> Workspace body dataclass</li>
+<li><em>(workspace)</em> Add workspace endpoint</li>
+<li><em>(workspace)</em> Collect workspaces endpoint</li>
+<li><em>(workspace)</em> Edit workspace endpoint</li>
+<li><em>(workspace)</em> Get time constraints</li>
+<li><em>(workspace)</em> Statistics endpoint</li>
+<li><em>(models)</em> Organization model</li>
+<li><em>(schema)</em> Added organization model</li>
+<li><em>(endpoint)</em> Added organization endpoint</li>
+<li><em>(organization)</em> Add endpoint method</li>
+<li><em>(organization)</em> Get endpoint method</li>
+<li><em>(models)</em> Validate organization name</li>
+<li><em>(models)</em> Validate workspace name</li>
+<li><em>(organization)</em> Edit endpoint method</li>
+<li><em>(organization)</em> Collect endpoint method</li>
+<li><em>(organization)</em> Delete endpoint method</li>
+<li><em>(workspace)</em> Organization id property</li>
+<li><em>(utility)</em> Add org endpoint to cleanup</li>
+<li>Add organization objects to <strong>init</strong></li>
+</ul>
+<h3 id="bug-fixes_8">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Api status not catching json decode error</li>
+<li><em>(body)</em> Verifying wrong variable</li>
+<li><em>(organization)</em> Make sure edit method stores and returns model</li>
+</ul>
+<h3 id="refactor_7">🚜 Refactor<a class="headerlink" href="#refactor_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(workspace)</em> Use a blank endpoint property</li>
+<li><em>(endpoint)</em> [<strong>breaking</strong>] Remove unnecessary class variables</li>
+<li><em>(workspace)</em> Improve get method error handling</li>
+</ul>
+<h3 id="deprecations_3">🕸 Deprecations<a class="headerlink" href="#deprecations_3" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(workspace)</em> Accept organization instead of workspace</li>
+<li><em>(workspace)</em> Turn get method workspace argument optional</li>
+</ul>
+<h3 id="documentation_9">📚 Documentation<a class="headerlink" href="#documentation_9" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(examples)</em> Improve authentication information</li>
+<li><em>(workspace)</em> Document new workspace features</li>
+<li><em>(workspace)</em> Improve docstrings</li>
+<li><em>(api)</em> Update project structure and mermaid</li>
+<li><em>(organization)</em> Add organization to api reference</li>
+<li><em>(workspace)</em> Add typed dicts to api documentation</li>
+<li><em>(config)</em> Reword deprecation</li>
+<li><em>(models)</em> Improve model documentation</li>
+</ul>
+<h3 id="miscellaneous-tasks_5">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(dev-deps)</em> Pytest dependency added</li>
+<li><em>(actions)</em> Add new secrets to environment</li>
+</ul>
+<h3 id="testing_6">🧪 Testing<a class="headerlink" href="#testing_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(conftest)</em> Organization id fixture</li>
+<li><em>(workspace)</em> Cover new endpoint methods</li>
+<li><em>(tags)</em> Extra delete method validation</li>
+<li><em>(user)</em> Fix test date creation</li>
+<li><em>(workspace)</em> Use org id instead</li>
+<li><em>(organization)</em> Test all functionality</li>
+<li><em>(conftest)</em> User id fixture</li>
+</ul>
+<h2 id="120-2024-10-27">[1.2.0] - 2024-10-27<a class="headerlink" href="#120-2024-10-27" title="Permanent link">¶</a></h2>
+<h3 id="features_7">🚀 Features<a class="headerlink" href="#features_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> User details endpoint</li>
+<li><em>(user)</em> Verify authentication static method</li>
+</ul>
+<h3 id="bug-fixes_9">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_9" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Authentication verifier using wrong endpoint</li>
+</ul>
+<h3 id="refactor_8">🚜 Refactor<a class="headerlink" href="#refactor_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> User httpx error codes</li>
+<li><em>(user)</em> Remove endpoint property forward slash</li>
+</ul>
+<h3 id="deprecations_4">🕸 Deprecations<a class="headerlink" href="#deprecations_4" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Check authentication method convert to staticmethod</li>
+</ul>
+<h3 id="documentation_10">📚 Documentation<a class="headerlink" href="#documentation_10" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Update documentation</li>
+</ul>
+<h2 id="111-2024-10-25">[1.1.1] - 2024-10-25<a class="headerlink" href="#111-2024-10-25" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_10">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_10" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(config)</em> Revert exception type change</li>
+<li><em>(cache)</em> Check if the model has been deleted already</li>
+</ul>
+<h3 id="miscellaneous-tasks_6">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_6" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(actions)</em> Documentation requires test to pass</li>
+</ul>
+<h2 id="110-2024-10-25">[1.1.0] - 2024-10-25<a class="headerlink" href="#110-2024-10-25" title="Permanent link">¶</a></h2>
+<h3 id="features_8">🚀 Features<a class="headerlink" href="#features_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Json session refresh method</li>
+<li><em>(config)</em> Get workspace helper function</li>
+<li><em>(config)</em> Togglrc workspace retrieve helper function</li>
+</ul>
+<h3 id="bug-fixes_11">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_11" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Json session diff method not including completely new models</li>
+</ul>
+<h3 id="refactor_9">🚜 Refactor<a class="headerlink" href="#refactor_9" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(config)</em> Extract togglrc retriever</li>
+</ul>
+<h3 id="documentation_11">📚 Documentation<a class="headerlink" href="#documentation_11" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(config)</em> Add example to config helper functions</li>
+<li><em>(config)</em> Add new helper functions</li>
+</ul>
+<h3 id="testing_7">🧪 Testing<a class="headerlink" href="#testing_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Test session refresh method and diffing</li>
+<li>Validate more errors</li>
+</ul>
+<h2 id="104-2024-10-24">[1.0.4] - 2024-10-24<a class="headerlink" href="#104-2024-10-24" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_12">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Json commit not syncing correctly</li>
+</ul>
+<h3 id="documentation_12">📚 Documentation<a class="headerlink" href="#documentation_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Improve json docstring</li>
+</ul>
+<h2 id="103-2024-10-22">[1.0.3] - 2024-10-22<a class="headerlink" href="#103-2024-10-22" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_13">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_13" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(client)</em> Collect method not passing on refresh</li>
+<li><em>(endpoint)</em> Methods are abiding refresh argument</li>
+<li><em>(user)</em> Current tracker actually using cache</li>
+<li><em>(cache)</em> Json not refreshing in find method</li>
+</ul>
+<h3 id="documentation_13">📚 Documentation<a class="headerlink" href="#documentation_13" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(contributing)</em> Add more references</li>
+<li><em>(endpoint)</em> Add a note for methods using external api every time</li>
+<li><em>(api)</em> Update mermaid graphs</li>
+<li><em>(api)</em> Project structure</li>
+</ul>
+<h3 id="testing_8">🧪 Testing<a class="headerlink" href="#testing_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(conftest)</em> Change number fixture</li>
+</ul>
+<h2 id="102-2024-10-18">[1.0.2] - 2024-10-18<a class="headerlink" href="#102-2024-10-18" title="Permanent link">¶</a></h2>
+<h3 id="deprecations_5">🕸 Deprecations<a class="headerlink" href="#deprecations_5" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(reports)</em> Rename methods to be consistent across reports</li>
+</ul>
+<h3 id="documentation_14">📚 Documentation<a class="headerlink" href="#documentation_14" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(readme)</em> Add changelog to links</li>
+<li><em>(reports)</em> Add raises to docstrings</li>
+<li><em>(api)</em> Small formatting changes</li>
+</ul>
+<h3 id="miscellaneous-tasks_7">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_7" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(config)</em> Coverage url</li>
+<li><em>(cliff)</em> Fix toml escape characters</li>
+</ul>
+<h2 id="101-2024-10-16">[1.0.1] - 2024-10-16<a class="headerlink" href="#101-2024-10-16" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_14">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_14" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Logger name</li>
+<li><em>(user)</em> Collect endpoint not returning anything without parameters</li>
+</ul>
+<h3 id="documentation_15">📚 Documentation<a class="headerlink" href="#documentation_15" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Fix docstring</li>
+</ul>
+<h3 id="miscellaneous-tasks_8">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_8" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(precommit)</em> Added gitleaks</li>
+<li><em>(config)</em> Additional urls</li>
+</ul>
+<h3 id="testing_9">🧪 Testing<a class="headerlink" href="#testing_9" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Collect method with no parameters</li>
+</ul>
+<h2 id="100-2024-10-15">[1.0.0] - 2024-10-15<a class="headerlink" href="#100-2024-10-15" title="Permanent link">¶</a></h2>
+<h3 id="features_9">🚀 Features<a class="headerlink" href="#features_9" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(utility)</em> Requires decorator</li>
+<li>Python 3.13 support</li>
+<li><em>(cache)</em> Comparison enumeration</li>
+<li><em>(cache)</em> Toggl query dataclass</li>
+</ul>
+<h3 id="bug-fixes_15">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_15" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tracker)</em> Adjust error type</li>
+<li><em>(utility)</em> Swap datetime conditional</li>
+<li><em>(endpoint)</em> Refactor server error retry logic</li>
+<li><em>(endpoints)</em> Return none on 404</li>
+<li><em>(cache)</em> Sqlite delete method</li>
+<li><em>(user)</em> Collect method not correctly formatting time arguments</li>
+</ul>
+<h3 id="refactor_10">🚜 Refactor<a class="headerlink" href="#refactor_10" title="Permanent link">¶</a></h3>
+<ul>
+<li>[<strong>breaking</strong>] Merge modules with toggl_api</li>
+<li><em>(endpoints)</em> [<strong>breaking</strong>] Remove deprecated methods</li>
+<li><em>(body)</em> [<strong>breaking</strong>] Remove deprecated workspace_id parameter</li>
+<li><em>(deps)</em> [<strong>breaking</strong>] Convert sqlalchemy to optional dependency</li>
+<li><em>(workspace)</em> Improved get endpoint</li>
+<li><em>(client)</em> Use literal for typing status strings</li>
+<li><em>(tag)</em> Delete endpoint typing</li>
+<li><em>(reports)</em> Make pagination options optional</li>
+<li><em>(cache)</em> [<strong>breaking</strong>] Remove inverse flag</li>
+<li><em>(cache)</em> Abstract class query method</li>
+<li><em>(cache)</em> Json query method</li>
+<li><em>(cache)</em> Sqlite query method</li>
+<li><em>(user)</em> Fully implement collect method cache retrieval</li>
+<li><em>(endpoints)</em> Logging for caught exceptions</li>
+<li>Additional debug logging</li>
+<li><em>(models)</em> Remove optional type from timestamp</li>
+<li><em>(cache)</em> Fix typing issues</li>
+</ul>
+<h3 id="documentation_16">📚 Documentation<a class="headerlink" href="#documentation_16" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(readme)</em> Update readme</li>
+<li><em>(api)</em> Update docs to new directory structure</li>
+<li>Update examples</li>
+<li><em>(mermaid)</em> Update diagrams</li>
+<li><em>(cache)</em> Improved metaclass</li>
+<li><em>(panzoom)</em> Full screen enabled</li>
+<li><em>(endpoints)</em> Add official api links</li>
+<li>Show source on endpoints</li>
+<li><em>(example)</em> Reports example</li>
+<li><em>(readme)</em> Add examples</li>
+<li><em>(cache)</em> Query docstrings added</li>
+<li><em>(example)</em> Logging example</li>
+<li><em>(contributing)</em> Additional instructions</li>
+</ul>
+<h3 id="styling_1">🎨 Styling<a class="headerlink" href="#styling_1" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Remove optional type annotation as return</li>
+</ul>
+<h3 id="miscellaneous-tasks_9">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_9" title="Permanent link">¶</a></h3>
+<ul>
+<li>Update coverage config</li>
+<li><em>(precommit)</em> Added mypy</li>
+<li><em>(nvim)</em> Function for generating official docstrings</li>
+<li><em>(actions)</em> Simplify workflows</li>
+<li><em>(typing)</em> Add py.typed file</li>
+</ul>
+<h3 id="testing_10">🧪 Testing<a class="headerlink" href="#testing_10" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(user)</em> Additional status code tests</li>
+<li><em>(endpoints)</em> Additional argument types</li>
+<li><em>(reports)</em> Validate extensions</li>
+<li><em>(tracker)</em> Mock http status code logic</li>
+<li><em>(sqlite)</em> Additional tests</li>
+<li><em>(conftest)</em> Only delay on integration tests</li>
+<li><em>(tracker)</em> Verify creation dates logic</li>
+<li>More coverage</li>
+<li><em>(cache)</em> Query conversion</li>
+</ul>
+<h2 id="051-2024-10-07">[0.5.1] - 2024-10-07<a class="headerlink" href="#051-2024-10-07" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_16">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_16" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(config)</em> Removed interpolation</li>
+</ul>
+<h3 id="documentation_17">📚 Documentation<a class="headerlink" href="#documentation_17" title="Permanent link">¶</a></h3>
+<ul>
+<li>Update contributing</li>
+<li><em>(endpoints)</em> Improve docstrings</li>
+</ul>
+<h3 id="miscellaneous-tasks_10">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_10" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(actions)</em> Fix release workflow</li>
+<li><em>(precommit)</em> Add gh action validator to pre commit</li>
+<li><em>(precommit)</em> Upgrade ruff</li>
+</ul>
+<h2 id="050-2024-10-06">[0.5.0] - 2024-10-06<a class="headerlink" href="#050-2024-10-06" title="Permanent link">¶</a></h2>
+<h3 id="features_10">🚀 Features<a class="headerlink" href="#features_10" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Api status endpoint</li>
+<li><em>(reports)</em> Summary report endpoints</li>
+<li><em>(reports)</em> Detailed report endpoints</li>
+<li><em>(reports)</em> Weekly report endpoints</li>
+<li><em>(reports)</em> Module level imports</li>
+<li><em>(body)</em> Validate parameter classmethod</li>
+</ul>
+<h3 id="bug-fixes_17">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_17" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Cache parent logic</li>
+<li><em>(utility)</em> Date override</li>
+</ul>
+<h3 id="refactor_11">🚜 Refactor<a class="headerlink" href="#refactor_11" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(meta)</em> Basebody abstract class</li>
+<li><em>(endpoint)</em> Remove final type from base endpoint</li>
+<li><em>(endpoint)</em> Adjust to allow for more flexible models</li>
+<li><em>(reports)</em> Adjust responses</li>
+<li><em>(util)</em> Default cleanup delay</li>
+<li><em>(reports)</em> Report body improvements</li>
+<li><em>(endpoints)</em> Adjust to new body format signature</li>
+</ul>
+<h3 id="deprecations_6">🕸 Deprecations<a class="headerlink" href="#deprecations_6" title="Permanent link">¶</a></h3>
+<ul>
+<li>Modules namespace</li>
+<li><em>(deps)</em> Convert sqlalchemy to optional dependency</li>
+<li><em>(body)</em> Workspace_id parameter</li>
+</ul>
+<h3 id="documentation_18">📚 Documentation<a class="headerlink" href="#documentation_18" title="Permanent link">¶</a></h3>
+<ul>
+<li>Show symbol type headings</li>
+<li><em>(reports)</em> Documentation update</li>
+<li>Improve user guide</li>
+<li>Move about folder</li>
+<li>Update mermaid diagrams</li>
+<li>Update changelog</li>
+</ul>
+<h3 id="styling_2">🎨 Styling<a class="headerlink" href="#styling_2" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Removed optional as a return type</li>
+</ul>
+<h3 id="miscellaneous-tasks_11">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_11" title="Permanent link">¶</a></h3>
+<ul>
+<li>Omit scripts folder from coverage</li>
+<li><em>(actions)</em> Remove macos from matrix</li>
+<li>Git cliff configuration</li>
+</ul>
+<h3 id="testing_11">🧪 Testing<a class="headerlink" href="#testing_11" title="Permanent link">¶</a></h3>
+<ul>
+<li>Fix config encoding</li>
+<li><em>(reports)</em> All endpoints</li>
+</ul>
+<h2 id="040-2024-09-23">[0.4.0] - 2024-09-23<a class="headerlink" href="#040-2024-09-23" title="Permanent link">¶</a></h2>
+<h3 id="features_11">🚀 Features<a class="headerlink" href="#features_11" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(scripts)</em> Clean toggl script</li>
+</ul>
+<h3 id="refactor_12">🚜 Refactor<a class="headerlink" href="#refactor_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoint)</em> Rename methods</li>
+<li>Cleanup utils</li>
+<li><em>(tags)</em> Delete method accepts int</li>
+</ul>
+<h3 id="documentation_19">📚 Documentation<a class="headerlink" href="#documentation_19" title="Permanent link">¶</a></h3>
+<ul>
+<li>Fix config docstring</li>
+<li>Update documentation</li>
+</ul>
+<h3 id="miscellaneous-tasks_12">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(nvim)</em> .nvim.lua file</li>
+<li>Bump version 0.4.0</li>
+</ul>
+<h3 id="testing_12">🧪 Testing<a class="headerlink" href="#testing_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(client)</em> Delete method int arg</li>
+</ul>
+<h2 id="031-2024-08-13">[0.3.1] - 2024-08-13<a class="headerlink" href="#031-2024-08-13" title="Permanent link">¶</a></h2>
+<h3 id="refactor_13">🚜 Refactor<a class="headerlink" href="#refactor_13" title="Permanent link">¶</a></h3>
+<ul>
+<li>Get custom workspace</li>
+</ul>
+<h3 id="miscellaneous-tasks_13">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_13" title="Permanent link">¶</a></h3>
+<ul>
+<li>Fix urls</li>
+<li>Bump version 0.3.1</li>
+</ul>
+<h3 id="testing_13">🧪 Testing<a class="headerlink" href="#testing_13" title="Permanent link">¶</a></h3>
+<ul>
+<li>Extra coverage</li>
+</ul>
+<h2 id="030-2024-06-26">[0.3.0] - 2024-06-26<a class="headerlink" href="#030-2024-06-26" title="Permanent link">¶</a></h2>
+<h3 id="refactor_14">🚜 Refactor<a class="headerlink" href="#refactor_14" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Allowing no expiration</li>
+<li><em>(cache)</em> Json cache syncing</li>
+<li><em>(cache)</em> Int allowed as argument</li>
+</ul>
+<h3 id="miscellaneous-tasks_14">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_14" title="Permanent link">¶</a></h3>
+<ul>
+<li>Bump version 0.3.0</li>
+</ul>
+<h2 id="023-2024-06-22">[0.2.3] - 2024-06-22<a class="headerlink" href="#023-2024-06-22" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_18">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_18" title="Permanent link">¶</a></h3>
+<ul>
+<li>Tracker tag conversion</li>
+</ul>
+<h3 id="documentation_20">📚 Documentation<a class="headerlink" href="#documentation_20" title="Permanent link">¶</a></h3>
+<ul>
+<li>Other applications</li>
+</ul>
+<h3 id="miscellaneous-tasks_15">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_15" title="Permanent link">¶</a></h3>
+<ul>
+<li>Updated ruff rules</li>
+<li>Bump version 0.2.3</li>
+</ul>
+<h3 id="testing_14">🧪 Testing<a class="headerlink" href="#testing_14" title="Permanent link">¶</a></h3>
+<ul>
+<li>Refactor conftest</li>
+</ul>
+<h2 id="022-2024-06-21">[0.2.2] - 2024-06-21<a class="headerlink" href="#022-2024-06-21" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_19">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_19" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(endpoints)</em> Single model get methods</li>
+<li>Config issues</li>
+</ul>
+<h3 id="refactor_15">🚜 Refactor<a class="headerlink" href="#refactor_15" title="Permanent link">¶</a></h3>
+<ul>
+<li>Flexible arguments</li>
+</ul>
+<h3 id="documentation_21">📚 Documentation<a class="headerlink" href="#documentation_21" title="Permanent link">¶</a></h3>
+<ul>
+<li>Remove release notes</li>
+</ul>
+<h3 id="miscellaneous-tasks_16">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_16" title="Permanent link">¶</a></h3>
+<ul>
+<li>Bump version 0.2.2</li>
+</ul>
+<h2 id="021-2024-06-21">[0.2.1] - 2024-06-21<a class="headerlink" href="#021-2024-06-21" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_20">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_20" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tracker)</em> Tag action only needed when editing</li>
+<li>Cached response inside list</li>
+</ul>
+<h3 id="refactor_16">🚜 Refactor<a class="headerlink" href="#refactor_16" title="Permanent link">¶</a></h3>
+<ul>
+<li>Logging</li>
+</ul>
+<h3 id="miscellaneous-tasks_17">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_17" title="Permanent link">¶</a></h3>
+<ul>
+<li>Bump version 0.2.1</li>
+</ul>
+<h3 id="testing_15">🧪 Testing<a class="headerlink" href="#testing_15" title="Permanent link">¶</a></h3>
+<ul>
+<li>Sqlite workspace id set to random</li>
+</ul>
+<h2 id="020-2024-06-20">[0.2.0] - 2024-06-20<a class="headerlink" href="#020-2024-06-20" title="Permanent link">¶</a></h2>
+<h3 id="features_12">🚀 Features<a class="headerlink" href="#features_12" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(cache)</em> Json max length</li>
+<li><em>(cache)</em> Query method</li>
+<li><em>(cache)</em> Connection close on delete</li>
+</ul>
+<h3 id="bug-fixes_21">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_21" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(tracker)</em> Bad body conditonal brackets</li>
+<li><em>(user)</em> Missing raise</li>
+</ul>
+<h3 id="refactor_17">🚜 Refactor<a class="headerlink" href="#refactor_17" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(model)</em> Better str representation</li>
+</ul>
+<h3 id="documentation_22">📚 Documentation<a class="headerlink" href="#documentation_22" title="Permanent link">¶</a></h3>
+<ul>
+<li>Update readme</li>
+</ul>
+<h3 id="miscellaneous-tasks_18">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_18" title="Permanent link">¶</a></h3>
+<ul>
+<li>Update httpx</li>
+<li>Bump version 0.2.0</li>
+</ul>
+<h2 id="011-2024-06-11">[0.1.1] - 2024-06-11<a class="headerlink" href="#011-2024-06-11" title="Permanent link">¶</a></h2>
+<h3 id="bug-fixes_22">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_22" title="Permanent link">¶</a></h3>
+<ul>
+<li>Tracker start error handling</li>
+<li><em>(endpoint)</em> Retry on server error</li>
+</ul>
+<h3 id="refactor_18">🚜 Refactor<a class="headerlink" href="#refactor_18" title="Permanent link">¶</a></h3>
+<ul>
+<li>Removed unnecessary method</li>
+<li>Base url added to client</li>
+</ul>
+<h3 id="documentation_23">📚 Documentation<a class="headerlink" href="#documentation_23" title="Permanent link">¶</a></h3>
+<ul>
+<li>Improved api documentation</li>
+</ul>
+<h3 id="styling_3">🎨 Styling<a class="headerlink" href="#styling_3" title="Permanent link">¶</a></h3>
+<ul>
+<li>Various changes</li>
+</ul>
+<h3 id="miscellaneous-tasks_19">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_19" title="Permanent link">¶</a></h3>
+<ul>
+<li>Fix release drafter</li>
+<li>Version 0.1.1</li>
+</ul>
+<h2 id="010-2024-06-10">[0.1.0] - 2024-06-10<a class="headerlink" href="#010-2024-06-10" title="Permanent link">¶</a></h2>
+<h3 id="features_13">🚀 Features<a class="headerlink" href="#features_13" title="Permanent link">¶</a></h3>
+<ul>
+<li>Basic project structure</li>
+<li>Toggl client metaclass</li>
+<li>Tracker api</li>
+<li>Dataclasses</li>
+<li>User endpoint</li>
+<li>Project api</li>
+<li>Workspace api</li>
+<li>Tag api</li>
+<li>Client api</li>
+<li>Config utility</li>
+<li>Added classes to init</li>
+<li>Utility functions</li>
+<li>Workspace utility</li>
+<li>Sql schema</li>
+<li>Cache model</li>
+<li><em>(trackers)</em> Body dataclass</li>
+<li><em>(projects)</em> Body dataclass</li>
+<li><em>(clients)</em> Body dataclass</li>
+<li><em>(trackers)</em> Add tracker value checking</li>
+</ul>
+<h3 id="bug-fixes_23">🐛 Bug Fixes<a class="headerlink" href="#bug-fixes_23" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(client)</em> Wrong workspace id</li>
+<li>Python 3.10 compatibility</li>
+<li>Typing logic</li>
+<li>Python 3.10 datetime parsing</li>
+<li><em>(user)</em> Missing refresh arg</li>
+<li><em>(models)</em> Timezone issues with sechma</li>
+<li><em>(cache)</em> Sqlite caching changes</li>
+<li><em>(trackers)</em> Stop endpoint</li>
+</ul>
+<h3 id="work-in-progress">🚧 Work In Progress<a class="headerlink" href="#work-in-progress" title="Permanent link">¶</a></h3>
+<ul>
+<li>Caching mechanism</li>
+<li>Cache mechanism</li>
+</ul>
+<h3 id="refactor_19">🚜 Refactor<a class="headerlink" href="#refactor_19" title="Permanent link">¶</a></h3>
+<ul>
+<li><em>(meta)</em> Cleaner classes</li>
+<li>Remove debugging code</li>
+<li>Renamed src directory</li>
+<li>Sql schema</li>
+<li>Model creation</li>
+<li><em>(models)</em> Foreign keys &amp; dict converter</li>
+<li><em>(endpoint)</em> Merged endpoints</li>
+<li>Endpoint changes</li>
+<li>Cache adjustments</li>
+<li>Model adjustments</li>
+<li><em>(cache)</em> Various changes</li>
+<li>General typing</li>
+<li><em>(models)</em> Missing timezone schema</li>
+<li>Small changes</li>
+<li>Simplified config utility</li>
+<li><em>(tags)</em> Improved json body</li>
+<li>Typing</li>
+</ul>
+<h3 id="documentation_24">📚 Documentation<a class="headerlink" href="#documentation_24" title="Permanent link">¶</a></h3>
+<ul>
+<li>Readme</li>
+<li>Added license</li>
+<li>Class &amp; package layout</li>
+<li>Mkdocs config</li>
+<li>Documentation boilerplate</li>
+<li>Cache flowchart</li>
+<li>Moved images</li>
+<li>Updated class graph</li>
+<li>Docstring</li>
+<li>Api documentation</li>
+<li>Api documentation</li>
+<li>User guide</li>
+<li>Examples</li>
+<li>Changelog</li>
+<li>Coverage badge</li>
+<li>Readme badge</li>
+</ul>
+<h3 id="styling_4">🎨 Styling<a class="headerlink" href="#styling_4" title="Permanent link">¶</a></h3>
+<ul>
+<li>Small changes</li>
+<li>Typing &amp; version</li>
+</ul>
+<h3 id="miscellaneous-tasks_20">⚙️ Miscellaneous Tasks<a class="headerlink" href="#miscellaneous-tasks_20" title="Permanent link">¶</a></h3>
+<ul>
+<li>Basic setup</li>
+<li>Added gitignore</li>
+<li>Basic data</li>
+<li>Ignore direnv</li>
+<li>Lsp &amp; lint config</li>
+<li>Pytest env dependency</li>
+<li>Pytest config</li>
+<li>Pytest order dependency</li>
+<li>Tracker cache</li>
+<li>Ci dependencies &amp; config</li>
+<li>Github publishing workflow</li>
+<li>Tox gh actions tweaks</li>
+<li>Sqlalchemy dependency</li>
+<li>Docs generation</li>
+<li>Doc dependencies</li>
+<li>Release notes</li>
+<li>Test dependencies</li>
+<li>Mypy config</li>
+<li>Sqlalchemy type stubs</li>
+<li>Added pre commit</li>
+<li>Mkdocstrings depedency</li>
+<li>Mkdocs dependencies</li>
+<li>Coverage</li>
+<li>Pygments dependency</li>
+<li>Mkdocs changelog dependency</li>
+<li>Poetry urls</li>
+<li>Mkdocs callout dependency</li>
+<li>Coverage</li>
+</ul>
+<h3 id="testing_16">🧪 Testing<a class="headerlink" href="#testing_16" title="Permanent link">¶</a></h3>
+<ul>
+<li>Conftest</li>
+<li>Metaclasses</li>
+<li>Conftest</li>
+<li>Teardown fixture</li>
+<li>Workspace id</li>
+<li>Refactor directory structure</li>
+<li>Endpoint refactor</li>
+<li>Pytest configuration</li>
+<li>Sqlite cache</li>
+</ul>
+<!-- generated by git-cliff -->
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Utilities" class="md-footer__link md-footer__link--prev" href="api-guide/utility.html">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                Utilities
+              </div>
+</div>
+</a>
+<a aria-label="Next: Contributing" class="md-footer__link md-footer__link--next" href="CONTRIBUTING.html">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                Contributing
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2025 David Kasakaitis
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": ".", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.code.select", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="assets/javascripts/bundle.c8b220af.min.js"></script>
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script><script src="assets/javascripts/panzoom.min.js"></script><script src="assets/javascripts/zoompan.js"></script></body>
+</html>

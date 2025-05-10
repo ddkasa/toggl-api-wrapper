@@ -1,0 +1,3190 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Simple Toggl API wrapper for non-premium features." name="description"/>
+<meta content="David Kasakaits" name="author"/>
+<link href="https://ddkasa.github.io/toggl-api-wrapper/api-guide/client.html" rel="canonical"/>
+<link href="project.html" rel="prev"/>
+<link href="tag.html" rel="next"/>
+<link href="../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.11" name="generator"/>
+<title>Client - Toggl API Wrapper</title>
+<link href="../assets/stylesheets/main.4af4bdda.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../assets/_mkdocstrings.css" rel="stylesheet"/>
+<link href="../stylesheet/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../assets/javascripts/glightbox.min.js"></script></link><link href="../assets/stylesheets/panzoom.css" rel="stylesheet"/><meta content='{"selectors": [".d2", ".mermaid"]}' name="panzoom-data"/><meta content="material" name="panzoom-theme"/></head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#toggl_api.ClientBody">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Toggl API Wrapper" class="md-header__button md-logo" data-md-component="logo" href=".." title="Toggl API Wrapper">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Toggl API Wrapper
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Client
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://www.github.com/ddkasa/toggl-api-wrapper" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
+</div>
+<div class="md-source__repository">
+    ddkasa/toggl-api-wrapper
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../index.html">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="index.html">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../CHANGELOG.html">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../CONTRIBUTING.html">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Toggl API Wrapper" class="md-nav__button md-logo" data-md-component="logo" href=".." title="Toggl API Wrapper">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Toggl API Wrapper
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://www.github.com/ddkasa/toggl-api-wrapper" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
+</div>
+<div class="md-source__repository">
+    ddkasa/toggl-api-wrapper
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../index.html">
+<span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../user-guide/installation.html">
+<span class="md-ellipsis">
+    Installation
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../user-guide/examples.html">
+<span class="md-ellipsis">
+    Examples
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="index.html">
+<span class="md-ellipsis">
+    API Reference
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="config.html">
+<span class="md-ellipsis">
+    Configuration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="endpoint.html">
+<span class="md-ellipsis">
+    Endpoint
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="cache.html">
+<span class="md-ellipsis">
+    Cache
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="exceptions.html">
+<span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="model.html">
+<span class="md-ellipsis">
+    Models
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="user.html">
+<span class="md-ellipsis">
+    User
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="organization.html">
+<span class="md-ellipsis">
+    Organization
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="workspace.html">
+<span class="md-ellipsis">
+    Workspace
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="tracker.html">
+<span class="md-ellipsis">
+    Trackers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="project.html">
+<span class="md-ellipsis">
+    Projects
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    Client
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="client.html">
+<span class="md-ellipsis">
+    Client
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> ClientBody
+    </span>
+</a>
+<nav aria-label=" ClientBody" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.name">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code> name
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.status">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code> status
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.format">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> format
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> ClientEndpoint
+    </span>
+</a>
+<nav aria-label=" ClientEndpoint" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.add">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> add
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.get">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> get
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.edit">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> edit
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.delete">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> delete
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.collect">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> collect
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> AsyncClientEndpoint
+    </span>
+</a>
+<nav aria-label=" AsyncClientEndpoint" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.add">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> add
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.get">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> get
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.edit">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> edit
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.delete">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> delete
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.collect">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> collect
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="tag.html">
+<span class="md-ellipsis">
+    Tags
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="reports.html">
+<span class="md-ellipsis">
+    Reports
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="utility.html">
+<span class="md-ellipsis">
+    Utilities
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../CHANGELOG.html">
+<span class="md-ellipsis">
+    Changelog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    About
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../CONTRIBUTING.html">
+<span class="md-ellipsis">
+    Contributing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../LICENSE.html">
+<span class="md-ellipsis">
+    License
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> ClientBody
+    </span>
+</a>
+<nav aria-label=" ClientBody" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.name">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code> name
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.status">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code> status
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientBody.format">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> format
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> ClientEndpoint
+    </span>
+</a>
+<nav aria-label=" ClientEndpoint" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.add">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> add
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.get">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> get
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.edit">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> edit
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.delete">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> delete
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.ClientEndpoint.collect">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> collect
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> AsyncClientEndpoint
+    </span>
+</a>
+<nav aria-label=" AsyncClientEndpoint" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.add">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> add
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.get">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> get
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.edit">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> edit
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.delete">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> delete
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#toggl_api.asyncio.AsyncClientEndpoint.collect">
+<span class="md-ellipsis">
+<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> collect
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://www.github.com/ddkasa/toggl-api-wrapper/blob/master/docs/api-guide/client.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+</a>
+<a class="md-content__button md-icon" href="https://www.github.com/ddkasa/toggl-api-wrapper/raw/master/docs/api-guide/client.md" title="View source of this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+</a>
+<h1>Client</h1>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="toggl_api.ClientBody">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <span class="doc doc-object-name doc-class-name">toggl_api.ClientBody</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.ClientBody" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="toggl_api.meta.BaseBody">BaseBody</span></code></p>
+<p>JSON body dataclass for PUT, POST &amp; PATCH requests.</p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">METHOD</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody.format" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;format&lt;/span&gt; (&lt;code&gt;toggl_api.ClientBody.format&lt;/code&gt;)'>format</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Format the body for JSON requests.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">ATTRIBUTE</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody.name" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-attribute"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-attribute-name"&gt;name&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-class-attribute"&gt;&lt;code&gt;class-attribute&lt;/code&gt;&lt;/small&gt;
+      &lt;small class="doc doc-label doc-label-instance-attribute"&gt;&lt;code&gt;instance-attribute&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.ClientBody.name&lt;/code&gt;)'>name</a></code></td>
+<td class="doc-attribute-details">
+<div class="doc-md-description">
+<p>Name of the client. Defaults to None. Will be required if its a POST request.</p>
+</div>
+<p>
+<span class="doc-attribute-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody.status" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-attribute"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-attribute-name"&gt;status&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-class-attribute"&gt;&lt;code&gt;class-attribute&lt;/code&gt;&lt;/small&gt;
+      &lt;small class="doc doc-label doc-label-instance-attribute"&gt;&lt;code&gt;instance-attribute&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.ClientBody.status&lt;/code&gt;)'>status</a></code></td>
+<td class="doc-attribute-details">
+<div class="doc-md-description">
+<p>Status of the client. API defaults to active. Premium Feature.</p>
+</div>
+<p>
+<span class="doc-attribute-annotation">
+<b>TYPE:</b>
+<code><span title="toggl_api._client.CLIENT_STATUS">CLIENT_STATUS</span> | None</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="toggl_api.ClientBody.name">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code> <span class="doc doc-object-name doc-attribute-name">name</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.ClientBody.name" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="&lt;code&gt;dataclasses.field&lt;/code&gt;">field</a></span><span class="p">(</span><span class="n"><span title="dataclasses.field(default)">default</span></span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Name of the client. Defaults to None. Will be required if its a POST request.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="toggl_api.ClientBody.status">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code> <span class="doc doc-object-name doc-attribute-name">status</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.ClientBody.status" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">status</span><span class="p">:</span> <span class="n"><span title="toggl_api._client.CLIENT_STATUS">CLIENT_STATUS</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="&lt;code&gt;dataclasses.field&lt;/code&gt;">field</a></span><span class="p">(</span><span class="n"><span title="dataclasses.field(default)">default</span></span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Status of the client. API defaults to active. Premium Feature.</p>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientBody.format">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">format</span>
+<a class="headerlink" href="#toggl_api.ClientBody.format" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nb">format</span><span class="p">(</span><span class="nf">endpoint</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="o">**</span><span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="&lt;code&gt;typing.Any&lt;/code&gt;">Any</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="&lt;code&gt;typing.Any&lt;/code&gt;">Any</a></span><span class="p">]</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Format the body for JSON requests.</p>
+<p>Gets called by the endpoint methods before requesting.</p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>endpoint</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>API endpoint for filtering purposes.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Any additonal body content that the endpoint request requires.
+If passing workspace id to client endpoints use 'wid' instead.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="&lt;code&gt;typing.Any&lt;/code&gt;">Any</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>{}</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="&lt;code&gt;typing.Any&lt;/code&gt;">Any</a>]</code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>JSON compatible formatted body.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="toggl_api.ClientEndpoint">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <span class="doc doc-object-name doc-class-name">toggl_api.ClientEndpoint</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" href="endpoint.html#toggl_api.meta.TogglCachedEndpoint" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.meta.TogglCachedEndpoint&lt;/span&gt;'>TogglCachedEndpoint</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a>]</code></p>
+<p>Specific endpoints for retrieving and modifying clients.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients">Official Documentation</a></p>
+<p><span class="doc-section-title">Examples:</span></p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">wid</span> <span class="o">=</span> <span class="mi">123213324</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client_endpoint</span> <span class="o">=</span> <span class="n">ClientEndpoint</span><span class="p">(</span><span class="n">wid</span><span class="p">,</span> <span class="n">BasicAuth</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">SqliteCache</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client_endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">214125562</span><span class="p">)</span>
+<span class="go">TogglClient(214125562, "Simplicidentata", workspace=123213324)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>workspace_id</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>The workspace the clients belong to.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglWorkspace" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglWorkspace&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglWorkspace&lt;/code&gt;)'>TogglWorkspace</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>auth</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Authentication for the client.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><span title="httpx.BasicAuth">BasicAuth</span></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>cache</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Cache object where the clients will stored and handled.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="cache.html#toggl_api.meta.cache.TogglCache" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.meta.cache.TogglCache&lt;/span&gt;'>TogglCache</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a>] | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>client</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Optional client to be passed to be used for requests. Useful
+when a global client is used and needs to be recycled.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><span title="httpx.Client">Client</span> | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>timeout</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>How long it takes for the client to timeout. Keyword Only.
+Defaults to 10 seconds.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><span title="httpx.Timeout">Timeout</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>10</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>re_raise</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to raise all HTTPStatusError errors and not handle them
+internally. Keyword Only.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>retries</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Max retries to attempt if the server returns a <em>5xx</em> status_code.
+Has no effect if re_raise is <code>True</code>. Keyword Only.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>3</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">METHOD</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientEndpoint.add" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;add&lt;/span&gt; (&lt;code&gt;toggl_api.ClientEndpoint.add&lt;/code&gt;)'>add</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Create a Client based on parameters set in the provided body.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientEndpoint.get" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;get&lt;/span&gt; (&lt;code&gt;toggl_api.ClientEndpoint.get&lt;/code&gt;)'>get</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Request a client based on its id.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientEndpoint.edit" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;edit&lt;/span&gt; (&lt;code&gt;toggl_api.ClientEndpoint.edit&lt;/code&gt;)'>edit</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Edit a client with the supplied parameters from the body.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientEndpoint.delete" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;delete&lt;/span&gt; (&lt;code&gt;toggl_api.ClientEndpoint.delete&lt;/code&gt;)'>delete</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Delete a client based on its ID.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.ClientEndpoint.collect" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;collect&lt;/span&gt; (&lt;code&gt;toggl_api.ClientEndpoint.collect&lt;/code&gt;)'>collect</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Request all Clients based on status and name if specified in the body.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ClientEndpoint</span><span class="p">(</span><span class="n">TogglCachedEndpoint</span><span class="p">[</span><span class="n">TogglClient</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""Specific endpoints for retrieving and modifying clients.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; wid = 123213324</span>
+<span class="sd">        &gt;&gt;&gt; client_endpoint = ClientEndpoint(wid, BasicAuth(...), SqliteCache(...))</span>
+<span class="sd">        &gt;&gt;&gt; client_endpoint.get(214125562)</span>
+<span class="sd">        TogglClient(214125562, "Simplicidentata", workspace=123213324)</span>
+
+<span class="sd">    Params:</span>
+<span class="sd">        workspace_id: The workspace the clients belong to.</span>
+<span class="sd">        auth: Authentication for the client.</span>
+<span class="sd">        cache: Cache object where the clients will stored and handled.</span>
+<span class="sd">        client: Optional client to be passed to be used for requests. Useful</span>
+<span class="sd">            when a global client is used and needs to be recycled.</span>
+<span class="sd">        timeout: How long it takes for the client to timeout. Keyword Only.</span>
+<span class="sd">            Defaults to 10 seconds.</span>
+<span class="sd">        re_raise: Whether to raise all HTTPStatusError errors and not handle them</span>
+<span class="sd">            internally. Keyword Only.</span>
+<span class="sd">        retries: Max retries to attempt if the server returns a *5xx* status_code.</span>
+<span class="sd">            Has no effect if re_raise is `True`. Keyword Only.</span>
+<span class="sd">    """</span>
+
+    <span class="n">MODEL</span> <span class="o">=</span> <span class="n">TogglClient</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workspace_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">TogglWorkspace</span><span class="p">,</span>
+        <span class="n">auth</span><span class="p">:</span> <span class="n">BasicAuth</span><span class="p">,</span>
+        <span class="n">cache</span><span class="p">:</span> <span class="n">TogglCache</span><span class="p">[</span><span class="n">TogglClient</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">client</span><span class="p">:</span> <span class="n">Client</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">Timeout</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">re_raise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">auth</span><span class="p">,</span>
+            <span class="n">cache</span><span class="p">,</span>
+            <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">re_raise</span><span class="o">=</span><span class="n">re_raise</span><span class="p">,</span>
+            <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span> <span class="o">=</span> <span class="n">workspace_id</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">workspace_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">workspace_id</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a Client based on parameters set in the provided body.</span>
+
+<span class="sd">        This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">        [Official Documentation](https://engineering.toggl.com/docs/api/clients#post-create-client)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            body: New parameters for the client to be created.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NamingError: If no name was set as its required.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Newly created client with specified parameters.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Name must be set in order to create a client!"</span>
+            <span class="k">raise</span> <span class="n">NamingError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">"TogglClient"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+                <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">"add"</span><span class="p">,</span> <span class="n">wid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span><span class="p">),</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">TogglClient</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Request a client based on its id.</span>
+
+<span class="sd">        [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-load-client-from-id)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            client_id: Which client to look for.</span>
+<span class="sd">            refresh: Whether to only check cache. It will default to True if id</span>
+<span class="sd">                is not found in cache. Defaults to False.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            HTTPStatusError: Any error that is not a 404 code or `re_raise` is True.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A TogglClient if the client was found else None.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+            <span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">client_id</span><span class="p">})</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_raise</span> <span class="ow">and</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">codes</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Client with id </span><span class="si">%s</span><span class="s2"> does not exist!"</span><span class="p">,</span> <span class="n">client_id</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"TogglClient"</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Edit a client with the supplied parameters from the body.</span>
+
+<span class="sd">        This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">        [Official Documentation](https://engineering.toggl.com/docs/api/clients#put-change-client)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            client: Target client to edit.</span>
+<span class="sd">            body: New parameters to use. Ignore client status.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Newly edited client or None if not found.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Client status not supported by edit endpoint"</span><span class="p">)</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">"TogglClient"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">"edit"</span><span class="p">,</span> <span class="n">wid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span><span class="p">),</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">PUT</span><span class="p">,</span>
+                <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Delete a client based on its ID.</span>
+
+<span class="sd">        This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">        [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            HTTPStatusError: If anything thats not an *ok* or *404* status code</span>
+<span class="sd">                is returned.</span>
+<span class="sd">        """</span>
+        <span class="n">client_id</span> <span class="o">=</span> <span class="n">client</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">client</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">DELETE</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_raise</span> <span class="ow">or</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">codes</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">"Client with id </span><span class="si">%s</span><span class="s2"> was either already deleted or did not exist in the first place!"</span><span class="p">,</span>
+                <span class="n">client_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">clt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">client</span><span class="p">})</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clt</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">clt</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TogglClient</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Client body 'status' parameter is not implemented with cache!"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">TogglQuery</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_cache</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TogglClient</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Request all Clients based on status and name if specified in the body.</span>
+
+<span class="sd">        [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            body: Status and name to target. Ignores notes. Ignores status if using cache.</span>
+<span class="sd">            refresh: Whether to refresh cache.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of clients. Empty if not found.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_cache</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"?</span><span class="si">{</span><span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="s2">"&amp;"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="s2">"?"</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"workspaces/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span><span class="si">}</span><span class="s2">/clients"</span>
+</code></pre></div></td></tr></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientEndpoint.add">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">add</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint.add" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Create a Client based on parameters set in the provided body.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#post-create-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>New parameters for the client to be created.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a></code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><a class="autorefs autorefs-internal" href="exceptions.html#toggl_api.NamingError" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.NamingError&lt;/span&gt; (&lt;code&gt;toggl_api._exceptions.NamingError&lt;/code&gt;)'>NamingError</a></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>If no name was set as its required.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>Newly created client with specified parameters.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a Client based on parameters set in the provided body.</span>
+
+<span class="sd">    This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients#post-create-client)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        body: New parameters for the client to be created.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NamingError: If no name was set as its required.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Newly created client with specified parameters.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Name must be set in order to create a client!"</span>
+        <span class="k">raise</span> <span class="n">NamingError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"TogglClient"</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">"add"</span><span class="p">,</span> <span class="n">wid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span><span class="p">),</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+            <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientEndpoint.get">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">get</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint.get" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
+    <span class="n">client_id</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Request a client based on its id.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#get-load-client-from-id">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>client_id</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Which client to look for.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>refresh</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to only check cache. It will default to True if id
+is not found in cache. Defaults to False.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><span title="httpx.HTTPStatusError">HTTPStatusError</span></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>Any error that is not a 404 code or <code>re_raise</code> is True.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a> | None</code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>A TogglClient if the client was found else None.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">TogglClient</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Request a client based on its id.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-load-client-from-id)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        client_id: Which client to look for.</span>
+<span class="sd">        refresh: Whether to only check cache. It will default to True if id</span>
+<span class="sd">            is not found in cache. Defaults to False.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPStatusError: Any error that is not a 404 code or `re_raise` is True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A TogglClient if the client was found else None.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+        <span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">client_id</span><span class="p">})</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_raise</span> <span class="ow">and</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">codes</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Client with id </span><span class="si">%s</span><span class="s2"> does not exist!"</span><span class="p">,</span> <span class="n">client_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"TogglClient"</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientEndpoint.edit">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">edit</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint.edit" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">edit</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Edit a client with the supplied parameters from the body.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#put-change-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>client</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Target client to edit.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>New parameters to use. Ignore client status.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a></code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>Newly edited client or None if not found.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TogglClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Edit a client with the supplied parameters from the body.</span>
+
+<span class="sd">    This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients#put-change-client)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        client: Target client to edit.</span>
+<span class="sd">        body: New parameters to use. Ignore client status.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Newly edited client or None if not found.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Client status not supported by edit endpoint"</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"TogglClient"</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">"edit"</span><span class="p">,</span> <span class="n">wid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_id</span><span class="p">),</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">PUT</span><span class="p">,</span>
+            <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientEndpoint.delete">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">delete</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint.delete" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">delete</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Delete a client based on its ID.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#delete-delete-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><span title="httpx.HTTPStatusError">HTTPStatusError</span></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>If anything thats not an <em>ok</em> or <em>404</em> status code
+is returned.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">TogglClient</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Delete a client based on its ID.</span>
+
+<span class="sd">    This endpoint always hit the external API in order to keep clients consistent.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients#delete-delete-client)</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPStatusError: If anything thats not an *ok* or *404* status code</span>
+<span class="sd">            is returned.</span>
+<span class="sd">    """</span>
+    <span class="n">client_id</span> <span class="o">=</span> <span class="n">client</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">client</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">client_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">DELETE</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_raise</span> <span class="ow">or</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">codes</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">"Client with id </span><span class="si">%s</span><span class="s2"> was either already deleted or did not exist in the first place!"</span><span class="p">,</span>
+            <span class="n">client_id</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">client</span><span class="p">})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clt</span><span class="p">,</span> <span class="n">TogglClient</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">clt</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.ClientEndpoint.collect">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">collect</span>
+<a class="headerlink" href="#toggl_api.ClientEndpoint.collect" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">collect</span><span class="p">(</span>
+    <span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a></span><span class="p">]</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Request all Clients based on status and name if specified in the body.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#get-list-clients">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Status and name to target. Ignores notes. Ignores status if using cache.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api._client.ClientBody&lt;/code&gt;)'>ClientBody</a> | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>refresh</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to refresh cache.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.models.TogglClient&lt;/code&gt;)'>TogglClient</a>]</code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>A list of clients. Empty if not found.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/toggl_api/_client.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">body</span><span class="p">:</span> <span class="n">ClientBody</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TogglClient</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Request all Clients based on status and name if specified in the body.</span>
+
+<span class="sd">    [Official Documentation](https://engineering.toggl.com/docs/api/clients#get-list-clients)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        body: Status and name to target. Ignores notes. Ignores status if using cache.</span>
+<span class="sd">        refresh: Whether to refresh cache.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of clients. Empty if not found.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_cache</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span>
+    <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"?</span><span class="si">{</span><span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">body</span> <span class="ow">and</span> <span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">"&amp;"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">"?"</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <span class="doc doc-object-name doc-class-name">toggl_api.asyncio.AsyncClientEndpoint</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" href="endpoint.html#toggl_api.asyncio.TogglAsyncCachedEndpoint" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.asyncio.TogglAsyncCachedEndpoint&lt;/span&gt; (&lt;code&gt;toggl_api.asyncio._async_endpoint.TogglAsyncCachedEndpoint&lt;/code&gt;)'>TogglAsyncCachedEndpoint</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a>]</code></p>
+<p>Specific endpoints for retrieving and modifying clients.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients">Official Documentation</a></p>
+<p><span class="doc-section-title">Examples:</span></p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">wid</span> <span class="o">=</span> <span class="mi">123213324</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client_endpoint</span> <span class="o">=</span> <span class="n">AsyncClientEndpoint</span><span class="p">(</span><span class="n">wid</span><span class="p">,</span> <span class="n">BasicAuth</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">AsyncSqliteCache</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">client_endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">214125562</span><span class="p">)</span>
+<span class="go">TogglClient(214125562, "Simplicidentata", workspace=123213324)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>workspace_id</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>The workspace the clients belong to.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglWorkspace" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglWorkspace&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglWorkspace</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>auth</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Authentication for the client.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><span title="httpx.BasicAuth">BasicAuth</span></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>cache</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Cache object where the clients will stored and handled.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="cache.html#toggl_api.asyncio.AsyncSqliteCache" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.asyncio.AsyncSqliteCache&lt;/span&gt; (&lt;code&gt;toggl_api.asyncio._async_sqlite_cache.AsyncSqliteCache&lt;/code&gt;)'>AsyncSqliteCache</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a>] | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>client</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Optional async client to be passed to be used for requests.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><span title="httpx.AsyncClient">AsyncClient</span> | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>timeout</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>How long it takes for the client to timeout. Keyword Only.
+Defaults to 10 seconds.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>10</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>re_raise</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to raise all HTTPStatusError errors and not handle them
+internally. Keyword Only.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>retries</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Max retries to attempt if the server returns a <em>5xx</em> status_code.
+Has no effect if re_raise is <code>True</code>. Keyword Only.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>3</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">METHOD</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.asyncio.AsyncClientEndpoint.add" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;add&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-async"&gt;&lt;code&gt;async&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.asyncio.AsyncClientEndpoint.add&lt;/code&gt;)'>add</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Create a Client based on parameters set in the provided body.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.asyncio.AsyncClientEndpoint.get" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;get&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-async"&gt;&lt;code&gt;async&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.asyncio.AsyncClientEndpoint.get&lt;/code&gt;)'>get</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Request a client based on its id.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.asyncio.AsyncClientEndpoint.edit" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;edit&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-async"&gt;&lt;code&gt;async&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.asyncio.AsyncClientEndpoint.edit&lt;/code&gt;)'>edit</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Edit a client with the supplied parameters from the body.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.asyncio.AsyncClientEndpoint.delete" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;delete&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-async"&gt;&lt;code&gt;async&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.asyncio.AsyncClientEndpoint.delete&lt;/code&gt;)'>delete</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Delete a client based on its ID.</p>
+</div>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td><code><a class="autorefs autorefs-internal" href="#toggl_api.asyncio.AsyncClientEndpoint.collect" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-method"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-function-name"&gt;collect&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-async"&gt;&lt;code&gt;async&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;toggl_api.asyncio.AsyncClientEndpoint.collect&lt;/code&gt;)'>collect</a></code></td>
+<td class="doc-function-details">
+<div class="doc-md-description">
+<p>Request all Clients based on status and name if specified in the body.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="doc doc-children">
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint.add">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">add</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-async"><code>async</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint.add" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Create a Client based on parameters set in the provided body.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#post-create-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>New parameters for the client to be created.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a></code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><a class="autorefs autorefs-internal" href="exceptions.html#toggl_api.NamingError" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.NamingError&lt;/span&gt;'>NamingError</a></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>If no name was set as its required.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>Newly created client with specified parameters.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint.get">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">get</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-async"><code>async</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint.get" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
+    <span class="n">client_id</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Request a client based on its id.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#get-load-client-from-id">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>client_id</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Which client to look for.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>refresh</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to only check cache. It will default to True if id
+is not found in cache. Defaults to False.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><span title="httpx.HTTPStatusError">HTTPStatusError</span></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>If anything thats not 'ok' or a 404 is returned.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a> | None</code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>A TogglClient if the client was found else None.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint.edit">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">edit</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-async"><code>async</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint.edit" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">edit</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Edit a client with the supplied parameters from the body.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#put-change-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>client</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Target client to edit.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>New parameters to use. Ignore client status.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a></code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>Newly edited client or None if not found.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint.delete">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">delete</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-async"><code>async</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint.delete" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">delete</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Delete a client based on its ID.</p>
+<p>This endpoint always hit the external API in order to keep clients consistent.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#delete-delete-client">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RAISES</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-raises-annotation">
+<code><span title="httpx.HTTPStatusError">HTTPStatusError</span></code>
+</span>
+</td>
+<td class="doc-raises-details">
+<div class="doc-md-description">
+<p>If anything thats not an <em>ok</em> or <em>404</em> status code
+is returned.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="toggl_api.asyncio.AsyncClientEndpoint.collect">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <span class="doc doc-object-name doc-function-name">collect</span>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-async"><code>async</code></small>
+</span>
+<a class="headerlink" href="#toggl_api.asyncio.AsyncClientEndpoint.collect" title="Permanent link">¶</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">collect</span><span class="p">(</span>
+    <span class="n">body</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a></span><span class="p">]</span>
+</code></pre></div>
+<div class="doc doc-contents">
+<p>Request all Clients based on status and name if specified in the body.</p>
+<p><a href="https://engineering.toggl.com/docs/api/clients#get-list-clients">Official Documentation</a></p>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">PARAMETER</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>body</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Status and name to target. Ignores notes. Ignores status if using cache.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-internal" href="#toggl_api.ClientBody" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.ClientBody&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>ClientBody</a> | None</code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>None</code>
+</span>
+</p>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>refresh</code>
+</td>
+<td class="doc-param-details">
+<div class="doc-md-description">
+<p>Whether to refresh cache.</p>
+</div>
+<p>
+<span class="doc-param-annotation">
+<b>TYPE:</b>
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+</span>
+<span class="doc-param-default">
+<b>DEFAULT:</b>
+<code>False</code>
+</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><span class="doc-section-title">RETURNS</span></th>
+<th><span>DESCRIPTION</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<span class="doc-returns-annotation">
+<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" href="model.html#toggl_api.TogglClient" title='&lt;code class="doc-symbol doc-symbol-heading doc-symbol-class"&gt;&lt;/code&gt;            &lt;span class="doc doc-object-name doc-class-name"&gt;toggl_api.TogglClient&lt;/span&gt;
+
+
+  &lt;span class="doc doc-labels"&gt;
+      &lt;small class="doc doc-label doc-label-dataclass"&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt;'>TogglClient</a>]</code>
+</span>
+</td>
+<td class="doc-returns-details">
+<div class="doc-md-description">
+<p>A list of clients. Empty if not found.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Projects" class="md-footer__link md-footer__link--prev" href="project.html">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                Projects
+              </div>
+</div>
+</a>
+<a aria-label="Next: Tags" class="md-footer__link md-footer__link--next" href="tag.html">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                Tags
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2025 David Kasakaitis
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.code.select", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script><script src="../assets/javascripts/panzoom.min.js"></script><script src="../assets/javascripts/zoompan.js"></script></body>
+</html>
